@@ -201,6 +201,22 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Local project artifacts
+.idea/
+build/
+dist/
+EmissorCurto/
+EmissorCurto.zip
+compras_app/os_emitidas/
+compras_app/pedidos_emitidos/
+compras_app/data/emissor_documentos.log
+compras_app/data/historico_oc.json
+compras_app/data/oc_counter.txt
+compras_app/data/os_counter.txt
+compras_app/data/oc_import.json
+compras_app/data/os_import.json
+compras_app/data/settings.json
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

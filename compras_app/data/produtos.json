@@ -1,0 +1,6158 @@
+{
+  "4-0001": {
+    "descricao": "JI CONFORT 517 14 M SELADO PLUS",
+    "unidade": "TF"
+  },
+  "4-0002": {
+    "descricao": "JI CONFORT 517 14 M SELADO ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0003": {
+    "descricao": "JI CONFORT 517 14 M VISTA ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0004": {
+    "descricao": "JI CONFORT 517 14 M VISTA PLUS",
+    "unidade": "TF"
+  },
+  "4-0005": {
+    "descricao": "JI CONFORT 517 14 M VITRE REVESTIDA",
+    "unidade": "TF"
+  },
+  "4-0006": {
+    "descricao": "JI CONFORT 517 15 M SELADO ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0007": {
+    "descricao": "JI CONFORT E/J TA SELADO",
+    "unidade": "TF"
+  },
+  "4-0008": {
+    "descricao": "JI CONFORT E/J TA VISTA",
+    "unidade": "TF"
+  },
+  "4-0009": {
+    "descricao": "JI CONFORT 417 10 M SELADO ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0010": {
+    "descricao": "JI CONFORT 417 10 M SELADO PLUS",
+    "unidade": "TF"
+  },
+  "4-0011": {
+    "descricao": "JI CONFORT 417 10 M VISTA ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0012": {
+    "descricao": "JI CONFORT 417 10 M VISTA PLUS",
+    "unidade": "TF"
+  },
+  "4-0013": {
+    "descricao": "JI CONFORT 417 10 M VITRE REVESTIDA",
+    "unidade": "TF"
+  },
+  "4-0014": {
+    "descricao": "JI CONFORT 417 14 M SELADO ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0015": {
+    "descricao": "JI CONFORT 417 14 M SELADO PLUS",
+    "unidade": "TF"
+  },
+  "4-0016": {
+    "descricao": "JI CONFORT 417 14 M VISTA ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0017": {
+    "descricao": "JI CONFORT 417 14 M VISTA PLUS",
+    "unidade": "TF"
+  },
+  "4-0018": {
+    "descricao": "JI CONFORT 417 14 M VITRE REVESTIDA",
+    "unidade": "TF"
+  },
+  "4-0019": {
+    "descricao": "JI CONFORT 517 15 M SELADO PLUS",
+    "unidade": "TF"
+  },
+  "4-0020": {
+    "descricao": "JI CONFORT 517 15 M VISTA ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0021": {
+    "descricao": "JI CONFORT 517 15 M VISTA PLUS",
+    "unidade": "TF"
+  },
+  "4-0022": {
+    "descricao": "JI CONFORT 517 15 M VITRE REVESTIDA",
+    "unidade": "TF"
+  },
+  "4-0023": {
+    "descricao": "JI CONFORT B/J/D SELADO",
+    "unidade": "TF"
+  },
+  "4-0024": {
+    "descricao": "JI CONFORT B/J/D VISTA",
+    "unidade": "TF"
+  },
+  "4-0025": {
+    "descricao": "JI CONFORT B/J/D VITRE ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0026": {
+    "descricao": "JI CONFORT E/J TA VITRE ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0027": {
+    "descricao": "JI CONFORT E/S/J TB SELADO",
+    "unidade": "TF"
+  },
+  "4-0028": {
+    "descricao": "JI CONFORT E/S/J TB VISTA",
+    "unidade": "TF"
+  },
+  "4-0029": {
+    "descricao": "JI CONFORT E/S/J TB VITRE ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0030": {
+    "descricao": "JI CONFORT IVECO 50 VITRE ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0031": {
+    "descricao": "JI CONFORT MASTER L1H1 SELADO",
+    "unidade": "TF"
+  },
+  "4-0032": {
+    "descricao": "JI CONFORT MASTER L2H2 SELADO ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0033": {
+    "descricao": "JI CONFORT MASTER L2H2 SELADO PLUS",
+    "unidade": "TF"
+  },
+  "4-0034": {
+    "descricao": "JI CONFORT MASTER L2H2 VISTA ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0035": {
+    "descricao": "JI CONFORT MASTER L2H2 VISTA PLUS",
+    "unidade": "TF"
+  },
+  "4-0036": {
+    "descricao": "JI CONFORT MASTER L3H2 SELADO ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0037": {
+    "descricao": "JI CONFORT MASTER L3H2 SELADO PLUS",
+    "unidade": "TF"
+  },
+  "4-0038": {
+    "descricao": "JI CONFORT MASTER L3H2 VISTA ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0039": {
+    "descricao": "JI CONFORT MASTER L3H2 VISTA PLUS",
+    "unidade": "TF"
+  },
+  "4-0040": {
+    "descricao": "JI CONFORT MASTER L3H2 VITRE ESSENCIAL",
+    "unidade": "TF"
+  },
+  "4-0041": {
+    "descricao": "JI CONFORT MASTER L3H2 VITRE PLUS",
+    "unidade": "TF"
+  },
+  "4-0042": {
+    "descricao": "JI CONFORT TRANSIT L3H2 VITRE",
+    "unidade": "TF"
+  },
+  "4-0043": {
+    "descricao": "JI CONFORT TRANSIT L3H3 SELADO",
+    "unidade": "TF"
+  },
+  "4-0044": {
+    "descricao": "JI CONFORT TRANSIT L3H3 VISTA",
+    "unidade": "TF"
+  },
+  "4-0045": {
+    "descricao": "JI CONFORT TRANSIT L4H3 VITRE",
+    "unidade": "TF"
+  },
+  "4-0046": {
+    "descricao": "JI URBAN E/J TA SELADO",
+    "unidade": "TF"
+  },
+  "4-0047": {
+    "descricao": "JI URBAN E/J TA VISTA",
+    "unidade": "TF"
+  },
+  "4-0048": {
+    "descricao": "JI URBAN E/J TA VITRE",
+    "unidade": "TF"
+  },
+  "4-0049": {
+    "descricao": "JI URBAN E/S/J TB SELADO",
+    "unidade": "TF"
+  },
+  "4-0050": {
+    "descricao": "JI URBAN E/S/J TB VISTA",
+    "unidade": "TF"
+  },
+  "4-0051": {
+    "descricao": "JI URBAN E/S/J TB VITRE",
+    "unidade": "TF"
+  },
+  "4-0052": {
+    "descricao": "JI URBAN TRANSIT L3H2 VITRE",
+    "unidade": "TF"
+  },
+  "3-0001": {
+    "descricao": "CJ BANCOS ESCOLAR - LS - 5,4,4,4 - ESCOLAR - 2P - COURVIN JI - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0002": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1E, 1E, 1 D - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0003": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,4 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0004": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3, 4 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0005": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 PME 1 A - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0006": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D, 3,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0007": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0008": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0009": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0010": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,4 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0011": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,4 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0012": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,4 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0013": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1D,1D,3,4 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0014": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1E,1D,1 D - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0015": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1E,1D,1 D - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0016": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1E,1D,1 D - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0017": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E,1E,1E,1D,1 D - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0018": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,2,2-1 - FIXO - 2P - TECIDO - EXPERT ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0019": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,2,3 - FIXO - 2P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0020": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,2,3 - FIXO - 2P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0021": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,2,3 - FIXO - 3P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0022": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,2,3 - FIXO - 3P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0023": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 2P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0024": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 2P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0025": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 3P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0026": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 3P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0027": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0028": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0029": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0030": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0031": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,2-1,2,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0032": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,2-1,2,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0033": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,2-1,2,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0034": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,2-1,2,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0035": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,2-1,2,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0036": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,3,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0037": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2-1,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0038": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,2,2-1 - FIXO - 2P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0039": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,2,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0040": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,2,2-1 - FIXO - 3P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0041": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,2,2-1 - FIXO - 3P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0042": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0043": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0044": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0045": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0046": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - FIXO - 2P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0047": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0048": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0049": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - FIXO - 3P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0050": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - FIXO - 3P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0051": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0052": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0053": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0054": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0055": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0056": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0057": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0058": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0059": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,4 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0060": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,4 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0061": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,4 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0062": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,4 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0063": {
+    "descricao": "CJ BANCOS FIXOS - LB - 5,3,3,4 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0064": {
+    "descricao": "CJ BANCOS FIXOS - LB - 5,3,3,4 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0065": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1D, 3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0066": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1D, 3, 3, 4 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0067": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1E, 1D, 1 D - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0068": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1E, 1E, 1E, 1D, 1 D - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0069": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1E, 1E, 1E, 1D, 1D, 1D, 3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0070": {
+    "descricao": "CJ BANCOS FIXOS - LB - 1E, 1E, 1E, 1E, 1D, 1D, 1D, 4 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0071": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0072": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,2,2 - FIXO - 3P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0073": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,3,4 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0074": {
+    "descricao": "CJ BANCOS FIXOS - LB - 3,4 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0075": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0076": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,2-1 - FIXO - 3P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0077": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,3 - FIXO - 2P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0078": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,3 - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0079": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,3 - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0080": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,3 - FIXO - 3P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0081": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,3 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0082": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1,2,3,3,3 - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0083": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - FIXO - 2P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0084": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,2-1 - REC - 2P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0085": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 PME 1 A - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0086": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 PME 2 A - FIXO - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0087": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,2-1 - FIXO - 2P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0088": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0089": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,2-1 - FIXO - 3P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0090": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,2-1 - FIXO - 3P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0091": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3,3 PME 1 A - FIXO - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0092": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0093": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,4 - FIXO - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0094": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0095": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,2-1 - FIXO - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0096": {
+    "descricao": "CJ BANCOS FIXOS - LB - 4,3,3,3 PME 2 A - FIXO - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0097": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1D, 3, 3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0098": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1D, 3, 3, 4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0099": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1D, 3, 3, 4 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0100": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 5 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0101": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1E, 1E, 1D, 1 D - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0102": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1E, 1E, 1D, 1D, 1D, 3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0103": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0104": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0105": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0106": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0107": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 4 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0108": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0109": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 4 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0110": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1D, 1D, 3, 4 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0111": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1E, 1D, 1 D - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0112": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1E, 1D, 1 D - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0113": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1E, 1D, 1 D - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0114": {
+    "descricao": "CJ BANCOS REC - LB - 1E, 1E, 1E, 1D, 1 D - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0115": {
+    "descricao": "CJ BANCOS REC - LB - 3,2,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0116": {
+    "descricao": "CJ BANCOS REC - LB - 3,2,2-1 - REC - 3P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0117": {
+    "descricao": "CJ BANCOS REC - LB - 3,2,3 - REC - 2P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0118": {
+    "descricao": "CJ BANCOS REC - LB - 3,2,3 - REC - 2P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0119": {
+    "descricao": "CJ BANCOS REC - LB - 3,2,3 - REC - 3P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0120": {
+    "descricao": "CJ BANCOS REC - LB - 3,2,3 - REC - 3P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0121": {
+    "descricao": "CJ BANCOS REC - LB - 3,3,3,4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0122": {
+    "descricao": "CJ BANCOS REC - LB - 3,3,4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0123": {
+    "descricao": "CJ BANCOS REC - LB - 3,4 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0124": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 2P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0125": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 2P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0126": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 3P - COURVIN - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0127": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 3P - TECIDO - EXPERT",
+    "unidade": "CJ"
+  },
+  "3-0128": {
+    "descricao": "CJ BANCOS REC - LB - 3,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0129": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0130": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0131": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0132": {
+    "descricao": "CJ BANCOS REC - LB - 3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0133": {
+    "descricao": "CJ BANCOS REC - LB - 4,1 D PME 1 A - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0134": {
+    "descricao": "CJ BANCOS REC - LB - 4,2,2-1,3,3,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0135": {
+    "descricao": "CJ BANCOS REC - LB - 4,2,2-1,3,3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0136": {
+    "descricao": "CJ BANCOS REC - LB - 4,2,2-1,3,3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0137": {
+    "descricao": "CJ BANCOS REC - LB - 4,2,2-1,3,3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0138": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0139": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,2-1 - REC - 3P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0140": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,3 - REC - 2P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0141": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0142": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0143": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,3 - REC - 3P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0144": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0145": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2,3,3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0146": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0147": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0148": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0149": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0150": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0151": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,3 PME 1 A - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0152": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2-1,2,3 PME 2 A - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0153": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,3 PME 2 A - REC - 2P - TECIDO - AERONAUTICA",
+    "unidade": "CJ"
+  },
+  "3-0154": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,3,3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0155": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0156": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,3,3 PME 1 A - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0157": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,3,3 PME 2 A - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0158": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,3,4 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0159": {
+    "descricao": "CJ BANCOS REC - LB - 4,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0160": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0161": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 PME 1 A - REC - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0162": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 PME 2 A - REC - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0163": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 PME 1 A - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0164": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 PME 2 A - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0165": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 PME 2 A - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0166": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 PME 2 A - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0167": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,2-1 - REC - 2P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0168": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0169": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,2-1 - REC - 3P - COURVIN - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0170": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,2-1 - REC - 3P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0171": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,4 PME 2 A - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0172": {
+    "descricao": "CJ BANCOS REC - LB - 4,2-1,2-1,2,2,2-1 - REC - 3P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0173": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,2,2-1 - REC - 2P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0174": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,2,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0175": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,2,2-1 - REC - 3P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0176": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,2,2-1 - REC - 3P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0177": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0178": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0179": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0180": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0181": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 - REC - 2P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0182": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0183": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 - REC - 2P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0184": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 - REC - 3P - COURVIN - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0185": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 - REC - 3P - TECIDO - ACESSIBILIDADE ELEVITTA",
+    "unidade": "CJ"
+  },
+  "3-0186": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,2-1 - REC - 3P - TECIDO - ACESSIBILIDADE FOCA",
+    "unidade": "CJ"
+  },
+  "3-0187": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0188": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0189": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0190": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0191": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3 PME 1 A - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0192": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,3 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0193": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,3 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0194": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0195": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,3 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0196": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,4 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0197": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0198": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,4 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0199": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,3,4 - REC - 3P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0200": {
+    "descricao": "CJ BANCOS REC - LB - 4,3,3,4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0201": {
+    "descricao": "CJ BANCOS REC - LB - 5,3,3,4 - REC - 2P - COURVIN - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0202": {
+    "descricao": "CJ BANCOS REC - LB - 5,3,3,4 - REC - 2P - TECIDO - NORMAL",
+    "unidade": "CJ"
+  },
+  "3-0203": {
+    "descricao": "CJ BANCOS REC - LE - 2,2,2,1 (CAB) - REC - 3P - COURVIN - EXECUTIVO",
+    "unidade": "CJ"
+  },
+  "3-0204": {
+    "descricao": "CJ BANCOS REC - LE - 3,1,1 - GIRATORIO - REC - 3P - COURVIN - EXECUTIVO",
+    "unidade": "CJ"
+  },
+  "3-0205": {
+    "descricao": "CJ BANCOS REC - LE - 3,2,2 - REC - 3P - COURVIN - EXECUTIVO",
+    "unidade": "CJ"
+  },
+  "3-0206": {
+    "descricao": "CJ BANCOS REC - LE - 3,2,3 - REC - 3P - TECIDO - EXECUTIVO",
+    "unidade": "CJ"
+  },
+  "3-0207": {
+    "descricao": "CJ BANCOS REC - LE - 3,3 - REC - 3P - COURVIN - EXECUTIVO",
+    "unidade": "CJ"
+  },
+  "1-0001": {
+    "descricao": "BCO ESCOLAR 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN JI",
+    "unidade": "Un"
+  },
+  "1-0002": {
+    "descricao": "BCO ESCOLAR 4 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN JI",
+    "unidade": "Un"
+  },
+  "1-0003": {
+    "descricao": "BCO ESCOLAR 5 L S/ AP BRACO LD 370MM TRAS CX RODAS 2P COURVIN JI",
+    "unidade": "Un"
+  },
+  "1-0004": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LD / LE 70MM ELEVITTA 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0005": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LD / LE 70MM ELEVITTA 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0006": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LD / LE 70MM FOCA BRAUN 3 P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0007": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LD / LE 70MM FOCA BRAUN 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0008": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0009": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0010": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0011": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0012": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0013": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0014": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0015": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0016": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0017": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0018": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0019": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0020": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0021": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0022": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0023": {
+    "descricao": "BCO FIXO 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0024": {
+    "descricao": "BCO FIXO 1 L CAB MASTER TECIDO",
+    "unidade": "Un"
+  },
+  "1-0025": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0026": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0027": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0028": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0029": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0030": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0031": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0032": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0033": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0034": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0035": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0036": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0037": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0038": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0039": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0040": {
+    "descricao": "BCO FIXO 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0041": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 210MM 2º FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0042": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 210MM 2º FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0043": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 210MM 2º FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0044": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 210MM 2º FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0045": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FOCA BRAUN 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0046": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FOCA BRAUN 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0047": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FOCA BRAUN 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0048": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FOCA BRAUN 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0049": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0050": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0051": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0052": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0053": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0054": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0055": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0056": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0057": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0058": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0059": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0060": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0061": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0062": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0063": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0064": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0065": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 70MM ELEVITTA 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0066": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 70MM ELEVITTA 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0067": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 70MM ELEVITTA 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0068": {
+    "descricao": "BCO FIXO 2 L C/ AP BRACO LD 70MM ELEVITTA 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0069": {
+    "descricao": "BCO FIXO 2 L DIR C/ AP BRACO LE 370MM ATRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0070": {
+    "descricao": "BCO FIXO 2 L DIR C/ AP BRACO LE 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0071": {
+    "descricao": "BCO FIXO 2 L DIR C/ AP BRACO LE 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0072": {
+    "descricao": "BCO FIXO 2 L LD C/ AP BRACO LE 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0073": {
+    "descricao": "BCO FIXO 3 L ( 2FIXO / 1 REB ) C/ AP BRACO 210MM 1º FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0074": {
+    "descricao": "BCO FIXO 3 L ( 2FIXO / 1 REB ) C/ AP BRACO 210MM 1º FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0075": {
+    "descricao": "BCO FIXO 3 L ( 2FIXO / 1 REB ) C/ AP BRACO 210MM 1º FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0076": {
+    "descricao": "BCO FIXO 3 L ( 2FIXO / 1 REB ) C/ AP BRACO 210MM 1º FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0077": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 100MM PME 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0078": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 100MM PME 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0079": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0080": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0081": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0082": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0083": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0084": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0085": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0086": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0087": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0088": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0089": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0090": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0091": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 330MM CONTRA MARCHA 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0092": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 330MM CONTRA MARCHA 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0093": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0094": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0095": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0096": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0097": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0098": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0099": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0100": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0101": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0102": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0103": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0104": {
+    "descricao": "BCO FIXO 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0105": {
+    "descricao": "BCO FIXO 3 L S/ AP BRACO 210MM 3º FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0106": {
+    "descricao": "BCO FIXO 3 L S/ AP BRACO 210MM 3º FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0107": {
+    "descricao": "BCO FIXO 3 L S/ AP BRACO 210MM 3º FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0108": {
+    "descricao": "BCO FIXO 3 L S/ AP BRACO 210MM 3º FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0109": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS (LASER) 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0110": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS (LASER) 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0111": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS (LASER) 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0112": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS (LASER) 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0113": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0114": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0115": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0116": {
+    "descricao": "BCO FIXO 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0117": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0118": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0119": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO LD 100MM PME 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0120": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO LD 100MM PME 2P TECIDO (P C 1421)",
+    "unidade": "Un"
+  },
+  "1-0121": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO LD 100MM PME 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0122": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO LD 100MM PME 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0123": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO LD 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0124": {
+    "descricao": "BCO FIXO 4 L S/ AP BRACO LD 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0125": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 100MM PME 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0126": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 100MM PME 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0127": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 100MM PME 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0128": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 100MM PME 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0129": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0130": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0131": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0132": {
+    "descricao": "BCO FIXO/RECLIN 4 L S/ AP BRACO 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0133": {
+    "descricao": "BCO INTERICO FIXO 5 L S/ AP BRACO 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0134": {
+    "descricao": "BCO INTERICO FIXO 5 L S/ AP BRACO 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0135": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LD / LE 70MM FOCA BRAUN 3 P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0136": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LD / LE 70MM FOCA BRAUN 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0137": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0138": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0139": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0140": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0141": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0142": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0143": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0144": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0145": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0146": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0147": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0148": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0149": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0150": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0151": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0152": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0153": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 65MM PME 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0154": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 65MM PME 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0155": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 65MM PME 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0156": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LE 65MM PME 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0157": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0158": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0159": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0160": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0161": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0162": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0163": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0164": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0165": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0166": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0167": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0168": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0169": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0170": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LD 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0171": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LE 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0172": {
+    "descricao": "BCO RECLINAVEL 1 L ESQ C/ AP BRACO LE 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0173": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LD / LE 70MM ELEVITTA 3 P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0174": {
+    "descricao": "BCO RECLINAVEL 1 L C/ AP BRACO LD / LE 70MM ELEVITTA 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0175": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 210MM 2ª FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0176": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 210MM 2ª FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0177": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 210MM 2ª FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0178": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 210MM 2ª FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0179": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 330MM FOCA BRAUN 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0180": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 330MM FOCA BRAUN 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0181": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 330MM FOCA BRAUN 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0182": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 330MM FOCA BRAUN 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0183": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0184": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0185": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0186": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0187": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0188": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0189": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0190": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0191": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0192": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0193": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0194": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0195": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0196": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 370MM TRAS CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0197": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 65MM PME 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0198": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 65MM PME 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0199": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 65MM PME 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0200": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 65MM PME 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0201": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 70MM ELEVITTA 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0202": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 70MM ELEVITTA 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0203": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 70MM ELEVITTA 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0204": {
+    "descricao": "BCO RECLINAVEL 2 L C/ AP BRACO LD 70MM ELEVITTA 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0205": {
+    "descricao": "BCO RECLINAVEL 2 L CAB MASTER 3P CENTRAL COURVIN",
+    "unidade": "Un"
+  },
+  "1-0206": {
+    "descricao": "BCO RECLINAVEL 2 L CAB MASTER 3P CENTRAL TECIDO",
+    "unidade": "Un"
+  },
+  "1-0207": {
+    "descricao": "BCO RECLINAVEL 3 L ( 2REC / 1 REB ) C/ AP BRACO 210MM 1ª FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0208": {
+    "descricao": "BCO RECLINAVEL 3 L ( 2REC / 1 REB ) C/ AP BRACO 210MM 1ª FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0209": {
+    "descricao": "BCO RECLINAVEL 3 L ( 2REC / 1 REB ) C/ AP BRACO 210MM 1ª FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0210": {
+    "descricao": "BCO RECLINAVEL 3 L ( 2REC / 1 REB ) C/ AP BRACO 210MM 1ª FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0211": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) C/ AP BRACO 210MM 2ª FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0212": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) C/ AP BRACO 210MM 2ª FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0213": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) C/ AP BRACO 210MM 2ª FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0214": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) C/ AP BRACO 210MM 2ª FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0215": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) S/ AP BRACO 210MM 2ª FIL EXPERT 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0216": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) S/ AP BRACO 210MM 2ª FIL EXPERT 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0217": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) S/ AP BRACO 210MM 2ª FIL EXPERT 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0218": {
+    "descricao": "BCO RECLINAVEL 3 L ( S/ REBATI ) S/ AP BRACO 210MM 2ª FIL EXPERT 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0219": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 100MM PME 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0220": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 100MM PME 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0221": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 100MM PME 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0222": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 100MM PME RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0223": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0224": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0225": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0226": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0227": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0228": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0229": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0230": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0231": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0232": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0233": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0234": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LD 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0235": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0236": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0237": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0238": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 330MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0239": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0240": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0241": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0242": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0243": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0244": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0245": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0246": {
+    "descricao": "BCO RECLINAVEL 3 L C/ AP BRACO LE 370MM SOBRE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0247": {
+    "descricao": "BCO RECLINAVEL 4 L C/ AP BRACO LD 330MM 3 PES FRENTE CX RODAS 3P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0248": {
+    "descricao": "BCO RECLINAVEL 4 L C/ AP BRACO LD 330MM 3 PES FRENTE CX RODAS 3P TECIDO",
+    "unidade": "Un"
+  },
+  "1-0249": {
+    "descricao": "BCO RECLINAVEL 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P COURVIN",
+    "unidade": "Un"
+  },
+  "1-0250": {
+    "descricao": "BCO RECLINAVEL 4 L C/ AP BRACO LD 330MM FRENTE CX RODAS 2P TECIDO",
+    "unidade": "Un"
+  },
+  "3-0208": {
+    "descricao": "CJ VIDROS SELADO MASTER L2H2 - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0251": {
+    "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0252": {
+    "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0253": {
+    "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LD 1357x630 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0254": {
+    "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LE 1357x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0255": {
+    "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0256": {
+    "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0209": {
+    "descricao": "CJ VIDROS SELADO MASTER L3H2 - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0257": {
+    "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LD 923x630 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0258": {
+    "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LE 923x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0259": {
+    "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LD 1082x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0260": {
+    "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LE 1082x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0210": {
+    "descricao": "CJ VIDROS SELADO MASTER L1H1 - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0261": {
+    "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LD 1195x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0262": {
+    "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LE 1210x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0263": {
+    "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LD 1078x630 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0264": {
+    "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LE 1078x686 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0211": {
+    "descricao": "CJ VIDROS SELADO TRANSIT L3H3 - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0265": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LE 1389x739 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0266": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LD 1365x741 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0267": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 2º VAO VERDE LD 976x728 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0268": {
+    "descricao": "VIDRO FIXOTRANSIT L3H3 2º VAO VERDE LE 976x728 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0269": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LD 671x716 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0270": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LE 671x716 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0271": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x833 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0272": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x833 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0212": {
+    "descricao": "CJ VIDROS SELADO TRANSIT L2H3 - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0273": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LE 1383x739 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0274": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LD 1373x741 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0275": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LE 1210x730 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0276": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LD 1210x730 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0277": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x830 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0278": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x830 - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0213": {
+    "descricao": "CJ VIDROS SELADO SPRINTER 10 M - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0279": {
+    "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0280": {
+    "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0281": {
+    "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LD 1637x761 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0282": {
+    "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LE 1637x761 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0283": {
+    "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0284": {
+    "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0214": {
+    "descricao": "CJ VIDROS SELADO SPRINTER 14 M - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0285": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LD 1418x705 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0286": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LE 1422x769 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0287": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LD 1291x766 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0288": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LE 1291x766 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0215": {
+    "descricao": "CJ VIDROS SELADO EXPERT/JUMPY/SCUDO - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0289": {
+    "descricao": "VIDRO FIXO E/J/S 1º VAO LD 1089x556 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0290": {
+    "descricao": "VIDRO FIXO E/J/S 1º VAO LE 1096x556 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0291": {
+    "descricao": "VIDRO FIXO E/J/S 2º VAO LD 1177x534 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0292": {
+    "descricao": "VIDRO FIXO E/J/S 2º VAO LE 1171x534 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0293": {
+    "descricao": "VIDRO FIXO E/J/S VIGIA LD 676x495 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0294": {
+    "descricao": "VIDRO FIXO E/J/S VIGIA LE 743x495 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0216": {
+    "descricao": "CJ VIDROS SELADO BOXER/JUMPER/DUCATO - SELADO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "1-0295": {
+    "descricao": "VIDRO FIXO B/J/D 1º VAO LD 1400x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0296": {
+    "descricao": "VIDRO FIXO B/J/D 1º VAO LE 1400x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0297": {
+    "descricao": "VIDRO FIXO B/J/D 2º VAO LD 1352x583 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0298": {
+    "descricao": "VIDRO FIXO B/J/D 2º VAO LE 1352x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0299": {
+    "descricao": "VIDRO FIXO B/J/D 3º VAO LD 771x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0300": {
+    "descricao": "VIDRO FIXO B/J/D 3º VAO LE 771x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0301": {
+    "descricao": "VIDRO FIXO B/J/D VIGIA LD 830x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0302": {
+    "descricao": "VIDRO FIXO B/J/D VIGIA LE 830x667 VERDE 4MM - SELADO - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0217": {
+    "descricao": "CJ REVESTIMENTO ESSENCIAL RENAULT MASTER L2H2",
+    "unidade": "CJ"
+  },
+  "1-0303": {
+    "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO BATENTE ASSOALHO",
+    "unidade": "Un"
+  },
+  "1-0304": {
+    "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA LATERAL LE",
+    "unidade": "Un"
+  },
+  "1-0305": {
+    "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0306": {
+    "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0307": {
+    "descricao": "ABS PC ESSENCIAL MASTER BOCAL CAIXA AR CONDICIONADO",
+    "unidade": "Un"
+  },
+  "1-0308": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2 ACABAMENTO CAPUCCINO",
+    "unidade": "Un"
+  },
+  "1-0309": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2 ACABAMENTO COIFA DO TETO",
+    "unidade": "Un"
+  },
+  "1-0310": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2/L3H2 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0311": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2/L3H2 ACABAMENTO DA COLUNA CORREDICA",
+    "unidade": "Un"
+  },
+  "1-0312": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2 LATERAL DIANTEIRA 1º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0313": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2 LATERAL TRASEIRA 2º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0314": {
+    "descricao": "ABS PC ESSENCIAL MASTER L2H2 LATERAL TRASEIRA 2º VAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0315": {
+    "descricao": "ABS TETO PC ESSENCIAL MASTER L2H2",
+    "unidade": "Un"
+  },
+  "1-0316": {
+    "descricao": "ABS PC ESSENCIAL MASTER REFORCO PRFV COLUNA FALSA TETO",
+    "unidade": "Un"
+  },
+  "3-0218": {
+    "descricao": "CJ REVESTIMENTO ESSENCIAL RENAULT MASTER L3H2",
+    "unidade": "CJ"
+  },
+  "1-0317": {
+    "descricao": "ABS PC MASTER L3H2 ACABAMENTO CAPUCCINO",
+    "unidade": "Un"
+  },
+  "1-0318": {
+    "descricao": "ABS PC MASTER L3H2 ACABAMENTO COIFA DO TETO",
+    "unidade": "Un"
+  },
+  "1-0319": {
+    "descricao": "ABS PC MASTER L3H2 ACABAMENTO INFERIOR CINTO SEGURANCA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0320": {
+    "descricao": "ABS PC MASTER L3H2 ACABAMENTO SUPERIOR CINTO SEGURANCA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0321": {
+    "descricao": "ABS PC MASTER L3H2 ACABAMENTO TAMPA INSPECAO LE/LD",
+    "unidade": "Un"
+  },
+  "1-0322": {
+    "descricao": "ABS PC MASTER L3H2 LATERAL INFERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0323": {
+    "descricao": "ABS PC MASTER L3H2 LATERAL INFERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0324": {
+    "descricao": "ABS PC MASTER L3H2 LATERAL INFERIOR 2º/3º VAO TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0325": {
+    "descricao": "ABS PC MASTER L3H2 LATERAL SUPERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0326": {
+    "descricao": "ABS PC MASTER L3H2 LATERAL SUPERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0327": {
+    "descricao": "ABS PC MASTER L3H2 LATERAL SUPERIOR 2º/3º VAO TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0328": {
+    "descricao": "ABS PC MASTER L3H2 ACABAMENTO CAIXA DE RODAS LD/LE",
+    "unidade": "Un"
+  },
+  "1-0329": {
+    "descricao": "ABS TETO PC MASTER L3H2",
+    "unidade": "Un"
+  },
+  "3-0219": {
+    "descricao": "CJ REVESTIMENTO B/J/D",
+    "unidade": "CJ"
+  },
+  "1-0330": {
+    "descricao": "ABS PC B/J/D ACABAMENTO BATENTE ASSOALHO",
+    "unidade": "Un"
+  },
+  "1-0331": {
+    "descricao": "ABS PC B/J/D ACABAMENTO CAPUCINO",
+    "unidade": "Un"
+  },
+  "1-0332": {
+    "descricao": "ABS PC B/J/D ACABAMENTO COIFA DO TETO",
+    "unidade": "Un"
+  },
+  "1-0333": {
+    "descricao": "ABS PC B/J/D ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0334": {
+    "descricao": "ABS PC B/J/D ACABAMENTO INFERIOR PORTA DE CORRER LD",
+    "unidade": "Un"
+  },
+  "1-0335": {
+    "descricao": "ABS PC B/J/D ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0336": {
+    "descricao": "ABS PC B/J/D ACABAMENTO SUPERIOR PORTA DE CORRER LD",
+    "unidade": "Un"
+  },
+  "1-0337": {
+    "descricao": "ABS PC B/J/D ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0338": {
+    "descricao": "ABS PC B/J/D ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0339": {
+    "descricao": "ABS PC B/J/D ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0340": {
+    "descricao": "ABS PC B/J/D LATERAL ARO JANELA PORTA DE CORRER LD",
+    "unidade": "Un"
+  },
+  "1-0341": {
+    "descricao": "ABS PC B/J/D LATERAL INFERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0342": {
+    "descricao": "ABS PC B/J/D LATERAL INFERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0343": {
+    "descricao": "ABS PC B/J/D LATERAL INFERIOR 2º/3º VAO TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0344": {
+    "descricao": "ABS PC B/J/D LATERAL SUPERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0345": {
+    "descricao": "ABS PC B/J/D LATERAL SUPERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0346": {
+    "descricao": "ABS PC B/J/D LATERAL SUPERIOR 2º/3º VAO TRASEIRA PASSAGERIO LD",
+    "unidade": "Un"
+  },
+  "1-0347": {
+    "descricao": "ABS PC B/J/D REFORCO PLASTICO COLUNA FALSA TETO",
+    "unidade": "Un"
+  },
+  "1-0348": {
+    "descricao": "ABS TETO PC B/J/D BJD",
+    "unidade": "Un"
+  },
+  "3-0220": {
+    "descricao": "CJ REVESTIMENTO E/S/J TB",
+    "unidade": "CJ"
+  },
+  "1-0349": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA LATERAL PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0350": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0351": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0352": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0353": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA LATERAL PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0354": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0355": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0356": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA FRONTAL CABINE/SALAO",
+    "unidade": "Un"
+  },
+  "1-0357": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA LATERAL",
+    "unidade": "Un"
+  },
+  "1-0358": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA TRASEIRA",
+    "unidade": "Un"
+  },
+  "1-0359": {
+    "descricao": "ABS PC E/S/J TB LATERAL MOTORISTA LE 1º/2º VAO",
+    "unidade": "Un"
+  },
+  "1-0360": {
+    "descricao": "ABS PC E/S/J TB LATERAL PASSAGEIRO LD 2º VAO",
+    "unidade": "Un"
+  },
+  "1-0361": {
+    "descricao": "ABS TETO PC E/S/J TB",
+    "unidade": "Un"
+  },
+  "1-0362": {
+    "descricao": "ABS PC REFORCO ACO PORTA LATERAL",
+    "unidade": "Un"
+  },
+  "3-0221": {
+    "descricao": "CJ REVESTIMENTO IVECO 50-180",
+    "unidade": "CJ"
+  },
+  "1-0363": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO ASSOALHO",
+    "unidade": "Un"
+  },
+  "1-0364": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO CAPUCINO",
+    "unidade": "Un"
+  },
+  "1-0365": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0366": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0367": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO LATERAL MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0368": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0369": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0370": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO PORTA LATERAL LD",
+    "unidade": "Un"
+  },
+  "1-0371": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO SOLEIRA PORTA LATERAL",
+    "unidade": "Un"
+  },
+  "1-0372": {
+    "descricao": "ABS PC IVECO 50-180 ACABAMENTO COIFA",
+    "unidade": "Un"
+  },
+  "1-0373": {
+    "descricao": "ABS PC IVECO 50-180 LATERAL DIANTEIRA 1º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0374": {
+    "descricao": "ABS PC IVECO 50-180 LATERAL TRASEIRA 2º/3º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0375": {
+    "descricao": "ABS PC IVECO 50-180 LATERAL TRASEIRA 2º/3º VAO MOTORISTA LD",
+    "unidade": "Un"
+  },
+  "1-0376": {
+    "descricao": "ABS PC IVECO 50-180 TAMPA INSPECAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0377": {
+    "descricao": "ABS PC IVECO 50-180 TAMPA INSPECAO PASSAGEIRO LE",
+    "unidade": "Un"
+  },
+  "1-0378": {
+    "descricao": "ABS TETO PC IVECO 50-180",
+    "unidade": "Un"
+  },
+  "3-0222": {
+    "descricao": "CJ REVESTIMENTO PLUS SPRINTER 417 10,5M³",
+    "unidade": "CJ"
+  },
+  "1-0379": {
+    "descricao": "ABS TETO PARTE 1 PC PLUS SPRINTER 10,5/14M³",
+    "unidade": "Un"
+  },
+  "1-0380": {
+    "descricao": "ABS TETO PARTE 2 PC PLUS SPRINTER 10,5/15M³",
+    "unidade": "Un"
+  },
+  "1-0381": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO SUPERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0382": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO INFERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0383": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO SUPERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0384": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO INFERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0385": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO SUPERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0386": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO INFERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0387": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14M³ ACABAMENTO CAIXA DE RODAS LE/LD",
+    "unidade": "Un"
+  },
+  "1-0388": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+    "unidade": "Un"
+  },
+  "1-0389": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0390": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0391": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0392": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO CONSOLE AR CONDICIONADO",
+    "unidade": "Un"
+  },
+  "1-0393": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0394": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0395": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LE",
+    "unidade": "Un"
+  },
+  "1-0396": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LD",
+    "unidade": "Un"
+  },
+  "3-0223": {
+    "descricao": "CJ DUTO AR CONDICIONADO ABS PC PLUS SPRINTER 10,5M³",
+    "unidade": "CJ"
+  },
+  "1-0397": {
+    "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0398": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO SPRINTER 10,5M³",
+    "unidade": "Un"
+  },
+  "3-0224": {
+    "descricao": "CJ REVESTIMENTO PLUS SPRINTER 417 14M³",
+    "unidade": "CJ"
+  },
+  "1-0399": {
+    "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO INFERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0400": {
+    "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO INFERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "3-0225": {
+    "descricao": "CJ DUTO AR CONDICIONADO ABS PC PLUS SPRINTER 14/15M³",
+    "unidade": "CJ"
+  },
+  "1-0401": {
+    "descricao": "ABS PC PLUS DUTO AR CONDICIONADO PARTE 1 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0402": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LE PARTE 1 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0403": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LE PARTE 2 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0404": {
+    "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO INFERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0405": {
+    "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO INFERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0406": {
+    "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO SUPERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0407": {
+    "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO SUPERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0408": {
+    "descricao": "ABS TETO PARTE 2 PC PLUS SPRINTER 14M³",
+    "unidade": "Un"
+  },
+  "1-0409": {
+    "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO SUPERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0410": {
+    "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO SUPERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "3-0226": {
+    "descricao": "CJ REVESTIMENTO PLUS SPRINTER 517 15M³",
+    "unidade": "CJ"
+  },
+  "1-0411": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ ACABAMENTO CAIXA DE RODAS LD/LE",
+    "unidade": "Un"
+  },
+  "1-0412": {
+    "descricao": "ABS TETO PARTE 1 PC PLUS SPRINTER 15M³",
+    "unidade": "Un"
+  },
+  "1-0413": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO INFERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0414": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO INFERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0415": {
+    "descricao": "ABS TETO PARTE 3 PC PLUS SPRINTER 15M³",
+    "unidade": "Un"
+  },
+  "1-0416": {
+    "descricao": "ABS TETO PARTE 2 PC PLUS SPRINTER 15M³",
+    "unidade": "Un"
+  },
+  "1-0417": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ ACABAMENTO COMPLEMENTO LATERAL TRASEIRA 3º VÃO SUPERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0418": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ ACABAMENTO COMPLEMENTO LATERAL TRASEIRA 3º VÃO SUPERIOR MOTORISTA LD",
+    "unidade": "Un"
+  },
+  "3-0227": {
+    "descricao": "CJ REVESTIMENTO TRANSIT L3H2 VITRE",
+    "unidade": "CJ"
+  },
+  "1-0419": {
+    "descricao": "ABS PC TRANSIT ACABAMENTO SOLEIRA DEGRAU ENTRADA PORTA CORRER LD",
+    "unidade": "Un"
+  },
+  "1-0420": {
+    "descricao": "ABS PC TRANSIT ACABAMENTO SOLEIRA PORTA TRASEIRA",
+    "unidade": "Un"
+  },
+  "1-0421": {
+    "descricao": "ABS PC TRANSIT L3H2 VITRE ACABAMENTO CAPUCCINO",
+    "unidade": "Un"
+  },
+  "1-0422": {
+    "descricao": "ABS PC TRANSIT L3H2 VITRE ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0423": {
+    "descricao": "ABS TETO CABINE AR CONDICIONADO PC TRANSIT L3H2 VITRE ACABAMENTO",
+    "unidade": "Un"
+  },
+  "1-0424": {
+    "descricao": "ABS PC TRANSIT L3H2 VITRE LATERAL DIANTEIRA 1º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0425": {
+    "descricao": "ABS PC TRANSIT L3H2 VITRE LATERAL TRASEIRA 2º/3º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0426": {
+    "descricao": "ABS PC TRANSIT L3H2 VITRE LATERAL TRASEIRA 2º/3º VAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0427": {
+    "descricao": "ABS TETO FRONTAL COM DUTO PC TRANSIT L3H2 VITRE",
+    "unidade": "Un"
+  },
+  "1-0428": {
+    "descricao": "ABS TETO TRASEIRA PC TRANSIT L3H2 VITRE",
+    "unidade": "Un"
+  },
+  "3-0228": {
+    "descricao": "CJ REVESTIMENTO TRANSIT L3H3 FURGAO",
+    "unidade": "CJ"
+  },
+  "1-0429": {
+    "descricao": "ABS PC TRANSIT L2H3/L3H3 LATERAL 1º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0430": {
+    "descricao": "ABS PC TRANSIT L2H3/L3H3 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0431": {
+    "descricao": "ABS PC TRANSIT L2H3/L3H3 ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0432": {
+    "descricao": "ABS PC TRANSIT L3H3 ACABAMENTO COLUNA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0433": {
+    "descricao": "ABS PC TRANSIT L3H3 ACABAMENTO COLUNA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0434": {
+    "descricao": "ABS PC TRANSIT L2H3/L3H3 ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+    "unidade": "Un"
+  },
+  "1-0435": {
+    "descricao": "ABS PC TRANSIT L3H3 LATERAL INFERIOR 2º/3º VAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0436": {
+    "descricao": "ABS PC TRANSIT L3H3 LATERAL INFERIOR 2º/3º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0437": {
+    "descricao": "ABS PC TRANSIT L3H3 LATERAL SUPERIOR 2º/3º VAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0438": {
+    "descricao": "ABS PC TRANSIT L3H3 LATERAL SUPERIOR 2º/3º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0439": {
+    "descricao": "ABS PC TRANSIT L3H3 ACABAMENTO MADEIRA REVESTIDA CONSOLE AR CONDICIONADO PECA INFERIOR",
+    "unidade": "Un"
+  },
+  "1-0440": {
+    "descricao": "ABS PC TRANSIT L3H3 ACABAMENTO MADEIRA REVESTIDA CONSOLE AR CONDICIONADO PECA SUPERIOR",
+    "unidade": "Un"
+  },
+  "1-0441": {
+    "descricao": "ABS TETO PARTE DIANTEIRA PC C/ DUTO TRANSIT L3H3",
+    "unidade": "Un"
+  },
+  "1-0442": {
+    "descricao": "ABS TETO PARTE TRASEIRA PC C/DUTO TRANSIT L3H3",
+    "unidade": "Un"
+  },
+  "1-0443": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO TRILHO ALUMINIO PADRAO JI",
+    "unidade": "Un"
+  },
+  "1-0444": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO INJETADO TRILHO RETRATOR PADRAO JI",
+    "unidade": "Un"
+  },
+  "1-0445": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM BEGE",
+    "unidade": "Un"
+  },
+  "1-0446": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM BRANCO",
+    "unidade": "Un"
+  },
+  "1-0447": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA CHUMBO",
+    "unidade": "Un"
+  },
+  "1-0448": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA LUNA",
+    "unidade": "Un"
+  },
+  "1-0449": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA PLATINA",
+    "unidade": "Un"
+  },
+  "1-0450": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM MARFIM",
+    "unidade": "Un"
+  },
+  "1-0451": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM MARROM",
+    "unidade": "Un"
+  },
+  "1-0452": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM PRETO",
+    "unidade": "Un"
+  },
+  "1-0453": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO BRANCO EXTERNO 1 1/4",
+    "unidade": "Un"
+  },
+  "1-0454": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO EXTERNO 40X40",
+    "unidade": "Un"
+  },
+  "1-0455": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO INTERNO 1",
+    "unidade": "Un"
+  },
+  "1-0456": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO INTERNO 25X25",
+    "unidade": "Un"
+  },
+  "1-0457": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO INTERNO 30X20",
+    "unidade": "Un"
+  },
+  "1-0458": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO INTERNO 40X20",
+    "unidade": "Un"
+  },
+  "1-0459": {
+    "descricao": "ACESSORIO ACABAMENTO TUBO INTERNO 50X30",
+    "unidade": "Un"
+  },
+  "1-0460": {
+    "descricao": "ACESSORIO ADESIVO DEMARCACAO PISO CADEIRANTE",
+    "unidade": "Un"
+  },
+  "1-0461": {
+    "descricao": "ACESSORIO ADESIVO IDENTIFICACAO ACESSIBILIDADE",
+    "unidade": "Un"
+  },
+  "1-0462": {
+    "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
+    "unidade": "Un"
+  },
+  "1-0463": {
+    "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
+    "unidade": "Un"
+  },
+  "1-0464": {
+    "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA LIGADO",
+    "unidade": "Un"
+  },
+  "1-0465": {
+    "descricao": "ACESSORIO ADESIVO MANUAL COM QR CODE LOTE MOBSUAS",
+    "unidade": "Un"
+  },
+  "1-0466": {
+    "descricao": "ACESSORIO ADESIVO SAIDA EMERGENCIA LIGADO",
+    "unidade": "Un"
+  },
+  "1-0467": {
+    "descricao": "ACESSORIO ADESIVO TATIL",
+    "unidade": "Un"
+  },
+  "1-0468": {
+    "descricao": "ACESSORIO ALCA PEGA MAO AMARELA 200MM",
+    "unidade": "Un"
+  },
+  "1-0469": {
+    "descricao": "ACESSORIO ALCA PEGA MAO AMARELA 30MMX430MM",
+    "unidade": "Un"
+  },
+  "1-0470": {
+    "descricao": "ACESSORIO ALCA PEGA MAO ELBUS",
+    "unidade": "Un"
+  },
+  "1-0471": {
+    "descricao": "ACESSORIO ALCA PEGA MAO MARCOPOLLO",
+    "unidade": "Un"
+  },
+  "1-0472": {
+    "descricao": "ACESSORIO ALCA PEGA MAO PRETA 200MM",
+    "unidade": "Un"
+  },
+  "1-0473": {
+    "descricao": "ACESSORIO ALCA PEGA MAO AMARELO ACO 900MM",
+    "unidade": "Un"
+  },
+  "1-0474": {
+    "descricao": "ACESSORIO ALCA PEGA MAO GRAFITE METALICO 340MM",
+    "unidade": "Un"
+  },
+  "1-0475": {
+    "descricao": "ACESSORIO ANTEPARO PLATAFORMA LATERAL LIGADO",
+    "unidade": "Un"
+  },
+  "1-0476": {
+    "descricao": "ACESSORIO APARELHO SOM SIMPLES COM ENTRADA USB",
+    "unidade": "Un"
+  },
+  "1-0477": {
+    "descricao": "ACESSORIO APOIO CABECA CADEIRA RODAS",
+    "unidade": "Un"
+  },
+  "1-0478": {
+    "descricao": "ACESSORIO BALAUSTRE AMARELO ENCAPSULADO 2,1M",
+    "unidade": "Un"
+  },
+  "1-0479": {
+    "descricao": "ACESSORIO BOX CADEIRANTE DIANTEIRO LIGADO",
+    "unidade": "Un"
+  },
+  "1-0480": {
+    "descricao": "ACESSORIO BOX CADEIRANTE TRASEIRO PIVOTANTE LIGADO",
+    "unidade": "Un"
+  },
+  "1-0481": {
+    "descricao": "ACESSORIO CAPA PARAFUSO 17MM",
+    "unidade": "Un"
+  },
+  "1-0482": {
+    "descricao": "ACESSORIO PEGA MAO TETO SPRINTER 14M³",
+    "unidade": "Un"
+  },
+  "1-0483": {
+    "descricao": "ACESSORIO CONE 50CM LAR/BCO PVC",
+    "unidade": "Un"
+  },
+  "1-0484": {
+    "descricao": "ACESSORIO CONSOLE CENTRAL APOIO BRACO ENTRE BANCOS EXECUTIVO",
+    "unidade": "Un"
+  },
+  "1-0485": {
+    "descricao": "ACESSORIO CONSOLE TV ABS SPRINTER 417",
+    "unidade": "Un"
+  },
+  "1-0486": {
+    "descricao": "ACESSORIO CONSOLE TV ABS SPRINTER 417 REVESTIDA",
+    "unidade": "Un"
+  },
+  "1-0487": {
+    "descricao": "ACESSORIO CONSOLE TV ABS SPRINTER 417 REVESTIDA PRETO",
+    "unidade": "Un"
+  },
+  "1-0488": {
+    "descricao": "ACESSORIO CONSOLE TV PRFV MASTER L3H2 PILAR MOLDE JI",
+    "unidade": "Un"
+  },
+  "1-0489": {
+    "descricao": "ACESSORIO CORDA PARA CORTINA CINZA",
+    "unidade": "Un"
+  },
+  "1-0490": {
+    "descricao": "ACESSORIO CORDA PARA CORTINA PRETA",
+    "unidade": "Un"
+  },
+  "3-0229": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA PRETA MASTER L1H1",
+    "unidade": "CJ"
+  },
+  "3-0230": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA PRETA MASTER L2H2",
+    "unidade": "CJ"
+  },
+  "3-0231": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA PRETA MASTER L3H2",
+    "unidade": "CJ"
+  },
+  "3-0232": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA PRETA SPRINTER 417 10,5M³",
+    "unidade": "CJ"
+  },
+  "3-0233": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA PRETA SPRINTER 417 14M³",
+    "unidade": "CJ"
+  },
+  "3-0234": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA PRETA SPRINTER 517 15,5M³",
+    "unidade": "CJ"
+  },
+  "3-0235": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA B/J/D",
+    "unidade": "CJ"
+  },
+  "3-0236": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA E/S/J",
+    "unidade": "CJ"
+  },
+  "3-0237": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA MASTER L1H1",
+    "unidade": "CJ"
+  },
+  "3-0238": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA MASTER L2H2",
+    "unidade": "CJ"
+  },
+  "3-0239": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA MASTER L3H2",
+    "unidade": "CJ"
+  },
+  "3-0240": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA SPRINTER 417 10,5M³",
+    "unidade": "CJ"
+  },
+  "3-0241": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA SPRINTER 417 14M³",
+    "unidade": "CJ"
+  },
+  "3-0242": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA SPRINTER 517 15,5M³",
+    "unidade": "CJ"
+  },
+  "3-0243": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA TRANSIT L3H2",
+    "unidade": "CJ"
+  },
+  "3-0244": {
+    "descricao": "ACESSORIO CJ CORTINA VELUDO PRETA TRANSIT L3H3",
+    "unidade": "CJ"
+  },
+  "3-0245": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO B/J/D",
+    "unidade": "CJ"
+  },
+  "3-0246": {
+    "descricao": "ACESSORIO CJ CORTINA LISA E/S/J TECIDO FAUNA COR CHUMBO",
+    "unidade": "CJ"
+  },
+  "3-0247": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO MASTER L1H1",
+    "unidade": "CJ"
+  },
+  "3-0248": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO MASTER L2H2",
+    "unidade": "CJ"
+  },
+  "3-0249": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO MASTER L3H2",
+    "unidade": "CJ"
+  },
+  "3-0250": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO SPRINTER 417 10,5M³",
+    "unidade": "CJ"
+  },
+  "3-0251": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO SPRINTER 417 14M³",
+    "unidade": "CJ"
+  },
+  "3-0252": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO SPRINTER 517 15,5M³",
+    "unidade": "CJ"
+  },
+  "3-0253": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO TRANSIT L2H3",
+    "unidade": "CJ"
+  },
+  "3-0254": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO TRANSIT L3H2 VISTRE",
+    "unidade": "CJ"
+  },
+  "3-0255": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO TRANSIT L3H3",
+    "unidade": "CJ"
+  },
+  "3-0256": {
+    "descricao": "ACESSORIO CJ CORTINA LISA TECIDO FAUNA COR CHUMBO TRANSIT L4H3",
+    "unidade": "CJ"
+  },
+  "3-0257": {
+    "descricao": "ACESSORIO CJ CORTINA PLISSADA E/S/J TECIDO PRETO",
+    "unidade": "CJ"
+  },
+  "3-0258": {
+    "descricao": "ACESSORIO CJ DIVISORIA Z E/S/J",
+    "unidade": "CJ"
+  },
+  "3-0259": {
+    "descricao": "ACESSORIO CJ DIVISORIA Z MASTER L3H2/L2H2",
+    "unidade": "CJ"
+  },
+  "1-0491": {
+    "descricao": "ACESSORIO DRENO ASSOALHO",
+    "unidade": "Un"
+  },
+  "3-0260": {
+    "descricao": "ACESSORIO CJ MONT CONTROLE EXTERNO ELEVADOR DPM II",
+    "unidade": "CJ"
+  },
+  "1-0492": {
+    "descricao": "ACESSORIO ELASTICO COM GANCHO 1M",
+    "unidade": "Un"
+  },
+  "1-0493": {
+    "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO ESCORT 83/92 RF0I55PL",
+    "unidade": "Un"
+  },
+  "1-0494": {
+    "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO FIAT PRETO RT1I30PR",
+    "unidade": "Un"
+  },
+  "1-0495": {
+    "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO RENEGADE RT1I29PR",
+    "unidade": "Un"
+  },
+  "1-0496": {
+    "descricao": "ACESSORIO ESTICADOR PET",
+    "unidade": "Un"
+  },
+  "1-0497": {
+    "descricao": "ACESSORIO ESTRIBO PRETO EMBARQUE LD B/J/D",
+    "unidade": "Un"
+  },
+  "1-0498": {
+    "descricao": "ACESSORIO ESTRIBO CROMADO EMBARQUE L D B/J/D",
+    "unidade": "Un"
+  },
+  "1-0499": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD E/S/J",
+    "unidade": "Un"
+  },
+  "1-0500": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD IVECO 50-180",
+    "unidade": "Un"
+  },
+  "1-0501": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD MASTER L1H1",
+    "unidade": "Un"
+  },
+  "1-0502": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD MASTER L2H2",
+    "unidade": "Un"
+  },
+  "1-0503": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE CROMADO LD MASTER L2H2",
+    "unidade": "Un"
+  },
+  "1-0504": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD MASTER L3H2",
+    "unidade": "Un"
+  },
+  "1-0505": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE CROMADO LD MASTER L3H2",
+    "unidade": "Un"
+  },
+  "1-0506": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD SPRINTER 417 10,5M³",
+    "unidade": "Un"
+  },
+  "1-0507": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD SPRINTER 417/517 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0508": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE CROMADO LD SPRINTER 417/517 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0509": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD TRANSIT L3H3/L3H2",
+    "unidade": "Un"
+  },
+  "1-0510": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LD TRANSIT L4H3",
+    "unidade": "Un"
+  },
+  "1-0511": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LE MASTER L2H2",
+    "unidade": "Un"
+  },
+  "1-0512": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LE MASTER L3H2",
+    "unidade": "Un"
+  },
+  "1-0513": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LE SPRINTER 417 10,5M³",
+    "unidade": "Un"
+  },
+  "1-0514": {
+    "descricao": "ACESSORIO ESTRIBO EMBARQUE PRETO LE TRANSIT L3H3/L3H2",
+    "unidade": "Un"
+  },
+  "1-0515": {
+    "descricao": "ACESSORIO ESTRIBO CROMADO E/S/J",
+    "unidade": "Un"
+  },
+  "1-0516": {
+    "descricao": "ACESSORIO EXTINTOR ABC 4KG",
+    "unidade": "Un"
+  },
+  "1-0517": {
+    "descricao": "ACESSORIO SUPORTE EXTINTOR ABC 4KG",
+    "unidade": "Un"
+  },
+  "3-0261": {
+    "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
+    "unidade": "CJ"
+  },
+  "1-0518": {
+    "descricao": "ACESSORIO FAIXA REFLETIVA LADO DIREITO",
+    "unidade": "Un"
+  },
+  "1-0519": {
+    "descricao": "ACESSORIO FAIXA REFLETIVA LADO ESQUERDO",
+    "unidade": "Un"
+  },
+  "1-0520": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO 03 CAMERAS LIGADO",
+    "unidade": "Un"
+  },
+  "1-0521": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO ALARME",
+    "unidade": "Un"
+  },
+  "1-0522": {
+    "descricao": "ACESSORIO BAGAGEIRO E/S/J EQMAX BOX BIG RACK 270L",
+    "unidade": "Un"
+  },
+  "1-0523": {
+    "descricao": "ACESSORIO BAGAGEIRO E/S/J EQMAX BOX BIG RACK 400L",
+    "unidade": "Un"
+  },
+  "1-0524": {
+    "descricao": "ACESSORIO BAGAGEIRO TUBULAR E/S/J PRETO",
+    "unidade": "Un"
+  },
+  "1-0525": {
+    "descricao": "ACESSORIO BAGAGEIRO TUBULAR E/S/J PRETO COM ESCADA",
+    "unidade": "Un"
+  },
+  "1-0526": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO CAIXA SUB SLIM COMPACTO PIONEER",
+    "unidade": "Un"
+  },
+  "1-0527": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO CALHA DE CHUVA",
+    "unidade": "Un"
+  },
+  "1-0528": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO CAMERA DE RE COM VISOR LCD",
+    "unidade": "Un"
+  },
+  "1-0529": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO CAMERA DIANTEIRA TRASEIRA COM ARMAZENAMENTO",
+    "unidade": "Un"
+  },
+  "1-0530": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO DPM ELEVITTA DISPOSITIVO DE POLTRONA MOVEL",
+    "unidade": "Un"
+  },
+  "1-0531": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO DPM FOCA DISPOSITIVO DE POLTRONA MOVEL",
+    "unidade": "Un"
+  },
+  "1-0532": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO ENGATE REBOQUE MASTER",
+    "unidade": "Un"
+  },
+  "1-0533": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO ESTRIBO AUTOMATICO EMBARQUE LD",
+    "unidade": "Un"
+  },
+  "1-0534": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO ESTRIBO EMBARQUE LD MASTER L3H2",
+    "unidade": "Un"
+  },
+  "1-0535": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO FAIXA ESCOLAR",
+    "unidade": "Un"
+  },
+  "1-0536": {
+    "descricao": "ACESSORIO GERENCIADOR BATERIA 100A",
+    "unidade": "Un"
+  },
+  "1-0537": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO GIROFLEX S/ SIRENE AMBAR SINALIZACAO DIANTEIRA TRASEIRA CHICOTE",
+    "unidade": "Un"
+  },
+  "1-0538": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO GIROFLEX S/ SIRENE VERMELHO AZUL SINALIZACAO DIANTEIRA TRASEIRA DESCARACTERIZADA STROBO CHICOTE",
+    "unidade": "Un"
+  },
+  "1-0539": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO ILUMINACAO ESTROBO DIANTEIRO TRASEIRO",
+    "unidade": "Un"
+  },
+  "1-0540": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO INSULFILM",
+    "unidade": "Un"
+  },
+  "1-0541": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO INSULFILM PARABRISA",
+    "unidade": "Un"
+  },
+  "1-0542": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO KIT 03 CAMERAS DIANTEIRA TRASEIRA LATERAL COM MONITOR",
+    "unidade": "Un"
+  },
+  "1-0543": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO KIT FAROL NEBLINA CHICOTE INSTALACAO",
+    "unidade": "Un"
+  },
+  "1-0544": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO KIT MULTIMIDIA FALANTES CABINE SALAO MOLDURA PAINEL",
+    "unidade": "Un"
+  },
+  "1-0545": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO KIT MULTIMIDIA FALANTES CABINE SALAO MOLDURA PAINEL E/S/J PIONNER",
+    "unidade": "Un"
+  },
+  "1-0546": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO MODULO SUBIDA VIDROS",
+    "unidade": "Un"
+  },
+  "1-0547": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO PAR FALANTE 6 HURICANE",
+    "unidade": "Un"
+  },
+  "1-0548": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO PLATAFORMA ELEVATORIA ELETRO HIDRAULICA BIPARTIDA",
+    "unidade": "Un"
+  },
+  "1-0549": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO PLATAFORMA ELEVATORIA ELETRO HIDRAULICA FECHADA",
+    "unidade": "Un"
+  },
+  "1-0550": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO PLOTAGEM CONFORME SOLICITADO",
+    "unidade": "Un"
+  },
+  "1-0551": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO PORTA AUTOMATICA",
+    "unidade": "Un"
+  },
+  "1-0552": {
+    "descricao": "ACESSORIO RACK E/S/J EQMAX NEW WAVE CINZA",
+    "unidade": "Un"
+  },
+  "1-0553": {
+    "descricao": "ACESSORIO RACK BATERIA AUXILIAR",
+    "unidade": "Un"
+  },
+  "1-0554": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO RACK TETO E/S/J COM BAU 400L",
+    "unidade": "Un"
+  },
+  "1-0555": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO RADIO USB BLUETOOTH FALANTES CABINE SALAO",
+    "unidade": "Un"
+  },
+  "1-0556": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO SENSOR DE RE VISOR INSTALACAO",
+    "unidade": "Un"
+  },
+  "1-0557": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO TAPETE DIANTEIRO CABINE",
+    "unidade": "Un"
+  },
+  "1-0558": {
+    "descricao": "ACESSORIO FATURAMENTO DIRETO TOLDO BOX E/S/J ALUMINIO",
+    "unidade": "Un"
+  },
+  "1-0559": {
+    "descricao": "ACESSORIO TV 19 MULTIMIDIA SUPORTE CHICOTE FALANTES CABINE SALAO INSTALACAO",
+    "unidade": "Un"
+  },
+  "1-0560": {
+    "descricao": "ACESSORIO TV 19 SUPORTE CHICOTE INSTALACAO",
+    "unidade": "Un"
+  },
+  "1-0561": {
+    "descricao": "ACESSORIO TV 24 SUPORTE CHICOTE INSTALACAO",
+    "unidade": "Un"
+  },
+  "1-0562": {
+    "descricao": "ACESSORIO TV RETRATIL FLIP DOWN",
+    "unidade": "Un"
+  },
+  "1-0563": {
+    "descricao": "ACESSORIO GANCHO AMARRA PORTA MALAS",
+    "unidade": "Un"
+  },
+  "1-0564": {
+    "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 18L",
+    "unidade": "Un"
+  },
+  "1-0565": {
+    "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 31L",
+    "unidade": "Un"
+  },
+  "1-0566": {
+    "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 51L",
+    "unidade": "Un"
+  },
+  "1-0567": {
+    "descricao": "ACESSORIO INTERMEDIARIO BALAUSTRE COR CHUMBO",
+    "unidade": "Un"
+  },
+  "1-0568": {
+    "descricao": "ACESSORIO LACRE EMERGENCIA MARTELINHO 2023",
+    "unidade": "Un"
+  },
+  "1-0569": {
+    "descricao": "ACESSORIO MARTELO EMERGENCIA",
+    "unidade": "Un"
+  },
+  "3-0262": {
+    "descricao": "ACESSORIO CJ PME PORTA MALAS ELEVADO 1 ANDAR",
+    "unidade": "CJ"
+  },
+  "3-0263": {
+    "descricao": "ACESSORIO CJ PME PORTA MALAS ELEVADO 2 ANDARES",
+    "unidade": "CJ"
+  },
+  "3-0264": {
+    "descricao": "ACESSORIO CJ PME MASTER L3H2 PORTA MALAS ELEVADO 3 ANDARES ELEVACAO 1 PISO",
+    "unidade": "CJ"
+  },
+  "1-0570": {
+    "descricao": "ACESSORIO PASSA FIO APITO COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0571": {
+    "descricao": "ACESSORIO PASSA FIO BORRACHA 19MM",
+    "unidade": "Un"
+  },
+  "1-0572": {
+    "descricao": "ACESSORIO PASTILHA RETROVISOR INTERNO MASTER",
+    "unidade": "Un"
+  },
+  "1-0573": {
+    "descricao": "ACESSORIO PEGA MAO AMARELO ACO 700MM",
+    "unidade": "Un"
+  },
+  "1-0574": {
+    "descricao": "ACESSORIO PEGA MAO AMARELO ACO E/S/J",
+    "unidade": "Un"
+  },
+  "1-0575": {
+    "descricao": "ACESSORIO PORTA COPO COM FUNDO COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0576": {
+    "descricao": "ACESSORIO PORTA COPO COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0577": {
+    "descricao": "ACESSORIO BATENTE PORTA MALAS E/S/J LG-BRIGHT CINZA",
+    "unidade": "Un"
+  },
+  "1-0578": {
+    "descricao": "ACESSORIO BATENTE PORTA MALAS E/S/J TARKET",
+    "unidade": "Un"
+  },
+  "1-0579": {
+    "descricao": "ACESSORIO PORTA PACOTE LUXO LD 1M COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0580": {
+    "descricao": "ACESSORIO PORTA PACOTE LUXO LE 2,5M COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0581": {
+    "descricao": "ACESSORIO PORTA PACOTE LUXO LE 3M COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0582": {
+    "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0583": {
+    "descricao": "ACESSORIO PRENDEDOR CORTINA PRETO",
+    "unidade": "Un"
+  },
+  "1-0584": {
+    "descricao": "ACESSORIO PROTETOR CARTER SPRINTER",
+    "unidade": "Un"
+  },
+  "1-0585": {
+    "descricao": "ACESSORIO RETRATOR FIXACAO CADEIRA RODAS Q-8200-A1-L",
+    "unidade": "Un"
+  },
+  "1-0586": {
+    "descricao": "ACESSORIO SOLEIRA DEGRAU INOX JI MONTADORA MASTER",
+    "unidade": "Un"
+  },
+  "1-0587": {
+    "descricao": "ACESSORIO SOLEIRA DEGRAU INOX JI MONTADORA SPRINTER",
+    "unidade": "Un"
+  },
+  "1-0588": {
+    "descricao": "ACESSORIO SOLEIRA DEGRAU INOX JI MONTADORA TRANSIT",
+    "unidade": "Un"
+  },
+  "1-0589": {
+    "descricao": "ACESSORIO SOLEIRA DIANTEIRA B/J/D SALAO CABINE",
+    "unidade": "Un"
+  },
+  "1-0590": {
+    "descricao": "ACESSORIO SOLEIRA DIANTEIRA SPRINTER SALAO CABINE",
+    "unidade": "Un"
+  },
+  "1-0591": {
+    "descricao": "ACESSORIO SUPORTE CAMERA RE SPRINTER",
+    "unidade": "Un"
+  },
+  "1-0592": {
+    "descricao": "ACESSORIO SUPORTE CELULAR ACRILICO",
+    "unidade": "Un"
+  },
+  "3-0265": {
+    "descricao": "ACESSORIO CJ SUPORTE CONE",
+    "unidade": "CJ"
+  },
+  "1-0593": {
+    "descricao": "ACESSORIO SUPORTE CORDA CORTINA",
+    "unidade": "Un"
+  },
+  "1-0594": {
+    "descricao": "ACESSORIO SUPORTE CORTINA CORTADA C20",
+    "unidade": "Un"
+  },
+  "1-0595": {
+    "descricao": "ACESSORIO SUPORTE CORTINA PLISSADA POLAR",
+    "unidade": "Un"
+  },
+  "1-0596": {
+    "descricao": "ACESSORIO TAMPA PAINEL 1 DIN",
+    "unidade": "Un"
+  },
+  "1-0597": {
+    "descricao": "ACESSORIO TAMPA PARAFUSO 25MM",
+    "unidade": "Un"
+  },
+  "1-0598": {
+    "descricao": "ACESSORIO TAMPA VENTILACAO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0599": {
+    "descricao": "ACESSORIO TAPETE BOUCLE CABINE E/S/J",
+    "unidade": "Un"
+  },
+  "1-0600": {
+    "descricao": "ACESSORIO TAPETE BORRACHA CABINE MASTER",
+    "unidade": "Un"
+  },
+  "1-0601": {
+    "descricao": "ACESSORIO TAPETE PASSADEIRA TARKET CABINE SPRINTER",
+    "unidade": "Un"
+  },
+  "1-0602": {
+    "descricao": "ACESSORIO TAPETE BORRACHA CABINE TRANSIT",
+    "unidade": "Un"
+  },
+  "1-0603": {
+    "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J",
+    "unidade": "Un"
+  },
+  "1-0604": {
+    "descricao": "ACESSORIO TERMINAL BALAUSTRE",
+    "unidade": "Un"
+  },
+  "1-0605": {
+    "descricao": "ACESSORIO TRINCO JUDEU COM TAMPA PRETA",
+    "unidade": "Un"
+  },
+  "1-0606": {
+    "descricao": "ACESSORIO VARETA PEGA MALAS PME",
+    "unidade": "Un"
+  },
+  "1-0607": {
+    "descricao": "ACESSORIO DPM FOCA ORBIT VAN DISPOSITIVO DE POLTRONA MOVEL",
+    "unidade": "Un"
+  },
+  "1-0608": {
+    "descricao": "ACESSORIO DPM ELEVITTA DISPOSITIVO DE POLTRONA MOVEL COM GIRO",
+    "unidade": "Un"
+  },
+  "1-0609": {
+    "descricao": "ACESSORIO DPM ELEVITTA DISPOSITIVO DE POLTRONA MOVEL SEM GIRO GIRO",
+    "unidade": "Un"
+  },
+  "1-0610": {
+    "descricao": "ACESSORIO LANTERNA SAIDA EMERGENCIA BASE RETA 6 LED 12V",
+    "unidade": "Un"
+  },
+  "1-0611": {
+    "descricao": "ACESSORIO FONTE E CARREGADOR AUTOMOTIVO USINA BOLT 50A 12V BIVOLT AUTOMATICO 180X200X70",
+    "unidade": "Un"
+  },
+  "1-0612": {
+    "descricao": "ACESSORIO INVERSOR DE CORRENTE USINA 1000W 12V-120V SENOIDAL",
+    "unidade": "Un"
+  },
+  "1-0613": {
+    "descricao": "ACESSORIO TV BOOSTER RETRATIL 15\" 12V",
+    "unidade": "Un"
+  },
+  "1-0614": {
+    "descricao": "ACESSORIO TV BAK LED 17\" DIGITAL HDMI/USB 12V",
+    "unidade": "Un"
+  },
+  "1-0615": {
+    "descricao": "ACESSORIO TV BAK LED 19\" DIGITAL HDMI/USB 12V",
+    "unidade": "Un"
+  },
+  "1-0616": {
+    "descricao": "ACESSORIO TV PHILCO 24\" DIGITAL HDMI/USB BIVOLT 12V",
+    "unidade": "Un"
+  },
+  "1-0617": {
+    "descricao": "ACESSORIO TV PHILCO 32\" DIGITAL HDMI/USB BIVOLT",
+    "unidade": "Un"
+  },
+  "1-0618": {
+    "descricao": "ACESSORIO DPM FOCA ORBIT VAN E/S/J DISPOSITIVO DE POLTRONA MOVEL",
+    "unidade": "Un"
+  },
+  "1-0619": {
+    "descricao": "ELETRICA INVERSOR DE TENSAO 1000W 120V ONDA MODIFICADA",
+    "unidade": "Un"
+  },
+  "1-0620": {
+    "descricao": "ACESSORIO PLATAFORMA ELEVATORIA ELETRO-HIDRAULICA BIPARTIDA",
+    "unidade": "Un"
+  },
+  "1-0621": {
+    "descricao": "ACESSORIO PLATAFORMA ELEVATORIA ELETRO-HIDRAULICA FECHADA",
+    "unidade": "Un"
+  },
+  "1-0622": {
+    "descricao": "ACESSORIO DPM FOCA ORBIT VAN L2H2 DISPOSITIVO DE POLTRONA MOVEL",
+    "unidade": "Un"
+  },
+  "3-0266": {
+    "descricao": "ACESSORIO CJ ARANDELA BASE IMPRESSAO 3D",
+    "unidade": "CJ"
+  },
+  "3-0267": {
+    "descricao": "ACESSORIO CJ ARANDELA CAPA IMPRESSAO 3D",
+    "unidade": "CJ"
+  },
+  "1-0623": {
+    "descricao": "ELETRICA BASE RELE CONECTOR 6 3 FEMEA 5 PINOS",
+    "unidade": "Un"
+  },
+  "1-0624": {
+    "descricao": "ELETRICA BATERIA AUX 100 A Z100E - ZETTA FREE",
+    "unidade": "Un"
+  },
+  "1-0625": {
+    "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 LIGA DESLIGA",
+    "unidade": "Un"
+  },
+  "1-0626": {
+    "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 QUADRADA LIGA DESLIGA",
+    "unidade": "Un"
+  },
+  "1-0627": {
+    "descricao": "ELETRICA BOTOEIRA PARADA SOLICITADA",
+    "unidade": "Un"
+  },
+  "1-0628": {
+    "descricao": "ELETRICA BOTOEIRA TIC TAC HASTE FERRO 2 POSICOES",
+    "unidade": "Un"
+  },
+  "1-0629": {
+    "descricao": "ELETRICA BOTOEIRA TIC TAC HASTE FERRO 3 POSICOES",
+    "unidade": "Un"
+  },
+  "1-0630": {
+    "descricao": "ELETRICA CABO AUTOMOTIVO 105C PRETO 4MM",
+    "unidade": "m"
+  },
+  "1-0631": {
+    "descricao": "ELETRICA CABO AUTOMOTIVO 105C VERMELHO 10MM",
+    "unidade": "m"
+  },
+  "1-0632": {
+    "descricao": "ELETRICA CABO AUTOMOTIVO 105C VERMELHO 4MM",
+    "unidade": "m"
+  },
+  "1-0633": {
+    "descricao": "ELETRICA CABO PP 2X1,5MM",
+    "unidade": "m"
+  },
+  "1-0634": {
+    "descricao": "ELETRICA CABO PP 3X2,5MM",
+    "unidade": "m"
+  },
+  "1-0635": {
+    "descricao": "ELETRICA CACHIMBO PROTECAO FIO",
+    "unidade": "Un"
+  },
+  "1-0636": {
+    "descricao": "ELETRICA CHAVE GERAL 12V",
+    "unidade": "Un"
+  },
+  "1-0637": {
+    "descricao": "ELETRICA CHICOTE ILUMINACAO B/J/D FURGAO",
+    "unidade": "Un"
+  },
+  "1-0638": {
+    "descricao": "ELETRICA CHICOTE ILUMINACAO B/J/D VITRE",
+    "unidade": "Un"
+  },
+  "1-0639": {
+    "descricao": "ELETRICA CHICOTE ILUMINACAO E/S/J TB",
+    "unidade": "Un"
+  },
+  "1-0640": {
+    "descricao": "ELETRICA CHICOTE ILUMINACAO MASTER L1H1/L2H2/L3H2",
+    "unidade": "Un"
+  },
+  "1-0641": {
+    "descricao": "ELETRICA CHICOTE TACOGRAFO B/J/D FURGAO",
+    "unidade": "Un"
+  },
+  "1-0642": {
+    "descricao": "ELETRICA CHICOTE TACOGRAFO B/J/D VITRE",
+    "unidade": "Un"
+  },
+  "1-0643": {
+    "descricao": "ELETRICA CHICOTE TACOGRAFO E/S/J",
+    "unidade": "Un"
+  },
+  "1-0644": {
+    "descricao": "ELETRICA CHICOTE TACOGRAFO MASTER L1H1/L2H2/L3H2",
+    "unidade": "Un"
+  },
+  "1-0645": {
+    "descricao": "ELETRICA CONECTOR FASTON FEMEA BRANCO 2 VIAS",
+    "unidade": "Un"
+  },
+  "1-0646": {
+    "descricao": "ELETRICA CONECTOR FASTON FEMEA BRANCO 3 VIAS",
+    "unidade": "Un"
+  },
+  "1-0647": {
+    "descricao": "ELETRICA CONECTOR FASTON FEMEA BRANCO 4 VIAS",
+    "unidade": "Un"
+  },
+  "1-0648": {
+    "descricao": "ELETRICA CONECTOR FASTON FEMEA BRANCO 5 VIAS",
+    "unidade": "Un"
+  },
+  "1-0649": {
+    "descricao": "ELETRICA CONECTOR FASTON FEMEA BRANCO 8 VIAS",
+    "unidade": "Un"
+  },
+  "1-0650": {
+    "descricao": "ELETRICA CONECTOR FASTON MACHO BRANCO 2 VIAS",
+    "unidade": "Un"
+  },
+  "1-0651": {
+    "descricao": "ELETRICA CONECTOR FASTON MACHO BRANCO 3 VIAS",
+    "unidade": "Un"
+  },
+  "1-0652": {
+    "descricao": "ELETRICA CONECTOR FASTON MACHO BRANCO 4 VIAS",
+    "unidade": "Un"
+  },
+  "1-0653": {
+    "descricao": "ELETRICA CONECTOR FASTON MACHO BRANCO 5 VIAS",
+    "unidade": "Un"
+  },
+  "1-0654": {
+    "descricao": "ELETRICA CONECTOR FASTON MACHO BRANCO 8 VIAS",
+    "unidade": "Un"
+  },
+  "1-0655": {
+    "descricao": "ELETRICA CONTROLADOR 2 CANAIS MODULO PISCA 12V 2A PULSO NEGATIVO CL LUZ",
+    "unidade": "Un"
+  },
+  "1-0656": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 12,5MM",
+    "unidade": "Un"
+  },
+  "1-0657": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 15MM",
+    "unidade": "Un"
+  },
+  "1-0658": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 18MM",
+    "unidade": "Un"
+  },
+  "1-0659": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 25MM",
+    "unidade": "Un"
+  },
+  "1-0660": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 4,5MM",
+    "unidade": "Un"
+  },
+  "1-0661": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 7,5MM",
+    "unidade": "Un"
+  },
+  "1-0662": {
+    "descricao": "ELETRICA CORRUGADO CONDUITE AUTOMOTIVO 9,5MM",
+    "unidade": "Un"
+  },
+  "1-0663": {
+    "descricao": "ELETRICA DECODER 12V 24V SOLICITACAO DE PARADA",
+    "unidade": "Un"
+  },
+  "1-0664": {
+    "descricao": "ELETRICA DIAMOND 4 LEDS AZUL",
+    "unidade": "Un"
+  },
+  "1-0665": {
+    "descricao": "ELETRICA DIAMOND 4 LEDS BRANCO",
+    "unidade": "Un"
+  },
+  "1-0666": {
+    "descricao": "ELETRICA DIAMOND 6 LEDS AZUL",
+    "unidade": "Un"
+  },
+  "1-0667": {
+    "descricao": "ELETRICA DIAMOND 6 LEDS BRANCO",
+    "unidade": "Un"
+  },
+  "1-0668": {
+    "descricao": "ELETRICA ESTROBO 4 LEDS 1W EXTERNO AZUL",
+    "unidade": "Un"
+  },
+  "1-0669": {
+    "descricao": "ELETRICA ESTROBO 4 LEDS 1W EXTERNO BRANCO CRISTAL",
+    "unidade": "Un"
+  },
+  "1-0670": {
+    "descricao": "ELETRICA ESTROBO 4 LEDS 1W EXTERNO VERMELHO",
+    "unidade": "Un"
+  },
+  "1-0671": {
+    "descricao": "ELETRICA ESTROBO 6 LEDS 1W EXTERNO AZUL",
+    "unidade": "Un"
+  },
+  "1-0672": {
+    "descricao": "ELETRICA ESTROBO 6 LEDS 1W EXTERNO BRANCO CRISTAL",
+    "unidade": "Un"
+  },
+  "1-0673": {
+    "descricao": "ELETRICA ESTROBO REDONDO BRANCO 6 LEDS",
+    "unidade": "Un"
+  },
+  "1-0674": {
+    "descricao": "ELETRICA EXAUSTOR 80MMX80MM 12V",
+    "unidade": "Un"
+  },
+  "1-0675": {
+    "descricao": "ELETRICA FAROL EMBARQUE PRETO 6W",
+    "unidade": "Un"
+  },
+  "1-0676": {
+    "descricao": "ELETRICA FIO 1,0MM AMARELO",
+    "unidade": "m"
+  },
+  "1-0677": {
+    "descricao": "ELETRICA FIO 1,0MM AZUL",
+    "unidade": "m"
+  },
+  "1-0678": {
+    "descricao": "ELETRICA FIO 1,0MM BRANCO",
+    "unidade": "m"
+  },
+  "1-0679": {
+    "descricao": "ELETRICA FIO 1,0MM CINZA",
+    "unidade": "m"
+  },
+  "1-0680": {
+    "descricao": "ELETRICA FIO 1,0MM LARANJA",
+    "unidade": "m"
+  },
+  "1-0681": {
+    "descricao": "ELETRICA FIO 1,0MM MARROM",
+    "unidade": "m"
+  },
+  "1-0682": {
+    "descricao": "ELETRICA FIO 1,0MM PRETO",
+    "unidade": "m"
+  },
+  "1-0683": {
+    "descricao": "ELETRICA FIO 1,0MM VERDE",
+    "unidade": "m"
+  },
+  "1-0684": {
+    "descricao": "ELETRICA FIO 1,0MM VERMELHO",
+    "unidade": "m"
+  },
+  "1-0685": {
+    "descricao": "ELETRICA FIO 2,5MM PRETO",
+    "unidade": "m"
+  },
+  "1-0686": {
+    "descricao": "ELETRICA FIO 2,5MM VERMELHO",
+    "unidade": "m"
+  },
+  "1-0687": {
+    "descricao": "ELETRICA FITA 3528 LED RGB DIGITAL COM SILICONE PROTECAO IP20 5 M",
+    "unidade": "m"
+  },
+  "1-0688": {
+    "descricao": "ELETRICA FITA LED 2835 AZUL MONOCROMATICA COM SILICONE PROTECAO IP65 5M",
+    "unidade": "m"
+  },
+  "1-0689": {
+    "descricao": "ELETRICA FITA LED 2835 AZUL MONOCROMATICA SEM SILICONE PROTECAO IP65 5M",
+    "unidade": "m"
+  },
+  "1-0690": {
+    "descricao": "ELETRICA FITA LED 2835 BRANCO FRIO 6000 K MONOCROMATICA COM SILICONE PROTECAO IP65 5M",
+    "unidade": "m"
+  },
+  "1-0691": {
+    "descricao": "ELETRICA FITA LED 2835 BRANCO FRIO 6000 K MONOCROMATICA SEM SILICONE PROTECAO IP65 5M",
+    "unidade": "m"
+  },
+  "1-0692": {
+    "descricao": "ELETRICA FITA LED ULTRA FINA 2835 BRANCO QUENTE 4000 K SEM SILICONE",
+    "unidade": "m"
+  },
+  "1-0693": {
+    "descricao": "ELETRICA FITA LED WS2811 5050 RGB ENDERECAVEL COM SILICONE PROTECAO IP65 5M",
+    "unidade": "m"
+  },
+  "1-0694": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 10A",
+    "unidade": "Un"
+  },
+  "1-0695": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 15A",
+    "unidade": "Un"
+  },
+  "1-0696": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 20A",
+    "unidade": "Un"
+  },
+  "1-0697": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 25A",
+    "unidade": "Un"
+  },
+  "1-0698": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 30A",
+    "unidade": "Un"
+  },
+  "1-0699": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 35A",
+    "unidade": "Un"
+  },
+  "1-0700": {
+    "descricao": "ELETRICA FUSIVEL LAMINA 5A",
+    "unidade": "Un"
+  },
+  "1-0701": {
+    "descricao": "ELETRICA FUSIVEL LAMINA MINI 10A",
+    "unidade": "Un"
+  },
+  "1-0702": {
+    "descricao": "ELETRICA FUSIVEL LAMINA MINI 5A",
+    "unidade": "Un"
+  },
+  "1-0703": {
+    "descricao": "ELETRICA FUSIVEL MIDI 70A 4 CM",
+    "unidade": "Un"
+  },
+  "1-0704": {
+    "descricao": "ELETRICA ILUMINACAO BALIZADORA LED DECK EMBUTIR REDONDO 2W 3000 K PROTECAO IP65",
+    "unidade": "Un"
+  },
+  "1-0705": {
+    "descricao": "ELETRICA ILUMINACAO MINI SPOT REDONDO 3W PRETO 3000 K BIVOLT PROTECAO IP20",
+    "unidade": "Un"
+  },
+  "1-0706": {
+    "descricao": "ELETRICA INTERRUPTOR LIGA DESLIGA UNIVERSAL ILUMINADO",
+    "unidade": "Un"
+  },
+  "1-0707": {
+    "descricao": "ELETRICA INTERRUPTOR PORTA REGULAVEL PROVA DAGUA",
+    "unidade": "Un"
+  },
+  "1-0708": {
+    "descricao": "ELETRICA LAMPADA 6/9 12V 2W BASE METAL",
+    "unidade": "Un"
+  },
+  "1-0709": {
+    "descricao": "ELETRICA LAMPADA TORPEDO LED 36MM",
+    "unidade": "Un"
+  },
+  "1-0710": {
+    "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+    "unidade": "Un"
+  },
+  "1-0711": {
+    "descricao": "ELETRICA LED PILOTO AZUL 6MM 12V IMPERMEAVEL IP67",
+    "unidade": "Un"
+  },
+  "1-0712": {
+    "descricao": "ELETRICA LED PILOTO VERMELHO 6MM 12V IMPERMEAVEL IP67",
+    "unidade": "Un"
+  },
+  "1-0713": {
+    "descricao": "ELETRICA LUMINARIA ALURE 30",
+    "unidade": "Un"
+  },
+  "1-0714": {
+    "descricao": "ELETRICA LUMINARIA DICROICA EMBUTIR VE3 COM TOQUE COR CINZA TITANIO",
+    "unidade": "Un"
+  },
+  "1-0715": {
+    "descricao": "ELETRICA LUMINARIA DICROICA EMBUTIR VE3 COM TOQUE COR PRETA",
+    "unidade": "Un"
+  },
+  "1-0716": {
+    "descricao": "ELETRICA LUMINARIA VAN TAMANHO M",
+    "unidade": "Un"
+  },
+  "1-0717": {
+    "descricao": "ELETRICA LUZ LED AZUL DIODO 5MM",
+    "unidade": "Un"
+  },
+  "1-0718": {
+    "descricao": "ELETRICA LUZ LED BRANCO FRIO DIODO 5MM",
+    "unidade": "Un"
+  },
+  "1-0719": {
+    "descricao": "ELETRICA LUZ LED BRANCO QUENTE DIODO 5MM",
+    "unidade": "Un"
+  },
+  "1-0720": {
+    "descricao": "ELETRICA LUZ LED VERMELHO DIODO 5MM",
+    "unidade": "Un"
+  },
+  "3-0268": {
+    "descricao": "ACESSORIO CJ LUZ VIGIA",
+    "unidade": "CJ"
+  },
+  "1-0721": {
+    "descricao": "ELETRICA LUZ VIGIA DELIMITADORA C/ ABA E LED ACRILICO CRISTAL 117X26X35",
+    "unidade": "Un"
+  },
+  "1-0722": {
+    "descricao": "ELETRICA LUZ VIGIA DELIMITADORA C/ ABA E LED ACRILICO VERMELHO 117X26X35",
+    "unidade": "Un"
+  },
+  "1-0723": {
+    "descricao": "ELETRICA MODULO COMANDO ESTROBO 6 FUNCOES",
+    "unidade": "Un"
+  },
+  "1-0724": {
+    "descricao": "ELETRICA PERFIL SILICONE 11MMX11MM TRANSLUCIDO",
+    "unidade": "m"
+  },
+  "1-0725": {
+    "descricao": "ELETRICA PLUG 90º PRETO MACHO 2P+T 10A",
+    "unidade": "Un"
+  },
+  "1-0726": {
+    "descricao": "ELETRICA PLUG RETO PRETO FEMEA 2P+T 10A",
+    "unidade": "Un"
+  },
+  "1-0727": {
+    "descricao": "ELETRICA PLUG RETO PRETO MACHO 2P+T 10A",
+    "unidade": "Un"
+  },
+  "1-0728": {
+    "descricao": "ELETRICA PORTA FUSIVEL LAMINA 2,5MM COR PRETO",
+    "unidade": "Un"
+  },
+  "1-0729": {
+    "descricao": "ELETRICA PORTA FUSIVEL MIDI 4 CM COM TAMPA",
+    "unidade": "Un"
+  },
+  "1-0730": {
+    "descricao": "ELETRICA PORTA LAMPADA BASE CURVA MARTELINHO IMPRESSAO 3D",
+    "unidade": "Un"
+  },
+  "1-0731": {
+    "descricao": "ELETRICA REGUA LED 4014 BRANCO FRIO 6000 K MONOCROMATICA SEM SILICONE PROTECAO IP54 1M",
+    "unidade": "Un"
+  },
+  "1-0732": {
+    "descricao": "ELETRICA REGULADOR TENSAO CORRENTE STEP DOWN BUCK DC 300W 9A",
+    "unidade": "Un"
+  },
+  "1-0733": {
+    "descricao": "ELETRICA RELE UNIVERSAL 4 PINOS 100A COM SUPORTE",
+    "unidade": "Un"
+  },
+  "1-0734": {
+    "descricao": "ELETRICA RELE UNIVERSAL 4 PINOS 40A COM SUPORTE",
+    "unidade": "Un"
+  },
+  "1-0735": {
+    "descricao": "ELETRICA RELE UNIVERSAL 5 PINOS 40A COM SUPORTE",
+    "unidade": "Un"
+  },
+  "1-0736": {
+    "descricao": "ELETRICA SENSOR MAGNETICO",
+    "unidade": "Un"
+  },
+  "1-0737": {
+    "descricao": "ELETRICA SIRENE RE 12V",
+    "unidade": "Un"
+  },
+  "1-0738": {
+    "descricao": "ELETRICA SUPORTE E ABRACADEIRA SENSOR MAGNETICO",
+    "unidade": "Un"
+  },
+  "1-0739": {
+    "descricao": "ELETRICA SUPORTE GIROFLEX",
+    "unidade": "Un"
+  },
+  "1-0740": {
+    "descricao": "ELETRICA SUPORTE GIROFLEX UNHA",
+    "unidade": "Un"
+  },
+  "1-0741": {
+    "descricao": "ELETRICA TACOGRAFO FIP SPY 32",
+    "unidade": "Un"
+  },
+  "1-0742": {
+    "descricao": "ELETRICA TERMINAL BATERIA TIPO SAPO",
+    "unidade": "Un"
+  },
+  "1-0743": {
+    "descricao": "ELETRICA TERMINAL FASTON LATAO FEMEA 1/4 6,3MM",
+    "unidade": "Un"
+  },
+  "1-0744": {
+    "descricao": "ELETRICA TERMINAL FASTON LATAO MACHO 1/4 6,3MM",
+    "unidade": "Un"
+  },
+  "1-0745": {
+    "descricao": "ELETRICA TERMINAL LATAO FEMEA 2,8MM MOSQUITO",
+    "unidade": "Un"
+  },
+  "1-0746": {
+    "descricao": "ELETRICA TERMINAL LATAO OLHAL GRANDE 3/8",
+    "unidade": "Un"
+  },
+  "1-0747": {
+    "descricao": "ELETRICA TERMINAL LATAO OLHAL MEDIO 1/4",
+    "unidade": "Un"
+  },
+  "1-0748": {
+    "descricao": "ELETRICA TERMINAL LATAO OLHAL PEQUENO 3/16",
+    "unidade": "Un"
+  },
+  "1-0749": {
+    "descricao": "ELETRICA TOMADA 12V TIPO ISQUEIRO COM TAMPA",
+    "unidade": "Un"
+  },
+  "1-0750": {
+    "descricao": "ELETRICA TOMADA MACHO 2P RETA 10A",
+    "unidade": "Un"
+  },
+  "1-0751": {
+    "descricao": "ELETRICA TOMADA MARGIRIUS P/ MOVEIS 2P+T PRETA 10A 250V",
+    "unidade": "Un"
+  },
+  "1-0752": {
+    "descricao": "ELETRICA TOMADA PAINEL MARGIRIUS 2P+T C/ RABICHO PRETA 10A 250V",
+    "unidade": "Un"
+  },
+  "1-0753": {
+    "descricao": "ELETRICA TOMADA PLUG STECK MACHO 2P+T 16A 200/250V 6H AZ IP44",
+    "unidade": "Un"
+  },
+  "1-0754": {
+    "descricao": "ELETRICA TOMADA SOBREPOR STECK 2P+T 16A 200/250V 6H AZ IP44",
+    "unidade": "Un"
+  },
+  "1-0755": {
+    "descricao": "ELETRICA TOMADA USB A LELONG 3 1 LUZ VERDE DUPLA SOBREPOR",
+    "unidade": "Un"
+  },
+  "1-0756": {
+    "descricao": "ELETRICA TOMADA USB A ORBE 3 1 LUZ AZUL DUPLA EMBUTIR COM TAMPA NH 1 5A",
+    "unidade": "Un"
+  },
+  "1-0757": {
+    "descricao": "ELETRICA TOMADA USB A ORBE 3 1 LUZ AZUL DUPLA EMBUTIR TAMPA REDONDA 1 5A",
+    "unidade": "Un"
+  },
+  "1-0758": {
+    "descricao": "ELETRICA TOMADA USB A ORBE 3 1 LUZ AZUL SIMPLES SMARTPLUG 1 5A",
+    "unidade": "Un"
+  },
+  "1-0759": {
+    "descricao": "ELETRICA TOMADA USB DUPLA TIPO C",
+    "unidade": "Un"
+  },
+  "1-0760": {
+    "descricao": "ELETRICA LANTERNA SAIDA EMERGENCIA BASE RETA 6 LED 12V",
+    "unidade": "Un"
+  },
+  "VE-0001": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 9,5 M³ FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0002": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 9,5 M³ 16L",
+    "unidade": "Un"
+  },
+  "VE-0003": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 9,5 M³ VITRE REVESTIDA",
+    "unidade": "Un"
+  },
+  "VE-0004": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 10,5 M³",
+    "unidade": "Un"
+  },
+  "VE-0005": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 14 M³",
+    "unidade": "Un"
+  },
+  "VE-0006": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 14 M³",
+    "unidade": "Un"
+  },
+  "VE-0007": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 15,5 M³",
+    "unidade": "Un"
+  },
+  "VE-0008": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 10,5 M³ VITRE REVESTIDA",
+    "unidade": "Un"
+  },
+  "VE-0009": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 14 M³ VITRE REVESTIDA",
+    "unidade": "Un"
+  },
+  "VE-0010": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 14 M³ VITRE REVESTIDA",
+    "unidade": "Un"
+  },
+  "VE-0011": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 15,5 M³ VITRE REVESTIDA",
+    "unidade": "Un"
+  },
+  "VE-0012": {
+    "descricao": "MERCEDES-BENZ SPRINTER 417 10,5 M³ ORIGINAL 16L",
+    "unidade": "Un"
+  },
+  "VE-0013": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 15,5 M³ ORIGINAL 18L",
+    "unidade": "Un"
+  },
+  "VE-0014": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 15,5 M³ ORIGINAL 20L",
+    "unidade": "Un"
+  },
+  "VE-0015": {
+    "descricao": "MERCEDES-BENZ SPRINTER 517 15,5 M³ ORIGINAL 21L",
+    "unidade": "Un"
+  },
+  "VE-0016": {
+    "descricao": "FORD TRANSIT L2H3",
+    "unidade": "Un"
+  },
+  "VE-0017": {
+    "descricao": "FORD TRANSIT L3H3",
+    "unidade": "Un"
+  },
+  "VE-0018": {
+    "descricao": "FORD TRANSIT L3H2 VITRE",
+    "unidade": "Un"
+  },
+  "VE-0019": {
+    "descricao": "FORD TRANSIT L4H3 VITRE",
+    "unidade": "Un"
+  },
+  "VE-0020": {
+    "descricao": "FORD TRANSIT L3H2 ORIGINAL 15L",
+    "unidade": "Un"
+  },
+  "VE-0021": {
+    "descricao": "FORD TRANSIT L4H3 ORIGINAL 18L",
+    "unidade": "Un"
+  },
+  "VE-0022": {
+    "descricao": "RENAULT MASTER L1H1",
+    "unidade": "Un"
+  },
+  "VE-0023": {
+    "descricao": "RENAULT MASTER L2H2",
+    "unidade": "Un"
+  },
+  "VE-0024": {
+    "descricao": "RENAULT MASTER L3H2",
+    "unidade": "Un"
+  },
+  "VE-0025": {
+    "descricao": "RENAULT MASTER L3H2 VITRE",
+    "unidade": "Un"
+  },
+  "VE-0026": {
+    "descricao": "RENAULT MASTER L3H2 ORIGINAL 16L",
+    "unidade": "Un"
+  },
+  "VE-0027": {
+    "descricao": "RENAULT KANGOO FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0028": {
+    "descricao": "PEUGEOT EXPERT FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0029": {
+    "descricao": "PEUGEOT EXPERT VITRE",
+    "unidade": "Un"
+  },
+  "VE-0030": {
+    "descricao": "PEUGEOT BOXER FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0031": {
+    "descricao": "PEUGEOT BOXER VITRE",
+    "unidade": "Un"
+  },
+  "VE-0032": {
+    "descricao": "CITROËN JUMPY FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0033": {
+    "descricao": "CITROËN JUMPY VITRE",
+    "unidade": "Un"
+  },
+  "VE-0034": {
+    "descricao": "CITROËN JUMPER FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0035": {
+    "descricao": "CITROËN JUMPER VITRE",
+    "unidade": "Un"
+  },
+  "VE-0036": {
+    "descricao": "CITROËN JUMPER ORIGINAL 17L",
+    "unidade": "Un"
+  },
+  "VE-0037": {
+    "descricao": "FIAT SCUDO FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0038": {
+    "descricao": "FIAT SCUDO VITRE",
+    "unidade": "Un"
+  },
+  "VE-0039": {
+    "descricao": "FIAT DUCATO FURGAO",
+    "unidade": "Un"
+  },
+  "VE-0040": {
+    "descricao": "FIAT DUCATO VITRE",
+    "unidade": "Un"
+  },
+  "VE-0041": {
+    "descricao": "FIAT DUCATO ORIGINAL 17L",
+    "unidade": "Un"
+  },
+  "VE-0042": {
+    "descricao": "IVECO 45-160 ORIGINAL 16L",
+    "unidade": "Un"
+  },
+  "VE-0043": {
+    "descricao": "IVECO 50-180 VITRE",
+    "unidade": "Un"
+  },
+  "VE-0044": {
+    "descricao": "IVECO 50-180 ORIGINAL 16L",
+    "unidade": "Un"
+  },
+  "UC-0001": {
+    "descricao": "CM ACUCAR 1KG",
+    "unidade": "Un"
+  },
+  "UC-0002": {
+    "descricao": "CM ADOCANTE LIQUIDO",
+    "unidade": "Un"
+  },
+  "UC-0003": {
+    "descricao": "CM AGUA SANITARIA 5L",
+    "unidade": "Un"
+  },
+  "UC-0004": {
+    "descricao": "CM ALCOOL 70 % 1L",
+    "unidade": "Un"
+  },
+  "UC-0005": {
+    "descricao": "CM SHAMPOO APC AUTOMOTIVO 50L",
+    "unidade": "Un"
+  },
+  "UC-0006": {
+    "descricao": "CM ARAME SOLDA MIG 1 0MM BOBINA 15KG",
+    "unidade": "Un"
+  },
+  "UC-0007": {
+    "descricao": "CM ATADURA CREPE",
+    "unidade": "Un"
+  },
+  "UC-0008": {
+    "descricao": "CM BAND AID",
+    "unidade": "Un"
+  },
+  "UC-0009": {
+    "descricao": "CM BOBINA PAPEL KRAFT BEGE-MAX",
+    "unidade": "Un"
+  },
+  "UC-0010": {
+    "descricao": "CM BROCA 1 5MM",
+    "unidade": "Un"
+  },
+  "UC-0011": {
+    "descricao": "CM BROCA 10MM",
+    "unidade": "Un"
+  },
+  "UC-0012": {
+    "descricao": "CM BROCA 12MM",
+    "unidade": "Un"
+  },
+  "UC-0013": {
+    "descricao": "CM BROCA 3MM",
+    "unidade": "Un"
+  },
+  "UC-0014": {
+    "descricao": "CM BROCA 5 1MM",
+    "unidade": "Un"
+  },
+  "UC-0015": {
+    "descricao": "CM BROCA 7MM",
+    "unidade": "Un"
+  },
+  "UC-0016": {
+    "descricao": "CM BROCA 7 1MM",
+    "unidade": "Un"
+  },
+  "UC-0017": {
+    "descricao": "CM BROCA 8MM",
+    "unidade": "Un"
+  },
+  "UC-0018": {
+    "descricao": "CM BROCA 8MM X 330MM",
+    "unidade": "Un"
+  },
+  "UC-0019": {
+    "descricao": "CM BUCHA LIMPEZA",
+    "unidade": "Un"
+  },
+  "UC-0020": {
+    "descricao": "CM BUCHA SIMPLES PRETA",
+    "unidade": "Un"
+  },
+  "UC-0021": {
+    "descricao": "CM CADERNO A4 80 FOLHA",
+    "unidade": "Un"
+  },
+  "UC-0022": {
+    "descricao": "CM CAFE GRAO 1KG",
+    "unidade": "Un"
+  },
+  "UC-0023": {
+    "descricao": "CM CAFE PO 500G",
+    "unidade": "Un"
+  },
+  "UC-0024": {
+    "descricao": "CM CAIXA CLIPES DE PAPEL",
+    "unidade": "Un"
+  },
+  "UC-0025": {
+    "descricao": "CM CAIXA DE COTONETES",
+    "unidade": "Un"
+  },
+  "UC-0026": {
+    "descricao": "CM CAIXA GRAMPO GRAMPEADOR 26/6",
+    "unidade": "Un"
+  },
+  "UC-0027": {
+    "descricao": "CM CANETA ESFEROGRAFICA AZUL",
+    "unidade": "Un"
+  },
+  "UC-0028": {
+    "descricao": "CM CARNAUBA EXPRESS VONIXX",
+    "unidade": "Un"
+  },
+  "UC-0029": {
+    "descricao": "CM CATALISADOR 2 1 FOSCO VINILICO",
+    "unidade": "Un"
+  },
+  "1-0761": {
+    "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
+    "unidade": "Un"
+  },
+  "1-0762": {
+    "descricao": "CM COLA ACRILICO FINA CA-60 1L",
+    "unidade": "Un"
+  },
+  "1-0763": {
+    "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
+    "unidade": "Un"
+  },
+  "1-0764": {
+    "descricao": "CM COLA INSTANTANEA 793 20G TEKBOND",
+    "unidade": "Un"
+  },
+  "1-0765": {
+    "descricao": "CM COLA MADEIRA BRANCA 500G",
+    "unidade": "Un"
+  },
+  "1-0766": {
+    "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+    "unidade": "Un"
+  },
+  "1-0767": {
+    "descricao": "CM COLA PU PARABRISA TERESON BOND 180 3H CURA 600ML",
+    "unidade": "Un"
+  },
+  "1-0768": {
+    "descricao": "CM COLA PU PARABRISA IMPACTA 24H CURA 400G",
+    "unidade": "Un"
+  },
+  "UC-0030": {
+    "descricao": "CM COLA QUENTE BASTAO 11MM",
+    "unidade": "Un"
+  },
+  "UC-0031": {
+    "descricao": "CM COPO PLASTICO DESCARTAVEL 180ML C/ 100UN",
+    "unidade": "Un"
+  },
+  "UC-0032": {
+    "descricao": "CM COPO PLASTICO DESCARTAVEL 50 ML C/ 100UN",
+    "unidade": "Un"
+  },
+  "UC-0033": {
+    "descricao": "CM DESENGRAXANTE MAXI RUBBER 900ML",
+    "unidade": "Un"
+  },
+  "UC-0034": {
+    "descricao": "CM DESINFETANTE 5L",
+    "unidade": "Un"
+  },
+  "UC-0035": {
+    "descricao": "CM DETERGENTE 500ML",
+    "unidade": "Un"
+  },
+  "UC-0036": {
+    "descricao": "CM DETERGENTE CREMOL AUTOMOTIVO 50L",
+    "unidade": "Un"
+  },
+  "UC-0037": {
+    "descricao": "CM DISCO CORTE 115MM",
+    "unidade": "Un"
+  },
+  "UC-0038": {
+    "descricao": "CM DISCO CORTE 250MM",
+    "unidade": "Un"
+  },
+  "UC-0039": {
+    "descricao": "CM DISCO LIXA 115MM",
+    "unidade": "Un"
+  },
+  "UC-0040": {
+    "descricao": "CM DISCO LIXA 250MM",
+    "unidade": "Un"
+  },
+  "UC-0041": {
+    "descricao": "CM ENVELOPE KRAFT 240MM X 340MM",
+    "unidade": "Un"
+  },
+  "UC-0042": {
+    "descricao": "CM ENVELOPE PLASTICO A4",
+    "unidade": "Un"
+  },
+  "UC-0043": {
+    "descricao": "CM ESPARADRAPO",
+    "unidade": "Un"
+  },
+  "UC-0044": {
+    "descricao": "CM ESTILETE 18MM",
+    "unidade": "Un"
+  },
+  "UC-0045": {
+    "descricao": "CM ESTOPA BRANCA 1KG",
+    "unidade": "Un"
+  },
+  "UC-0046": {
+    "descricao": "CM FITA CREPE 18MM",
+    "unidade": "Un"
+  },
+  "UC-0047": {
+    "descricao": "CM FITA CREPE AMARELA 18MM",
+    "unidade": "Un"
+  },
+  "UC-0048": {
+    "descricao": "CM FITA CREPE AMARELA 5MM",
+    "unidade": "Un"
+  },
+  "UC-0049": {
+    "descricao": "CM FITA CREPE 48MM X 50M",
+    "unidade": "Un"
+  },
+  "UC-0050": {
+    "descricao": "CM FITA DUPLA FACE VHB",
+    "unidade": "Un"
+  },
+  "UC-0051": {
+    "descricao": "CM FITA DUREX 12MM X 50M",
+    "unidade": "Un"
+  },
+  "UC-0052": {
+    "descricao": "CM FITA ISOLANTE 19MM X 20M",
+    "unidade": "Un"
+  },
+  "UC-0053": {
+    "descricao": "CM FITA ZEBRADA",
+    "unidade": "Un"
+  },
+  "UC-0054": {
+    "descricao": "CM FLANELA AMARELA 400MMX600MM",
+    "unidade": "Un"
+  },
+  "UC-0055": {
+    "descricao": "CM FLANELA GREEN 400MMX600MM",
+    "unidade": "Un"
+  },
+  "UC-0056": {
+    "descricao": "CM FLOCO NYLON 33 PRATA 1KG",
+    "unidade": "Un"
+  },
+  "1-0769": {
+    "descricao": "CM GALVANIZADOR A FRIO SPRAY",
+    "unidade": "Un"
+  },
+  "UC-0057": {
+    "descricao": "CM GAZE",
+    "unidade": "Un"
+  },
+  "UC-0058": {
+    "descricao": "CM GIZ",
+    "unidade": "Un"
+  },
+  "UC-0059": {
+    "descricao": "CM GRAFITE HB 0,5MM",
+    "unidade": "Un"
+  },
+  "UC-0060": {
+    "descricao": "CM GUARDANAPO DE PAPEL",
+    "unidade": "Un"
+  },
+  "UC-0061": {
+    "descricao": "CM LAMINA ESTILETE 18MM",
+    "unidade": "Un"
+  },
+  "UC-0062": {
+    "descricao": "CM LAMINA SILICONE SECAGEM",
+    "unidade": "Un"
+  },
+  "UC-0063": {
+    "descricao": "CM LAMINA VIDRO MASCARA SOLDA",
+    "unidade": "Un"
+  },
+  "UC-0064": {
+    "descricao": "CM LAPIS CARPINTEIRO",
+    "unidade": "Un"
+  },
+  "UC-0065": {
+    "descricao": "CM LAPIS GRAFITE",
+    "unidade": "Un"
+  },
+  "UC-0066": {
+    "descricao": "CM LAVA AUTO DESINCRUSTANTE VONIXX",
+    "unidade": "Un"
+  },
+  "UC-0067": {
+    "descricao": "CM LAVA AUTOS BUBBLE FOAM JACA",
+    "unidade": "Un"
+  },
+  "UC-0068": {
+    "descricao": "CM LIMPA VIDROS SPRAY FINISHER",
+    "unidade": "Un"
+  },
+  "UC-0069": {
+    "descricao": "CM LIMPADOR CONCENTRADO",
+    "unidade": "Un"
+  },
+  "UC-0070": {
+    "descricao": "CM LIXA A275 P400",
+    "unidade": "Un"
+  },
+  "UC-0071": {
+    "descricao": "CM LIXA AGUA 1200",
+    "unidade": "Un"
+  },
+  "UC-0072": {
+    "descricao": "CM LIXA CINTA 75MM X 610MM",
+    "unidade": "Un"
+  },
+  "UC-0073": {
+    "descricao": "CM LIXA DAGUA P150",
+    "unidade": "Un"
+  },
+  "UC-0074": {
+    "descricao": "CM LIXA SECO A275 P120",
+    "unidade": "Un"
+  },
+  "UC-0075": {
+    "descricao": "CM LIXA SECO A275 P80",
+    "unidade": "Un"
+  },
+  "UC-0076": {
+    "descricao": "CM LIXA SECO P800",
+    "unidade": "Un"
+  },
+  "UC-0077": {
+    "descricao": "CM LUVA LATEX TAMANHO G",
+    "unidade": "Un"
+  },
+  "UC-0078": {
+    "descricao": "CM LUVA LATEX TAMANHO M",
+    "unidade": "Un"
+  },
+  "UC-0079": {
+    "descricao": "CM LUVA LATEX TAMANHO P",
+    "unidade": "Un"
+  },
+  "UC-0080": {
+    "descricao": "CM LUVA MICROFIBRA 25X16",
+    "unidade": "Un"
+  },
+  "UC-0081": {
+    "descricao": "CM LUVA MULTITATO SS1003",
+    "unidade": "Un"
+  },
+  "UC-0082": {
+    "descricao": "CM LUVA RASPA TAMANHO G",
+    "unidade": "Un"
+  },
+  "UC-0083": {
+    "descricao": "CM LUVA RASPA TAMANHO M",
+    "unidade": "Un"
+  },
+  "UC-0084": {
+    "descricao": "CM LUVA RASPA TAMANHO P",
+    "unidade": "Un"
+  },
+  "UC-0085": {
+    "descricao": "CM LUVAS MECANICA POLIURETANO TATIL",
+    "unidade": "Un"
+  },
+  "UC-0086": {
+    "descricao": "CM LUVAS TIPO CIRURGICA",
+    "unidade": "Un"
+  },
+  "UC-0087": {
+    "descricao": "CM MARCA TEXTO MULTICOLOR",
+    "unidade": "Un"
+  },
+  "UC-0088": {
+    "descricao": "CM MASCARA FILTRO QUIMICO",
+    "unidade": "Un"
+  },
+  "UC-0089": {
+    "descricao": "CM MASCARA PURIFICADOR AR",
+    "unidade": "Un"
+  },
+  "UC-0090": {
+    "descricao": "CM MASSA PLASTICA 400G",
+    "unidade": "Un"
+  },
+  "UC-0091": {
+    "descricao": "CM MASSA POLIR NUMERO 2 900G",
+    "unidade": "Un"
+  },
+  "UC-0092": {
+    "descricao": "CM OCULOS DE PROTECAO INCOLOR C/ CA",
+    "unidade": "Un"
+  },
+  "UC-0093": {
+    "descricao": "CM PACOTE BISCOITOS VARIADOS",
+    "unidade": "Un"
+  },
+  "UC-0094": {
+    "descricao": "CM PACOTE PAPEL A4 C/ 500 FOLHAS",
+    "unidade": "Un"
+  },
+  "UC-0095": {
+    "descricao": "CM PANO DE CHAO",
+    "unidade": "Un"
+  },
+  "UC-0096": {
+    "descricao": "CM PAPEL HIGIENICO FOLHA DUPLA",
+    "unidade": "Un"
+  },
+  "UC-0097": {
+    "descricao": "CM PAPEL HIGIENICO FOLHA SIMPLES",
+    "unidade": "Un"
+  },
+  "UC-0098": {
+    "descricao": "CM PAPEL TOALHA FOLHA DUPLA",
+    "unidade": "Un"
+  },
+  "UC-0099": {
+    "descricao": "CM PAPEL TOALHA FOLHA SIMPLES",
+    "unidade": "Un"
+  },
+  "UC-0100": {
+    "descricao": "CM PASTA LIMPEZA MAOS 2KG",
+    "unidade": "Un"
+  },
+  "UC-0101": {
+    "descricao": "CM PERNEIRA RASPA",
+    "unidade": "Un"
+  },
+  "UC-0102": {
+    "descricao": "CM PILHA ALCALINA AA",
+    "unidade": "Un"
+  },
+  "UC-0103": {
+    "descricao": "CM PILHA ALCALINA AAA",
+    "unidade": "Un"
+  },
+  "UC-0104": {
+    "descricao": "CM PINCEL",
+    "unidade": "Un"
+  },
+  "UC-0105": {
+    "descricao": "CM PINCEL BRUSH EXTERNO 16",
+    "unidade": "Un"
+  },
+  "UC-0106": {
+    "descricao": "CM PINCEL BRUSH INTERNO 16",
+    "unidade": "Un"
+  },
+  "UC-0107": {
+    "descricao": "CM PINCA",
+    "unidade": "Un"
+  },
+  "UC-0108": {
+    "descricao": "CM PRETINHO PNEU",
+    "unidade": "Un"
+  },
+  "UC-0109": {
+    "descricao": "CM TINTA PRETO CADILAC",
+    "unidade": "Un"
+  },
+  "UC-0110": {
+    "descricao": "CM PROTEGEL PLUS SILICONE GEL PROTELIM",
+    "unidade": "Un"
+  },
+  "UC-0111": {
+    "descricao": "CM PROTETOR AURICULAR",
+    "unidade": "Un"
+  },
+  "UC-0112": {
+    "descricao": "CM PROTETOR AURICULAR PLUG C/ CORDAO 16DB C/ CA",
+    "unidade": "Un"
+  },
+  "UC-0113": {
+    "descricao": "CM PROTETOR DORSAL",
+    "unidade": "Un"
+  },
+  "UC-0114": {
+    "descricao": "CM QUEROSENE 900ML",
+    "unidade": "Un"
+  },
+  "UC-0115": {
+    "descricao": "CM RECIBO COMERCIAL",
+    "unidade": "Un"
+  },
+  "UC-0116": {
+    "descricao": "CM REJUVEX VONIXX REVITALIZADOR",
+    "unidade": "Un"
+  },
+  "UC-0117": {
+    "descricao": "CM REMOCOLA REMOVEDOR DE COLAS",
+    "unidade": "Un"
+  },
+  "UC-0118": {
+    "descricao": "CM REMOVEDOR COLA STRIKE VONIXX",
+    "unidade": "Un"
+  },
+  "UC-0119": {
+    "descricao": "CM SACHE ACUCAR",
+    "unidade": "Un"
+  },
+  "UC-0120": {
+    "descricao": "CM SACHE ADOCANTE",
+    "unidade": "Un"
+  },
+  "UC-0121": {
+    "descricao": "CM SACO CHAO XADRES",
+    "unidade": "Un"
+  },
+  "UC-0122": {
+    "descricao": "CM SACO DE LIXO 100L",
+    "unidade": "Un"
+  },
+  "UC-0123": {
+    "descricao": "CM SACO DE LIXO 15L",
+    "unidade": "Un"
+  },
+  "UC-0124": {
+    "descricao": "CM SACO DE LIXO 200L",
+    "unidade": "Un"
+  },
+  "UC-0125": {
+    "descricao": "CM SACO DE LIXO 20L",
+    "unidade": "Un"
+  },
+  "UC-0126": {
+    "descricao": "CM SACO DE LIXO 30L",
+    "unidade": "Un"
+  },
+  "UC-0127": {
+    "descricao": "CM SACO DE LIXO 40L",
+    "unidade": "Un"
+  },
+  "UC-0128": {
+    "descricao": "CM SACO DE LIXO 60L",
+    "unidade": "Un"
+  },
+  "UC-0129": {
+    "descricao": "CM SELADOR PET",
+    "unidade": "Un"
+  },
+  "UC-0130": {
+    "descricao": "CM SELADORA MADEIRA 3600ML",
+    "unidade": "Un"
+  },
+  "UC-0131": {
+    "descricao": "CM SERINGA AGULHA",
+    "unidade": "Un"
+  },
+  "UC-0132": {
+    "descricao": "CM SERRA SABRE",
+    "unidade": "Un"
+  },
+  "UC-0133": {
+    "descricao": "CM SERRINHA 300MM/12\"",
+    "unidade": "Un"
+  },
+  "1-0770": {
+    "descricao": "CM SIKA AKTIVATOR 100 1000ML",
+    "unidade": "Un"
+  },
+  "1-0771": {
+    "descricao": "CM COLA PU SIKAFLEX 256",
+    "unidade": "Un"
+  },
+  "UC-0134": {
+    "descricao": "CM SILICONE ACETICO INCOLOR 280G",
+    "unidade": "Un"
+  },
+  "UC-0135": {
+    "descricao": "CM SILICONE GEL 3 6KG",
+    "unidade": "Un"
+  },
+  "UC-0136": {
+    "descricao": "CM SILICONE GEL 3,6KG",
+    "unidade": "Un"
+  },
+  "UC-0137": {
+    "descricao": "CM SOLUCAO IODO",
+    "unidade": "Un"
+  },
+  "UC-0138": {
+    "descricao": "CM SORO FISIOLOGICO",
+    "unidade": "Un"
+  },
+  "UC-0139": {
+    "descricao": "CM SOLVENTE SINTETICO PARA FLOCAGEM 900ML",
+    "unidade": "Un"
+  },
+  "UC-0140": {
+    "descricao": "CM THINNER 5L",
+    "unidade": "Un"
+  },
+  "UC-0141": {
+    "descricao": "CM TINTA BRANCO MERCEDES BENZ",
+    "unidade": "Un"
+  },
+  "UC-0142": {
+    "descricao": "CM TINTA BRANCO PEUGEOT",
+    "unidade": "Un"
+  },
+  "UC-0143": {
+    "descricao": "CM TINTA BRANCO RENAULT",
+    "unidade": "Un"
+  },
+  "UC-0144": {
+    "descricao": "CM TINTA PRETO FOSCO VINILICO",
+    "unidade": "Un"
+  },
+  "UC-0145": {
+    "descricao": "CM TINTA SPRAY BRANCO",
+    "unidade": "Un"
+  },
+  "UC-0146": {
+    "descricao": "CM TINTA SPRAY PRETO FOSCO",
+    "unidade": "Un"
+  },
+  "UC-0147": {
+    "descricao": "CM TOALHA MICROFIBRA 400MMX600MM ZACS",
+    "unidade": "Un"
+  },
+  "UC-0148": {
+    "descricao": "CM TOALHA SECAGEM TWIST 900MMX600MM",
+    "unidade": "Un"
+  },
+  "1-0772": {
+    "descricao": "CM TINTA SINTETICO BASE SOLVENTE PRETO KL GENESIS PARA FLOCAGEM",
+    "unidade": "Un"
+  },
+  "1-0773": {
+    "descricao": "CM VASELINA LIQUIDA 1L",
+    "unidade": "Un"
+  },
+  "1-0774": {
+    "descricao": "CM VELCRO FEMEA PRETO 25MM",
+    "unidade": "Un"
+  },
+  "1-0775": {
+    "descricao": "CM VELCRO MACHO PRETO 25MM",
+    "unidade": "Un"
+  },
+  "UC-0149": {
+    "descricao": "CM SHAMPOO AUTOMOTIVO",
+    "unidade": "Un"
+  },
+  "1-0776": {
+    "descricao": "MP BARRA CHATA ACO 1 1/2\"X1/8\"",
+    "unidade": "m"
+  },
+  "1-0777": {
+    "descricao": "MP BARRA CHATA ACO 2\"X1/4\"",
+    "unidade": "m"
+  },
+  "1-0778": {
+    "descricao": "MP BARRA CHATA ACO 2\"X1/4\" 50,8MMX6,35MM",
+    "unidade": "m"
+  },
+  "1-0779": {
+    "descricao": "MP BORRACHA PERFIL J PORTA LATERAL E TRASEIRA 11,9X35X15 - 15º",
+    "unidade": "m"
+  },
+  "1-0780": {
+    "descricao": "MP BORRACHA PERFIL U JANELA REVESTIMENTO SPRINTER 20X17X15MM",
+    "unidade": "m"
+  },
+  "1-0781": {
+    "descricao": "MP BORRACHA PERFIL U ACABAMENTO ABS 12X9X7MM",
+    "unidade": "m"
+  },
+  "1-0782": {
+    "descricao": "MP BORRACHA PERFIL L ACABAMENTO PME 14,49X18,94MM - 75º",
+    "unidade": "m"
+  },
+  "1-0783": {
+    "descricao": "MP BORRACHA PERFIL T ACABAMENTO TRILHO 39X21X13MM",
+    "unidade": "m"
+  },
+  "1-0784": {
+    "descricao": "MP BORRACHA PERFIL U PORTA LATERAL/TRASEIRA 19X15MM",
+    "unidade": "m"
+  },
+  "1-0785": {
+    "descricao": "MP CANTONEIRA PVC PRETA C/ SUPORTE LED 6000MM",
+    "unidade": "m"
+  },
+  "1-0786": {
+    "descricao": "MP CANTONEIRA PVC AMARELA PERFIL DEGRAU ESCADA 6000MM",
+    "unidade": "m"
+  },
+  "1-0787": {
+    "descricao": "MP CANTONEIRA PVC PRETA PARAFUSO EMBUTIDO 6000MM",
+    "unidade": "m"
+  },
+  "1-0788": {
+    "descricao": "MP CANTONEIRA PVC PRETA PERFIL DEGRAU ESCADA 6000MM",
+    "unidade": "m"
+  },
+  "1-0789": {
+    "descricao": "MP CHAPA ACRILICO CRISTAL 3050X2050X5MM",
+    "unidade": "m2"
+  },
+  "1-0790": {
+    "descricao": "MP CHAPA ACRILICO FUME 2000X1000X3,0MM",
+    "unidade": "m2"
+  },
+  "1-0791": {
+    "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+    "unidade": "m2"
+  },
+  "1-0792": {
+    "descricao": "MP CHAPA ALUMINIO XADREZ 3000X1000X1,2MM",
+    "unidade": "Un"
+  },
+  "1-0793": {
+    "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
+    "unidade": "m2"
+  },
+  "1-0794": {
+    "descricao": "MP CHAPA COMPENSADO 3270X2200X12MM",
+    "unidade": "m2"
+  },
+  "1-0795": {
+    "descricao": "MP CHAPA COMPENSADO 3000X1600X12MM",
+    "unidade": "m2"
+  },
+  "1-0796": {
+    "descricao": "MP CHAPA COMPENSADO 3800X1850X12MM",
+    "unidade": "m2"
+  },
+  "1-0797": {
+    "descricao": "MP CHAPA COMPENSADO 3200X1850X12MM",
+    "unidade": "m2"
+  },
+  "1-0798": {
+    "descricao": "MP CHAPA COMPENSADO 2200X1600X6MM",
+    "unidade": "m2"
+  },
+  "1-0799": {
+    "descricao": "MP CHAPA EUCATEX 2750X1850X3MM",
+    "unidade": "m2"
+  },
+  "1-0800": {
+    "descricao": "MP CHAPA MDF 2750X1850X12MM",
+    "unidade": "m2"
+  },
+  "1-0801": {
+    "descricao": "MP CHAPA MDF 2750X1850X15MM",
+    "unidade": "m2"
+  },
+  "1-0802": {
+    "descricao": "MP CHAPA MDF 2750X1850X6MM",
+    "unidade": "m2"
+  },
+  "1-0803": {
+    "descricao": "MP CHAPA MDF 2750X1850X9MM",
+    "unidade": "m2"
+  },
+  "1-0804": {
+    "descricao": "MP CHAPA POLICARBONATO C/ LINER 3050X2050X5MM",
+    "unidade": "m2"
+  },
+  "1-0805": {
+    "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+    "unidade": "m2"
+  },
+  "1-0806": {
+    "descricao": "MP FITA ACABAMENTO CANTONEIRA 12MM PRETA PERFIL DEGRAU ESCADA",
+    "unidade": "m"
+  },
+  "1-0807": {
+    "descricao": "MP FITA ACABAMENTO CANTONEIRA 15,1MM AMARELA PERFIL DEGRAU ESCADA",
+    "unidade": "m"
+  },
+  "1-0808": {
+    "descricao": "MP FITA ACABAMENTO CANTONEIRA 15,1MM PRETA PERFIL DEGRAU ESCADA",
+    "unidade": "m"
+  },
+  "1-0809": {
+    "descricao": "MP FITA ACABAMENTO BANCO 25MM",
+    "unidade": "m"
+  },
+  "1-0810": {
+    "descricao": "MP FITA ANTI DERRAPANTE AUTO ADESIVA 50MMX15 M",
+    "unidade": "m"
+  },
+  "1-0811": {
+    "descricao": "MP METALON ACO 1,2X40X20",
+    "unidade": "m"
+  },
+  "1-0812": {
+    "descricao": "MP METALON ACO 1,2X50X30",
+    "unidade": "m"
+  },
+  "1-0813": {
+    "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+    "unidade": "m"
+  },
+  "1-0814": {
+    "descricao": "MP PASSADEIRA LG BRIGHT GRAFITE 92402",
+    "unidade": "m"
+  },
+  "1-0815": {
+    "descricao": "MP PASSADEIRA LG BRIGHT CINZA POLAR 92407",
+    "unidade": "m"
+  },
+  "1-0816": {
+    "descricao": "MP FITA ACABAMENTO CANTONEIRA 15MM TRANSLUCIDO PERFIL DEGRAU ESCADA",
+    "unidade": "m"
+  },
+  "1-0817": {
+    "descricao": "MP PERFIL PORTA PACOTES ENTRE FOCOS PORTA PACOTES 6000MM",
+    "unidade": "m"
+  },
+  "1-0818": {
+    "descricao": "MP PERFIL RETO ESTRIADO PVC AMARELO",
+    "unidade": "m"
+  },
+  "1-0819": {
+    "descricao": "MP PERFIL RETO ESTRIADO PVC PRETO",
+    "unidade": "m"
+  },
+  "1-0820": {
+    "descricao": "MP PERFIL PORTA PACOTES FRONTAL CINZA METALIZADO PORTA PACOTES 6000MM",
+    "unidade": "m"
+  },
+  "1-0821": {
+    "descricao": "MP PERFIL PORTA PACOTES LENTE BRANCO LEITOSO PORTA PACOTES 6000MM",
+    "unidade": "m"
+  },
+  "1-0822": {
+    "descricao": "MP PERFIL PORTA PACOTES TRASEIRO CINZA METALIZADO PORTA PACOTES 6000MM",
+    "unidade": "m"
+  },
+  "1-0823": {
+    "descricao": "MP TUBO ALUMINIO 32MM PEGA MAO",
+    "unidade": "m"
+  },
+  "1-0824": {
+    "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+    "unidade": "m"
+  },
+  "1-0825": {
+    "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI MONTADORA 50X17X16MM",
+    "unidade": "m"
+  },
+  "1-0826": {
+    "descricao": "MP PERFIL ALUMINIO USINADO TRILHO RETRATOR CADEIRA DE RODAS 50X15X10MM",
+    "unidade": "m"
+  },
+  "1-0827": {
+    "descricao": "MP PERFIL PVC H EMENDA MADEIRA 5000MM",
+    "unidade": "m"
+  },
+  "1-0828": {
+    "descricao": "FX ABRACADEIRA NYLON PRETA 100X2,5MM",
+    "unidade": "Un"
+  },
+  "1-0829": {
+    "descricao": "FX ABRACADEIRA NYLON PRETA 150X3,6MM",
+    "unidade": "Un"
+  },
+  "1-0830": {
+    "descricao": "FX ABRACADEIRA NYLON PRETA 280X4,8MM",
+    "unidade": "Un"
+  },
+  "1-0831": {
+    "descricao": "FX ABRACADEIRA NYLON PRETA COM TRAVA 100X4,8MM",
+    "unidade": "Un"
+  },
+  "1-0832": {
+    "descricao": "FX ARRUELA FUNILEIRO 3/8 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0833": {
+    "descricao": "FX ARRUELA LISA 10X30X2,5MM ZINCADA",
+    "unidade": "Un"
+  },
+  "1-0834": {
+    "descricao": "FX ARRUELA LISA M10 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0835": {
+    "descricao": "FX ARRUELA M3 GROSSA ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0836": {
+    "descricao": "FX ARRUELA M3 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0837": {
+    "descricao": "FX ARRUELA M8 GROSSA ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0838": {
+    "descricao": "FX ARRUELA M8 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0839": {
+    "descricao": "FX ARRUELA PRESSAO M10 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0840": {
+    "descricao": "FX ARRUELA PRESSAO M6 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0841": {
+    "descricao": "FX ARRUELA PRESSAO M8 ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0842": {
+    "descricao": "FX BARRA ROSCADA M10 500MM",
+    "unidade": "m"
+  },
+  "1-0843": {
+    "descricao": "FX BUCHA ESPACADORA 10MM",
+    "unidade": "Un"
+  },
+  "1-0844": {
+    "descricao": "FX BUCHA ESPACADORA 15MM",
+    "unidade": "Un"
+  },
+  "1-0845": {
+    "descricao": "FX BUCHA ESPACADORA 18MM",
+    "unidade": "Un"
+  },
+  "1-0846": {
+    "descricao": "FX BUCHA ESPACADORA 20MM",
+    "unidade": "Un"
+  },
+  "1-0847": {
+    "descricao": "FX BUCHA ESPACADORA 25MM",
+    "unidade": "Un"
+  },
+  "1-0848": {
+    "descricao": "FX BUCHA ESPACADORA 30MM",
+    "unidade": "Un"
+  },
+  "1-0849": {
+    "descricao": "FX BUCHA ESPACADORA 55MM",
+    "unidade": "Un"
+  },
+  "1-0850": {
+    "descricao": "FX PARAFUSO ALLEN CABECA CHATA ESCAREADO M10X40MM OLEADO",
+    "unidade": "Un"
+  },
+  "1-0851": {
+    "descricao": "FX PARAFUSO ALLEN CABECA CHATA ESCAREADO M6X35MM OLEADO",
+    "unidade": "Un"
+  },
+  "1-0852": {
+    "descricao": "FX PARAFUSO ALLEN CABECA CHATA ESCAREADO M8X40MM OLEADO",
+    "unidade": "Un"
+  },
+  "1-0853": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE 3,5X35MM PHILIPS FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0854": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,5X19MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0855": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,9X16MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0856": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,9X19MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0857": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,9X25MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0858": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X16MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0859": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X19MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0860": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X25MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0861": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X38MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0862": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X45MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0863": {
+    "descricao": "FX PARAFUSO CHIPBOARD CABECA CHATA PHILIPS 3,5X40MM BICROMATIZADO",
+    "unidade": "Un"
+  },
+  "1-0864": {
+    "descricao": "FX PARAFUSO CHIPBOARD CABECA CHATA PHILIPS 3X10MM BICROMATIZADO",
+    "unidade": "Un"
+  },
+  "1-0865": {
+    "descricao": "FX PARAFUSO CHIPBOARD CABECA CHATA PHILIPS 5X40MM BICROMATIZADO",
+    "unidade": "Un"
+  },
+  "1-0866": {
+    "descricao": "FX PARAFUSO CHIPBOARD CABECA CHATA PHILIPS 5X60MM BICROMATIZADO",
+    "unidade": "Un"
+  },
+  "1-0867": {
+    "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X32MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0868": {
+    "descricao": "FX PARAFUSO PANELA PHILIPS 6,3X16MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0869": {
+    "descricao": "FX PARAFUSO PANELA PHILIPS 6,3X32MM ZINCO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0870": {
+    "descricao": "FX PARAFUSO PONTA AGULHA 3,5X25MM FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0871": {
+    "descricao": "FX PARAFUSO PONTA AGULHA 3,5X35MM FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0872": {
+    "descricao": "FX PARAFUSO PONTA AGULHA 3,5X45MM FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0873": {
+    "descricao": "FX PARAFUSO PONTA BROCA 3,5X25MM FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0874": {
+    "descricao": "FX PARAFUSO PONTA BROCA 3,5X35MM FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0875": {
+    "descricao": "FX PARAFUSO PONTA BROCA 3,5X45MM FOSFATIZADO PRETO",
+    "unidade": "Un"
+  },
+  "1-0876": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X100MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0877": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X110MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0878": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X150MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0879": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X180MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0880": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X30MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0881": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X35MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0882": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X50MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0883": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X60MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0884": {
+    "descricao": "FX PARAFUSO SEXTAVADO M10X70MM ZINCO BRANCO CL8,8",
+    "unidade": "Un"
+  },
+  "1-0885": {
+    "descricao": "FX PARAFUSO SEXTAVADO M5X80MM INOX A2",
+    "unidade": "Un"
+  },
+  "1-0886": {
+    "descricao": "FX PORCA AUTO TRAVANTE M10 ZINCO BRANCO CL8",
+    "unidade": "Un"
+  },
+  "1-0887": {
+    "descricao": "FX PORCA AUTO TRAVANTE M12 ZINCO BRANCO CL8",
+    "unidade": "Un"
+  },
+  "1-0888": {
+    "descricao": "FX PORCA AUTO TRAVANTE M6 ZINCO BRANCO CL8",
+    "unidade": "Un"
+  },
+  "1-0889": {
+    "descricao": "FX PORCA AUTO TRAVANTE M8 BAIXA ZINCO BRANCO CL8",
+    "unidade": "Un"
+  },
+  "1-0890": {
+    "descricao": "FX PORCA TORQUE M10 ZINCO BRANCO CL8",
+    "unidade": "Un"
+  },
+  "1-0891": {
+    "descricao": "FX REBITE ARTICULADO PRETO COM ROSCA",
+    "unidade": "Un"
+  },
+  "1-0892": {
+    "descricao": "FX REBITE RAPIDO PLASTICO BRANCO",
+    "unidade": "Un"
+  },
+  "1-0893": {
+    "descricao": "FX REBITE RAPIDO PLASTICO CHUMBO",
+    "unidade": "Un"
+  },
+  "1-0894": {
+    "descricao": "FX REBITE RAPIDO PLASTICO CINZA",
+    "unidade": "Un"
+  },
+  "1-0895": {
+    "descricao": "FX REBITE RAPIDO PLASTICO INCOLOR",
+    "unidade": "Un"
+  },
+  "1-0896": {
+    "descricao": "FX REBITE RAPIDO PLASTICO PLATINA",
+    "unidade": "Un"
+  },
+  "1-0897": {
+    "descricao": "FX REBITE RAPIDO PLASTICO PRETO",
+    "unidade": "Un"
+  },
+  "1-0898": {
+    "descricao": "FX REBITE REPUXO CABECA REDONDA ACO 4,8X21MM",
+    "unidade": "Un"
+  },
+  "1-0899": {
+    "descricao": "FX REBITE REPUXO CABECA REDONDA ACO 4X10MM",
+    "unidade": "Un"
+  },
+  "1-0900": {
+    "descricao": "FX REBITE REPUXO CABECA REDONDA ACO 4X15MM",
+    "unidade": "Un"
+  },
+  "1-0901": {
+    "descricao": "FX BARRA ROSCADA ACO M10 500MM",
+    "unidade": "m"
+  },
+  "1-0902": {
+    "descricao": "FX PARAFUSO ALLEN CABECA CILINDRICA M10X35MM OLEADO",
+    "unidade": "Un"
+  },
+  "1-0903": {
+    "descricao": "JANELA CORREDICA MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0904": {
+    "descricao": "JANELA CORREDICA MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0905": {
+    "descricao": "JANELA CORREDICA MASTER L1H1 1º VAO LD 1195x686 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0906": {
+    "descricao": "JANELA CORREDICA MASTER L1H1 1º VAO LE 1210x686 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0907": {
+    "descricao": "JANELA CORREDICA TRANSIT L3H3 1º VAO VERDE LE 1389x739 - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0908": {
+    "descricao": "JANELA CORREDICA TRANSIT L3H3 1º VAO VERDE LD 1365x741 - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0909": {
+    "descricao": "JANELA CORREDICA TRANSIT L2H3 1º VAO VERDE LE 1383x739 - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0910": {
+    "descricao": "JANELA CORREDICA TRANSIT L2H3 1º VAO VERDE LD 1373x741 - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0911": {
+    "descricao": "JANELA CORREDICA SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0912": {
+    "descricao": "JANELA CORREDICA SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0913": {
+    "descricao": "JANELA CORREDICA E/J/S 1º VAO LD 1089x556 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0914": {
+    "descricao": "JANELA CORREDICA E/J/S 1º VAO LE 1096x556 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0915": {
+    "descricao": "JANELA CORREDICA B/J/D 1º VAO LD 1400x667 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "1-0916": {
+    "descricao": "JANELA CORREDICA B/J/D 1º VAO LE 1400x667 VERDE 4MM - VISTA - VIDROFORTE",
+    "unidade": "Un"
+  },
+  "3-0269": {
+    "descricao": "CJ VIDROS VISTA MASTER L2H2 - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0270": {
+    "descricao": "CJ VIDROS VISTA MASTER L3H2  - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0271": {
+    "descricao": "CJ VIDROS VISTA MASTER L1H1  - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0272": {
+    "descricao": "CJ VIDROS VISTA TRANSIT L3H3  - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0273": {
+    "descricao": "CJ VIDROS VISTA TRANSIT L2H3  - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0274": {
+    "descricao": "CJ VIDROS VISTA SPRINTER 10 M  - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0275": {
+    "descricao": "CJ VIDROS VISTA SPRINTER 14 M  - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0276": {
+    "descricao": "CJ VIDROS VISTA EXPERT/JUMPY/SCUDO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0277": {
+    "descricao": "CJ VIDROS VISTA BOXER/JUMPER/DUCATO - VIDROFORTE",
+    "unidade": "CJ"
+  },
+  "3-0278": {
+    "descricao": "CJ VIDROS SELADO MASTER L2H2 - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0917": {
+    "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0918": {
+    "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0919": {
+    "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LD 1357x630 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0920": {
+    "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LE 1357x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0921": {
+    "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0922": {
+    "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0279": {
+    "descricao": "CJ VIDROS SELADO MASTER L3H2 - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0923": {
+    "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LD 923x630 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0924": {
+    "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LE 923x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0925": {
+    "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LD 1082x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0926": {
+    "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LE 1082x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0280": {
+    "descricao": "CJ VIDROS SELADO MASTER L1H1 - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0927": {
+    "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LD 1195x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0928": {
+    "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LE 1210x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0929": {
+    "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LD 1078x630 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0930": {
+    "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LE 1078x686 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0281": {
+    "descricao": "CJ VIDROS SELADO TRANSIT L3H3 - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0931": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LE 1389x739 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0932": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LD 1365x741 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0933": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 2º VAO VERDE LD 976x728 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0934": {
+    "descricao": "VIDRO FIXOTRANSIT L3H3 2º VAO VERDE LE 976x728 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0935": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LD 671x716 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0936": {
+    "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LE 671x716 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0937": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x833 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0938": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x833 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0282": {
+    "descricao": "CJ VIDROS SELADO TRANSIT L2H3 - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0939": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LE 1383x739 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0940": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LD 1373x741 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0941": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LE 1210x730 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0942": {
+    "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LD 1210x730 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0943": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x830 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0944": {
+    "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x830 - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0283": {
+    "descricao": "CJ VIDROS SELADO SPRINTER 10 M - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0945": {
+    "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0946": {
+    "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0947": {
+    "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LD 1637x761 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0948": {
+    "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LE 1637x761 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0949": {
+    "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0950": {
+    "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0284": {
+    "descricao": "CJ VIDROS SELADO SPRINTER 14 M - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0951": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LD 1418x705 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0952": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LE 1422x769 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0953": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LD 1291x766 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0954": {
+    "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LE 1291x766 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0285": {
+    "descricao": "CJ VIDROS SELADO EXPERT/JUMPY/SCUDO - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0955": {
+    "descricao": "VIDRO FIXO E/J/S 1º VAO LD 1089x556 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0956": {
+    "descricao": "VIDRO FIXO E/J/S 1º VAO LE 1096x556 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0957": {
+    "descricao": "VIDRO FIXO E/J/S 2º VAO LD 1177x534 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0958": {
+    "descricao": "VIDRO FIXO E/J/S 2º VAO LE 1171x534 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0959": {
+    "descricao": "VIDRO FIXO E/J/S VIGIA LD 676x495 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0960": {
+    "descricao": "VIDRO FIXO E/J/S VIGIA LE 743x495 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "3-0286": {
+    "descricao": "CJ VIDROS SELADO BOXER/JUMPER/DUCATO - SELADO - VETROEX",
+    "unidade": "CJ"
+  },
+  "1-0961": {
+    "descricao": "VIDRO FIXO B/J/D 1º VAO LD 1400x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0962": {
+    "descricao": "VIDRO FIXO B/J/D 1º VAO LE 1400x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0963": {
+    "descricao": "VIDRO FIXO B/J/D 2º VAO LD 1352x583 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0964": {
+    "descricao": "VIDRO FIXO B/J/D 2º VAO LE 1352x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0965": {
+    "descricao": "VIDRO FIXO B/J/D 3º VAO LD 771x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0966": {
+    "descricao": "VIDRO FIXO B/J/D 3º VAO LE 771x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0967": {
+    "descricao": "VIDRO FIXO B/J/D VIGIA LD 830x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0968": {
+    "descricao": "VIDRO FIXO B/J/D VIGIA LE 830x667 VERDE 4MM - SELADO - VETROEX",
+    "unidade": "Un"
+  },
+  "1-0969": {
+    "descricao": "JANELA CORREDICA E/J/S 1º VAO LD 1089x556 VERDE 4MM - VISTA - STYLLUS",
+    "unidade": "Un"
+  },
+  "1-0970": {
+    "descricao": "JANELA CORREDICA E/J/S 1º VAO LE 1096x556 VERDE 4MM - VISTA - STYLLUS",
+    "unidade": "Un"
+  },
+  "3-0287": {
+    "descricao": "CJ VIDROS VISTA 1º LD/LE 2º LE EXPERT/JUMPY/SCUDO - STYLLUS",
+    "unidade": "CJ"
+  },
+  "1-0971": {
+    "descricao": "JANELA CORREDICA E/J/S 2º VAO LE 1171x534 VERDE 4MM - VISTA - STYLLUS",
+    "unidade": "Un"
+  },
+  "1-0972": {
+    "descricao": "ABS PC E/S/J TB TAMPA INSPECAO CX AR CONDICIONADO LE",
+    "unidade": "Un"
+  },
+  "1-0973": {
+    "descricao": "ABS PC E/S/J TB ACABAMENTO MACANETA PORTA LATERAL PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0974": {
+    "descricao": "ABS PC PLUS DUTO AR CONDICIONADO PARTE 2 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0975": {
+    "descricao": "ABS PC PLUS DUTO AR CONDICIONADO PARTE 3 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0976": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LE PARTE 3 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0977": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LD PARTE 1 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0978": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LD PARTE 2 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "1-0979": {
+    "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LD PARTE 3 SPRINTER 14/15M³",
+    "unidade": "Un"
+  },
+  "3-0288": {
+    "descricao": "CJ REVESTIMENTO TRANSIT L4H3 VITRE",
+    "unidade": "CJ"
+  },
+  "1-0980": {
+    "descricao": "ABS PC TRANSIT L4H3 LATERAL 1º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0981": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0982": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0983": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA TRASEIRA MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0984": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA TRASEIRA PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0985": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+    "unidade": "Un"
+  },
+  "1-0986": {
+    "descricao": "ABS PC TRANSIT L4H3 LATERAL INFERIOR 2º/3º VAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0987": {
+    "descricao": "ABS PC TRANSIT L4H3 LATERAL INFERIOR 2º/3º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0988": {
+    "descricao": "ABS PC TRANSIT L4H3 LATERAL SUPERIOR 2º/3º VAO PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0989": {
+    "descricao": "ABS PC TRANSIT L4H3 LATERAL SUPERIOR 2º/3º VAO MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0990": {
+    "descricao": "ABS TETO C/ DUTO LATERAL TRANSIT L4H3",
+    "unidade": "Un"
+  },
+  "1-0991": {
+    "descricao": "ABS TETO CABINE SOBRE MOTORISTA TRANSIT L4H3",
+    "unidade": "Un"
+  },
+  "1-0992": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO CAIXA DE RODAS LD/LE",
+    "unidade": "Un"
+  },
+  "1-0993": {
+    "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO CONSOLE AR CONDICIONADO",
+    "unidade": "Un"
+  },
+  "1-0994": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO SUPERIOR MOTORISTA LE",
+    "unidade": "Un"
+  },
+  "1-0995": {
+    "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO SUPERIOR PASSAGEIRO LD",
+    "unidade": "Un"
+  },
+  "1-0996": {
+    "descricao": "ABS TETO PARTE 4 PC PLUS SPRINTER 15M³",
+    "unidade": "Un"
+  },
+  "1-0997": {
+    "descricao": "ABS PC PLUS DUTO AR CONDICIONADO SPRINTER 10,5M³",
+    "unidade": "Un"
+  },
+  "3-0289": {
+    "descricao": "CJ PISO CN 12 MM MASTER L2H2 LG BRIGHT GRAFITE 92402 - UNIVERSAL - R00",
+    "unidade": "CJ"
+  },
+  "1-0998": {
+    "descricao": "MP MANTA AUTOADESIVA ALUMINIZADA P/ ISOLAMENTO TERMICO",
+    "unidade": "m"
+  },
+  "3-0290": {
+    "descricao": "CJ ISOLAMENTO TERMICO P/ MASTER L3H2 C/ MANTA AUTOADESIVA ALUMINIZADA",
+    "unidade": "CJ"
+  },
+  "3-0291": {
+    "descricao": "CJ PISO CN 12 MM MASTER L3H2 LG BRIGHT GRAFITE 92402 - 16 FIXO 4,3,3,3 MCA - R00",
+    "unidade": "CJ"
+  },
+  "2-0001": {
+    "descricao": "PP PISO CN 12 MM MASTER L3H2 - 16 FIXO 4,3,3,3 MCA - R00",
+    "unidade": "Un"
+  },
+  "1-0999": {
+    "descricao": "CM COLA INSTANTANEA RETROVISOR REPARO 10 ML 50G TEKBOND",
+    "unidade": "Un"
+  },
+  "3-0292": {
+    "descricao": "CJ CANTONEIRA PVC PRETA PORTAS (LATERAL E TRASEIRA) RENAULT MASTER L2H2/L3H3",
+    "unidade": "CJ"
+  },
+  "2-0002": {
+    "descricao": "PP CANTONEIRA PVC PRETA PORTA LATERAL CORREDICA RENAULT MASTER L2H2/L3H3",
+    "unidade": "Un"
+  },
+  "2-0003": {
+    "descricao": "PP CANTONEIRA PVC PRETA PORTA LATERAL TRASEIRA RENAULT MASTER L2H2/L3H3",
+    "unidade": "Un"
+  }
+}

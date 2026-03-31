@@ -1,0 +1,2618 @@
+{
+  "3-0208": [
+    {
+      "codigo": "1-0251",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0252",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0253",
+      "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LD 1357x630 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0254",
+      "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LE 1357x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0255",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0256",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0209": [
+    {
+      "codigo": "1-0257",
+      "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LD 923x630 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0258",
+      "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LE 923x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0259",
+      "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LD 1082x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0260",
+      "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LE 1082x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0252",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0251",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0255",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0256",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0210": [
+    {
+      "codigo": "1-0261",
+      "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LD 1195x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0262",
+      "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LE 1210x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0263",
+      "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LD 1078x630 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0264",
+      "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LE 1078x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0255",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0256",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0211": [
+    {
+      "codigo": "1-0265",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LE 1389x739 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0266",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LD 1365x741 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0267",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 2º VAO VERDE LD 976x728 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0268",
+      "descricao": "VIDRO FIXOTRANSIT L3H3 2º VAO VERDE LE 976x728 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0269",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LD 671x716 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0270",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LE 671x716 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0271",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x833 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0272",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x833 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0212": [
+    {
+      "codigo": "1-0273",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LE 1383x739 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0274",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LD 1373x741 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0275",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LE 1210x730 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0276",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LD 1210x730 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0277",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x830 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0278",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x830 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0213": [
+    {
+      "codigo": "1-0279",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0280",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0281",
+      "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LD 1637x761 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0282",
+      "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LE 1637x761 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0283",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0284",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0214": [
+    {
+      "codigo": "1-0285",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LD 1418x705 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0286",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LE 1422x769 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0287",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LD 1291x766 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0288",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LE 1291x766 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0279",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0280",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0283",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0284",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0215": [
+    {
+      "codigo": "1-0289",
+      "descricao": "VIDRO FIXO E/J/S 1º VAO LD 1089x556 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0290",
+      "descricao": "VIDRO FIXO E/J/S 1º VAO LE 1096x556 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0291",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LD 1177x534 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0292",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LE 1171x534 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0293",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LD 676x495 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0294",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LE 743x495 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0216": [
+    {
+      "codigo": "1-0295",
+      "descricao": "VIDRO FIXO B/J/D 1º VAO LD 1400x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0296",
+      "descricao": "VIDRO FIXO B/J/D 1º VAO LE 1400x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0297",
+      "descricao": "VIDRO FIXO B/J/D 2º VAO LD 1352x583 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0298",
+      "descricao": "VIDRO FIXO B/J/D 2º VAO LE 1352x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0299",
+      "descricao": "VIDRO FIXO B/J/D 3º VAO LD 771x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0300",
+      "descricao": "VIDRO FIXO B/J/D 3º VAO LE 771x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0301",
+      "descricao": "VIDRO FIXO B/J/D VIGIA LD 830x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0302",
+      "descricao": "VIDRO FIXO B/J/D VIGIA LE 830x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0269": [
+    {
+      "codigo": "1-0903",
+      "descricao": "JANELA CORREDICA MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0904",
+      "descricao": "JANELA CORREDICA MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0253",
+      "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LD 1357x630 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0254",
+      "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LE 1357x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0255",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0256",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0270": [
+    {
+      "codigo": "1-0257",
+      "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LD 923x630 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0258",
+      "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LE 923x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0259",
+      "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LD 1082x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0260",
+      "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LE 1082x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0903",
+      "descricao": "JANELA CORREDICA MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0904",
+      "descricao": "JANELA CORREDICA MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0255",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0256",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0271": [
+    {
+      "codigo": "1-0905",
+      "descricao": "JANELA CORREDICA MASTER L1H1 1º VAO LD 1195x686 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0906",
+      "descricao": "JANELA CORREDICA MASTER L1H1 1º VAO LE 1210x686 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0263",
+      "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LD 1078x630 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0264",
+      "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LE 1078x686 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0255",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0256",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0272": [
+    {
+      "codigo": "1-0907",
+      "descricao": "JANELA CORREDICA TRANSIT L3H3 1º VAO VERDE LE 1389x739 - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0908",
+      "descricao": "JANELA CORREDICA TRANSIT L3H3 1º VAO VERDE LD 1365x741 - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0267",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 2º VAO VERDE LD 976x728 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0268",
+      "descricao": "VIDRO FIXOTRANSIT L3H3 2º VAO VERDE LE 976x728 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0269",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LD 671x716 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0270",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LE 671x716 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0271",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x833 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0272",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x833 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0273": [
+    {
+      "codigo": "1-0909",
+      "descricao": "JANELA CORREDICA TRANSIT L2H3 1º VAO VERDE LE 1383x739 - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0910",
+      "descricao": "JANELA CORREDICA TRANSIT L2H3 1º VAO VERDE LD 1373x741 - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0275",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LE 1210x730 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0276",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LD 1210x730 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0277",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x830 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0278",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x830 - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0274": [
+    {
+      "codigo": "1-0911",
+      "descricao": "JANELA CORREDICA SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0912",
+      "descricao": "JANELA CORREDICA SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0281",
+      "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LD 1637x761 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0282",
+      "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LE 1637x761 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0283",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0284",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0275": [
+    {
+      "codigo": "1-0285",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LD 1418x705 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0286",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LE 1422x769 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0287",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LD 1291x766 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0288",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LE 1291x766 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0911",
+      "descricao": "JANELA CORREDICA SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0912",
+      "descricao": "JANELA CORREDICA SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0283",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0284",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0276": [
+    {
+      "codigo": "1-0913",
+      "descricao": "JANELA CORREDICA E/J/S 1º VAO LD 1089x556 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0914",
+      "descricao": "JANELA CORREDICA E/J/S 1º VAO LE 1096x556 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0291",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LD 1177x534 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0292",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LE 1171x534 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0293",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LD 676x495 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0294",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LE 743x495 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0277": [
+    {
+      "codigo": "1-0915",
+      "descricao": "JANELA CORREDICA B/J/D 1º VAO LD 1400x667 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0916",
+      "descricao": "JANELA CORREDICA B/J/D 1º VAO LE 1400x667 VERDE 4MM - VISTA - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0297",
+      "descricao": "VIDRO FIXO B/J/D 2º VAO LD 1352x583 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0298",
+      "descricao": "VIDRO FIXO B/J/D 2º VAO LE 1352x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0299",
+      "descricao": "VIDRO FIXO B/J/D 3º VAO LD 771x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0300",
+      "descricao": "VIDRO FIXO B/J/D 3º VAO LE 771x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0301",
+      "descricao": "VIDRO FIXO B/J/D VIGIA LD 830x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0302",
+      "descricao": "VIDRO FIXO B/J/D VIGIA LE 830x667 VERDE 4MM - SELADO - VIDROFORTE",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0278": [
+    {
+      "codigo": "1-0917",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0918",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0919",
+      "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LD 1357x630 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0920",
+      "descricao": "VIDRO FIXO MASTER L2H2 2º VAO LE 1357x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0921",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0922",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0279": [
+    {
+      "codigo": "1-0917",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LD 1425x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0918",
+      "descricao": "VIDRO FIXO MASTER L2H2/L3H2 1º VAO LE 1431x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0923",
+      "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LD 923x630 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0924",
+      "descricao": "VIDRO FIXO MASTER L3H2 2º VAO LE 923x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0925",
+      "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LD 1082x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0926",
+      "descricao": "VIDRO FIXO MASTER L3H2 3º VAO LE 1082x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0921",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0922",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0280": [
+    {
+      "codigo": "1-0927",
+      "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LD 1195x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0928",
+      "descricao": "VIDRO FIXO MASTER L1H1 1º VAO LE 1210x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0929",
+      "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LD 1078x630 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0930",
+      "descricao": "VIDRO FIXO MASTER L1H1 2º VAO LE 1078x686 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0921",
+      "descricao": "VIDRO FIXO MASTER VIGIA LD 838x798 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0922",
+      "descricao": "VIDRO FIXO MASTER VIGIA LE 686x793 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0281": [
+    {
+      "codigo": "1-0931",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LE 1389x739 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0932",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 1º VAO VERDE LD 1365x741 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0933",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 2º VAO VERDE LD 976x728 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0934",
+      "descricao": "VIDRO FIXOTRANSIT L3H3 2º VAO VERDE LE 976x728 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0935",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LD 671x716 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0936",
+      "descricao": "VIDRO FIXO TRANSIT L3H3 3º VAO VERDE LE 671x716 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0937",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x833 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0938",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x833 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0282": [
+    {
+      "codigo": "1-0939",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LE 1383x739 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0940",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 1º VAO VERDE LD 1373x741 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0941",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LE 1210x730 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0942",
+      "descricao": "VIDRO FIXO TRANSIT L2H3 2º VAO VERDE 4MM LD 1210x730 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0943",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LE 792x830 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0944",
+      "descricao": "VIDRO FIXO TRANSIT VIGIA VERDE LD 792x830 - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0283": [
+    {
+      "codigo": "1-0945",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0946",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0947",
+      "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LD 1637x761 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0948",
+      "descricao": "VIDRO FIXO SPRINTER 10 M 2º VAO LE 1637x761 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0949",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0950",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0284": [
+    {
+      "codigo": "1-0945",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LD 1404x771 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0946",
+      "descricao": "VIDRO FIXO SPRINTER 10/14 M 1º VAO LE 1404x771 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0951",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LD 1418x705 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0952",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 2º VAO LE 1422x769 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0953",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LD 1291x766 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0954",
+      "descricao": "VIDRO FIXO SPRINTER 14 M 3º VAO LE 1291x766 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0949",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LD 815x800 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0950",
+      "descricao": "VIDRO FIXO SPRINTER VIGIA LE 815x800 VERDE 5MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0285": [
+    {
+      "codigo": "1-0955",
+      "descricao": "VIDRO FIXO E/J/S 1º VAO LD 1089x556 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0956",
+      "descricao": "VIDRO FIXO E/J/S 1º VAO LE 1096x556 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0957",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LD 1177x534 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0958",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LE 1171x534 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0959",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LD 676x495 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0960",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LE 743x495 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0286": [
+    {
+      "codigo": "1-0961",
+      "descricao": "VIDRO FIXO B/J/D 1º VAO LD 1400x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0962",
+      "descricao": "VIDRO FIXO B/J/D 1º VAO LE 1400x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0963",
+      "descricao": "VIDRO FIXO B/J/D 2º VAO LD 1352x583 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0964",
+      "descricao": "VIDRO FIXO B/J/D 2º VAO LE 1352x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0965",
+      "descricao": "VIDRO FIXO B/J/D 3º VAO LD 771x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0966",
+      "descricao": "VIDRO FIXO B/J/D 3º VAO LE 771x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0967",
+      "descricao": "VIDRO FIXO B/J/D VIGIA LD 830x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0968",
+      "descricao": "VIDRO FIXO B/J/D VIGIA LE 830x667 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0287": [
+    {
+      "codigo": "1-0969",
+      "descricao": "JANELA CORREDICA E/J/S 1º VAO LD 1089x556 VERDE 4MM - VISTA - STYLLUS",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0970",
+      "descricao": "JANELA CORREDICA E/J/S 1º VAO LE 1096x556 VERDE 4MM - VISTA - STYLLUS",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0957",
+      "descricao": "VIDRO FIXO E/J/S 2º VAO LD 1177x534 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0971",
+      "descricao": "JANELA CORREDICA E/J/S 2º VAO LE 1171x534 VERDE 4MM - VISTA - STYLLUS",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0959",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LD 676x495 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0960",
+      "descricao": "VIDRO FIXO E/J/S VIGIA LE 743x495 VERDE 4MM - SELADO - VETROEX",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0217": [
+    {
+      "codigo": "1-0303",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO BATENTE ASSOALHO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0304",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA LATERAL LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0305",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0306",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0307",
+      "descricao": "ABS PC ESSENCIAL MASTER BOCAL CAIXA AR CONDICIONADO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0308",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2 ACABAMENTO CAPUCCINO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0309",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2 ACABAMENTO COIFA DO TETO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0310",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2/L3H2 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0311",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2/L3H2 ACABAMENTO DA COLUNA CORREDICA",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0312",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2 LATERAL DIANTEIRA 1º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0313",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2 LATERAL TRASEIRA 2º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0314",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2 LATERAL TRASEIRA 2º VAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0315",
+      "descricao": "ABS TETO PC ESSENCIAL MASTER L2H2",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0316",
+      "descricao": "ABS PC ESSENCIAL MASTER REFORCO PRFV COLUNA FALSA TETO",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0218": [
+    {
+      "codigo": "1-0307",
+      "descricao": "ABS PC ESSENCIAL MASTER BOCAL CAIXA AR CONDICIONADO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0310",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2/L3H2 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0305",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0306",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0304",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO SUPERIOR PORTA LATERAL LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0311",
+      "descricao": "ABS PC ESSENCIAL MASTER L2H2/L3H2 ACABAMENTO DA COLUNA CORREDICA",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0316",
+      "descricao": "ABS PC ESSENCIAL MASTER REFORCO PRFV COLUNA FALSA TETO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0303",
+      "descricao": "ABS PC ESSENCIAL MASTER ACABAMENTO BATENTE ASSOALHO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0317",
+      "descricao": "ABS PC MASTER L3H2 ACABAMENTO CAPUCCINO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0318",
+      "descricao": "ABS PC MASTER L3H2 ACABAMENTO COIFA DO TETO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0319",
+      "descricao": "ABS PC MASTER L3H2 ACABAMENTO INFERIOR CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0320",
+      "descricao": "ABS PC MASTER L3H2 ACABAMENTO SUPERIOR CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0321",
+      "descricao": "ABS PC MASTER L3H2 ACABAMENTO TAMPA INSPECAO LE/LD",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0322",
+      "descricao": "ABS PC MASTER L3H2 LATERAL INFERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0323",
+      "descricao": "ABS PC MASTER L3H2 LATERAL INFERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0324",
+      "descricao": "ABS PC MASTER L3H2 LATERAL INFERIOR 2º/3º VAO TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0325",
+      "descricao": "ABS PC MASTER L3H2 LATERAL SUPERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0326",
+      "descricao": "ABS PC MASTER L3H2 LATERAL SUPERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0327",
+      "descricao": "ABS PC MASTER L3H2 LATERAL SUPERIOR 2º/3º VAO TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0328",
+      "descricao": "ABS PC MASTER L3H2 ACABAMENTO CAIXA DE RODAS LD/LE",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0329",
+      "descricao": "ABS TETO PC MASTER L3H2",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0219": [
+    {
+      "codigo": "1-0330",
+      "descricao": "ABS PC B/J/D ACABAMENTO BATENTE ASSOALHO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0331",
+      "descricao": "ABS PC B/J/D ACABAMENTO CAPUCINO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0332",
+      "descricao": "ABS PC B/J/D ACABAMENTO COIFA DO TETO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0333",
+      "descricao": "ABS PC B/J/D ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0334",
+      "descricao": "ABS PC B/J/D ACABAMENTO INFERIOR PORTA DE CORRER LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0335",
+      "descricao": "ABS PC B/J/D ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0336",
+      "descricao": "ABS PC B/J/D ACABAMENTO SUPERIOR PORTA DE CORRER LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0337",
+      "descricao": "ABS PC B/J/D ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0338",
+      "descricao": "ABS PC B/J/D ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0339",
+      "descricao": "ABS PC B/J/D ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0340",
+      "descricao": "ABS PC B/J/D LATERAL ARO JANELA PORTA DE CORRER LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0341",
+      "descricao": "ABS PC B/J/D LATERAL INFERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0342",
+      "descricao": "ABS PC B/J/D LATERAL INFERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0343",
+      "descricao": "ABS PC B/J/D LATERAL INFERIOR 2º/3º VAO TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0344",
+      "descricao": "ABS PC B/J/D LATERAL SUPERIOR 1º VAO DIANTEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0345",
+      "descricao": "ABS PC B/J/D LATERAL SUPERIOR 2º/3º VAO TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0346",
+      "descricao": "ABS PC B/J/D LATERAL SUPERIOR 2º/3º VAO TRASEIRA PASSAGERIO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0347",
+      "descricao": "ABS PC B/J/D REFORCO PLASTICO COLUNA FALSA TETO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0348",
+      "descricao": "ABS TETO PC B/J/D BJD",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0220": [
+    {
+      "codigo": "1-0349",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA LATERAL PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0350",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0351",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0352",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0353",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA LATERAL PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0354",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0355",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0356",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA FRONTAL CABINE/SALAO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0357",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA LATERAL",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0358",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA TRASEIRA",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0359",
+      "descricao": "ABS PC E/S/J TB LATERAL MOTORISTA LE 1º/2º VAO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0360",
+      "descricao": "ABS PC E/S/J TB LATERAL PASSAGEIRO LD 2º VAO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0361",
+      "descricao": "ABS TETO PC E/S/J TB",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0362",
+      "descricao": "ABS PC REFORCO ACO PORTA LATERAL",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0221": [
+    {
+      "codigo": "1-0363",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO ASSOALHO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0364",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO CAPUCINO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0365",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0366",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0367",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO LATERAL MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0368",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0369",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0370",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO PORTA LATERAL LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0371",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO SOLEIRA PORTA LATERAL",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0372",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO COIFA",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0373",
+      "descricao": "ABS PC IVECO 50-180 LATERAL DIANTEIRA 1º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0374",
+      "descricao": "ABS PC IVECO 50-180 LATERAL TRASEIRA 2º/3º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0375",
+      "descricao": "ABS PC IVECO 50-180 LATERAL TRASEIRA 2º/3º VAO MOTORISTA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0376",
+      "descricao": "ABS PC IVECO 50-180 TAMPA INSPECAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0377",
+      "descricao": "ABS PC IVECO 50-180 TAMPA INSPECAO PASSAGEIRO LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0378",
+      "descricao": "ABS TETO PC IVECO 50-180",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "3-0222": [
+    {
+      "codigo": "1-0379",
+      "descricao": "ABS TETO PARTE 1 PC PLUS SPRINTER 10,5/14M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0380",
+      "descricao": "ABS TETO PARTE 2 PC PLUS SPRINTER 10,5/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0381",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0382",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0383",
+      "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0384",
+      "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0385",
+      "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO SUPERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0386",
+      "descricao": "ABS PC PLUS SPRINTER 10,5M³ LATERAL 2º VAO INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0387",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14M³ ACABAMENTO CAIXA DE RODAS LE/LD",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0388",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0389",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0390",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0391",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0392",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO CONSOLE AR CONDICIONADO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0393",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0394",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0395",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0396",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0397",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0224": [
+    {
+      "codigo": "1-0379",
+      "descricao": "ABS TETO PARTE 1 PC PLUS SPRINTER 10,5/14M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0381",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0382",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0387",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14M³ ACABAMENTO CAIXA DE RODAS LE/LD",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0388",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0389",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0390",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0391",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0392",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO CONSOLE AR CONDICIONADO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0393",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0394",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0395",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0396",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0397",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0408",
+      "descricao": "ABS TETO PARTE 2 PC PLUS SPRINTER 14M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0409",
+      "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0410",
+      "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO SUPERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0399",
+      "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0400",
+      "descricao": "ABS PC PLUS SPRINTER 14M³ LATERAL 3º VAO INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0404",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0405",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0406",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0407",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO SUPERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0226": [
+    {
+      "codigo": "1-0381",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0382",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ LATERAL 1º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0388",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0389",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0390",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO SUPERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0391",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0392",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO CONSOLE AR CONDICIONADO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0393",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0394",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0395",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0396",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA INFERIOR CENTRAL LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0397",
+      "descricao": "ABS PC PLUS SPRINTER 10,5/14/15M³ ACABAMENTO COLUNA TRASEIRA INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0404",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0405",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0406",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0407",
+      "descricao": "ABS PC PLUS SPRINTER 14/15M³ LATERAL 2º VAO SUPERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0411",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ ACABAMENTO CAIXA DE RODAS LD/LE",
+      "unidade": "un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0413",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO INFERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0414",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO INFERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0417",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ ACABAMENTO COMPLEMENTO LATERAL TRASEIRA 3º VÃO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0418",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ ACABAMENTO COMPLEMENTO LATERAL TRASEIRA 3º VÃO SUPERIOR MOTORISTA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0994",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO SUPERIOR MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0995",
+      "descricao": "ABS PC PLUS SPRINTER 15M³ LATERAL 3º VAO SUPERIOR PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0412",
+      "descricao": "ABS TETO PARTE 1 PC PLUS SPRINTER 15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0415",
+      "descricao": "ABS TETO PARTE 3 PC PLUS SPRINTER 15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0416",
+      "descricao": "ABS TETO PARTE 2 PC PLUS SPRINTER 15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0996",
+      "descricao": "ABS TETO PARTE 4 PC PLUS SPRINTER 15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0288": [
+    {
+      "codigo": "1-0980",
+      "descricao": "ABS PC TRANSIT L4H3 LATERAL 1º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0981",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0982",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0983",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0984",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO COLUNA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0985",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0986",
+      "descricao": "ABS PC TRANSIT L4H3 LATERAL INFERIOR 2º/3º VAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0987",
+      "descricao": "ABS PC TRANSIT L4H3 LATERAL INFERIOR 2º/3º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0988",
+      "descricao": "ABS PC TRANSIT L4H3 LATERAL SUPERIOR 2º/3º VAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0989",
+      "descricao": "ABS PC TRANSIT L4H3 LATERAL SUPERIOR 2º/3º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0990",
+      "descricao": "ABS TETO C/ DUTO LATERAL TRANSIT L4H3",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0991",
+      "descricao": "ABS TETO CABINE SOBRE MOTORISTA TRANSIT L4H3",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0992",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO CAIXA DE RODAS LD/LE",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0993",
+      "descricao": "ABS PC TRANSIT L4H3 ACABAMENTO CONSOLE AR CONDICIONADO",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0228": [
+    {
+      "codigo": "1-0429",
+      "descricao": "ABS PC TRANSIT L2H3/L3H3 LATERAL 1º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0430",
+      "descricao": "ABS PC TRANSIT L2H3/L3H3 ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0431",
+      "descricao": "ABS PC TRANSIT L2H3/L3H3 ACABAMENTO COLUNA CINTO SEGURANCA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0432",
+      "descricao": "ABS PC TRANSIT L3H3 ACABAMENTO COLUNA TRASEIRA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0433",
+      "descricao": "ABS PC TRANSIT L3H3 ACABAMENTO COLUNA TRASEIRA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0434",
+      "descricao": "ABS PC TRANSIT L2H3/L3H3 ACABAMENTO SUPERIOR PORTA CORREDICA LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0435",
+      "descricao": "ABS PC TRANSIT L3H3 LATERAL INFERIOR 2º/3º VAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0436",
+      "descricao": "ABS PC TRANSIT L3H3 LATERAL INFERIOR 2º/3º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0437",
+      "descricao": "ABS PC TRANSIT L3H3 LATERAL SUPERIOR 2º/3º VAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0438",
+      "descricao": "ABS PC TRANSIT L3H3 LATERAL SUPERIOR 2º/3º VAO MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0441",
+      "descricao": "ABS TETO PARTE DIANTEIRA PC C/ DUTO TRANSIT L3H3",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0442",
+      "descricao": "ABS TETO PARTE TRASEIRA PC C/DUTO TRANSIT L3H3",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0223": [
+    {
+      "codigo": "1-0997",
+      "descricao": "ABS PC PLUS DUTO AR CONDICIONADO SPRINTER 10,5M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0398",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO SPRINTER 10,5M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0225": [
+    {
+      "codigo": "1-0401",
+      "descricao": "ABS PC PLUS DUTO AR CONDICIONADO PARTE 1 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0974",
+      "descricao": "ABS PC PLUS DUTO AR CONDICIONADO PARTE 2 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0975",
+      "descricao": "ABS PC PLUS DUTO AR CONDICIONADO PARTE 3 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0402",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LE PARTE 1 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0403",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LE PARTE 2 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0976",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LE PARTE 3 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0977",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LD PARTE 1 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0978",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LD PARTE 2 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0979",
+      "descricao": "ABS PC PLUS LENTE DUTO AR CONDICIONADO LD PARTE 3 SPRINTER 14/15M³",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0290": [
+    {
+      "codigo": "1-0998",
+      "descricao": "MP MANTA AUTOADESIVA ALUMINIZADA P/ ISOLAMENTO TERMICO",
+      "unidade": "m",
+      "quantidade": "12"
+    }
+  ],
+  "3-0291": [
+    {
+      "codigo": "2-0001",
+      "descricao": "PP PISO CN 12 MM MASTER L3H2 - 16 FIXO 4,3,3,3 MCA - R00",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0814",
+      "descricao": "MP PASSADEIRA LG BRIGHT GRAFITE 92402",
+      "unidade": "m",
+      "quantidade": "3.8"
+    },
+    {
+      "codigo": "1-0766",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "l",
+      "quantidade": "0.25"
+    }
+  ],
+  "2-0001": [
+    {
+      "codigo": "1-0793",
+      "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "3-0292": [
+    {
+      "codigo": "2-0002",
+      "descricao": "PP CANTONEIRA PVC PRETA PORTA LATERAL CORREDICA RENAULT MASTER L2H2/L3H3",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "2-0003",
+      "descricao": "PP CANTONEIRA PVC PRETA PORTA LATERAL TRASEIRA RENAULT MASTER L2H2/L3H3",
+      "unidade": "Un",
+      "quantidade": "1"
+    }
+  ],
+  "2-0002": [
+    {
+      "codigo": "1-0788",
+      "descricao": "MP CANTONEIRA PVC PRETA PERFIL DEGRAU ESCADA 6000MM",
+      "unidade": "m",
+      "quantidade": ""
+    }
+  ],
+  "2-0003": [
+    {
+      "codigo": "1-0788",
+      "descricao": "MP CANTONEIRA PVC PRETA PERFIL DEGRAU ESCADA 6000MM",
+      "unidade": "m",
+      "quantidade": ""
+    }
+  ],
+  "3-0261": [
+    {
+      "codigo": "1-0516",
+      "descricao": "ACESSORIO EXTINTOR ABC 4KG",
+      "unidade": "un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0517",
+      "descricao": "ACESSORIO SUPORTE EXTINTOR ABC 4KG",
+      "unidade": "un",
+      "quantidade": "1"
+    }
+  ],
+  "4-0036": [
+    {
+      "codigo": "3-0209",
+      "descricao": "CJ VIDROS SELADO MASTER L3H2 - SELADO - VIDROFORTE",
+      "unidade": "CJ",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0767",
+      "descricao": "CM COLA PU PARABRISA TERESON BOND 180 3H CURA 600ML",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0784",
+      "descricao": "MP BORRACHA PERFIL U PORTA LATERAL/TRASEIRA 19X15MM",
+      "unidade": "m",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0769",
+      "descricao": "CM GALVANIZADOR A FRIO SPRAY",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0640",
+      "descricao": "ELETRICA CHICOTE ILUMINACAO MASTER L1H1/L2H2/L3H2",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0644",
+      "descricao": "ELETRICA CHICOTE TACOGRAFO MASTER L1H1/L2H2/L3H2",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0741",
+      "descricao": "ELETRICA TACOGRAFO FIP SPY 32",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0713",
+      "descricao": "ELETRICA LUMINARIA ALURE 30",
+      "unidade": "Un",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "1-0625",
+      "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 LIGA DESLIGA",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "3-0290",
+      "descricao": "CJ ISOLAMENTO TERMICO P/ MASTER L3H2 C/ MANTA AUTOADESIVA ALUMINIZADA",
+      "unidade": "CJ",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0572",
+      "descricao": "ACESSORIO PASTILHA RETROVISOR INTERNO MASTER",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0494",
+      "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO FIAT PRETO RT1I30PR",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0999",
+      "descricao": "CM COLA INSTANTANEA RETROVISOR REPARO 10 ML 50G TEKBOND",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "3-0261",
+      "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
+      "unidade": "CJ",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0518",
+      "descricao": "ACESSORIO FAIXA REFLETIVA LADO DIREITO",
+      "unidade": "Un",
+      "quantidade": "6"
+    },
+    {
+      "codigo": "1-0519",
+      "descricao": "ACESSORIO FAIXA REFLETIVA LADO ESQUERDO",
+      "unidade": "Un",
+      "quantidade": "6"
+    },
+    {
+      "codigo": "3-0218",
+      "descricao": "CJ REVESTIMENTO ESSENCIAL RENAULT MASTER L3H2",
+      "unidade": "CJ",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0859",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X19MM ZINCO BRANCO",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0867",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X32MM ZINCO BRANCO",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0861",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X38MM ZINCO BRANCO",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0857",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,9X25MM ZINCO BRANCO",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0447",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA CHUMBO",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0449",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA PLATINA",
+      "unidade": "Un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0781",
+      "descricao": "MP BORRACHA PERFIL U ACABAMENTO ABS 12X9X7MM",
+      "unidade": "m",
+      "quantidade": ""
+    },
+    {
+      "codigo": "1-0568",
+      "descricao": "ACESSORIO LACRE EMERGENCIA MARTELINHO 2023",
+      "unidade": "Un",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "1-0463",
+      "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
+      "unidade": "Un",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "3-0292",
+      "descricao": "CJ CANTONEIRA PVC PRETA PORTAS (LATERAL E TRASEIRA) RENAULT MASTER L2H2/L3H3",
+      "unidade": "CJ",
+      "quantidade": "1"
+    }
+  ]
+}

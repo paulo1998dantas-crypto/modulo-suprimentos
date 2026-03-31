@@ -1,0 +1,2845 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Pedido de Compra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--ink:#1b1f2a;
+--muted:#6b7280;
+--line:#e6e7eb;
+--brand:#0b1c3a;
+--accent:#0ea5a3;
+--bg:#f4f6fb;
+--card:#ffffff;
+}
+
+*{box-sizing:border-box;}
+
+body{
+font-family:"Manrope", Arial, sans-serif;
+background:linear-gradient(180deg, #eef3fb 0%, #f7f9fc 100%);
+color:var(--ink);
+margin:0;
+}
+
+.topbar{
+background:rgba(248,250,252,0.92);
+color:var(--ink);
+padding:16px 24px;
+display:flex;
+align-items:center;
+gap:16px;
+border-bottom:1px solid #e5e7eb;
+box-shadow:0 10px 24px rgba(15,23,42,0.06);
+position:relative;
+}
+
+.topbar-actions{
+display:flex;
+align-items:center;
+gap:12px;
+margin-left:auto;
+}
+
+.topbar-reset{
+width:36px;
+height:36px;
+border-radius:10px;
+border:none;
+background:#eef2f7;
+color:#0f172a;
+font-size:18px;
+cursor:pointer;
+box-shadow:0 6px 14px rgba(15,23,42,0.12);
+}
+
+.topbar-reset:hover{
+filter:brightness(0.97);
+}
+
+.nav-tabs{
+display:flex;
+gap:10px;
+}
+
+.tab-btn{
+background:transparent;
+border:1px solid #dbe2ea;
+color:#0f172a;
+padding:8px 14px;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+position:relative;
+transition:transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.tab-btn:hover{
+transform:translateY(-1px);
+border-color:#cbd5e1;
+box-shadow:0 8px 18px rgba(15,23,42,0.08);
+}
+
+.tab-btn.active{
+background:linear-gradient(90deg, #0ea5a3, #22c3c1);
+color:white;
+border-color:transparent;
+box-shadow:0 10px 22px rgba(14,165,163,0.25);
+}
+
+.tab-content{
+display:none;
+}
+
+.tab-content.active{
+display:block;
+animation:tab-fade 520ms ease-in-out;
+}
+
+@keyframes tab-fade{
+from{opacity:0; transform:translateY(10px); filter:blur(4px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+.logo{
+height:44px;
+width:auto;
+filter:drop-shadow(0 6px 8px rgba(2,6,23,0.10));
+}
+
+.topbar h1{
+display:none;
+}
+
+.container{
+padding:28px 24px 40px 24px;
+max-width:1200px;
+margin:0 auto;
+}
+
+.card{
+background:var(--card);
+padding:22px;
+margin-bottom:22px;
+border-radius:12px;
+box-shadow:0 10px 24px rgba(15,23,42,0.08);
+border:1px solid #f0f1f4;
+}
+
+.card h3{
+margin:0 0 14px 0;
+font-size:16px;
+}
+
+.dashboard-grid{
+display:grid;
+grid-template-columns:repeat(2, minmax(0, 1fr));
+gap:22px;
+}
+
+.chart-card{
+background:var(--card);
+border:1px solid #edf0f5;
+border-radius:14px;
+padding:18px;
+box-shadow:0 10px 24px rgba(15,23,42,0.08);
+}
+
+.chart-card h3{
+margin:0 0 12px 0;
+font-size:15px;
+}
+
+.chart-canvas{
+width:100%;
+height:280px;
+display:block;
+}
+
+.dashboard-actions{
+display:flex;
+justify-content:flex-end;
+margin-bottom:16px;
+}
+  .os-actions{
+  gap:1cm;
+  }
+
+.btn{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:10px 16px;
+border-radius:10px;
+border:1px solid #dbe2ea;
+background:#0b1c3a;
+color:#fff;
+text-decoration:none;
+font-weight:600;
+}
+
+.btn:hover{
+filter:brightness(0.98);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3, 1fr);
+gap:18px;
+}
+
+.grid-4{
+display:grid;
+grid-template-columns:repeat(4, 1fr);
+gap:16px;
+}
+
+label{
+font-size:12px;
+color:var(--muted);
+font-weight:600;
+}
+
+input, textarea, select{
+width:100%;
+padding:8px 10px;
+margin-top:6px;
+border:1px solid var(--line);
+border-radius:8px;
+font-size:14px;
+background:white;
+}
+
+input[readonly]{
+background:#f8fafc;
+color:#111827;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+table-layout:fixed;
+}
+
+th{
+background:#f2f4f8;
+padding:10px;
+font-size:12px;
+text-transform:uppercase;
+letter-spacing:0.4px;
+color:#4b5563;
+text-align:center;
+}
+
+td{
+padding:8px;
+border-bottom:1px solid #e5e7eb;
+vertical-align:top;
+text-align:center;
+}
+
+button{
+background:var(--accent);
+border:none;
+color:white;
+padding:10px 16px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+}
+
+button:hover{
+background:#0c8f8d;
+}
+
+.footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.total-box{
+background:#f1f5f9;
+padding:14px;
+border-radius:10px;
+width:280px;
+border:1px solid #e5e7eb;
+}
+
+.grid-2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:18px;
+}
+
+.input-group{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+.input-prefix{
+background:#eef2f7;
+border:1px solid var(--line);
+border-radius:8px;
+padding:8px 10px;
+font-size:13px;
+color:#475569;
+min-width:42px;
+text-align:center;
+}
+
+.input-group input{
+margin-top:0;
+}
+
+.section-split{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:22px;
+}
+
+.floating-actions{
+position:fixed;
+right:24px;
+bottom:24px;
+display:flex;
+flex-direction:column;
+gap:12px;
+z-index:50;
+}
+
+.fab{
+width:auto;
+min-width:52px;
+height:44px;
+border-radius:22px;
+border:none;
+background:var(--brand);
+color:#fff;
+font-size:20px;
+cursor:pointer;
+box-shadow:0 12px 24px rgba(2,6,23,0.25);
+display:flex;
+align-items:center;
+justify-content:center;
+padding:0 14px;
+white-space:nowrap;
+}
+
+.fab.secondary{
+background:var(--accent);
+}
+
+.panel{
+position:fixed;
+right:24px;
+bottom:90px;
+width:min(520px, 92vw);
+max-height:80vh;
+overflow:auto;
+background:var(--card);
+border:1px solid #eef0f4;
+border-radius:16px;
+box-shadow:0 20px 40px rgba(2,8,23,0.22);
+padding:18px;
+z-index:40;
+display:none;
+}
+
+.panel.open{
+display:block;
+animation:panel-in 180ms ease-out;
+}
+
+@keyframes panel-in{
+from{transform:translateY(10px); opacity:0;}
+to{transform:translateY(0); opacity:1;}
+}
+
+.panel-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin-bottom:10px;
+}
+
+.panel-title{
+  font-size:15px;
+  font-weight:700;
+  margin:0;
+  }
+
+  .cadastro-section{
+  display:none;
+  }
+  .cadastro-section.active{
+  display:block;
+  }
+  .cadastro-sections{
+  display:grid;
+  gap:16px;
+  }
+.fab-group{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  }
+  .fab-menu{
+  display:none;
+  flex-direction:column;
+  gap:10px;
+  margin-left:10px;
+  padding-left:10px;
+  border-left:2px dashed #cbd5f5;
+  }
+  .fab-menu.open{
+  display:flex;
+  }
+  .fab-parent{
+  background:linear-gradient(160deg, #0b1c3a, #1f2f55);
+  color:#fff;
+  }
+  .fab-child{
+  background:linear-gradient(160deg, #6ea8ff, #8fc3ff) !important;
+  color:#0b1c3a !important;
+  }
+
+.panel-close{
+border:none;
+background:#eef2f7;
+width:32px;
+height:32px;
+border-radius:8px;
+cursor:pointer;
+font-weight:700;
+color:#111827;
+}
+
+.tabela-itens th:nth-child(2),
+.tabela-itens td:nth-child(2){
+width:18%;
+}
+
+.tabela-itens th:nth-child(1),
+.tabela-itens td:nth-child(1){
+width:9%;
+}
+
+.tabela-itens th:nth-child(3),
+.tabela-itens td:nth-child(3){
+width:6%;
+}
+
+.tabela-itens th:nth-child(4),
+.tabela-itens td:nth-child(4){
+width:6%;
+}
+
+.tabela-itens th:nth-child(5),
+.tabela-itens td:nth-child(5){
+width:13%;
+}
+
+.tabela-itens th:nth-child(6),
+.tabela-itens td:nth-child(6){
+width:13%;
+}
+
+.tabela-itens th:nth-child(7),
+.tabela-itens td:nth-child(7){
+width:9%;
+}
+
+.tabela-itens th:nth-child(8),
+.tabela-itens td:nth-child(8){
+width:9%;
+}
+
+.tabela-itens th:nth-child(9),
+.tabela-itens td:nth-child(9){
+width:9%;
+}
+
+.tabela-itens th:nth-child(10),
+.tabela-itens td:nth-child(10){
+width:12%;
+}
+.tabela-itens th:nth-child(11),
+.tabela-itens td:nth-child(11){
+width:4%;
+}
+
+.tabela-itens textarea[name="descricao[]"]{
+min-height:60px;
+resize:vertical;
+}
+
+.tabela-itens input{
+font-size:13px;
+}
+
+.tabela-os{
+width:100%;
+border-collapse:collapse;
+table-layout:fixed;
+}
+
+.tabela-os th:nth-child(1),
+.tabela-os td:nth-child(1){
+width:18%;
+}
+.tabela-os td:nth-child(1) select{
+text-align:center;
+text-align-last:center;
+width:100%;
+padding-right:22px;
+}
+.tabela-os td:nth-child(1) select option{
+text-align:center;
+}
+
+.tabela-os th:nth-child(2),
+.tabela-os td:nth-child(2){
+width:52%;
+}
+
+.tabela-os th:nth-child(3),
+.tabela-os td:nth-child(3){
+width:10%;
+}
+
+.tabela-os th:nth-child(4),
+.tabela-os td:nth-child(4){
+width:10%;
+}
+
+.tabela-os th:nth-child(5),
+.tabela-os td:nth-child(5){
+width:10%;
+}
+
+.tabela-os textarea{
+min-height:60px;
+resize:vertical;
+}
+
+.tabela-componentes{
+width:100%;
+border-collapse:collapse;
+table-layout:fixed;
+}
+
+.tabela-componentes th:nth-child(1),
+.tabela-componentes td:nth-child(1){
+width:14%;
+}
+
+.tabela-componentes th:nth-child(2),
+.tabela-componentes td:nth-child(2){
+width:16%;
+}
+
+.tabela-componentes th:nth-child(3),
+.tabela-componentes td:nth-child(3){
+width:40%;
+}
+
+.tabela-componentes th:nth-child(4),
+.tabela-componentes td:nth-child(4){
+width:15%;
+}
+
+.tabela-componentes th:nth-child(5),
+.tabela-componentes td:nth-child(5){
+width:15%;
+}
+.btn-row-remove{
+background:#e11d48;
+border:none;
+color:#fff;
+width:28px;
+height:28px;
+border-radius:50%;
+cursor:pointer;
+font-weight:700;
+line-height:1;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+margin-left:8px;
+}
+.btn-row-remove:hover{
+background:#be123c;
+}
+
+@media (max-width:900px){
+.grid{grid-template-columns:1fr 1fr;}
+.section-split{grid-template-columns:1fr;}
+.grid-4{grid-template-columns:1fr 1fr;}
+}
+
+@media (max-width:640px){
+.grid{grid-template-columns:1fr;}
+.grid-2{grid-template-columns:1fr;}
+.topbar{flex-direction:column; align-items:flex-start;}
+.grid-4{grid-template-columns:1fr;}
+}
+
+/* UI refresh: more modern, dynamic, and polished */
+body{
+background:
+radial-gradient(1200px 600px at 10% -10%, rgba(14,165,163,0.18), transparent 60%),
+radial-gradient(1000px 500px at 90% 0%, rgba(12,45,108,0.18), transparent 55%),
+linear-gradient(180deg, #eef3fb 0%, #f8fbff 60%, #f7f9fc 100%);
+}
+
+.topbar{
+position:sticky;
+top:0;
+z-index:60;
+backdrop-filter:saturate(180%) blur(6px);
+}
+
+.topbar::after{
+content:"";
+position:absolute;
+left:0;
+right:0;
+bottom:-1px;
+height:2px;
+background:linear-gradient(90deg, rgba(14,165,163,0.15), rgba(12,45,108,0.15), rgba(14,165,163,0.15));
+}
+
+.container{
+padding-top:18px;
+}
+
+.card{
+border-radius:16px;
+box-shadow:
+0 20px 45px rgba(15,23,42,0.08),
+0 4px 10px rgba(15,23,42,0.04);
+transition:transform 160ms ease, box-shadow 160ms ease;
+}
+.card:hover{
+transform:translateY(-2px);
+box-shadow:
+0 24px 55px rgba(15,23,42,0.10),
+0 6px 14px rgba(15,23,42,0.06);
+}
+
+.card h3{
+font-size:17px;
+letter-spacing:0.2px;
+position:relative;
+padding-bottom:8px;
+}
+.card h3::after{
+content:"";
+position:absolute;
+left:0;
+bottom:0;
+width:42px;
+height:3px;
+border-radius:999px;
+background:linear-gradient(90deg, var(--accent), #2dd4bf);
+}
+
+input, textarea, select{
+border-radius:10px;
+border:1px solid #e2e8f0;
+box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
+transition:border-color 120ms ease, box-shadow 120ms ease;
+}
+input:focus, textarea:focus, select:focus{
+outline:none;
+border-color:rgba(14,165,163,0.7);
+box-shadow:0 0 0 3px rgba(14,165,163,0.15);
+}
+
+button{
+background:linear-gradient(90deg, #0ea5a3, #12b7b5);
+box-shadow:0 8px 18px rgba(14,165,163,0.25);
+transition:transform 120ms ease, box-shadow 120ms ease;
+}
+button:hover{
+transform:translateY(-1px);
+box-shadow:0 12px 24px rgba(14,165,163,0.28);
+}
+button:active{
+transform:translateY(0);
+}
+
+.tab-btn{
+border-radius:12px;
+padding:8px 14px;
+}
+.tab-btn.active{
+box-shadow:0 10px 20px rgba(255,255,255,0.18);
+}
+
+.panel{
+border-radius:18px;
+background:rgba(255,255,255,0.92);
+backdrop-filter:blur(6px);
+}
+
+.floating-actions .fab{
+background:linear-gradient(160deg, #0b1c3a, #1f2f55);
+}
+.floating-actions .fab.secondary{
+background:linear-gradient(160deg, #0ea5a3, #22c3c1);
+}
+
+th{
+background:linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.total-box{
+border-radius:14px;
+background:linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.input-prefix{
+border-radius:10px;
+}
+
+</style>
+
+<script>
+const produtos = {{ produtos|tojson }};
+const fornecedores = {{ fornecedores|tojson }};
+const osProdutos = {{ os_produtos|tojson }};
+const osFornecedores = {{ os_fornecedores|tojson }};
+const osComponentes = {{ os_componentes|tojson }};
+const osProcessos = {{ os_processos|tojson }};
+const ocPrefill = {{ oc_prefill|tojson }};
+const osPrefill = {{ os_prefill|tojson }};
+let ocPrefillApplied = false;
+let osPrefillApplied = false;
+const hasOsPrefill = osPrefill && Object.keys(osPrefill).length > 0;
+let osComposicaoSource = "bom";
+let osTabInitialized = false;
+
+function initOsTab(){
+if (osTabInitialized){
+return;
+}
+if (hasOsPrefill){
+aplicarPrefillOS();
+} else {
+preencherProcessosPadrao("PADRAO");
+}
+osTabInitialized = true;
+}
+
+function parseNumber(value){
+if (value === "" || value === null || value === undefined){
+return 0;
+}
+const normalized = String(value).replace(",", ".");
+const numero = parseFloat(normalized);
+return Number.isNaN(numero) ? 0 : numero;
+}
+
+function normalizarCodigoOS(valor){
+const codigo = extrairCodigo(valor, osProdutos);
+if (codigo){
+return codigo;
+}
+const raw = (valor || "").trim();
+if (!raw){
+return "";
+}
+return raw.split(" - ")[0].trim();
+}
+
+function expandComposicao(codigoItem, quantidade){
+  const codigoRaiz = normalizarCodigoOS(codigoItem);
+  if (!codigoRaiz || !osComponentes[codigoRaiz]){
+    return [];
+  }
+  const rows = [];
+  function visit(codigo, multiplier, level, ancestors){
+    const codigoPai = normalizarCodigoOS(codigo);
+    const componentes = osComponentes[codigoPai] || [];
+    componentes.forEach((comp) => {
+      const codigoComp = normalizarCodigoOS(comp.codigo || "");
+      const qtdBase = parseNumber(comp.quantidade);
+      const total = multiplier * qtdBase;
+      rows.push({
+        item: codigoPai,
+        codigo: codigoComp,
+        descricao: comp.descricao || "",
+        unidade: comp.unidade || "",
+        qtd: total ? total : "",
+        level,
+      });
+      if (codigoComp && total && !ancestors.has(codigoComp) && osComponentes[codigoComp]){
+        const nextAncestors = new Set(ancestors);
+        nextAncestors.add(codigoComp);
+        visit(codigoComp, total, level + 1, nextAncestors);
+      }
+    });
+  }
+  visit(codigoRaiz, parseNumber(quantidade), 0, new Set([codigoRaiz]));
+  return rows;
+}
+
+function formatCurrency(value){
+const fixed = Number(value || 0).toFixed(2);
+const parts = fixed.split(".");
+const inteiro = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+return `R$ ${inteiro},${parts[1]}`;
+}
+
+function buildOptions(map){
+let options = '<option value=""></option>';
+Object.keys(map).forEach((key) => {
+const descRaw = map[key] && (map[key].descricao || map[key].nome) ? (map[key].descricao || map[key].nome) : "";
+const desc = descRaw ? ` - ${descRaw}` : "";
+options += `<option value="${key}${desc}"></option>`;
+});
+return options;
+}
+
+function extrairCodigo(valor, map){
+const raw = (valor || "").trim();
+if (!raw){
+return "";
+}
+const parts = raw.split(" - ");
+const code = parts[0].trim();
+if (map && (map[code] || map[code.toUpperCase()] || map[code.toLowerCase()])){
+return code;
+}
+const rawLower = raw.toLowerCase();
+if (map){
+for (const key in map){
+const item = map[key] || {};
+const desc = (item.descricao || item.nome || "").toString().toLowerCase();
+if (desc.startsWith(rawLower)){
+return key;
+}
+}
+}
+return raw;
+}
+
+function adicionarLinha(){
+
+let tabela = document.getElementById("tabela_itens");
+let linha = tabela.insertRow();
+
+linha.innerHTML = `
+<td>
+<input name="codigo[]" list="oc-produtos-list">
+</td>
+<td><textarea name="descricao[]" rows="2" readonly></textarea></td>
+<td><input name="unidade[]" readonly></td>
+<td><input type="number" step="1" min="0" name="qtd[]"></td>
+<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
+<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0"></div></td>
+<td><input type="number" step="0.01" min="0" name="ipi[]"></td>
+<td><input type="number" step="0.01" min="0" name="icms[]"></td>
+<td><input type="number" step="0.01" min="0" name="cofins[]"></td>
+<td><input name="total_item[]" readonly></td>
+<td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOC(this)">-</button></td>
+`;
+
+}
+
+function removerLinhaItemOC(btn){
+const row = btn.closest("tr");
+const tabela = row ? row.closest("table") : null;
+if (!row || !tabela){
+return;
+}
+if (tabela.rows.length <= 2){
+const select = row.querySelector('input[name="codigo[]"]');
+const desc = row.querySelector('textarea[name="descricao[]"]');
+const unidade = row.querySelector('input[name="unidade[]"]');
+const qtd = row.querySelector('input[name="qtd[]"]');
+const valor = row.querySelector('input[name="valor[]"]');
+const desconto = row.querySelector('input[name="desconto[]"]');
+const ipi = row.querySelector('input[name="ipi[]"]');
+const icms = row.querySelector('input[name="icms[]"]');
+const cofins = row.querySelector('input[name="cofins[]"]');
+const total = row.querySelector('input[name="total_item[]"]');
+if (select) select.value = "";
+if (desc) desc.value = "";
+if (unidade) unidade.value = "";
+if (qtd) qtd.value = "";
+if (valor) valor.value = "";
+if (desconto) desconto.value = "0";
+if (ipi) ipi.value = "";
+if (icms) icms.value = "";
+if (cofins) cofins.value = "";
+if (total) total.value = "";
+calcularTotais();
+return;
+}
+tabela.deleteRow(row.rowIndex);
+calcularTotais();
+}
+
+function preencherPorCodigo(input){
+const codigo = extrairCodigo(input.value, produtos);
+if (!codigo){
+return;
+}
+if ((input.value || "").trim() !== codigo){
+input.value = codigo;
+}
+
+const produto = produtos[codigo] || produtos[codigo.toUpperCase()] || produtos[codigo.toLowerCase()];
+if (!produto){
+const row = input.closest("tr");
+if (row){
+const descricao = row.querySelector('textarea[name="descricao[]"]');
+const unidade = row.querySelector('input[name="unidade[]"]');
+const valor = row.querySelector('input[name="valor[]"]');
+const ipi = row.querySelector('input[name="ipi[]"]');
+const icms = row.querySelector('input[name="icms[]"]');
+const cofins = row.querySelector('input[name="cofins[]"]');
+const hasDesc = descricao && descricao.value;
+if (!hasDesc){
+if (descricao) descricao.value = "";
+if (unidade) unidade.value = "";
+if (valor) valor.value = "";
+if (ipi) ipi.value = "";
+if (icms) icms.value = "";
+if (cofins) cofins.value = "";
+}
+}
+return;
+}
+
+const row = input.closest("tr");
+if (!row){
+return;
+}
+
+const descricao = row.querySelector('textarea[name="descricao[]"]');
+if (descricao){
+descricao.value = produto.descricao || produto.nome || "";
+}
+
+const unidade = row.querySelector('input[name="unidade[]"]');
+if (unidade){
+unidade.value = produto.unidade || "UN";
+}
+
+const valor = row.querySelector('input[name="valor[]"]');
+if (valor && produto.valor){
+valor.value = produto.valor;
+}
+
+const ipi = row.querySelector('input[name="ipi[]"]');
+if (ipi && produto.ipi){
+ipi.value = produto.ipi;
+}
+
+const icms = row.querySelector('input[name="icms[]"]');
+if (icms && produto.icms){
+icms.value = produto.icms;
+}
+
+const cofins = row.querySelector('input[name="cofins[]"]');
+if (cofins && produto.cofins){
+cofins.value = produto.cofins;
+}
+}
+
+function preencherFornecedor(input){
+const chave = (input.value || "").trim();
+if (!chave){
+const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep"];
+campos.forEach((name) => {
+const campo = document.querySelector(`input[name="${name}"]`);
+if (campo){
+campo.value = "";
+}
+});
+return;
+}
+
+function preencherFornecedorOS(input){
+const chave = (input.value || "").trim();
+if (!chave){
+return;
+}
+}
+
+const fornecedor = fornecedores[chave] || fornecedores[chave.toUpperCase()] || fornecedores[chave.toLowerCase()];
+if (!fornecedor){
+return;
+}
+
+const campos = [
+["razao_social", "razao_social"],
+["cnpj", "cnpj"],
+["email", "email"],
+["telefone", "telefone"],
+["endereco", "endereco"],
+["bairro", "bairro"],
+["cidade", "cidade"],
+["uf", "uf"],
+["cep", "cep"],
+];
+
+campos.forEach(([inputName, key]) => {
+const campo = document.querySelector(`input[name="${inputName}"]`);
+if (campo && !campo.value && fornecedor[key]){
+campo.value = fornecedor[key];
+}
+});
+}
+
+function calcularTotais(){
+const linhas = document.querySelectorAll("#tabela_itens tr");
+let totalItens = 0;
+let totalSemImpostos = 0;
+
+linhas.forEach((row, index) => {
+if (index === 0){
+return;
+}
+
+const qtd = row.querySelector('input[name="qtd[]"]');
+const valor = row.querySelector('input[name="valor[]"]');
+const desconto = row.querySelector('input[name="desconto[]"]');
+const totalItem = row.querySelector('input[name="total_item[]"]');
+const ipi = row.querySelector('input[name="ipi[]"]');
+const icms = row.querySelector('input[name="icms[]"]');
+const cofins = row.querySelector('input[name="cofins[]"]');
+
+if (!qtd || !valor || !desconto || !totalItem){
+return;
+}
+
+const base = (parseNumber(qtd.value) * parseNumber(valor.value)) - parseNumber(desconto.value);
+const taxa = parseNumber(ipi && ipi.value) + parseNumber(icms && icms.value) + parseNumber(cofins && cofins.value);
+const total = base > 0 ? base * (1 + (taxa / 100)) : 0;
+totalItem.value = total > 0 ? formatCurrency(total) : "R$ 0,00";
+totalItens += total > 0 ? total : 0;
+totalSemImpostos += base > 0 ? base : 0;
+});
+
+const freteInput = document.getElementById("frete");
+const freteValor = freteInput ? parseNumber(freteInput.value) : 0;
+const totalPedido = totalItens + freteValor;
+
+const totalItensInput = document.getElementById("total_itens");
+const totalItensDisplay = document.getElementById("total_itens_display");
+const totalSemImpostosDisplay = document.getElementById("total_sem_impostos_display");
+if (totalItensInput){
+totalItensInput.value = totalItens.toFixed(2);
+}
+if (totalItensDisplay){
+totalItensDisplay.value = formatCurrency(totalItens);
+}
+if (totalSemImpostosDisplay){
+totalSemImpostosDisplay.value = formatCurrency(totalSemImpostos);
+}
+
+const totalPedidoInput = document.getElementById("total_pedido");
+const totalPedidoDisplay = document.getElementById("total_pedido_display");
+if (totalPedidoInput){
+totalPedidoInput.value = totalPedido.toFixed(2);
+}
+if (totalPedidoDisplay){
+totalPedidoDisplay.value = formatCurrency(totalPedido);
+}
+}
+
+function calcularVencimento(){
+const prazoInput = document.getElementById("prazo");
+const vencimentoInput = document.getElementById("vencimento");
+if (!prazoInput || !vencimentoInput){
+return;
+}
+
+const prazo = parseInt(prazoInput.value, 10);
+if (Number.isNaN(prazo) || prazo < 0){
+vencimentoInput.value = "";
+return;
+}
+
+const hoje = new Date();
+hoje.setDate(hoje.getDate() + prazo);
+
+const dia = String(hoje.getDate()).padStart(2, "0");
+const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+const ano = hoje.getFullYear();
+
+vencimentoInput.value = `${dia}/${mes}/${ano}`;
+}
+
+function adicionarLinhaOS(){
+const tabela = document.getElementById("tabela_os");
+let linha = tabela.insertRow();
+
+linha.innerHTML = `
+<td>
+<input name="os_codigo[]" list="os-produtos-list">
+</td>
+<td><textarea name="os_descricao[]" rows="2" readonly></textarea></td>
+<td><input type="number" step="1" min="0" name="os_qtd[]"></td>
+<td><input name="os_serie[]"></td>
+<td><input name="os_unidade[]" readonly></td>
+<td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOS(this)">-</button></td>
+`;
+}
+
+function removerLinhaItemOS(btn){
+const row = btn.closest("tr");
+const tabela = row ? row.closest("table") : null;
+if (!row || !tabela){
+return;
+}
+if (tabela.rows.length <= 2){
+const select = row.querySelector('input[name="os_codigo[]"]');
+const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const qtd = row.querySelector('input[name="os_qtd[]"]');
+const serie = row.querySelector('input[name="os_serie[]"]');
+const unidade = row.querySelector('input[name="os_unidade[]"]');
+if (select) select.value = "";
+if (desc) desc.value = "";
+if (qtd) qtd.value = "";
+if (serie) serie.value = "";
+if (unidade) unidade.value = "";
+renderComponentes();
+return;
+}
+tabela.deleteRow(row.rowIndex);
+renderComponentes();
+}
+
+function preencherOSItem(select){
+const codigo = extrairCodigo(select.value, osProdutos);
+const row = select.closest("tr");
+if (!row){
+return;
+}
+if ((select.value || "").trim() !== codigo){
+select.value = codigo;
+}
+const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const unidade = row.querySelector('input[name="os_unidade[]"]');
+if (codigo && osProdutos[codigo]){
+desc.value = osProdutos[codigo].descricao || "";
+unidade.value = osProdutos[codigo].unidade || "UN";
+} else {
+const hasDesc = desc && desc.value;
+if (!hasDesc){
+desc.value = "";
+if (unidade) unidade.value = "";
+}
+}
+renderComponentes();
+}
+
+function renderComponentes(){
+const tbody = document.getElementById("tabela_componentes_body");
+if (!tbody){
+return;
+}
+tbody.innerHTML = "";
+
+function renderComposicaoRows(rows){
+tbody.innerHTML = "";
+rows.forEach((comp) => {
+const row = document.createElement("tr");
+row.innerHTML = `
+<td>${comp.item || ""}<input type="hidden" name="os_comp_item[]" value="${comp.item || ""}"></td>
+<td>${comp.codigo || ""}<input type="hidden" name="os_comp_codigo[]" value="${comp.codigo || ""}"></td>
+<td style="padding-left:${(comp.level || 0) * 16}px">${comp.descricao || ""}<input type="hidden" name="os_comp_descricao[]" value="${comp.descricao || ""}"></td>
+<td>${comp.unidade || ""}<input type="hidden" name="os_comp_unidade[]" value="${comp.unidade || ""}"></td>
+<td>${comp.qtd || ""}<input type="hidden" name="os_comp_qtd[]" value="${comp.qtd || ""}"><input type="hidden" name="os_comp_level[]" value="${comp.level || 0}"></td>
+`;
+tbody.appendChild(row);
+});
+}
+
+if (osComposicaoSource === "prefill" && osPrefill && osPrefill.composicao && osPrefill.composicao.length){
+const rows = osPrefill.composicao.map((c) => ({
+item: c.item || "",
+codigo: c.codigo || "",
+descricao: c.descricao || "",
+unidade: c.unidade || "",
+qtd: c.qtd || "",
+level: c.level || 0,
+}));
+renderComposicaoRows(rows);
+return;
+}
+
+const rows = [];
+const linhas = document.querySelectorAll("#tabela_os tr");
+linhas.forEach((row, index) => {
+if (index === 0){
+return;
+}
+const sel = row.querySelector('input[name="os_codigo[]"]');
+const qtdInput = row.querySelector('input[name="os_qtd[]"]');
+const codigoItem = sel ? normalizarCodigoOS(sel.value) : "";
+const qtdItem = qtdInput ? parseNumber(qtdInput.value) : 0;
+if (!codigoItem || !osComponentes[codigoItem]){
+return;
+}
+const composicaoExpandida = expandComposicao(codigoItem, qtdItem);
+if (composicaoExpandida.length){
+rows.push(...composicaoExpandida);
+}
+});
+renderComposicaoRows(rows);
+}
+
+function adicionarComponenteOS(){
+const tabela = document.querySelector("#panel-os-item table.tabela-componentes");
+if (!tabela){
+return;
+}
+const row = tabela.insertRow();
+row.innerHTML = `
+<td><input name="os_comp_codigo[]" required></td>
+<td><input name="os_comp_descricao[]" required></td>
+<td><input name="os_comp_unidade[]" value="UN"></td>
+<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0" required></td>
+`;
+}
+
+function preencherProcessosPadrao(conjunto){
+if (hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
+return;
+}
+const data = osProcessos && osProcessos[conjunto] ? osProcessos[conjunto] : {};
+const map = {
+"CORTE": "corte",
+"AR CONDICIONADO": "ar",
+"PREPARAÇÃO DE PEÇAS": "preparacao",
+"ISOLAMENTO": "isolamento",
+"REVESTIMENTO": "revestimento",
+"BANCOS": "bancos",
+"ELÉTRICA 2": "eletrica",
+"LIMPEZA/LIBERAÇÃO": "limpeza",
+};
+
+Object.keys(map).forEach((nome) => {
+const key = map[nome];
+const linhas = data[nome] || [];
+aplicarProcessoTabela(key, linhas);
+});
+}
+
+function aplicarProcessoTabela(key, linhas){
+const tabela = document.getElementById(`processo_${key}`);
+if (!tabela){
+return;
+}
+
+// limpa linhas existentes (exceto header)
+while (tabela.rows.length > 1){
+tabela.deleteRow(1);
+}
+
+if (!linhas.length){
+const row = tabela.insertRow();
+row.innerHTML = `
+<td><input name="proc_${key}_atividade[]"></td>
+<td>
+<input name="proc_${key}_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+`;
+return;
+}
+
+linhas.forEach((linha) => {
+const row = tabela.insertRow();
+row.innerHTML = `
+<td><input name="proc_${key}_atividade[]" value="${linha.atividade || ""}"></td>
+<td>
+<input name="proc_${key}_responsavel[]" value="${linha.responsavel || ""}">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+`;
+});
+}
+
+function coletarProcessosUI(){
+const map = {
+"CORTE": "corte",
+"AR CONDICIONADO": "ar",
+"PREPARAÇÃO DE PEÇAS": "preparacao",
+"ISOLAMENTO": "isolamento",
+"REVESTIMENTO": "revestimento",
+"BANCOS": "bancos",
+"ELÉTRICA 2": "eletrica",
+"LIMPEZA/LIBERAÇÃO": "limpeza",
+};
+const data = {};
+Object.keys(map).forEach((nome) => {
+const key = map[nome];
+const tabela = document.getElementById(`processo_${key}`);
+if (!tabela){
+return;
+}
+const linhas = [];
+for (let i = 1; i < tabela.rows.length; i++){
+const row = tabela.rows[i];
+const atvInput = row.querySelector(`input[name="proc_${key}_atividade[]"]`);
+const respInput = row.querySelector(`input[name="proc_${key}_responsavel[]"]`);
+const atividade = atvInput ? atvInput.value.trim() : "";
+const responsavel = respInput ? respInput.value.trim() : "";
+if (atividade){
+linhas.push({atividade, responsavel});
+}
+}
+data[nome] = linhas;
+});
+return data;
+}
+
+function limparOSForm(){
+const form = document.getElementById("form-os");
+if (!form){
+return;
+}
+form.reset();
+
+const tabelaOS = document.getElementById("tabela_os");
+if (tabelaOS){
+while (tabelaOS.rows.length > 2){
+tabelaOS.deleteRow(2);
+}
+const row = tabelaOS.rows[1];
+if (row){
+const select = row.querySelector('input[name="os_codigo[]"]');
+const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const qtd = row.querySelector('input[name="os_qtd[]"]');
+const serie = row.querySelector('input[name="os_serie[]"]');
+const unidade = row.querySelector('input[name="os_unidade[]"]');
+if (select) select.value = "";
+if (desc) desc.value = "";
+if (qtd) qtd.value = "";
+if (serie) serie.value = "";
+if (unidade) unidade.value = "";
+}
+}
+
+const processos = [
+    "processo_corte",
+    "processo_ar",
+    "processo_preparacao",
+    "processo_isolamento",
+    "processo_revestimento",
+    "processo_bancos",
+    "processo_eletrica",
+    "processo_limpeza",
+];
+processos.forEach((id) => {
+const tabela = document.getElementById(id);
+if (!tabela){
+return;
+}
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+const row = tabela.rows[1];
+if (row){
+const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
+const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
+if (atv) atv.value = "";
+if (resp) resp.value = "";
+}
+});
+
+const tbody = document.getElementById("tabela_componentes_body");
+if (tbody){
+tbody.innerHTML = "";
+}
+}
+
+function limparOCForm(){
+const form = document.querySelector('form[action="/gerar_oc"]');
+if (!form){
+return;
+}
+form.reset();
+
+const tabela = document.getElementById("tabela_itens");
+if (tabela){
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+const row = tabela.rows[1];
+if (row){
+const select = row.querySelector('select[name="codigo[]"]');
+const desc = row.querySelector('textarea[name="descricao[]"]');
+const unidade = row.querySelector('input[name="unidade[]"]');
+const qtd = row.querySelector('input[name="qtd[]"]');
+const valor = row.querySelector('input[name="valor[]"]');
+const desconto = row.querySelector('input[name="desconto[]"]');
+const ipi = row.querySelector('input[name="ipi[]"]');
+const icms = row.querySelector('input[name="icms[]"]');
+const cofins = row.querySelector('input[name="cofins[]"]');
+const total = row.querySelector('input[name="total_item[]"]');
+if (select) select.value = "";
+if (desc) desc.value = "";
+if (unidade) unidade.value = "";
+if (qtd) qtd.value = "";
+if (valor) valor.value = "";
+if (desconto) desconto.value = "0";
+if (ipi) ipi.value = "";
+if (icms) icms.value = "";
+if (cofins) cofins.value = "";
+if (total) total.value = "";
+}
+}
+
+const fornecedorSelect = document.querySelector('select[name="fornecedor"]');
+if (fornecedorSelect) fornecedorSelect.value = "";
+
+calcularTotais();
+calcularVencimento();
+}
+
+function setSelectValue(select, value){
+if (!select || !value){
+return;
+}
+if (select.tagName && select.tagName.toLowerCase() === "select"){
+const exists = Array.from(select.options).some((opt) => opt.value === value);
+if (!exists){
+const opt = document.createElement("option");
+opt.value = value;
+opt.textContent = value;
+select.appendChild(opt);
+}
+select.value = value;
+return;
+}
+// input
+select.value = value;
+}
+
+function aplicarPrefillOC(){
+if (ocPrefillApplied || !ocPrefill || Object.keys(ocPrefill).length === 0){
+return;
+}
+ocPrefillApplied = true;
+const fornecedorSelect = document.querySelector('select[name="fornecedor"]');
+if (ocPrefill.fornecedor){
+setSelectValue(fornecedorSelect, ocPrefill.fornecedor);
+}
+const campos = [
+["razao_social", "razao_social"],
+["cnpj", "cnpj"],
+["email", "email"],
+["telefone", "telefone"],
+["endereco", "endereco"],
+["bairro", "bairro"],
+["cidade", "cidade"],
+["uf", "uf"],
+["cep", "cep"],
+["previsao", "previsao"],
+["tipo_frete", "tipo_frete"],
+["forma_pagamento", "forma_pagamento"],
+["prazo", "prazo"],
+["vencimento", "vencimento"],
+];
+campos.forEach(([name, key]) => {
+const input = document.querySelector(`input[name="${name}"]`);
+if (input && ocPrefill[key] !== undefined && ocPrefill[key] !== null && ocPrefill[key] !== ""){
+input.value = ocPrefill[key];
+}
+});
+const obs = document.querySelector('textarea[name="obs"]');
+if (obs && ocPrefill.obs){
+obs.value = ocPrefill.obs;
+}
+const freteInput = document.getElementById("frete");
+if (freteInput && ocPrefill.frete !== undefined && ocPrefill.frete !== ""){
+freteInput.value = ocPrefill.frete;
+}
+
+const tabela = document.getElementById("tabela_itens");
+if (tabela && ocPrefill.itens && ocPrefill.itens.length){
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+const items = ocPrefill.itens;
+for (let i = 0; i < items.length; i++){
+if (i > 0){
+adicionarLinha();
+}
+const row = tabela.rows[i + 1];
+const item = items[i];
+const sel = row.querySelector('input[name="codigo[]"]');
+const desc = row.querySelector('textarea[name="descricao[]"]');
+const unidade = row.querySelector('input[name="unidade[]"]');
+const qtd = row.querySelector('input[name="qtd[]"]');
+const valor = row.querySelector('input[name="valor[]"]');
+const desconto = row.querySelector('input[name="desconto[]"]');
+if (item.codigo) setSelectValue(sel, item.codigo);
+if (desc) desc.value = item.descricao || "";
+if (unidade && item.unidade) unidade.value = item.unidade;
+if (qtd && item.qtd !== undefined) qtd.value = item.qtd;
+if (valor && item.valor !== undefined && item.valor !== "") valor.value = item.valor;
+if (desconto && item.desconto !== undefined && item.desconto !== "") desconto.value = item.desconto;
+}
+}
+calcularTotais();
+calcularVencimento();
+}
+
+function aplicarPrefillOS(){
+if (osPrefillApplied || !osPrefill || Object.keys(osPrefill).length === 0){
+return;
+}
+osPrefillApplied = true;
+const clienteSelect = document.querySelector('select[name="os_cliente"]');
+if (osPrefill.cliente){
+setSelectValue(clienteSelect, osPrefill.cliente);
+}
+const campos = [
+["os_numero", "os_numero"],
+["os_chassis", "chassis"],
+["os_municipio", "municipio"],
+["os_mmv", "mmv"],
+["os_previsao_inicio", "previsao_inicio"],
+["os_previsao_termino", "previsao_termino"],
+];
+campos.forEach(([name, key]) => {
+const input = document.querySelector(`input[name="${name}"]`);
+if (input && osPrefill[key] !== undefined && osPrefill[key] !== null && osPrefill[key] !== ""){
+input.value = osPrefill[key];
+}
+});
+const obsMateriais = document.querySelector('textarea[name="os_obs_materiais"]');
+if (obsMateriais && osPrefill.obs_materiais){
+obsMateriais.value = osPrefill.obs_materiais;
+}
+const obs = document.querySelector('textarea[name="os_obs"]');
+if (obs && osPrefill.obs){
+obs.value = osPrefill.obs;
+}
+
+const tabela = document.getElementById("tabela_os");
+if (tabela && osPrefill.itens && osPrefill.itens.length){
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+const items = osPrefill.itens;
+for (let i = 0; i < items.length; i++){
+if (i > 0){
+adicionarLinhaOS();
+}
+const row = tabela.rows[i + 1];
+const item = items[i];
+const sel = row.querySelector('input[name="os_codigo[]"]');
+const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const qtd = row.querySelector('input[name="os_qtd[]"]');
+const serie = row.querySelector('input[name="os_serie[]"]');
+const unidade = row.querySelector('input[name="os_unidade[]"]');
+if (item.codigo) setSelectValue(sel, item.codigo);
+if (desc) desc.value = item.descricao || "";
+if (qtd && item.qtd !== undefined) qtd.value = item.qtd;
+if (serie && item.serie) serie.value = item.serie;
+if (unidade && item.unidade) unidade.value = item.unidade;
+}
+}
+
+if (osPrefill.processos){
+const map = {
+"CORTE": "corte",
+"AR CONDICIONADO": "ar",
+"PREPARAÃ‡ÃƒO DE PEÃ‡AS": "preparacao",
+"ISOLAMENTO": "isolamento",
+"REVESTIMENTO": "revestimento",
+"BANCOS": "bancos",
+"ELÃ‰TRICA 2": "eletrica",
+"LIMPEZA/LIBERAÃ‡ÃƒO": "limpeza",
+};
+Object.keys(map).forEach((nome) => {
+const key = map[nome];
+const linhas = osPrefill.processos[nome] || [];
+aplicarProcessoTabela(key, linhas);
+});
+}
+if (osPrefill.composicao && osPrefill.composicao.length){
+osComposicaoSource = "prefill";
+} else {
+osComposicaoSource = "bom";
+}
+renderComponentes();
+}
+function adicionarProcessoLinha(key){
+const tabela = document.getElementById(`processo_${key}`);
+if (!tabela){
+return;
+}
+const row = tabela.insertRow();
+row.innerHTML = `
+<td><input name="proc_${key}_atividade[]"></td>
+<td>
+<input name="proc_${key}_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+`;
+}
+
+function removerLinhaProcesso(btn){
+const row = btn.closest("tr");
+const tabela = row ? row.closest("table") : null;
+if (!row || !tabela){
+return;
+}
+if (tabela.rows.length <= 2){
+const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
+const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
+if (atv) atv.value = "";
+if (resp) resp.value = "";
+return;
+}
+tabela.deleteRow(row.rowIndex);
+}
+
+function limparProcessosUI(){
+const processos = [
+    "processo_corte",
+    "processo_ar",
+    "processo_preparacao",
+    "processo_isolamento",
+    "processo_revestimento",
+    "processo_bancos",
+    "processo_eletrica",
+    "processo_limpeza",
+];
+processos.forEach((id) => {
+const tabela = document.getElementById(id);
+if (!tabela){
+return;
+}
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+const row = tabela.rows[1];
+if (row){
+const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
+const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
+if (atv) atv.value = "";
+if (resp) resp.value = "";
+}
+});
+}
+
+function renderBarChart(canvasId, labels, values, color, valuePrefix){
+const canvas = document.getElementById(canvasId);
+if (!canvas){
+return;
+}
+const ctx = canvas.getContext("2d");
+if (!ctx){
+return;
+}
+const parent = canvas.parentElement;
+const width = (parent && parent.clientWidth ? parent.clientWidth : canvas.clientWidth) || 600;
+const height = canvas.clientHeight || 280;
+canvas.width = width;
+canvas.height = height;
+
+ctx.clearRect(0, 0, width, height);
+const padding = 42;
+const chartWidth = width - padding * 2;
+const chartHeight = height - padding * 2;
+if (!values || values.length === 0){
+ctx.font = "14px Manrope, Arial, sans-serif";
+ctx.fillStyle = "#64748b";
+ctx.fillText("Sem dados", padding, height / 2);
+return;
+}
+const maxVal = Math.max(1, ...values);
+const barWidth = values.length ? chartWidth / values.length : chartWidth;
+
+ctx.strokeStyle = "#e2e8f0";
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.moveTo(padding, padding);
+ctx.lineTo(padding, height - padding);
+ctx.lineTo(width - padding, height - padding);
+ctx.stroke();
+
+ctx.font = "12px Manrope, Arial, sans-serif";
+ctx.fillStyle = "#475569";
+
+values.forEach((val, idx) => {
+const barHeight = (val / maxVal) * (chartHeight - 10);
+const x = padding + idx * barWidth + 8;
+const y = height - padding - barHeight;
+const w = Math.max(14, barWidth - 16);
+ctx.fillStyle = color;
+ctx.fillRect(x, y, w, barHeight);
+ctx.fillStyle = "#334155";
+ctx.fillText(labels[idx] || "", x, height - padding + 16);
+const label = valuePrefix ? `${valuePrefix}${val.toFixed ? val.toFixed(2) : val}` : `${val}`;
+ctx.fillText(label, x, y - 6);
+});
+}
+
+function getCookieValue(name){
+const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+return match ? decodeURIComponent(match[2]) : "";
+}
+
+function clearCookie(name){
+document.cookie = name + "=; Max-Age=0; path=/";
+}
+
+function monitorSaveStatus(){
+let attempts = 0;
+const timer = setInterval(() => {
+const status = getCookieValue("save_status");
+if (status){
+if (status === "onedrive"){
+alert("Salvo no onedrive corretamente.");
+} else {
+alert("Não foi possivel salvar no onedrive.");
+}
+clearCookie("save_status");
+clearInterval(timer);
+return;
+}
+attempts += 1;
+if (attempts > 12){
+clearInterval(timer);
+}
+}, 500);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+const tabela = document.getElementById("tabela_itens");
+if (tabela){
+tabela.addEventListener("change", (e) => {
+if (e.target && e.target.name === "codigo[]"){
+preencherPorCodigo(e.target);
+}
+});
+
+tabela.addEventListener("input", (e) => {
+if (e.target && e.target.name === "codigo[]"){
+preencherPorCodigo(e.target);
+}
+    if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]"].includes(e.target.name)){
+    calcularTotais();
+    }
+});
+}
+
+const fornecedorInput = document.querySelector('select[name="fornecedor"]');
+if (fornecedorInput){
+fornecedorInput.addEventListener("change", () => {
+preencherFornecedor(fornecedorInput);
+});
+}
+
+const osFornecedorInput = document.querySelector('select[name="os_cliente"]');
+if (osFornecedorInput){
+osFornecedorInput.addEventListener("change", () => {
+preencherFornecedorOS(osFornecedorInput);
+});
+}
+
+const fornecedorPanel = document.getElementById("panel-fornecedor");
+const itemPanel = document.getElementById("panel-item");
+const abrirFornecedor = document.getElementById("abrir-fornecedor");
+const abrirItem = document.getElementById("abrir-item");
+const fecharFornecedor = document.getElementById("fechar-fornecedor");
+const fecharItem = document.getElementById("fechar-item");
+const osFornecedorPanel = document.getElementById("panel-os-fornecedor");
+const osItemPanel = document.getElementById("panel-os-item");
+const osProcessosPanel = document.getElementById("panel-os-processos");
+const abrirOsFornecedor = document.getElementById("abrir-os-fornecedor");
+const abrirOsItem = document.getElementById("abrir-os-item");
+const abrirOsProcessos = document.getElementById("abrir-os-processos");
+const fecharOsFornecedor = document.getElementById("fechar-os-fornecedor");
+const fecharOsItem = document.getElementById("fechar-os-item");
+const fecharOsProcessos = document.getElementById("fechar-os-processos");
+const cadastroComprasToggle = document.getElementById("cadastro-compras-toggle");
+const cadastroComprasMenu = document.getElementById("cadastro-compras-menu");
+const cadastroProducaoToggle = document.getElementById("cadastro-producao-toggle");
+const cadastroProducaoMenu = document.getElementById("cadastro-producao-menu");
+
+const cadastroSections = [fornecedorPanel, itemPanel, osFornecedorPanel, osItemPanel, osProcessosPanel].filter(Boolean);
+function abrirCadastro(panel){
+cadastroSections.forEach((p) => p.classList.remove("active"));
+if (panel){
+panel.classList.add("active");
+panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+}
+
+if (abrirFornecedor && fornecedorPanel){
+abrirFornecedor.addEventListener("click", () => {
+abrirCadastro(fornecedorPanel);
+});
+}
+
+if (abrirItem && itemPanel){
+abrirItem.addEventListener("click", () => {
+abrirCadastro(itemPanel);
+});
+}
+
+if (fecharFornecedor && fornecedorPanel){
+fecharFornecedor.addEventListener("click", () => {
+fornecedorPanel.classList.remove("active");
+});
+}
+
+if (fecharItem && itemPanel){
+fecharItem.addEventListener("click", () => {
+itemPanel.classList.remove("active");
+});
+}
+
+if (abrirOsFornecedor && osFornecedorPanel){
+abrirOsFornecedor.addEventListener("click", () => {
+abrirCadastro(osFornecedorPanel);
+});
+}
+
+if (abrirOsItem && osItemPanel){
+abrirOsItem.addEventListener("click", () => {
+abrirCadastro(osItemPanel);
+});
+}
+
+if (abrirOsProcessos && osProcessosPanel){
+abrirOsProcessos.addEventListener("click", () => {
+abrirCadastro(osProcessosPanel);
+});
+}
+
+if (fecharOsFornecedor && osFornecedorPanel){
+fecharOsFornecedor.addEventListener("click", () => {
+osFornecedorPanel.classList.remove("active");
+});
+}
+
+if (fecharOsItem && osItemPanel){
+fecharOsItem.addEventListener("click", () => {
+osItemPanel.classList.remove("active");
+});
+}
+
+if (fecharOsProcessos && osProcessosPanel){
+fecharOsProcessos.addEventListener("click", () => {
+osProcessosPanel.classList.remove("active");
+});
+}
+
+if (cadastroComprasToggle && cadastroComprasMenu){
+cadastroComprasToggle.addEventListener("click", () => {
+cadastroComprasMenu.classList.toggle("open");
+if (cadastroProducaoMenu) cadastroProducaoMenu.classList.remove("open");
+});
+}
+
+if (cadastroProducaoToggle && cadastroProducaoMenu){
+cadastroProducaoToggle.addEventListener("click", () => {
+cadastroProducaoMenu.classList.toggle("open");
+if (cadastroComprasMenu) cadastroComprasMenu.classList.remove("open");
+});
+}
+
+const freteInput = document.getElementById("frete");
+if (freteInput){
+freteInput.addEventListener("input", () => {
+calcularTotais();
+});
+}
+
+const prazoInput = document.getElementById("prazo");
+if (prazoInput){
+prazoInput.addEventListener("input", () => {
+calcularVencimento();
+});
+}
+
+const tabelaOS = document.getElementById("tabela_os");
+if (tabelaOS){
+tabelaOS.addEventListener("change", (e) => {
+if (e.target.name === "os_codigo[]"){
+osComposicaoSource = "bom";
+preencherOSItem(e.target);
+}
+
+const processosTabelas = [
+    "processo_corte",
+    "processo_ar",
+    "processo_preparacao",
+    "processo_isolamento",
+    "processo_revestimento",
+    "processo_bancos",
+    "processo_eletrica",
+    "processo_limpeza",
+];
+processosTabelas.forEach((id) => {
+const tabela = document.getElementById(id);
+if (tabela){
+    tabela.addEventListener("input", () => {});
+}
+});
+});
+tabelaOS.addEventListener("input", (e) => {
+if (e.target.name === "os_codigo[]"){
+osComposicaoSource = "bom";
+preencherOSItem(e.target);
+}
+if (e.target.name === "os_qtd[]"){
+osComposicaoSource = "bom";
+renderComponentes();
+}
+});
+}
+
+const formOc = document.querySelector('form[action="/gerar_oc"]');
+if (formOc){
+formOc.addEventListener("submit", () => {
+monitorSaveStatus();
+});
+}
+
+const formOs = document.getElementById("form-os");
+if (formOs){
+formOs.addEventListener("submit", () => {
+monitorSaveStatus();
+});
+}
+
+const tabButtons = document.querySelectorAll(".tab-btn");
+const cadastroActions = document.getElementById("cadastro-actions");
+const defaultTab = document.body.getAttribute("data-default-tab") || "oc";
+let initialTarget = "tab-oc";
+const dashboardData = {{ dashboard|tojson }};
+let dashboardRendered = false;
+function renderDashboardCharts(){
+if (!dashboardData){
+return;
+}
+const ocLabels = (dashboardData.oc_totais || []).map((d) => d.data);
+const ocValues = (dashboardData.oc_totais || []).map((d) => parseNumber(d.valor));
+const osLabels = (dashboardData.os_quantidades || []).map((d) => d.data);
+const osValues = (dashboardData.os_quantidades || []).map((d) => parseNumber(d.valor));
+setTimeout(() => {
+renderBarChart("chart-compras", ocLabels, ocValues, "#0ea5a3", "R$ ");
+renderBarChart("chart-os", osLabels, osValues, "#0b1c3a", "");
+dashboardRendered = true;
+}, 0);
+}
+tabButtons.forEach((btn) => {
+btn.addEventListener("click", () => {
+const current = document.querySelector(".tab-content.active");
+if (current && current.id === "tab-oc"){
+limparOCForm();
+}
+if (current && current.id === "tab-os"){
+limparOSForm();
+}
+tabButtons.forEach((b) => b.classList.remove("active"));
+btn.classList.add("active");
+const target = btn.getAttribute("data-tab");
+document.querySelectorAll(".tab-content").forEach((pane) => {
+pane.classList.toggle("active", pane.id === target);
+});
+if (cadastroActions){
+cadastroActions.style.display = target === "tab-cadastro" ? "flex" : "none";
+}
+if (target === "tab-os"){
+initOsTab();
+}
+if (target === "tab-dashboard"){
+renderDashboardCharts();
+}
+});
+});
+
+if (cadastroActions){
+const active = document.querySelector(`.tab-btn[data-tab="tab-${defaultTab}"]`) || document.querySelector(".tab-btn.active");
+if (active && !active.classList.contains("active")){
+active.click();
+}
+initialTarget = active ? active.getAttribute("data-tab") : "tab-oc";
+cadastroActions.style.display = initialTarget === "tab-cadastro" ? "flex" : "none";
+}
+
+calcularTotais();
+renderComponentes();
+aplicarPrefillOC();
+if (initialTarget === "tab-os"){
+initOsTab();
+}
+if (initialTarget === "tab-dashboard"){
+renderDashboardCharts();
+}
+
+window.addEventListener("resize", () => {
+const dash = document.getElementById("tab-dashboard");
+if (dash && dash.classList.contains("active")){
+renderDashboardCharts();
+}
+});
+});
+
+</script>
+
+</head>
+
+<body data-default-tab="{{ tab }}">
+
+<div class="topbar">
+<img class="logo" src="/static/logo.png" alt="Logo">
+<div class="topbar-actions">
+<form method="POST" action="/resetar_base" onsubmit="return confirm('Tem certeza que deseja resetar a base de dados? Isso apaga cadastros locais.');">
+<button type="submit" class="topbar-reset" title="Resetar base de dados">&#8635;</button>
+</form>
+<div class="nav-tabs">
+<button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
+<button type="button" class="tab-btn" data-tab="tab-os">Produção</button>
+<button type="button" class="tab-btn" data-tab="tab-cadastro">Cadastro</button>
+<button type="button" class="tab-btn" data-tab="tab-dashboard">Dashboard</button>
+</div>
+</div>
+</div>
+
+<div class="container">
+
+<div id="tab-oc" class="tab-content active">
+<div class="card">
+<h3>Importar Pedido de Compra (DOCX/PDF)</h3>
+<form method="POST" action="/importar_oc_documento" enctype="multipart/form-data">
+<label>Arquivo de Pedido</label>
+<input type="file" name="arquivo_oc_template" accept=".docx,.pdf" required>
+<br><br>
+<button type="submit">Importar Pedido</button>
+</form>
+</div>
+<form method="POST" action="/gerar_oc" onsubmit="setTimeout(limparOCForm, 500)">
+
+<div class="card">
+
+<h3>Dados do Fornecedor</h3>
+
+<div class="grid-4">
+
+<div>
+<label>Fornecedor</label>
+<select name="fornecedor">
+<option value=""></option>
+{% for key, f in fornecedores.items() %}
+<option value="{{ key }}">{{ f["fornecedor"] if "fornecedor" in f else key }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div>
+<label>Razao Social</label>
+<input name="razao_social" readonly>
+</div>
+
+<div>
+<label>CNPJ</label>
+<input name="cnpj" readonly>
+</div>
+
+<div>
+<label>Email</label>
+<input name="email" readonly>
+</div>
+
+<div>
+<label>Telefone</label>
+<input name="telefone" readonly>
+</div>
+
+<div>
+<label>Endereco</label>
+<input name="endereco" readonly>
+</div>
+
+<div>
+<label>Bairro</label>
+<input name="bairro" readonly>
+</div>
+
+<div>
+<label>Cidade</label>
+<input name="cidade" readonly>
+</div>
+
+<div>
+<label>UF</label>
+<input name="uf" readonly>
+</div>
+
+<div>
+<label>CEP</label>
+<input name="cep" readonly>
+</div>
+
+<div>
+<label>Previsao</label>
+<input name="previsao" type="date">
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Itens do Pedido</h3>
+
+<table id="tabela_itens" class="tabela-itens">
+
+<tr>
+<th>Codigo</th>
+<th>Descricao</th>
+<th>Unidade</th>
+<th>Qtd</th>
+<th>Valor Unit</th>
+<th>Desconto</th>
+<th>IPI</th>
+<th>ICMS</th>
+<th>COFINS</th>
+<th>Total Item</th>
+<th></th>
+</tr>
+
+<tr>
+<td>
+<input name="codigo[]" list="oc-produtos-list">
+</td>
+<td><textarea name="descricao[]" rows="2" readonly></textarea></td>
+<td><input name="unidade[]" readonly></td>
+<td><input type="number" step="1" min="0" name="qtd[]"></td>
+<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
+<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0"></div></td>
+<td><input type="number" step="0.01" min="0" name="ipi[]"></td>
+<td><input type="number" step="0.01" min="0" name="icms[]"></td>
+<td><input type="number" step="0.01" min="0" name="cofins[]"></td>
+<td><input name="total_item[]" readonly></td>
+<td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOC(this)">-</button></td>
+</tr>
+
+</table>
+
+<datalist id="oc-produtos-list">
+{% for key, p in produtos.items() %}
+<option value="{{ key }}{% if p.get('descricao') %} - {{ p.get('descricao') }}{% endif %}"></option>
+{% endfor %}
+</datalist>
+
+<br>
+
+<button type="button" onclick="adicionarLinha()">Adicionar Item</button>
+
+</div>
+
+<div class="card">
+
+<h3>Frete e Pagamento</h3>
+
+<div class="grid-2">
+
+  <div>
+  <label>Tipo de Frete</label>
+  <select name="tipo_frete">
+    <option value="">Selecione</option>
+    <option value="CIF">CIF</option>
+    <option value="FOB">FOB</option>
+  </select>
+  </div>
+
+<div>
+<label>Frete</label>
+<div class="input-group"><span class="input-prefix">R$</span><input id="frete" type="number" step="0.01" min="0" name="frete" value="0"></div>
+</div>
+
+<div>
+<label>Total sem Impostos</label>
+<div class="input-group"><span class="input-prefix">R$</span><input id="total_sem_impostos_display" readonly></div>
+</div>
+
+<div>
+<label>Total Itens</label>
+<div class="input-group"><span class="input-prefix">R$</span><input id="total_itens_display" readonly></div>
+<input id="total_itens" name="total_itens" type="hidden">
+</div>
+
+<div>
+<label>Total do Pedido</label>
+<div class="input-group"><span class="input-prefix">R$</span><input id="total_pedido_display" readonly></div>
+<input id="total_pedido" name="total_pedido" type="hidden">
+</div>
+
+  <div>
+  <label>Forma de Pagamento</label>
+  <select name="forma_pagamento">
+    <option value="">Selecione</option>
+    <option value="A vista">A vista</option>
+    <option value="A prazo">A prazo</option>
+  </select>
+  </div>
+
+<div>
+<label>Prazo (dias)</label>
+<input id="prazo" name="prazo" type="number" step="1" min="0">
+</div>
+
+<div>
+<label>Vencimento</label>
+<input id="vencimento" name="vencimento" readonly>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Observacoes</h3>
+
+<textarea name="obs" rows="4"></textarea>
+
+</div>
+
+<div class="card footer">
+
+  <div>
+  <button type="submit" name="oc_mode" value="completo">
+  Emitir Pedido
+  </button>
+  </div>
+  <div>
+  <button type="submit" name="oc_mode" value="resumido">
+  Emitir Pedido Resumido
+  </button>
+  </div>
+
+</div>
+
+</form>
+</div>
+
+<div id="tab-dashboard" class="tab-content">
+<div class="dashboard-actions">
+<a class="btn" href="/exportar_dashboard">Exportar Excel</a>
+</div>
+<div class="dashboard-grid">
+<div class="chart-card">
+<h3>Compras - Valor Total Gasto x Data de Criacao</h3>
+<canvas id="chart-compras" class="chart-canvas"></canvas>
+</div>
+<div class="chart-card">
+<h3>O.S - Quantidade x Data de Criacao</h3>
+<canvas id="chart-os" class="chart-canvas"></canvas>
+</div>
+</div>
+</div>
+
+<div id="tab-os" class="tab-content">
+<div class="card">
+<h3>Importar Ordem de Servico (DOCX/PDF)</h3>
+<form method="POST" action="/importar_os_documento" enctype="multipart/form-data">
+<label>Arquivo de O.S</label>
+<input type="file" name="arquivo_os_template" accept=".docx,.pdf" required>
+<br><br>
+<button type="submit">Importar O.S</button>
+</form>
+</div>
+<form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data" onsubmit="setTimeout(limparOSForm, 500)">
+
+<div class="card">
+<h3>Dados do Cliente</h3>
+<div class="grid-4">
+<div>
+<label>Cliente</label>
+<select name="os_cliente">
+<option value=""></option>
+{% for key, f in os_fornecedores.items() %}
+<option value="{{ key }}">{{ f["cliente"] if "cliente" in f else key }}</option>
+{% endfor %}
+</select>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Dados da O.S</h3>
+<div class="grid-4">
+<div>
+<label>Nº O.S (opcional)</label>
+<input name="os_numero">
+</div>
+<div>
+<label>Chassis</label>
+<input name="os_chassis">
+</div>
+<div>
+<label>Municipio</label>
+<input name="os_municipio">
+</div>
+<div>
+<label>MMV</label>
+<input name="os_mmv">
+</div>
+<div>
+<label>Previsao Inicio</label>
+<input name="os_previsao_inicio" type="datetime-local">
+</div>
+<div>
+<label>Previsao Termino</label>
+<input name="os_previsao_termino" type="datetime-local">
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Descricao do Servico</h3>
+<textarea name="os_descricao_servico" rows="4"></textarea>
+</div>
+
+<div class="card">
+<h3>Itens da OS</h3>
+<table id="tabela_os" class="tabela-os">
+<tr>
+<th>Codigo Produto</th>
+<th>Descricao Produto</th>
+<th>Qtd</th>
+<th>Nº Serie</th>
+<th>Un</th>
+<th></th>
+</tr>
+<tr>
+<td>
+<input name="os_codigo[]" list="os-produtos-list">
+</td>
+<td><textarea name="os_descricao[]" rows="2" readonly></textarea></td>
+<td><input type="number" step="1" min="0" name="os_qtd[]"></td>
+<td><input name="os_serie[]"></td>
+<td><input name="os_unidade[]" readonly></td>
+<td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOS(this)">-</button></td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarLinhaOS()">Adicionar Item</button>
+</div>
+
+<datalist id="os-produtos-list">
+{% for key, p in os_produtos.items() %}
+<option value="{{ key }}{% if p.get('descricao') %} - {{ p.get('descricao') }}{% endif %}"></option>
+{% endfor %}
+</datalist>
+
+<div class="card">
+<h3>Componentes</h3>
+<table class="tabela-componentes">
+<tr>
+<th>Item</th>
+<th>Componente</th>
+<th>Descricao</th>
+<th>Unidade</th>
+<th>Qtd</th>
+</tr>
+<tbody id="tabela_componentes_body"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3>Layout (PDF)</h3>
+<input type="file" name="os_layout_pdf" accept=".pdf">
+</div>
+
+<div class="card">
+<h3>Observacoes - Materiais</h3>
+<textarea name="os_obs_materiais" rows="3"></textarea>
+</div>
+
+<div class="card">
+<h3>Processos Produtivos</h3>
+<button type="button" onclick="limparProcessosUI()">Excluir Todos os Processos</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Corte</h3>
+<table id="processo_corte" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_corte_atividade[]"></td>
+<td>
+<input name="proc_corte_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('corte')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Ar Condicionado</h3>
+<table id="processo_ar" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_ar_atividade[]"></td>
+<td>
+<input name="proc_ar_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('ar')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Preparacao de Pecas</h3>
+<table id="processo_preparacao" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_preparacao_atividade[]"></td>
+<td>
+<input name="proc_preparacao_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('preparacao')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Desmontagem e Isolamento</h3>
+<table id="processo_isolamento" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_isolamento_atividade[]"></td>
+<td>
+<input name="proc_isolamento_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('isolamento')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Revestimento</h3>
+<table id="processo_revestimento" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_revestimento_atividade[]"></td>
+<td>
+<input name="proc_revestimento_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('revestimento')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Bancos</h3>
+<table id="processo_bancos" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_bancos_atividade[]"></td>
+<td>
+<input name="proc_bancos_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('bancos')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Eletrica</h3>
+<table id="processo_eletrica" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_eletrica_atividade[]"></td>
+<td>
+<input name="proc_eletrica_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('eletrica')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Limpeza/Liberação</h3>
+<table id="processo_limpeza" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_limpeza_atividade[]"></td>
+<td>
+<input name="proc_limpeza_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('limpeza')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Observacoes</h3>
+<textarea name="os_obs" rows="4"></textarea>
+</div>
+
+<div class="card footer">
+<div>
+<div class="dashboard-actions os-actions">
+<button type="submit" name="os_mode" value="completa">O.S completa</button>
+<button type="submit" name="os_mode" value="mascara">Mascara</button>
+<button type="submit" name="os_mode" value="resumida">O.S resumida</button>
+</div>
+</div>
+</div>
+
+</form>
+</div>
+
+<div id="tab-cadastro" class="tab-content">
+<div class="card">
+<h3>Cadastros</h3>
+<p>Selecione um cadastro pelos botões flutuantes.</p>
+</div>
+<div class="card">
+<h3>Caminhos de Salvamento</h3>
+<form method="POST" action="/salvar_caminhos">
+<div class="grid">
+<div>
+<label>Caminho Compras (O.C)</label>
+<input name="pedidos_dir" value="{{ save_paths.pedidos_dir if save_paths else '' }}">
+</div>
+<div>
+<label>Caminho Produção (O.S)</label>
+<input name="os_dir" value="{{ save_paths.os_dir if save_paths else '' }}">
+</div>
+<div>
+<label>Caminho B.O.M</label>
+<input name="bom_dir" value="{{ save_paths.bom_dir if save_paths else '' }}">
+</div>
+</div>
+<button type="submit">Salvar Caminhos</button>
+</form>
+</div>
+<div class="card">
+  <h3>Atualizar B.O.M</h3>
+  <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ bom_dir }}</strong> e importa o conteúdo para os cadastros.</p>
+  <form method="POST" action="/atualizar_bom">
+    <button type="submit">Atualizar B.O.M</button>
+  </form>
+  {% if bom_status %}
+    <div class="total-box" style="margin-top:16px;">
+      {{ bom_status }}
+    </div>
+  {% endif %}
+</div>
+<div class="cadastro-sections">
+<div id="panel-fornecedor" class="card cadastro-section" aria-hidden="true">
+<div class="panel-header">
+<div class="panel-title">Cadastro de Fornecedor</div>
+<button type="button" id="fechar-fornecedor" class="panel-close">X</button>
+</div>
+<form method="POST" action="/cadastrar_fornecedor">
+<div class="grid">
+<div>
+<label>Fornecedor</label>
+<input name="fornecedor" required>
+</div>
+<div>
+<label>Razao Social</label>
+<input name="razao_social">
+</div>
+<div>
+<label>CNPJ</label>
+<input name="cnpj">
+</div>
+<div>
+<label>Email</label>
+<input name="email">
+</div>
+<div>
+<label>Telefone</label>
+<input name="telefone">
+</div>
+<div>
+<label>Endereco</label>
+<input name="endereco">
+</div>
+<div>
+<label>Bairro</label>
+<input name="bairro">
+</div>
+<div>
+<label>Cidade</label>
+<input name="cidade">
+</div>
+<div>
+<label>UF</label>
+<input name="uf">
+</div>
+<div>
+<label>CEP</label>
+<input name="cep">
+</div>
+</div>
+<br>
+<button type="submit">Cadastrar Fornecedor</button>
+</form>
+<br>
+<form method="POST" action="/importar_fornecedores" enctype="multipart/form-data">
+<label>Importar Planilha (XLSX)</label>
+<input type="file" name="arquivo_fornecedores" accept=".xlsx">
+<br><br>
+<button type="submit">Importar Fornecedores</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_fornecedores">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+</div>
+
+<div id="panel-item" class="card cadastro-section" aria-hidden="true">
+<div class="panel-header">
+<div class="panel-title">Cadastro de Item</div>
+<button type="button" id="fechar-item" class="panel-close">X</button>
+</div>
+<form method="POST" action="/cadastrar_item">
+<div class="grid">
+<div>
+<label>Codigo</label>
+<input name="codigo" required>
+</div>
+<div>
+<label>Descricao</label>
+<input name="descricao" required>
+</div>
+<div>
+<label>Unidade</label>
+<input name="unidade" value="UN">
+</div>
+<div>
+<label>Valor Unitario</label>
+<div class="input-group"><span class="input-prefix">R$</span><input name="valor" type="number" step="0.01" min="0"></div>
+</div>
+<div>
+<label>IPI (%)</label>
+<input name="ipi" type="number" step="0.01" min="0">
+</div>
+<div>
+<label>ICMS (%)</label>
+<input name="icms" type="number" step="0.01" min="0">
+</div>
+<div>
+<label>COFINS (%)</label>
+<input name="cofins" type="number" step="0.01" min="0">
+</div>
+</div>
+<br>
+<button type="submit">Cadastrar Item</button>
+</form>
+<br>
+<form method="POST" action="/importar_produtos" enctype="multipart/form-data">
+<label>Importar Planilha (XLSX)</label>
+<input type="file" name="arquivo_produtos" accept=".xlsx">
+<br><br>
+<button type="submit">Importar Itens</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_produtos">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+</div>
+
+<div id="panel-os-fornecedor" class="card cadastro-section" aria-hidden="true">
+<div class="panel-header">
+<div class="panel-title">Cadastro de Cliente (OS)</div>
+<button type="button" id="fechar-os-fornecedor" class="panel-close">X</button>
+</div>
+<form method="POST" action="/cadastrar_os_fornecedor">
+<div class="grid">
+<div>
+<label>Cliente</label>
+<input name="os_fornecedor" required>
+</div>
+</div>
+<br>
+<button type="submit">Cadastrar Cliente (OS)</button>
+</form>
+<br>
+<form method="POST" action="/importar_os_fornecedores" enctype="multipart/form-data">
+<label>Importar Clientes (XLSX)</label>
+<input type="file" name="arquivo_os_fornecedores" accept=".xlsx">
+<br><br>
+<button type="submit">Importar Clientes (OS)</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_os_clientes">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+</div>
+
+<div id="panel-os-item" class="card cadastro-section" aria-hidden="true">
+<div class="panel-header">
+<div class="panel-title">Cadastro de Item (OS)</div>
+<button type="button" id="fechar-os-item" class="panel-close">X</button>
+</div>
+<form method="POST" action="/cadastrar_os_item">
+<div class="grid">
+<div>
+<label>Codigo</label>
+<input name="os_item_codigo" required>
+</div>
+<div>
+<label>Descricao</label>
+<input name="os_item_descricao" required>
+</div>
+<div>
+<label>Unidade</label>
+<input name="os_item_unidade" value="UN">
+</div>
+</div>
+<br>
+<label>Componentes</label>
+<table class="tabela-componentes">
+<tr>
+<th>Codigo</th>
+<th>Descricao</th>
+<th>Unidade</th>
+<th>Qtd</th>
+</tr>
+<tr>
+<td><input name="os_comp_codigo[]" required></td>
+<td><input name="os_comp_descricao[]" required></td>
+<td><input name="os_comp_unidade[]" value="UN"></td>
+<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0" required></td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarComponenteOS()">Adicionar Componente</button>
+<br><br>
+<button type="submit">Cadastrar Item (OS)</button>
+</form>
+<br>
+<form method="POST" action="/importar_os_produtos" enctype="multipart/form-data">
+<label>Importar Itens (XLSX)</label>
+<input type="file" name="arquivo_os_produtos" accept=".xlsx">
+<br><br>
+<button type="submit">Importar Itens (OS)</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_os_itens">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+<br>
+<form method="POST" action="/importar_os_componentes" enctype="multipart/form-data">
+<label>Importar Componentes (XLSX)</label>
+<input type="file" name="arquivo_os_componentes" accept=".xlsx">
+<br><br>
+<button type="submit">Importar Componentes</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_os_componentes">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+</div>
+
+<div id="panel-os-processos" class="card cadastro-section" aria-hidden="true">
+<div class="panel-header">
+<div class="panel-title">Processos Padrao (OS)</div>
+<button type="button" id="fechar-os-processos" class="panel-close">X</button>
+</div>
+<form method="POST" action="/importar_os_processos" enctype="multipart/form-data">
+<label>Importar Processos (XLSX)</label>
+<input type="file" name="arquivo_os_processos" accept=".xlsx">
+<br><br>
+<button type="submit">Importar Processos</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_os_processos">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+</div>
+</div>
+</div>
+
+<div id="cadastro-actions" class="floating-actions" style="display:none">
+<div class="fab-group">
+<button id="cadastro-compras-toggle" class="fab fab-parent" type="button" title="Cadastro - Compras">Cadastro - Compras</button>
+<div id="cadastro-compras-menu" class="fab-menu">
+<button id="abrir-fornecedor" class="fab fab-child" type="button" title="Cadastro Fornecedor">Cadastro Fornecedor</button>
+<button id="abrir-item" class="fab fab-child" type="button" title="Cadastro Produto">Cadastro Produto</button>
+</div>
+</div>
+<div class="fab-group">
+<button id="cadastro-producao-toggle" class="fab fab-parent" type="button" title="Cadastro - Produção">Cadastro - Produção</button>
+<div id="cadastro-producao-menu" class="fab-menu">
+<button id="abrir-os-fornecedor" class="fab fab-child" type="button" title="Cadastro de Cliente">Cadastro de Cliente</button>
+<button id="abrir-os-item" class="fab fab-child" type="button" title="Cadastro de itens">Cadastro de itens</button>
+<button id="abrir-os-processos" class="fab fab-child" type="button" title="Processos">Processos</button>
+</div>
+</div>
+</div>
+
+</body>
+
+</html>
