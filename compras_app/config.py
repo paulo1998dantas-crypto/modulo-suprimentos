@@ -29,6 +29,7 @@ else:
 DEFAULT_PEDIDOS_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 03 Compras\01 Pedidos de Compra"
 DEFAULT_OS_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 02 Produção\01 Controle de Produção"
 DEFAULT_BOM_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 02 Produção\01 Controle de Produção\01 - Projeto Cadastro\02 - B.O.M"
+DEFAULT_PROCESSOS_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 02 Produção\01 Controle de Produção\01 - Projeto Cadastro\03 - PROCESSOS"
 
 PRODUTOS_FILE = os.path.join(DATA_DIR, "produtos.json")
 FORNECEDORES_FILE = os.path.join(DATA_DIR, "fornecedores.json")
@@ -152,6 +153,20 @@ def set_bom_dir(bom_dir):
         settings["bom_dir"] = bom_dir.strip()
     else:
         settings.pop("bom_dir", None)
+    salvar_settings(settings)
+
+
+def get_processos_dir():
+    settings = _carregar_settings()
+    return settings.get("processos_dir") or DEFAULT_PROCESSOS_DIR
+
+
+def set_processos_dir(processos_dir):
+    settings = _carregar_settings()
+    if processos_dir and processos_dir.strip():
+        settings["processos_dir"] = processos_dir.strip()
+    else:
+        settings.pop("processos_dir", None)
     salvar_settings(settings)
 
 

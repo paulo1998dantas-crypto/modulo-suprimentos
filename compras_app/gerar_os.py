@@ -1,33 +1,32 @@
+import logging
 import os
 import tempfile
-import logging
+from datetime import datetime, timedelta
+
+import pypdfium2 as pdfium
 from docx import Document
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches
-from composicao import expandir_composicao_itens
+
+from composicao import resolver_composicao_final
 from config import TEMPLATE_OS, pasta_os
-import pypdfium2 as pdfium
+from os_template import mapear_tabelas_os
 
 logger = logging.getLogger(__name__)
 
+
 def _resolve_unique_path(path):
-    dir_path = os.path.dirname(path)
-    try:
-        arquivos = os.listdir(dir_path)
-    except Exception:
-        arquivos = []
-    existe_02 = any(
-        a.lower().endswith(".docx") and a.strip().startswith("02")
-        for a in arquivos
-    )
-    if not os.path.exists(path) and not existe_02:
+    if not os.path.exists(path):
         return path
     base, ext = os.path.splitext(path)
-    for i in range(1, 100):
-        candidato = f"{base} - R{i:02d}{ext}"
+    for idx in range(1, 100):
+        candidato = f"{base} - R{idx:02d}{ext}"
         if not os.path.exists(candidato):
             return candidato
     return path
+
 
 def _safe_save_doc(doc, path):
     try:
@@ -49,34 +48,55 @@ def _set_cell_text(cell, texto):
     cell.text = "" if texto is None else str(texto)
 
 
-def _set_cell_align_center(cell):
-    for p in cell.paragraphs:
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+def _set_cell_align(cell, alignment):
+    for paragraph in cell.paragraphs:
+        paragraph.alignment = alignment
 
 
-def _set_os_numero(cell, numero_os):
-    # Mantem alinhamento central e quebra em duas linhas como no template
+def _set_vertical_merge(cell, mode=None):
+    tc_pr = cell._tc.get_or_add_tcPr()
+    vmerge = tc_pr.find(qn("w:vMerge"))
+    if vmerge is None:
+        vmerge = OxmlElement("w:vMerge")
+        tc_pr.append(vmerge)
+    if mode:
+        vmerge.set(qn("w:val"), mode)
+    else:
+        if qn("w:val") in vmerge.attrib:
+            del vmerge.attrib[qn("w:val")]
+
+
+def _set_os_numero_legacy_unused(cell, numero_os):
     while len(cell.paragraphs) < 2:
         cell.add_paragraph()
-    for p in cell.paragraphs:
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        for run in p.runs:
+    for paragraph in cell.paragraphs:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in paragraph.runs:
             run.text = ""
     p0 = cell.paragraphs[0]
     p1 = cell.paragraphs[1]
-    run0 = p0.add_run("Nº")
-    run0.bold = False
-    run1 = p1.add_run(str(numero_os))
-    run1.bold = True
+    p0.add_run("Nº")
+    run_num = p1.add_run(str(numero_os))
+    run_num.bold = True
+
+
+def _set_os_numero(cell, numero_os):
+    while len(cell.paragraphs) < 2:
+        cell.add_paragraph()
+    for paragraph in cell.paragraphs:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in paragraph.runs:
+            run.text = ""
+    p0 = cell.paragraphs[0]
+    p1 = cell.paragraphs[1]
+    p0.add_run("N\u00ba Ordem de Servi\u00e7o")
+    run_num = p1.add_run(str(numero_os))
+    run_num.bold = True
 
 
 def _limpar_linhas_apos(tabela, header_index):
-    for i in range(len(tabela.rows) - 1, header_index, -1):
-        tabela._tbl.remove(tabela.rows[i]._tr)
-
-
-def _normalizar_numero(numero):
-    return str(numero).strip()
+    for idx in range(len(tabela.rows) - 1, header_index, -1):
+        tabela._tbl.remove(tabela.rows[idx]._tr)
 
 
 def _formatar_datetime_local(texto):
@@ -92,10 +112,65 @@ def _formatar_datetime_local(texto):
     return texto
 
 
-def _preencher_tabela_produtos(tabela, itens):
-    # Mantem cabecalho de colunas (linha 0)
-    _limpar_linhas_apos(tabela, 0)
+def _parse_datetime_local(texto):
+    if not texto:
+        return None
+    texto = str(texto).strip()
+    formatos = (
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M",
+        "%d/%m/%Y - %H:%M:%S",
+        "%d/%m/%Y - %H:%M",
+        "%d/%m/%Y %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%Y",
+    )
+    for formato in formatos:
+        try:
+            return datetime.strptime(texto, formato)
+        except Exception:
+            continue
+    try:
+        return datetime.fromisoformat(texto.replace("Z", "+00:00")).replace(tzinfo=None)
+    except Exception:
+        return None
 
+
+def _formatar_data_necessidade(texto):
+    dt = _parse_datetime_local(texto)
+    if dt is not None:
+        return (dt - timedelta(days=1)).strftime("%d/%m/%Y")
+    texto_formatado = _formatar_datetime_local(texto)
+    if " - " in texto_formatado:
+        return texto_formatado.split(" - ", 1)[0]
+    return texto_formatado
+
+
+def _configurar_cabecalho_requisicao(doc, refs, dados):
+    if refs.get("cabecalho") is not None and refs["cabecalho"] < len(doc.tables):
+        tabela_cabecalho = doc.tables[refs["cabecalho"]]
+        if tabela_cabecalho.rows and len(tabela_cabecalho.rows[0].cells) > 1:
+            _set_cell_text(tabela_cabecalho.cell(0, 1), "ORDEM DE REQUISI\u00c7\u00c3O")
+
+    if refs.get("dados") is None or refs["dados"] >= len(doc.tables):
+        return
+
+    tabela_dados = doc.tables[refs["dados"]]
+    if tabela_dados.rows:
+        for cell in tabela_dados.rows[0].cells:
+            _set_cell_text(cell, "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O")
+    if len(tabela_dados.rows) > 3 and len(tabela_dados.rows[3].cells) >= 4:
+        _set_cell_text(tabela_dados.cell(3, 0), "DATA DE NECESSIDADE:")
+        _set_cell_text(
+            tabela_dados.cell(3, 1),
+            _formatar_data_necessidade(dados.get("previsao_inicio", "")),
+        )
+        _set_cell_text(tabela_dados.cell(3, 2), "")
+        _set_cell_text(tabela_dados.cell(3, 3), "")
+
+
+def _preencher_tabela_produtos(tabela, itens):
+    _limpar_linhas_apos(tabela, 0)
     for item in itens:
         row = tabela.add_row().cells
         _set_cell_text(row[0], item.get("codigo", ""))
@@ -104,58 +179,83 @@ def _preencher_tabela_produtos(tabela, itens):
         _set_cell_text(row[3], item.get("serie", ""))
         _set_cell_text(row[4], item.get("unidade", ""))
         for cell in row:
-            _set_cell_align_center(cell)
+            _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
 
-def _preencher_tabela_componentes(tabela, itens, componentes):
-    # Mantem titulo e cabecalho de colunas (linhas 0 e 1)
+def _preencher_tabela_componentes(tabela, composicao):
     _limpar_linhas_apos(tabela, 1)
-
-    for comp in expandir_composicao_itens(itens, componentes):
+    for comp in composicao or []:
         row = tabela.add_row().cells
+        try:
+            level = int(comp.get("level", 0) or 0)
+        except Exception:
+            level = 0
+        prefixo = " >" * level
+        descricao = f"{prefixo} {comp.get('descricao', '')}".strip() if level else comp.get("descricao", "")
         _set_cell_text(row[0], comp.get("codigo", ""))
-        _set_cell_text(row[1], comp.get("descricao", ""))
+        _set_cell_text(row[1], descricao)
         _set_cell_text(row[2], comp.get("qtd", ""))
         _set_cell_text(row[3], comp.get("unidade", ""))
         for cell in row:
-            _set_cell_align_center(cell)
-
-
-def _preencher_tabela_componentes_direto(tabela, composicao):
-    # Mantem titulo e cabecalho de colunas (linhas 0 e 1)
-    _limpar_linhas_apos(tabela, 1)
-
-    for comp in composicao:
-        row = tabela.add_row().cells
-        _set_cell_text(row[0], comp.get("codigo", ""))
-        _set_cell_text(row[1], comp.get("descricao", ""))
-        _set_cell_text(row[2], comp.get("qtd", ""))
-        _set_cell_text(row[3], comp.get("unidade", ""))
-        for cell in row:
-            _set_cell_align_center(cell)
+            _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
 
 def _preencher_tabela_processo(tabela, linhas):
-    # mantem titulo e cabecalho de colunas (linhas 0 e 1)
     _limpar_linhas_apos(tabela, 1)
+    linhas = list(linhas or [])
+    if not linhas:
+        return
+
+    responsavel = next((str(linha.get("responsavel", "") or "").strip() for linha in linhas if str(linha.get("responsavel", "") or "").strip()), "")
+    data = next((str(linha.get("data", "") or "").strip() for linha in linhas if str(linha.get("data", "") or "").strip()), "")
+    inicio = next((str(linha.get("inicio", "") or "").strip() for linha in linhas if str(linha.get("inicio", "") or "").strip()), "")
+    fim = next((str(linha.get("fim", "") or "").strip() for linha in linhas if str(linha.get("fim", "") or "").strip()), "")
+    feito = next((str(linha.get("feito", "") or "").strip() for linha in linhas if str(linha.get("feito", "") or "").strip()), "")
 
     for idx, linha in enumerate(linhas, start=1):
         row = tabela.add_row().cells
         _set_cell_text(row[0], idx)
-        atividade = linha.get("atividade", "")
-        try:
-            merged = row[1].merge(row[2])
-            _set_cell_text(merged, atividade)
-        except Exception:
-            _set_cell_text(row[1], atividade)
-            _set_cell_text(row[2], "")
-        _set_cell_text(row[3], linha.get("responsavel", ""))
-        _set_cell_text(row[4], "")
-        _set_cell_text(row[5], "")
+        if len(row) > 1:
+            _set_cell_text(row[1], linha.get("atividade", ""))
+        for col_idx in range(2, len(row)):
+            _set_cell_text(row[col_idx], "")
+        for cell in row:
+            _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
+
+    first_data_row = 2
+    last_data_row = len(tabela.rows) - 1
+    for col_idx, valor in (
+        (2, responsavel),
+        (3, data),
+        (4, inicio),
+        (5, fim),
+        (6, feito),
+    ):
+        if col_idx >= len(tabela.columns):
+            continue
+        cell = tabela.rows[first_data_row].cells[col_idx]
+        if last_data_row > first_data_row:
+            _set_vertical_merge(cell, "restart")
+            for row_idx in range(first_data_row + 1, last_data_row + 1):
+                cont_cell = tabela.rows[row_idx].cells[col_idx]
+                _set_cell_text(cont_cell, "")
+                _set_vertical_merge(cont_cell)
+        _set_cell_text(cell, valor)
+        _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
 
-def _inserir_layout_pdf(doc, file_storage, table_index=13):
-    if not file_storage or not file_storage.filename:
+def _limpar_layout(tabela):
+    if len(tabela.rows) <= 1 or len(tabela.rows[1].cells) == 0:
+        return
+    cell = tabela.cell(1, 0)
+    cell.text = ""
+    for paragraph in cell.paragraphs:
+        for run in paragraph.runs:
+            run.text = ""
+
+
+def _inserir_layout_pdf(tabela, file_storage):
+    if not tabela or not file_storage or not file_storage.filename:
         return
 
     tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
@@ -178,26 +278,16 @@ def _inserir_layout_pdf(doc, file_storage, table_index=13):
     except Exception as exc:
         logger.warning("Falha ao renderizar PDF para imagem: %s", exc)
         return
+
     tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
     tmp_img.close()
     pil_image.save(tmp_img.name)
 
-    if len(doc.tables) > table_index:
-        t = doc.tables[table_index]
-        cell = t.cell(1, 0)
-        cell.text = ""
-        p = cell.paragraphs[0] if cell.paragraphs else cell.add_paragraph()
-        p.add_run().add_picture(tmp_img.name, width=Inches(6.8))
+    cell = tabela.cell(1, 0)
+    cell.text = ""
+    paragraph = cell.paragraphs[0] if cell.paragraphs else cell.add_paragraph()
+    paragraph.add_run().add_picture(tmp_img.name, width=Inches(6.8))
 
-
-def _limpar_layout(doc, table_index=13):
-    if len(doc.tables) > table_index:
-        t = doc.tables[table_index]
-        cell = t.cell(1, 0)
-        cell.text = ""
-        for p in cell.paragraphs:
-            for run in p.runs:
-                run.text = ""
 
 def _remover_tabela(doc, tabela):
     try:
@@ -206,134 +296,159 @@ def _remover_tabela(doc, tabela):
         pass
 
 
-def gerar_os_docx(numero_os, dados, itens, componentes, processos, layout_pdf=None, composicao_importada=None, modo="completa"):
+def _alinhar_descricao_esquerda(tabela, coluna, inicio_linha=0):
+    if not tabela:
+        return
+    for row in tabela.rows[inicio_linha:]:
+        if len(row.cells) <= coluna:
+            continue
+        for paragraph in row.cells[coluna].paragraphs:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+
+def _alinhar_tudo_centro(doc):
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+
+def _alinhar_tabelas_processo(refs, doc):
+    for idx in refs.get("processos", {}).values():
+        if idx >= len(doc.tables):
+            continue
+        tabela = doc.tables[idx]
+        for row in tabela.rows[2:]:
+            for cell_idx, cell in enumerate(row.cells):
+                alinhamento = WD_ALIGN_PARAGRAPH.LEFT if cell_idx == 1 else WD_ALIGN_PARAGRAPH.CENTER
+                for paragraph in cell.paragraphs:
+                    paragraph.alignment = alinhamento
+
+
+def _salvar_documento_os(doc, numero_os, dados, titulo_arquivo="O.S"):
+    pasta = pasta_os(numero_os, dados)
+    cliente = (dados.get("cliente", "") or "").strip()
+    chassi = (dados.get("chassis", "") or "").strip()
+    nome = f"02 - {titulo_arquivo} - {cliente} - {chassi}.docx"
+    path = os.path.join(pasta, nome)
+    path = _resolve_unique_path(path)
+    return _safe_save_doc(doc, path)
+
+
+def gerar_os_docx(
+    numero_os,
+    dados,
+    itens,
+    componentes,
+    processos,
+    layout_pdf=None,
+    composicao_resolvida=None,
+    modo="completa",
+    titulo_arquivo="O.S",
+):
     doc = Document(TEMPLATE_OS)
+    refs = mapear_tabelas_os(doc)
 
-    # Tabela 0 - Cabecalho numero OS
-    t0 = doc.tables[0]
-    _set_os_numero(t0.cell(0, 2), numero_os)
+    if refs.get("cabecalho") is not None:
+        _set_os_numero(doc.tables[refs["cabecalho"]].cell(0, 2), numero_os)
 
-    # Tabela 1 - Dados da ordem
-    t1 = doc.tables[1]
-    _set_cell_text(t1.cell(1, 1), dados.get("chassis", ""))
-    _set_cell_text(t1.cell(1, 3), dados.get("municipio", ""))
-    _set_cell_text(t1.cell(2, 1), dados.get("cliente", ""))
-    _set_cell_text(t1.cell(2, 3), dados.get("mmv", ""))
-    _set_cell_text(t1.cell(3, 1), _formatar_datetime_local(dados.get("previsao_inicio", "")))
-    _set_cell_text(t1.cell(3, 3), _formatar_datetime_local(dados.get("previsao_termino", "")))
+    if refs.get("dados") is not None:
+        tabela_dados = doc.tables[refs["dados"]]
+        _set_cell_text(tabela_dados.cell(1, 1), dados.get("chassis", ""))
+        _set_cell_text(tabela_dados.cell(1, 3), dados.get("municipio", ""))
+        _set_cell_text(tabela_dados.cell(2, 1), dados.get("cliente", ""))
+        _set_cell_text(tabela_dados.cell(2, 3), dados.get("mmv", ""))
+        _set_cell_text(tabela_dados.cell(3, 1), _formatar_datetime_local(dados.get("previsao_inicio", "")))
+        _set_cell_text(tabela_dados.cell(3, 3), _formatar_datetime_local(dados.get("previsao_termino", "")))
 
-    # Tabela 2 - Produtos
-    _preencher_tabela_produtos(doc.tables[2], itens)
+    if modo in {"expedicao", "preparacao"}:
+        _configurar_cabecalho_requisicao(doc, refs, dados)
 
-    # Tabela 3 - Composicao (so quando nao for resumida)
-    if modo != "resumida":
-        if composicao_importada:
-            _preencher_tabela_componentes_direto(doc.tables[3], composicao_importada)
-        else:
-            _preencher_tabela_componentes(doc.tables[3], itens, componentes)
+    if refs.get("itens") is not None:
+        _preencher_tabela_produtos(doc.tables[refs["itens"]], itens)
+
+    composicao_final = composicao_resolvida or resolver_composicao_final(itens, componentes)
+    ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao"}
+    ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao"}
+    ocultar_processos = modo in {"mascara", "expedicao", "preparacao"}
+
+    if not ocultar_composicao and refs.get("composicao") is not None:
+        _preencher_tabela_componentes(doc.tables[refs["composicao"]], composicao_final)
+
+    if ocultar_composicao and refs.get("composicao") is not None:
+        _remover_tabela(doc, doc.tables[refs["composicao"]])
+        refs = mapear_tabelas_os(doc)
 
     if modo == "mascara":
-        # remove obs materiais e processos, mas manter layout
-        remover_indices = list(range(4, min(len(doc.tables), 13)))
-        for idx in sorted(remover_indices, reverse=True):
+        indices_remover = []
+        if refs.get("observacoes") is not None:
+            indices_remover.append(refs["observacoes"])
+        indices_remover.extend(refs.get("processos", {}).values())
+        for idx in sorted(set(indices_remover), reverse=True):
+            if idx < len(doc.tables):
+                _remover_tabela(doc, doc.tables[idx])
+        refs = mapear_tabelas_os(doc)
+        if refs.get("layout") is not None:
+            tabela_layout = doc.tables[refs["layout"]]
+            _limpar_layout(tabela_layout)
+            _inserir_layout_pdf(tabela_layout, layout_pdf)
+        _alinhar_tudo_centro(doc)
+        if refs.get("itens") is not None and refs["itens"] < len(doc.tables):
+            _alinhar_descricao_esquerda(doc.tables[refs["itens"]], 1)
+        if refs.get("composicao") is not None and refs["composicao"] < len(doc.tables):
+            _alinhar_descricao_esquerda(doc.tables[refs["composicao"]], 1, inicio_linha=1)
+        return _salvar_documento_os(doc, numero_os, dados, titulo_arquivo=titulo_arquivo)
+
+    if ocultar_observacoes and refs.get("observacoes") is not None:
+        _remover_tabela(doc, doc.tables[refs["observacoes"]])
+        refs = mapear_tabelas_os(doc)
+    elif refs.get("observacoes") is not None:
+        tabela_obs = doc.tables[refs["observacoes"]]
+        if len(tabela_obs.rows) > 1:
+            _set_cell_text(tabela_obs.cell(1, 0), dados.get("obs_materiais", ""))
+
+    if ocultar_processos:
+        indices_processos_vazios = list(refs.get("processos", {}).values())
+    else:
+        indices_processos_vazios = [
+            idx
+            for nome, idx in refs.get("processos", {}).items()
+            if not (processos.get(nome) or [])
+        ]
+    for idx in sorted(set(indices_processos_vazios), reverse=True):
+        if idx < len(doc.tables):
             _remover_tabela(doc, doc.tables[idx])
-        layout_idx = len(doc.tables) - 1 if len(doc.tables) > 0 else 0
-        _limpar_layout(doc, layout_idx)
-        _inserir_layout_pdf(doc, layout_pdf, layout_idx)
-        pasta = pasta_os(numero_os, dados)
-        cliente = (dados.get("cliente", "") or "").strip()
-        chassi = (dados.get("chassis", "") or "").strip()
-        nome = f"02 - O.S. - {cliente} - {chassi}.docx"
-        path = os.path.join(pasta, nome)
-        path = _resolve_unique_path(path)
-        path = _safe_save_doc(doc, path)
-        return path
 
-    offset = -1 if modo == "resumida" else 0
-    if modo == "resumida":
-        _remover_tabela(doc, doc.tables[3])
-
-    # Tabela 4 - Observacoes materiais
-    t4 = doc.tables[4 + offset]
-    if len(t4.rows) > 1:
-        _set_cell_text(t4.cell(1, 0), "")
-    _set_cell_text(t4.cell(1, 0), dados.get("obs_materiais", ""))
-
-    # Tabelas de processos (indices 5 a 12)
-    processos_map = {
-        "CORTE": 5 + offset,
-        "AR CONDICIONADO": 6 + offset,
-        "PREPARAÇÃO DE PEÇAS": 7 + offset,
-        "ISOLAMENTO": 8 + offset,
-        "REVESTIMENTO": 9 + offset,
-        "BANCOS": 10 + offset,
-        "ELÉTRICA 2": 11 + offset,
-        "LIMPEZA/LIBERAÇÃO": 12 + offset,
-    }
-
-    for nome, idx in processos_map.items():
+    refs = mapear_tabelas_os(doc)
+    for nome, idx in refs.get("processos", {}).items():
         linhas = processos.get(nome, [])
-        _preencher_tabela_processo(doc.tables[idx], linhas)
+        if idx < len(doc.tables) and linhas:
+            _preencher_tabela_processo(doc.tables[idx], linhas)
 
     if dados.get("obs"):
         doc.add_paragraph("")
         doc.add_paragraph(f"OBS FINAL: {dados.get('obs')}")
 
-    _limpar_layout(doc, 13 + offset)
-    _inserir_layout_pdf(doc, layout_pdf, 13 + offset)
+    if refs.get("layout") is not None and refs["layout"] < len(doc.tables):
+        tabela_layout = doc.tables[refs["layout"]]
+        _limpar_layout(tabela_layout)
+        _inserir_layout_pdf(tabela_layout, layout_pdf)
 
-    pasta = pasta_os(numero_os, dados)
-    cliente = (dados.get("cliente", "") or "").strip()
-    chassi = (dados.get("chassis", "") or "").strip()
-    nome = f"02 - O.S. - {cliente} - {chassi}.docx"
-    path = os.path.join(pasta, nome)
-    path = _resolve_unique_path(path)
+    _alinhar_tudo_centro(doc)
+    refs = mapear_tabelas_os(doc)
 
-    # Centraliza texto dentro de todas as celulas
-    for table in doc.tables:
-        for row in table.rows:
-            for cell in row.cells:
-                for p in cell.paragraphs:
-                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    if refs.get("itens") is not None and refs["itens"] < len(doc.tables):
+        _alinhar_descricao_esquerda(doc.tables[refs["itens"]], 1)
 
-    # Mantem colunas de descricao alinhadas à esquerda
-    try:
-        if len(doc.tables) > 2:
-            for row in doc.tables[2].rows:
-                if len(row.cells) > 1:
-                    for p in row.cells[1].paragraphs:
-                        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        if len(doc.tables) > 3:
-            for row in doc.tables[3].rows:
-                if len(row.cells) > 1:
-                    for p in row.cells[1].paragraphs:
-                        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            # Titulo "COMPOSIÇÃO – LISTA DE MATERIAIS"
-            if len(doc.tables[3].rows) > 0 and len(doc.tables[3].rows[0].cells) > 0:
-                for p in doc.tables[3].rows[0].cells[0].paragraphs:
-                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        # Campos Chassi, Cliente e Previsao Inicio (tabela 1)
-        if len(doc.tables) > 1:
-            t1 = doc.tables[1]
-            for (r, c) in [(1, 1), (2, 1), (3, 1)]:
-                if r < len(t1.rows) and c < len(t1.rows[r].cells):
-                    for p in t1.rows[r].cells[c].paragraphs:
-                        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        # Conteudo das tabelas de processos alinhado a esquerda (linhas de dados)
-        processos_indices = [5 + offset, 6 + offset, 7 + offset, 8 + offset, 9 + offset, 10 + offset, 11 + offset, 12 + offset]
-        for idx in processos_indices:
-            if idx < len(doc.tables):
-                tproc = doc.tables[idx]
-                for r_idx in range(len(tproc.rows)):
-                    # mantém titulo/cabecalho centralizados
-                    if r_idx < 2:
-                        continue
-                    row = tproc.rows[r_idx]
-                    for cell in row.cells:
-                        for p in cell.paragraphs:
-                            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    except Exception:
-        pass
+    if refs.get("composicao") is not None and refs["composicao"] < len(doc.tables):
+        _alinhar_descricao_esquerda(doc.tables[refs["composicao"]], 1, inicio_linha=1)
 
-    path = _safe_save_doc(doc, path)
-    return path
+    if refs.get("dados") is not None and refs["dados"] < len(doc.tables):
+        tabela_dados = doc.tables[refs["dados"]]
+        for row_idx, col_idx in [(1, 1), (2, 1), (3, 1)]:
+            if row_idx < len(tabela_dados.rows) and col_idx < len(tabela_dados.rows[row_idx].cells):
+                _set_cell_align(tabela_dados.rows[row_idx].cells[col_idx], WD_ALIGN_PARAGRAPH.LEFT)
+
+    _alinhar_tabelas_processo(refs, doc)
+    return _salvar_documento_os(doc, numero_os, dados, titulo_arquivo=titulo_arquivo)

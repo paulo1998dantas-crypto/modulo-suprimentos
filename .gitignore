@@ -207,6 +207,8 @@ build/
 dist/
 EmissorCurto/
 EmissorCurto.zip
+ModuloSuprimentos_envio/
+ModuloSuprimentos_envio.zip
 compras_app/os_emitidas/
 compras_app/pedidos_emitidos/
 compras_app/data/emissor_documentos.log

@@ -82,3 +82,60 @@ def expandir_composicao_itens(itens, componentes):
             )
         )
     return linhas
+
+
+def expandir_composicao_referenciada(linhas, componentes):
+    componentes = normalizar_componentes(componentes)
+    resultado = []
+
+    def visitar(codigo_pai, quantidade_pai, item_raiz, level, ancestrais):
+        for comp in componentes.get(codigo_pai, []) or []:
+            codigo_comp = normalizar_codigo(comp.get("codigo", ""))
+            qtd_base = parse_quantidade(comp.get("quantidade", comp.get("qtd", 0)))
+            qtd_total = quantidade_pai * qtd_base
+            resultado.append(
+                {
+                    "item": item_raiz,
+                    "codigo": codigo_comp,
+                    "descricao": comp.get("descricao", "") or "",
+                    "unidade": comp.get("unidade", "") or "",
+                    "qtd": qtd_total if qtd_total else "",
+                    "level": level,
+                }
+            )
+            if codigo_comp and qtd_total and codigo_comp not in ancestrais and codigo_comp in componentes:
+                proximos = set(ancestrais)
+                proximos.add(codigo_comp)
+                visitar(codigo_comp, qtd_total, item_raiz, level + 1, proximos)
+
+    for linha in linhas or []:
+        item_raiz = normalizar_codigo(linha.get("item", "")) or normalizar_codigo(linha.get("codigo", ""))
+        codigo = normalizar_codigo(linha.get("codigo", ""))
+        try:
+            level = int(linha.get("level", 0) or 0)
+        except Exception:
+            level = 0
+
+        resultado.append(
+            normalizar_linha_composicao(
+                linha,
+                item=item_raiz,
+                level=level,
+            )
+        )
+
+        qtd = parse_quantidade(linha.get("qtd", linha.get("quantidade", 0)))
+        if codigo and qtd and codigo in componentes:
+            visitar(codigo, qtd, item_raiz, level + 1, {codigo})
+
+    return resultado
+
+
+def resolver_composicao_final(itens, componentes, composicao_importada=None):
+    componentes_norm = normalizar_componentes(componentes)
+    linhas = expandir_composicao_itens(itens, componentes_norm)
+    if linhas:
+        return linhas
+    if composicao_importada:
+        return expandir_composicao_referenciada(composicao_importada, componentes_norm)
+    return []

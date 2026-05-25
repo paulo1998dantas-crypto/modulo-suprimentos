@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
@@ -218,6 +218,168 @@ font-size:14px;
 background:white;
 }
 
+input[type="file"]{
+width:100%;
+margin-top:6px;
+padding:14px 16px;
+border:1px dashed #bfd0e6;
+border-radius:14px;
+background:linear-gradient(180deg, #f8fbff 0%, #eef5fb 100%);
+color:#334155;
+cursor:pointer;
+box-shadow:inset 0 1px 0 rgba(255,255,255,0.92), 0 10px 24px rgba(15,23,42,0.05);
+transition:border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+input[type="file"]:hover{
+border-color:#79c9c8;
+background:linear-gradient(180deg, #fbfdff 0%, #f1fbfb 100%);
+box-shadow:inset 0 1px 0 rgba(255,255,255,0.96), 0 14px 30px rgba(14,165,163,0.10);
+transform:translateY(-1px);
+}
+
+input[type="file"]:focus{
+outline:none;
+border-color:#0ea5a3;
+box-shadow:0 0 0 4px rgba(14,165,163,0.14), inset 0 1px 0 rgba(255,255,255,0.96);
+}
+
+input[type="file"]::file-selector-button,
+input[type="file"]::-webkit-file-upload-button{
+border:none;
+margin-right:14px;
+padding:11px 18px;
+border-radius:999px;
+background:linear-gradient(135deg, #0b1c3a, #174586);
+color:#fff;
+font-weight:700;
+font-size:13px;
+cursor:pointer;
+box-shadow:0 10px 20px rgba(11,28,58,0.22);
+transition:transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+input[type="file"]::file-selector-button:hover,
+input[type="file"]::-webkit-file-upload-button:hover{
+filter:brightness(1.04);
+transform:translateY(-1px);
+box-shadow:0 14px 24px rgba(11,28,58,0.26);
+}
+
+.file-input-meta{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:12px;
+margin-top:8px;
+font-size:12px;
+line-height:1.45;
+color:#64748b;
+}
+
+.file-input-caption{
+font-weight:700;
+color:#475569;
+word-break:break-word;
+}
+
+.file-input-meta.has-file .file-input-caption{
+color:#0f766e;
+}
+
+.file-input-hint{
+text-align:right;
+font-size:11px;
+color:#94a3b8;
+}
+
+.auto-process-display{
+margin-top:6px;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #dbe7f2;
+background:linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+font-size:13px;
+font-weight:700;
+color:#0f172a;
+box-shadow:inset 0 1px 0 rgba(255,255,255,0.92);
+}
+
+.auto-process-display.is-empty{
+color:#64748b;
+font-weight:600;
+}
+
+.lookup-field{
+position:relative;
+}
+
+.lookup-menu{
+display:none;
+position:absolute;
+top:calc(100% + 6px);
+left:0;
+right:0;
+background:#fff;
+border:1px solid #dbe2ea;
+border-radius:12px;
+box-shadow:0 18px 34px rgba(15,23,42,0.14);
+overflow:auto;
+max-height:260px;
+z-index:60;
+}
+
+.lookup-menu.open{
+display:block;
+}
+
+.lookup-field.has-open{
+z-index:61;
+}
+
+.lookup-option{
+width:100%;
+border:none;
+border-radius:0;
+background:#fff;
+color:#0f172a;
+padding:10px 12px;
+text-align:left;
+display:block;
+cursor:pointer;
+border-bottom:1px solid #eef2f7;
+}
+
+.lookup-option:last-child{
+border-bottom:none;
+}
+
+.lookup-option:hover,
+.lookup-option:focus{
+background:#eef6ff;
+color:#0f172a;
+}
+
+.lookup-primary{
+display:block;
+font-size:13px;
+font-weight:700;
+line-height:1.35;
+}
+
+.lookup-secondary{
+display:block;
+font-size:12px;
+color:#64748b;
+line-height:1.35;
+margin-top:2px;
+}
+
+.lookup-hidden{
+display:none;
+}
+
 input[readonly]{
 background:#f8fafc;
 color:#111827;
@@ -244,6 +406,46 @@ padding:8px;
 border-bottom:1px solid #e5e7eb;
 vertical-align:top;
 text-align:center;
+}
+
+.os-drag-cell{
+width:46px;
+text-align:center;
+}
+
+.os-drag-handle{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+width:32px;
+height:32px;
+border-radius:10px;
+border:1px solid #dbe2ea;
+background:linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+color:#475569;
+font-size:15px;
+font-weight:700;
+letter-spacing:1px;
+cursor:grab;
+user-select:none;
+box-shadow:0 6px 14px rgba(15,23,42,0.08);
+transition:transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.os-drag-handle:hover{
+transform:translateY(-1px);
+border-color:#9fb3c8;
+background:linear-gradient(180deg, #ffffff 0%, #eef6ff 100%);
+box-shadow:0 10px 20px rgba(15,23,42,0.12);
+}
+
+.os-drag-handle:active{
+cursor:grabbing;
+}
+
+.tabela-os tr.is-dragging{
+opacity:0.6;
+background:#eefcfb;
 }
 
 button{
@@ -335,6 +537,7 @@ align-items:center;
 justify-content:center;
 padding:0 14px;
 white-space:nowrap;
+text-decoration:none;
 }
 
 .fab.secondary{
@@ -411,10 +614,23 @@ margin-bottom:10px;
   background:linear-gradient(160deg, #0b1c3a, #1f2f55);
   color:#fff;
   }
-  .fab-child{
+.fab-child{
   background:linear-gradient(160deg, #6ea8ff, #8fc3ff) !important;
   color:#0b1c3a !important;
   }
+
+#tab-cadastro .cadastro-section{
+display:block;
+scroll-margin-top:96px;
+}
+
+#tab-cadastro .panel-close{
+display:none;
+}
+
+#cadastro-actions .fab-menu{
+display:flex !important;
+}
 
 .panel-close{
 border:none;
@@ -481,9 +697,9 @@ width:12%;
 width:4%;
 }
 
-.tabela-itens textarea[name="descricao[]"]{
-min-height:60px;
-resize:vertical;
+.tabela-itens input[name="descricao[]"],
+.tabela-os input[name="os_descricao[]"]{
+text-align:left;
 }
 
 .tabela-itens input{
@@ -498,36 +714,44 @@ table-layout:fixed;
 
 .tabela-os th:nth-child(1),
 .tabela-os td:nth-child(1){
-width:18%;
-}
-.tabela-os td:nth-child(1) select{
-text-align:center;
-text-align-last:center;
-width:100%;
-padding-right:22px;
-}
-.tabela-os td:nth-child(1) select option{
-text-align:center;
+width:6%;
+white-space:nowrap;
 }
 
 .tabela-os th:nth-child(2),
 .tabela-os td:nth-child(2){
-width:52%;
+width:11%;
+white-space:nowrap;
 }
 
 .tabela-os th:nth-child(3),
 .tabela-os td:nth-child(3){
-width:10%;
+width:50%;
 }
 
 .tabela-os th:nth-child(4),
 .tabela-os td:nth-child(4){
-width:10%;
+width:7%;
 }
 
 .tabela-os th:nth-child(5),
 .tabela-os td:nth-child(5){
-width:10%;
+width:13%;
+}
+
+.tabela-os th:nth-child(6),
+.tabela-os td:nth-child(6){
+width:5%;
+}
+
+.tabela-os th:nth-child(7),
+.tabela-os td:nth-child(7){
+width:8%;
+}
+
+.tabela-os td:nth-child(2) input{
+text-align:center;
+font-weight:700;
 }
 
 .tabela-os textarea{
@@ -725,6 +949,8 @@ const osProdutos = {{ os_produtos|tojson }};
 const osFornecedores = {{ os_fornecedores|tojson }};
 const osComponentes = {{ os_componentes|tojson }};
 const osProcessos = {{ os_processos|tojson }};
+const osProcessoDefs = {{ processos_os|tojson }};
+const osProcessoPorItem = {{ processo_transformacao_por_item|tojson }};
 const ocPrefill = {{ oc_prefill|tojson }};
 const osPrefill = {{ os_prefill|tojson }};
 let ocPrefillApplied = false;
@@ -732,6 +958,8 @@ let osPrefillApplied = false;
 const hasOsPrefill = osPrefill && Object.keys(osPrefill).length > 0;
 let osComposicaoSource = "bom";
 let osTabInitialized = false;
+const osProcessoMap = Object.fromEntries(osProcessoDefs.map((processo) => [processo.nome, processo.key]));
+const osProcessoTableIds = osProcessoDefs.map((processo) => `processo_${processo.key}`);
 
 function initOsTab(){
 if (osTabInitialized){
@@ -740,7 +968,7 @@ return;
 if (hasOsPrefill){
 aplicarPrefillOS();
 } else {
-preencherProcessosPadrao("PADRAO");
+preencherProcessosPadrao(conjuntoProcessoAtual());
 }
 osTabInitialized = true;
 }
@@ -764,6 +992,113 @@ if (!raw){
 return "";
 }
 return raw.split(" - ")[0].trim();
+}
+
+function quantidadeOSValor(input){
+if (!input){
+return 1;
+}
+const raw = String(input.value || "").trim();
+const numero = parseNumber(raw);
+if (!raw || numero <= 0){
+return 1;
+}
+return numero;
+}
+
+function conjuntoProcessoAtual(){
+const input = document.getElementById("os_processo_conjunto");
+if (input && input.value){
+return input.value;
+}
+return "";
+}
+
+function processoConjuntoDisponivel(conjunto){
+if (!conjunto){
+return false;
+}
+const conjuntos = Object.keys(osProcessos || {});
+if (!conjuntos.length){
+return conjunto === "PADRAO";
+}
+return conjuntos.includes(conjunto);
+}
+
+function definirProcessoConjuntoUI(conjunto){
+const input = document.getElementById("os_processo_conjunto");
+const display = document.getElementById("os_processo_conjunto_display");
+const valor = conjunto || "";
+if (input){
+input.value = valor;
+input.dataset.autoProcesso = valor;
+}
+if (display){
+display.textContent = valor || "Aguardando transformacao vinculada";
+display.classList.toggle("is-empty", !valor);
+}
+}
+
+function resolverProcessoAutomaticoOS(){
+const linhas = document.querySelectorAll("#tabela_os tr");
+const conjuntos = new Set();
+linhas.forEach((row, index) => {
+if (index === 0){
+return;
+}
+const input = row.querySelector('input[name="os_codigo[]"]');
+const codigo = input ? normalizarCodigoOS(input.value) : "";
+const conjunto = codigo ? osProcessoPorItem[codigo] : "";
+if (conjunto){
+conjuntos.add(conjunto);
+}
+});
+if (conjuntos.size === 1){
+return { conjunto: Array.from(conjuntos)[0], conflito: false };
+}
+if (conjuntos.size > 1){
+return { conjunto: "", conflito: true };
+}
+return { conjunto: "", conflito: false };
+}
+
+function atualizarHintProcessoAutomatico(info){
+const hint = document.getElementById("os_processo_auto_hint");
+if (!hint){
+return;
+}
+if (info && info.conflito){
+hint.textContent = "Mais de uma transformacao com processos diferentes foi selecionada.";
+return;
+}
+if (info && info.conjunto){
+hint.textContent = `Processo automatico pela transformacao: ${info.conjunto}`;
+return;
+}
+hint.textContent = "Sem vinculacao previa entre transformacao e processo. Processos permanecem em branco.";
+}
+
+function aplicarProcessoAutomaticoOS(options){
+const forcar = Boolean(options && options.forcar);
+if (!forcar && hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
+return;
+}
+const input = document.getElementById("os_processo_conjunto");
+if (!input){
+return;
+}
+const info = resolverProcessoAutomaticoOS();
+atualizarHintProcessoAutomatico(info);
+if (!info.conjunto){
+definirProcessoConjuntoUI("");
+preencherProcessosPadrao("", { forcar: true });
+return;
+}
+if (!processoConjuntoDisponivel(info.conjunto)){
+return;
+}
+definirProcessoConjuntoUI(info.conjunto);
+preencherProcessosPadrao(info.conjunto, { forcar: true });
 }
 
 function expandComposicao(codigoItem, quantidade){
@@ -798,6 +1133,57 @@ function expandComposicao(codigoItem, quantidade){
   return rows;
 }
 
+function coletarComposicaoBom(){
+const rows = [];
+const linhas = document.querySelectorAll("#tabela_os tr");
+linhas.forEach((row, index) => {
+if (index === 0){
+return;
+}
+const sel = row.querySelector('input[name="os_codigo[]"]');
+const qtdInput = row.querySelector('input[name="os_qtd[]"]');
+const codigoItem = sel ? normalizarCodigoOS(sel.value) : "";
+const qtdItem = quantidadeOSValor(qtdInput);
+if (!codigoItem || !osComponentes[codigoItem]){
+return;
+}
+rows.push(...expandComposicao(codigoItem, qtdItem));
+});
+return rows;
+}
+
+function expandirComposicaoImportada(rows){
+const expanded = [];
+rows.forEach((comp) => {
+const baseLevel = Number(comp.level || 0);
+const base = {
+item: comp.item || "",
+codigo: comp.codigo || "",
+descricao: comp.descricao || "",
+unidade: comp.unidade || "",
+qtd: comp.qtd || "",
+level: baseLevel,
+};
+expanded.push(base);
+const codigo = normalizarCodigoOS(base.codigo);
+const qtd = parseNumber(base.qtd);
+if (!codigo || !qtd || !osComponentes[codigo]){
+return;
+}
+expandComposicao(codigo, qtd).forEach((filho) => {
+expanded.push({
+item: base.item || filho.item || codigo,
+codigo: filho.codigo || "",
+descricao: filho.descricao || "",
+unidade: filho.unidade || "",
+qtd: filho.qtd || "",
+level: baseLevel + 1 + Number(filho.level || 0),
+});
+});
+});
+return expanded;
+}
+
 function formatCurrency(value){
 const fixed = Number(value || 0).toFixed(2);
 const parts = fixed.split(".");
@@ -815,6 +1201,43 @@ options += `<option value="${key}${desc}"></option>`;
 return options;
 }
 
+function normalizarBusca(texto){
+return String(texto || "")
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g, "")
+.toLowerCase()
+.trim();
+}
+
+function getProdutoInfo(map, codigo){
+if (!codigo || !map){
+return null;
+}
+return map[codigo] || map[codigo.toUpperCase()] || map[codigo.toLowerCase()] || null;
+}
+
+function getCadastroInfo(map, chave){
+if (!chave || !map){
+return null;
+}
+return map[chave] || map[chave.toUpperCase()] || map[chave.toLowerCase()] || null;
+}
+
+function obterDisplayFornecedor(chave, item){
+return (item && (item.fornecedor || item.razao_social)) || chave || "";
+}
+
+function obterDisplayCliente(chave, item){
+return (item && item.cliente) || chave || "";
+}
+
+function formatarCadastroBusca(chave, display){
+if (!display || display === chave){
+return chave || "";
+}
+return `${display} (${chave})`;
+}
+
 function extrairCodigo(valor, map){
 const raw = (valor || "").trim();
 if (!raw){
@@ -825,17 +1248,194 @@ const code = parts[0].trim();
 if (map && (map[code] || map[code.toUpperCase()] || map[code.toLowerCase()])){
 return code;
 }
-const rawLower = raw.toLowerCase();
+const rawLower = normalizarBusca(raw);
+let startsWith = "";
+let contains = "";
 if (map){
 for (const key in map){
 const item = map[key] || {};
-const desc = (item.descricao || item.nome || "").toString().toLowerCase();
-if (desc.startsWith(rawLower)){
+const desc = normalizarBusca(item.descricao || item.nome || "");
+const keyNorm = normalizarBusca(key);
+const comboNorm = normalizarBusca(`${key} ${item.descricao || item.nome || ""}`);
+if (desc === rawLower || keyNorm === rawLower || comboNorm === rawLower){
 return key;
 }
+if (!startsWith && (desc.startsWith(rawLower) || keyNorm.startsWith(rawLower) || comboNorm.startsWith(rawLower))){
+startsWith = key;
+}
+if (!contains && (desc.includes(rawLower) || keyNorm.includes(rawLower) || comboNorm.includes(rawLower))){
+contains = key;
 }
 }
+}
+if (startsWith){
+return startsWith;
+}
+if (contains){
+return contains;
+}
+return /^[\\w-]+$/i.test(raw) ? raw : "";
+}
+
+function extrairChaveCadastro(valor, map, displayBuilder){
+const raw = (valor || "").trim();
+if (!raw){
+return "";
+}
+if (map && (map[raw] || map[raw.toUpperCase()] || map[raw.toLowerCase()])){
 return raw;
+}
+const parenteses = raw.match(/\(([^)]+)\)\s*$/);
+if (parenteses){
+const chave = parenteses[1].trim();
+if (map && (map[chave] || map[chave.toUpperCase()] || map[chave.toLowerCase()])){
+return chave;
+}
+}
+const busca = normalizarBusca(raw);
+let startsWith = "";
+let contains = "";
+for (const key in map || {}){
+const item = map[key] || {};
+const display = displayBuilder(key, item);
+const keyNorm = normalizarBusca(key);
+const displayNorm = normalizarBusca(display);
+const comboNorm = normalizarBusca(formatarCadastroBusca(key, display));
+if (keyNorm === busca || displayNorm === busca || comboNorm === busca){
+return key;
+}
+if (!startsWith && (keyNorm.startsWith(busca) || displayNorm.startsWith(busca) || comboNorm.startsWith(busca))){
+startsWith = key;
+}
+if (!contains && (keyNorm.includes(busca) || displayNorm.includes(busca) || comboNorm.includes(busca))){
+contains = key;
+}
+}
+return startsWith || contains || "";
+}
+
+function getLookupItemsForSource(source){
+if (source === "produtos"){
+return Object.keys(produtos || {}).map((codigo) => {
+const item = produtos[codigo] || {};
+return {
+codigo,
+descricao: item.descricao || item.nome || "",
+unidade: item.unidade || "",
+valor: item.valor || "",
+ipi: item.ipi || "",
+icms: item.icms || "",
+cofins: item.cofins || "",
+};
+});
+}
+if (source === "os-produtos"){
+return Object.keys(osProdutos || {}).map((codigo) => {
+const item = osProdutos[codigo] || {};
+return {
+codigo,
+descricao: item.descricao || item.nome || "",
+unidade: item.unidade || "",
+};
+});
+}
+if (source === "fornecedores"){
+return Object.keys(fornecedores || {}).map((key) => {
+const item = fornecedores[key] || {};
+return {
+key,
+display: obterDisplayFornecedor(key, item),
+secondary: item.cnpj || "",
+};
+});
+}
+if (source === "clientes"){
+return Object.keys(osFornecedores || {}).map((key) => {
+const item = osFornecedores[key] || {};
+const display = obterDisplayCliente(key, item);
+return {
+key,
+display,
+secondary: display !== key ? key : "",
+};
+});
+}
+return [];
+}
+
+function pontuarLookupItem(item, query, source, mode){
+if (!query){
+return 100;
+}
+if (source === "produtos" || source === "os-produtos"){
+const codigo = normalizarBusca(item.codigo);
+const descricao = normalizarBusca(item.descricao);
+const combo = normalizarBusca(`${item.codigo} ${item.descricao}`);
+if (mode === "descricao"){
+if (descricao === query) return 0;
+if (descricao.startsWith(query)) return 1;
+if (descricao.includes(query)) return 2;
+if (codigo === query) return 3;
+if (codigo.startsWith(query)) return 4;
+if (combo.includes(query)) return 5;
+return null;
+}
+if (codigo === query) return 0;
+if (codigo.startsWith(query)) return 1;
+if (codigo.includes(query)) return 2;
+if (descricao === query) return 3;
+if (descricao.startsWith(query)) return 4;
+if (descricao.includes(query)) return 5;
+if (combo.includes(query)) return 6;
+return null;
+}
+const display = normalizarBusca(item.display || "");
+const key = normalizarBusca(item.key || "");
+const combo = normalizarBusca(`${item.display || ""} ${item.key || ""}`);
+if (display === query) return 0;
+if (display.startsWith(query)) return 1;
+if (display.includes(query)) return 2;
+if (key === query) return 3;
+if (key.startsWith(query)) return 4;
+if (key.includes(query)) return 5;
+if (combo.includes(query)) return 6;
+return null;
+}
+
+function filtrarLookupItems(input){
+const source = input.dataset.lookupSource || "";
+const mode = input.dataset.lookupMode || "codigo";
+const items = getLookupItemsForSource(source);
+const query = normalizarBusca(input.value);
+if (!query){
+return items.slice(0, 12);
+}
+return items
+.map((item) => ({ item, score: pontuarLookupItem(item, query, source, mode) }))
+.filter((entry) => entry.score !== null)
+.sort((a, b) => a.score - b.score)
+.slice(0, 12)
+.map((entry) => entry.item);
+}
+
+function fecharLookupMenu(menu){
+if (!menu){
+return;
+}
+menu.classList.remove("open");
+const wrapper = menu.closest(".lookup-field");
+if (wrapper){
+wrapper.classList.remove("has-open");
+}
+}
+
+function fecharTodosLookupMenus(except){
+document.querySelectorAll(".lookup-menu.open").forEach((menu) => {
+if (except && menu === except){
+return;
+}
+fecharLookupMenu(menu);
+});
 }
 
 function adicionarLinha(){
@@ -845,9 +1445,17 @@ let linha = tabela.insertRow();
 
 linha.innerHTML = `
 <td>
-<input name="codigo[]" list="oc-produtos-list">
+<div class="lookup-field">
+<input name="codigo[]" data-lookup-source="produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
+<div class="lookup-menu"></div>
+</div>
 </td>
-<td><textarea name="descricao[]" rows="2" readonly></textarea></td>
+<td>
+<div class="lookup-field">
+<input name="descricao[]" data-lookup-source="produtos" data-lookup-mode="descricao" autocomplete="off" placeholder="Descricao do produto">
+<div class="lookup-menu"></div>
+</div>
+</td>
 <td><input name="unidade[]" readonly></td>
 <td><input type="number" step="1" min="0" name="qtd[]"></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
@@ -859,6 +1467,8 @@ linha.innerHTML = `
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOC(this)">-</button></td>
 `;
 
+inicializarLookupsEscopo(linha);
+
 }
 
 function removerLinhaItemOC(btn){
@@ -869,7 +1479,7 @@ return;
 }
 if (tabela.rows.length <= 2){
 const select = row.querySelector('input[name="codigo[]"]');
-const desc = row.querySelector('textarea[name="descricao[]"]');
+const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
@@ -896,98 +1506,65 @@ calcularTotais();
 }
 
 function preencherPorCodigo(input){
+const row = input.closest("tr");
 const codigo = extrairCodigo(input.value, produtos);
-if (!codigo){
+if (!row || !codigo){
 return;
 }
-if ((input.value || "").trim() !== codigo){
-input.value = codigo;
-}
-
-const produto = produtos[codigo] || produtos[codigo.toUpperCase()] || produtos[codigo.toLowerCase()];
+const produto = getProdutoInfo(produtos, codigo);
 if (!produto){
-const row = input.closest("tr");
-if (row){
-const descricao = row.querySelector('textarea[name="descricao[]"]');
+return;
+}
+const codigoInput = row.querySelector('input[name="codigo[]"]');
+const descricaoInput = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
 const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
-const hasDesc = descricao && descricao.value;
-if (!hasDesc){
-if (descricao) descricao.value = "";
-if (unidade) unidade.value = "";
-if (valor) valor.value = "";
-if (ipi) ipi.value = "";
-if (icms) icms.value = "";
-if (cofins) cofins.value = "";
-}
-}
-return;
+if (codigoInput) codigoInput.value = codigo;
+if (descricaoInput) descricaoInput.value = produto.descricao || produto.nome || "";
+if (unidade) unidade.value = produto.unidade || "UN";
+if (valor) valor.value = produto.valor || "";
+if (ipi) ipi.value = produto.ipi || "";
+if (icms) icms.value = produto.icms || "";
+if (cofins) cofins.value = produto.cofins || "";
 }
 
+function preencherPorDescricao(input){
 const row = input.closest("tr");
-if (!row){
+const codigo = extrairCodigo(input.value, produtos);
+if (!row || !codigo){
 return;
 }
-
-const descricao = row.querySelector('textarea[name="descricao[]"]');
-if (descricao){
-descricao.value = produto.descricao || produto.nome || "";
+const codigoInput = row.querySelector('input[name="codigo[]"]') || input;
+codigoInput.value = codigo;
+preencherPorCodigo(codigoInput);
 }
 
-const unidade = row.querySelector('input[name="unidade[]"]');
-if (unidade){
-unidade.value = produto.unidade || "UN";
-}
-
-const valor = row.querySelector('input[name="valor[]"]');
-if (valor && produto.valor){
-valor.value = produto.valor;
-}
-
-const ipi = row.querySelector('input[name="ipi[]"]');
-if (ipi && produto.ipi){
-ipi.value = produto.ipi;
-}
-
-const icms = row.querySelector('input[name="icms[]"]');
-if (icms && produto.icms){
-icms.value = produto.icms;
-}
-
-const cofins = row.querySelector('input[name="cofins[]"]');
-if (cofins && produto.cofins){
-cofins.value = produto.cofins;
-}
-}
-
-function preencherFornecedor(input){
-const chave = (input.value || "").trim();
-if (!chave){
-const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep"];
-campos.forEach((name) => {
+function limparCamposFornecedor(){
+["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep"].forEach((name) => {
 const campo = document.querySelector(`input[name="${name}"]`);
 if (campo){
 campo.value = "";
 }
 });
-return;
 }
 
-function preencherFornecedorOS(input){
-const chave = (input.value || "").trim();
-if (!chave){
+function aplicarFornecedorSelecionado(input, chave){
+const fornecedor = getCadastroInfo(fornecedores, chave);
+const hidden = document.querySelector('input[name="fornecedor"]');
+if (!fornecedor || !input){
+if (hidden){
+hidden.value = "";
+}
+limparCamposFornecedor();
 return;
 }
+if (hidden){
+hidden.value = chave;
 }
-
-const fornecedor = fornecedores[chave] || fornecedores[chave.toUpperCase()] || fornecedores[chave.toLowerCase()];
-if (!fornecedor){
-return;
-}
-
+input.value = formatarCadastroBusca(chave, obterDisplayFornecedor(chave, fornecedor));
 const campos = [
 ["razao_social", "razao_social"],
 ["cnpj", "cnpj"],
@@ -999,14 +1576,197 @@ const campos = [
 ["uf", "uf"],
 ["cep", "cep"],
 ];
-
 campos.forEach(([inputName, key]) => {
 const campo = document.querySelector(`input[name="${inputName}"]`);
-if (campo && !campo.value && fornecedor[key]){
-campo.value = fornecedor[key];
+if (campo){
+campo.value = fornecedor[key] || "";
 }
 });
 }
+
+function preencherFornecedor(input){
+if (!input){
+return;
+}
+const chave = extrairChaveCadastro(input.value, fornecedores, obterDisplayFornecedor);
+if (!chave){
+const hidden = document.querySelector('input[name="fornecedor"]');
+if (hidden){
+hidden.value = "";
+}
+if (!(input.value || "").trim()){
+limparCamposFornecedor();
+}
+return;
+}
+aplicarFornecedorSelecionado(input, chave);
+}
+
+function aplicarClienteSelecionado(input, chave){
+const cliente = getCadastroInfo(osFornecedores, chave);
+const hidden = document.querySelector('input[name="os_cliente"]');
+if (!cliente || !input){
+if (hidden){
+hidden.value = "";
+}
+return;
+}
+if (hidden){
+hidden.value = chave;
+}
+input.value = formatarCadastroBusca(chave, obterDisplayCliente(chave, cliente));
+}
+
+function preencherFornecedorOS(input){
+if (!input){
+return;
+}
+const chave = extrairChaveCadastro(input.value, osFornecedores, obterDisplayCliente);
+if (!chave){
+const hidden = document.querySelector('input[name="os_cliente"]');
+if (hidden){
+hidden.value = "";
+}
+return;
+}
+aplicarClienteSelecionado(input, chave);
+}
+
+function renderLookupMenu(input){
+const wrapper = input.closest(".lookup-field");
+if (!wrapper){
+return;
+}
+const menu = wrapper.querySelector(".lookup-menu");
+if (!menu){
+return;
+}
+const items = filtrarLookupItems(input);
+if (!items.length){
+fecharLookupMenu(menu);
+return;
+}
+fecharTodosLookupMenus(menu);
+menu.innerHTML = "";
+const source = input.dataset.lookupSource || "";
+const mode = input.dataset.lookupMode || "codigo";
+items.forEach((item) => {
+const option = document.createElement("button");
+option.type = "button";
+option.className = "lookup-option";
+let primary = "";
+let secondary = "";
+if (source === "produtos" || source === "os-produtos"){
+if (mode === "descricao"){
+primary = item.descricao || item.codigo;
+secondary = item.codigo;
+} else {
+primary = item.codigo;
+secondary = item.descricao || "";
+}
+} else {
+primary = item.display || item.key;
+secondary = item.secondary || "";
+}
+option.innerHTML = `
+<span class="lookup-primary">${primary || ""}</span>
+${secondary ? `<span class="lookup-secondary">${secondary}</span>` : ""}
+`;
+option.addEventListener("mousedown", (event) => {
+event.preventDefault();
+if (source === "produtos"){
+preencherPorCodigo((() => {
+const row = input.closest("tr");
+if (!row){
+return input;
+}
+const codigoInput = row.querySelector('input[name="codigo[]"]');
+if (codigoInput){
+codigoInput.value = item.codigo;
+}
+return codigoInput || input;
+})());
+} else if (source === "os-produtos"){
+const row = input.closest("tr");
+if (row){
+aplicarProdutoLinhaOS(row, item.codigo);
+}
+} else if (source === "fornecedores"){
+aplicarFornecedorSelecionado(input, item.key);
+} else if (source === "clientes"){
+aplicarClienteSelecionado(input, item.key);
+}
+fecharLookupMenu(menu);
+});
+menu.appendChild(option);
+});
+menu.classList.add("open");
+wrapper.classList.add("has-open");
+}
+
+function sincronizarLookupInput(input){
+if (!input){
+return;
+}
+if (input.name === "codigo[]"){
+preencherPorCodigo(input);
+return;
+}
+if (input.name === "descricao[]"){
+preencherPorDescricao(input);
+return;
+}
+if (input.name === "fornecedor_busca"){
+preencherFornecedor(input);
+return;
+}
+if (input.name === "os_codigo[]"){
+preencherOSItem(input);
+return;
+}
+if (input.name === "os_descricao[]"){
+preencherOSDescricao(input);
+return;
+}
+if (input.name === "os_cliente_busca"){
+preencherFornecedorOS(input);
+}
+}
+
+function inicializarLookupInput(input){
+if (!input || input.dataset.lookupReady === "1"){
+return;
+}
+input.dataset.lookupReady = "1";
+input.addEventListener("focus", () => {
+renderLookupMenu(input);
+});
+input.addEventListener("input", () => {
+renderLookupMenu(input);
+});
+input.addEventListener("blur", () => {
+const menu = input.closest(".lookup-field") ? input.closest(".lookup-field").querySelector(".lookup-menu") : null;
+setTimeout(() => {
+sincronizarLookupInput(input);
+fecharLookupMenu(menu);
+}, 140);
+});
+}
+
+function inicializarLookupsEscopo(root){
+if (!root || !root.querySelectorAll){
+return;
+}
+root.querySelectorAll("[data-lookup-source]").forEach((input) => {
+inicializarLookupInput(input);
+});
+}
+
+document.addEventListener("click", (event) => {
+if (!event.target.closest(".lookup-field")){
+fecharTodosLookupMenus();
+}
+});
 
 function calcularTotais(){
 const linhas = document.querySelectorAll("#tabela_itens tr");
@@ -1088,20 +1848,104 @@ const ano = hoje.getFullYear();
 vencimentoInput.value = `${dia}/${mes}/${ano}`;
 }
 
+function inicializarOrdenacaoItensOS(){
+const tabela = document.getElementById("tabela_os");
+if (!tabela || tabela.dataset.sortReady === "1"){
+return;
+}
+tabela.dataset.sortReady = "1";
+let linhaArrastada = null;
+
+function finalizarArraste(){
+if (linhaArrastada){
+linhaArrastada.classList.remove("is-dragging");
+}
+linhaArrastada = null;
+}
+
+tabela.addEventListener("dragstart", (event) => {
+const handle = event.target.closest(".os-drag-handle");
+if (!handle){
+return;
+}
+const row = handle.closest("tr");
+if (!row || row.rowIndex === 0){
+return;
+}
+linhaArrastada = row;
+row.classList.add("is-dragging");
+if (event.dataTransfer){
+event.dataTransfer.effectAllowed = "move";
+try {
+event.dataTransfer.setData("text/plain", String(row.rowIndex));
+} catch (error) {
+// alguns navegadores podem bloquear setData; o arraste continua funcionando
+}
+}
+});
+
+tabela.addEventListener("dragover", (event) => {
+if (!linhaArrastada){
+return;
+}
+const alvo = event.target.closest("tr");
+if (!alvo || alvo === linhaArrastada || alvo.rowIndex === 0){
+return;
+}
+event.preventDefault();
+const rect = alvo.getBoundingClientRect();
+const inserirAntes = event.clientY < rect.top + (rect.height / 2);
+const parent = alvo.parentNode;
+if (!parent){
+return;
+}
+if (inserirAntes){
+parent.insertBefore(linhaArrastada, alvo);
+} else {
+parent.insertBefore(linhaArrastada, alvo.nextSibling);
+}
+});
+
+tabela.addEventListener("drop", (event) => {
+if (!linhaArrastada){
+return;
+}
+event.preventDefault();
+osComposicaoSource = "bom";
+renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
+});
+
+tabela.addEventListener("dragend", () => {
+finalizarArraste();
+});
+}
+
 function adicionarLinhaOS(){
 const tabela = document.getElementById("tabela_os");
 let linha = tabela.insertRow();
 
 linha.innerHTML = `
+<td class="os-drag-cell"><span class="os-drag-handle" draggable="true" title="Arrastar item">⋮⋮</span></td>
 <td>
-<input name="os_codigo[]" list="os-produtos-list">
+<div class="lookup-field">
+<input name="os_codigo[]" data-lookup-source="os-produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
+<div class="lookup-menu"></div>
+</div>
 </td>
-<td><textarea name="os_descricao[]" rows="2" readonly></textarea></td>
-<td><input type="number" step="1" min="0" name="os_qtd[]"></td>
+<td>
+<div class="lookup-field">
+<input name="os_descricao[]" data-lookup-source="os-produtos" data-lookup-mode="descricao" autocomplete="off" placeholder="Descricao do produto">
+<div class="lookup-menu"></div>
+</div>
+</td>
+<td><input type="number" step="1" min="1" name="os_qtd[]" value="1"></td>
 <td><input name="os_serie[]"></td>
 <td><input name="os_unidade[]" readonly></td>
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOS(this)">-</button></td>
 `;
+
+inicializarLookupsEscopo(linha);
 }
 
 function removerLinhaItemOS(btn){
@@ -1112,44 +1956,99 @@ return;
 }
 if (tabela.rows.length <= 2){
 const select = row.querySelector('input[name="os_codigo[]"]');
-const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
 if (select) select.value = "";
 if (desc) desc.value = "";
-if (qtd) qtd.value = "";
+if (qtd) qtd.value = "1";
 if (serie) serie.value = "";
 if (unidade) unidade.value = "";
 renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
 return;
 }
 tabela.deleteRow(row.rowIndex);
 renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
 }
 
-function preencherOSItem(select){
-const codigo = extrairCodigo(select.value, osProdutos);
-const row = select.closest("tr");
+function aplicarProdutoLinhaOS(row, codigo){
+if (!row || !codigo){
+return;
+}
+const produto = getProdutoInfo(osProdutos, codigo);
+if (!produto){
+return;
+}
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const descricaoInput = row.querySelector('input[name="os_descricao[]"]');
+const unidadeInput = row.querySelector('input[name="os_unidade[]"]');
+const qtdInput = row.querySelector('input[name="os_qtd[]"]');
+if (codigoInput){
+codigoInput.value = codigo;
+}
+if (descricaoInput){
+descricaoInput.value = produto.descricao || produto.nome || "";
+}
+if (unidadeInput){
+unidadeInput.value = produto.unidade || "UN";
+}
+if (qtdInput && (!String(qtdInput.value || "").trim() || parseNumber(qtdInput.value) <= 0)){
+qtdInput.value = "1";
+}
+osComposicaoSource = "bom";
+renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
+}
+
+function preencherOSItem(input){
+if (!input){
+return;
+}
+const row = input.closest("tr");
 if (!row){
 return;
 }
-if ((select.value || "").trim() !== codigo){
-select.value = codigo;
-}
-const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const codigo = extrairCodigo(input.value, osProdutos);
+if (!codigo){
+if (!(input.value || "").trim()){
+const desc = row.querySelector('input[name="os_descricao[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
-if (codigo && osProdutos[codigo]){
-desc.value = osProdutos[codigo].descricao || "";
-unidade.value = osProdutos[codigo].unidade || "UN";
-} else {
-const hasDesc = desc && desc.value;
-if (!hasDesc){
-desc.value = "";
+if (desc) desc.value = "";
 if (unidade) unidade.value = "";
-}
-}
+osComposicaoSource = "bom";
 renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
+}
+return;
+}
+aplicarProdutoLinhaOS(row, codigo);
+}
+
+function preencherOSDescricao(input){
+if (!input){
+return;
+}
+const row = input.closest("tr");
+if (!row){
+return;
+}
+const codigo = extrairCodigo(input.value, osProdutos);
+if (!codigo){
+if (!(input.value || "").trim()){
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const unidade = row.querySelector('input[name="os_unidade[]"]');
+if (codigoInput) codigoInput.value = "";
+if (unidade) unidade.value = "";
+osComposicaoSource = "bom";
+renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
+}
+return;
+}
+aplicarProdutoLinhaOS(row, codigo);
 }
 
 function renderComponentes(){
@@ -1174,38 +2073,18 @@ tbody.appendChild(row);
 });
 }
 
-if (osComposicaoSource === "prefill" && osPrefill && osPrefill.composicao && osPrefill.composicao.length){
-const rows = osPrefill.composicao.map((c) => ({
-item: c.item || "",
-codigo: c.codigo || "",
-descricao: c.descricao || "",
-unidade: c.unidade || "",
-qtd: c.qtd || "",
-level: c.level || 0,
-}));
-renderComposicaoRows(rows);
+const rowsBom = coletarComposicaoBom();
+if (rowsBom.length){
+renderComposicaoRows(rowsBom);
 return;
 }
 
-const rows = [];
-const linhas = document.querySelectorAll("#tabela_os tr");
-linhas.forEach((row, index) => {
-if (index === 0){
+if (osComposicaoSource === "prefill" && osPrefill && osPrefill.composicao && osPrefill.composicao.length){
+renderComposicaoRows(expandirComposicaoImportada(osPrefill.composicao));
 return;
 }
-const sel = row.querySelector('input[name="os_codigo[]"]');
-const qtdInput = row.querySelector('input[name="os_qtd[]"]');
-const codigoItem = sel ? normalizarCodigoOS(sel.value) : "";
-const qtdItem = qtdInput ? parseNumber(qtdInput.value) : 0;
-if (!codigoItem || !osComponentes[codigoItem]){
-return;
-}
-const composicaoExpandida = expandComposicao(codigoItem, qtdItem);
-if (composicaoExpandida.length){
-rows.push(...composicaoExpandida);
-}
-});
-renderComposicaoRows(rows);
+
+renderComposicaoRows([]);
 }
 
 function adicionarComponenteOS(){
@@ -1222,26 +2101,15 @@ row.innerHTML = `
 `;
 }
 
-function preencherProcessosPadrao(conjunto){
-if (hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
+function preencherProcessosPadrao(conjunto, options){
+const forcar = Boolean(options && options.forcar);
+if (!forcar && hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
 return;
 }
 const data = osProcessos && osProcessos[conjunto] ? osProcessos[conjunto] : {};
-const map = {
-"CORTE": "corte",
-"AR CONDICIONADO": "ar",
-"PREPARAÇÃO DE PEÇAS": "preparacao",
-"ISOLAMENTO": "isolamento",
-"REVESTIMENTO": "revestimento",
-"BANCOS": "bancos",
-"ELÉTRICA 2": "eletrica",
-"LIMPEZA/LIBERAÇÃO": "limpeza",
-};
-
-Object.keys(map).forEach((nome) => {
-const key = map[nome];
-const linhas = data[nome] || [];
-aplicarProcessoTabela(key, linhas);
+osProcessoDefs.forEach((processo) => {
+const linhas = data[processo.nome] || [];
+aplicarProcessoTabela(processo.key, linhas);
 });
 }
 
@@ -1281,19 +2149,9 @@ row.innerHTML = `
 }
 
 function coletarProcessosUI(){
-const map = {
-"CORTE": "corte",
-"AR CONDICIONADO": "ar",
-"PREPARAÇÃO DE PEÇAS": "preparacao",
-"ISOLAMENTO": "isolamento",
-"REVESTIMENTO": "revestimento",
-"BANCOS": "bancos",
-"ELÉTRICA 2": "eletrica",
-"LIMPEZA/LIBERAÇÃO": "limpeza",
-};
 const data = {};
-Object.keys(map).forEach((nome) => {
-const key = map[nome];
+osProcessoDefs.forEach((processo) => {
+const key = processo.key;
 const tabela = document.getElementById(`processo_${key}`);
 if (!tabela){
 return;
@@ -1309,7 +2167,7 @@ if (atividade){
 linhas.push({atividade, responsavel});
 }
 }
-data[nome] = linhas;
+data[processo.nome] = linhas;
 });
 return data;
 }
@@ -1329,28 +2187,19 @@ tabelaOS.deleteRow(2);
 const row = tabelaOS.rows[1];
 if (row){
 const select = row.querySelector('input[name="os_codigo[]"]');
-const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
 if (select) select.value = "";
 if (desc) desc.value = "";
-if (qtd) qtd.value = "";
+if (qtd) qtd.value = "1";
 if (serie) serie.value = "";
 if (unidade) unidade.value = "";
 }
 }
 
-const processos = [
-    "processo_corte",
-    "processo_ar",
-    "processo_preparacao",
-    "processo_isolamento",
-    "processo_revestimento",
-    "processo_bancos",
-    "processo_eletrica",
-    "processo_limpeza",
-];
+const processos = osProcessoTableIds;
 processos.forEach((id) => {
 const tabela = document.getElementById(id);
 if (!tabela){
@@ -1372,6 +2221,9 @@ const tbody = document.getElementById("tabela_componentes_body");
 if (tbody){
 tbody.innerHTML = "";
 }
+definirProcessoConjuntoUI("");
+atualizarHintProcessoAutomatico({ conjunto: "", conflito: false });
+preencherProcessosPadrao(conjuntoProcessoAtual(), { forcar: true });
 }
 
 function limparOCForm(){
@@ -1388,8 +2240,8 @@ tabela.deleteRow(2);
 }
 const row = tabela.rows[1];
 if (row){
-const select = row.querySelector('select[name="codigo[]"]');
-const desc = row.querySelector('textarea[name="descricao[]"]');
+const select = row.querySelector('input[name="codigo[]"]');
+const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
@@ -1411,8 +2263,10 @@ if (total) total.value = "";
 }
 }
 
-const fornecedorSelect = document.querySelector('select[name="fornecedor"]');
-if (fornecedorSelect) fornecedorSelect.value = "";
+const fornecedorHidden = document.querySelector('input[name="fornecedor"]');
+if (fornecedorHidden) fornecedorHidden.value = "";
+const fornecedorBusca = document.querySelector('input[name="fornecedor_busca"]');
+if (fornecedorBusca) fornecedorBusca.value = "";
 
 calcularTotais();
 calcularVencimento();
@@ -1442,9 +2296,9 @@ if (ocPrefillApplied || !ocPrefill || Object.keys(ocPrefill).length === 0){
 return;
 }
 ocPrefillApplied = true;
-const fornecedorSelect = document.querySelector('select[name="fornecedor"]');
-if (ocPrefill.fornecedor){
-setSelectValue(fornecedorSelect, ocPrefill.fornecedor);
+const fornecedorInput = document.querySelector('input[name="fornecedor_busca"]');
+if (fornecedorInput && ocPrefill.fornecedor){
+aplicarFornecedorSelecionado(fornecedorInput, ocPrefill.fornecedor);
 }
 const campos = [
 ["razao_social", "razao_social"],
@@ -1490,13 +2344,21 @@ adicionarLinha();
 const row = tabela.rows[i + 1];
 const item = items[i];
 const sel = row.querySelector('input[name="codigo[]"]');
-const desc = row.querySelector('textarea[name="descricao[]"]');
+const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
 const desconto = row.querySelector('input[name="desconto[]"]');
-if (item.codigo) setSelectValue(sel, item.codigo);
-if (desc) desc.value = item.descricao || "";
+if (item.codigo){
+setSelectValue(sel, item.codigo);
+preencherPorCodigo(sel);
+} else if (desc && item.descricao){
+desc.value = item.descricao;
+preencherPorDescricao(desc);
+}
+if (desc && item.descricao && !item.codigo){
+desc.value = item.descricao || "";
+}
 if (unidade && item.unidade) unidade.value = item.unidade;
 if (qtd && item.qtd !== undefined) qtd.value = item.qtd;
 if (valor && item.valor !== undefined && item.valor !== "") valor.value = item.valor;
@@ -1512,9 +2374,9 @@ if (osPrefillApplied || !osPrefill || Object.keys(osPrefill).length === 0){
 return;
 }
 osPrefillApplied = true;
-const clienteSelect = document.querySelector('select[name="os_cliente"]');
-if (osPrefill.cliente){
-setSelectValue(clienteSelect, osPrefill.cliente);
+const clienteInput = document.querySelector('input[name="os_cliente_busca"]');
+if (clienteInput && osPrefill.cliente){
+aplicarClienteSelecionado(clienteInput, osPrefill.cliente);
 }
 const campos = [
 ["os_numero", "os_numero"],
@@ -1552,34 +2414,37 @@ adicionarLinhaOS();
 const row = tabela.rows[i + 1];
 const item = items[i];
 const sel = row.querySelector('input[name="os_codigo[]"]');
-const desc = row.querySelector('textarea[name="os_descricao[]"]');
+const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
-if (item.codigo) setSelectValue(sel, item.codigo);
-if (desc) desc.value = item.descricao || "";
-if (qtd && item.qtd !== undefined) qtd.value = item.qtd;
+if (item.codigo){
+setSelectValue(sel, item.codigo);
+aplicarProdutoLinhaOS(row, item.codigo);
+} else if (desc && item.descricao){
+desc.value = item.descricao;
+preencherOSDescricao(desc);
+}
+if (desc && item.descricao && !item.codigo){
+desc.value = item.descricao || "";
+}
+if (qtd && item.qtd !== undefined){
+const qtdItem = parseNumber(item.qtd);
+qtd.value = qtdItem > 0 ? item.qtd : "1";
+}
 if (serie && item.serie) serie.value = item.serie;
 if (unidade && item.unidade) unidade.value = item.unidade;
 }
 }
 
 if (osPrefill.processos){
-const map = {
-"CORTE": "corte",
-"AR CONDICIONADO": "ar",
-"PREPARAÃ‡ÃƒO DE PEÃ‡AS": "preparacao",
-"ISOLAMENTO": "isolamento",
-"REVESTIMENTO": "revestimento",
-"BANCOS": "bancos",
-"ELÃ‰TRICA 2": "eletrica",
-"LIMPEZA/LIBERAÃ‡ÃƒO": "limpeza",
-};
-Object.keys(map).forEach((nome) => {
-const key = map[nome];
-const linhas = osPrefill.processos[nome] || [];
-aplicarProcessoTabela(key, linhas);
+osProcessoDefs.forEach((processo) => {
+const linhas = osPrefill.processos[processo.nome] || [];
+aplicarProcessoTabela(processo.key, linhas);
 });
+atualizarHintProcessoAutomatico(resolverProcessoAutomaticoOS());
+} else {
+aplicarProcessoAutomaticoOS({ forcar: true });
 }
 if (osPrefill.composicao && osPrefill.composicao.length){
 osComposicaoSource = "prefill";
@@ -1587,6 +2452,7 @@ osComposicaoSource = "prefill";
 osComposicaoSource = "bom";
 }
 renderComponentes();
+aplicarProcessoAutomaticoOS();
 }
 function adicionarProcessoLinha(key){
 const tabela = document.getElementById(`processo_${key}`);
@@ -1620,16 +2486,7 @@ tabela.deleteRow(row.rowIndex);
 }
 
 function limparProcessosUI(){
-const processos = [
-    "processo_corte",
-    "processo_ar",
-    "processo_preparacao",
-    "processo_isolamento",
-    "processo_revestimento",
-    "processo_bancos",
-    "processo_eletrica",
-    "processo_limpeza",
-];
+const processos = osProcessoTableIds;
 processos.forEach((id) => {
 const tabela = document.getElementById(id);
 if (!tabela){
@@ -1718,7 +2575,7 @@ if (status){
 if (status === "onedrive"){
 alert("Salvo no onedrive corretamente.");
 } else {
-alert("Não foi possivel salvar no onedrive.");
+alert("Nao foi possivel salvar no onedrive.");
 }
 clearCookie("save_status");
 clearInterval(timer);
@@ -1731,33 +2588,127 @@ clearInterval(timer);
 }, 500);
 }
 
+function formatarTiposArquivo(accept){
+if (!accept){
+return "";
+}
+return accept
+.split(",")
+.map((item) => item.trim())
+.filter(Boolean)
+.join(" ");
+}
+
+function resumirArquivosSelecionados(input){
+const files = Array.from(input && input.files ? input.files : []);
+if (!files.length){
+return "Nenhum arquivo selecionado";
+}
+if (files.length === 1){
+return files[0].name || "1 arquivo selecionado";
+}
+return `${files.length} arquivos selecionados`;
+}
+
+function atualizarMetaArquivo(input){
+if (!input){
+return;
+}
+const meta = input.nextElementSibling && input.nextElementSibling.classList.contains("file-input-meta")
+? input.nextElementSibling
+: null;
+if (!meta){
+return;
+}
+const caption = meta.querySelector(".file-input-caption");
+const hint = meta.querySelector(".file-input-hint");
+const hasFiles = Boolean(input.files && input.files.length);
+if (caption){
+caption.textContent = resumirArquivosSelecionados(input);
+}
+if (hint){
+const tipos = formatarTiposArquivo(input.getAttribute("accept"));
+const base = input.multiple ? "Upload multiplo habilitado" : "Upload de arquivo unico";
+hint.textContent = tipos ? `${base} | ${tipos}` : base;
+}
+meta.classList.toggle("has-file", hasFiles);
+}
+
+function inicializarFileInputs(root){
+if (!root || !root.querySelectorAll){
+return;
+}
+root.querySelectorAll('input[type="file"]').forEach((input) => {
+if (input.dataset.fileUiReady !== "1"){
+input.dataset.fileUiReady = "1";
+let meta = input.nextElementSibling;
+if (!meta || !meta.classList.contains("file-input-meta")){
+meta = document.createElement("div");
+meta.className = "file-input-meta";
+meta.innerHTML = `
+<div class="file-input-caption">Nenhum arquivo selecionado</div>
+<div class="file-input-hint"></div>
+`;
+input.insertAdjacentElement("afterend", meta);
+}
+input.addEventListener("change", () => {
+atualizarMetaArquivo(input);
+});
+}
+atualizarMetaArquivo(input);
+});
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+inicializarLookupsEscopo(document);
+inicializarFileInputs(document);
+definirProcessoConjuntoUI(conjuntoProcessoAtual());
+inicializarOrdenacaoItensOS();
+
 const tabela = document.getElementById("tabela_itens");
 if (tabela){
 tabela.addEventListener("change", (e) => {
 if (e.target && e.target.name === "codigo[]"){
 preencherPorCodigo(e.target);
 }
+if (e.target && e.target.name === "descricao[]"){
+preencherPorDescricao(e.target);
+}
 });
 
 tabela.addEventListener("input", (e) => {
-if (e.target && e.target.name === "codigo[]"){
-preencherPorCodigo(e.target);
+if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]"].includes(e.target.name)){
+calcularTotais();
 }
-    if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]"].includes(e.target.name)){
-    calcularTotais();
-    }
 });
 }
 
-const fornecedorInput = document.querySelector('select[name="fornecedor"]');
+const fornecedorInput = document.querySelector('input[name="fornecedor_busca"]');
 if (fornecedorInput){
 fornecedorInput.addEventListener("change", () => {
 preencherFornecedor(fornecedorInput);
 });
 }
 
-const osFornecedorInput = document.querySelector('select[name="os_cliente"]');
+const tabelaOs = document.getElementById("tabela_os");
+if (tabelaOs){
+tabelaOs.addEventListener("change", (e) => {
+if (e.target && e.target.name === "os_codigo[]"){
+preencherOSItem(e.target);
+}
+if (e.target && e.target.name === "os_descricao[]"){
+preencherOSDescricao(e.target);
+}
+});
+tabelaOs.addEventListener("input", (e) => {
+if (e.target && e.target.name === "os_qtd[]"){
+osComposicaoSource = "bom";
+renderComponentes();
+}
+});
+}
+
+const osFornecedorInput = document.querySelector('input[name="os_cliente_busca"]');
 if (osFornecedorInput){
 osFornecedorInput.addEventListener("change", () => {
 preencherFornecedorOS(osFornecedorInput);
@@ -1867,6 +2818,23 @@ if (cadastroComprasMenu) cadastroComprasMenu.classList.remove("open");
 });
 }
 
+window.__cadastroFabReady = Boolean(
+cadastroComprasToggle &&
+cadastroComprasMenu &&
+cadastroProducaoToggle &&
+cadastroProducaoMenu &&
+abrirFornecedor &&
+abrirItem &&
+abrirOsFornecedor &&
+abrirOsItem &&
+abrirOsProcessos &&
+fecharFornecedor &&
+fecharItem &&
+fecharOsFornecedor &&
+fecharOsItem &&
+fecharOsProcessos
+);
+
 const freteInput = document.getElementById("frete");
 if (freteInput){
 freteInput.addEventListener("input", () => {
@@ -1878,43 +2846,6 @@ const prazoInput = document.getElementById("prazo");
 if (prazoInput){
 prazoInput.addEventListener("input", () => {
 calcularVencimento();
-});
-}
-
-const tabelaOS = document.getElementById("tabela_os");
-if (tabelaOS){
-tabelaOS.addEventListener("change", (e) => {
-if (e.target.name === "os_codigo[]"){
-osComposicaoSource = "bom";
-preencherOSItem(e.target);
-}
-
-const processosTabelas = [
-    "processo_corte",
-    "processo_ar",
-    "processo_preparacao",
-    "processo_isolamento",
-    "processo_revestimento",
-    "processo_bancos",
-    "processo_eletrica",
-    "processo_limpeza",
-];
-processosTabelas.forEach((id) => {
-const tabela = document.getElementById(id);
-if (tabela){
-    tabela.addEventListener("input", () => {});
-}
-});
-});
-tabelaOS.addEventListener("input", (e) => {
-if (e.target.name === "os_codigo[]"){
-osComposicaoSource = "bom";
-preencherOSItem(e.target);
-}
-if (e.target.name === "os_qtd[]"){
-osComposicaoSource = "bom";
-renderComponentes();
-}
 });
 }
 
@@ -2020,7 +2951,7 @@ renderDashboardCharts();
 </form>
 <div class="nav-tabs">
 <button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
-<button type="button" class="tab-btn" data-tab="tab-os">Produção</button>
+<button type="button" class="tab-btn" data-tab="tab-os">Producao</button>
 <button type="button" class="tab-btn" data-tab="tab-cadastro">Cadastro</button>
 <button type="button" class="tab-btn" data-tab="tab-dashboard">Dashboard</button>
 </div>
@@ -2049,12 +2980,11 @@ renderDashboardCharts();
 
 <div>
 <label>Fornecedor</label>
-<select name="fornecedor">
-<option value=""></option>
-{% for key, f in fornecedores.items() %}
-<option value="{{ key }}">{{ f["fornecedor"] if "fornecedor" in f else key }}</option>
-{% endfor %}
-</select>
+<input type="hidden" name="fornecedor">
+<div class="lookup-field">
+<input name="fornecedor_busca" data-lookup-source="fornecedores" autocomplete="off" placeholder="Digite codigo, CNPJ ou nome do fornecedor">
+<div class="lookup-menu"></div>
+</div>
 </div>
 
 <div>
@@ -2133,9 +3063,17 @@ renderDashboardCharts();
 
 <tr>
 <td>
-<input name="codigo[]" list="oc-produtos-list">
+<div class="lookup-field">
+<input name="codigo[]" data-lookup-source="produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
+<div class="lookup-menu"></div>
+</div>
 </td>
-<td><textarea name="descricao[]" rows="2" readonly></textarea></td>
+<td>
+<div class="lookup-field">
+<input name="descricao[]" data-lookup-source="produtos" data-lookup-mode="descricao" autocomplete="off" placeholder="Descricao do produto">
+<div class="lookup-menu"></div>
+</div>
+</td>
 <td><input name="unidade[]" readonly></td>
 <td><input type="number" step="1" min="0" name="qtd[]"></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
@@ -2273,6 +3211,26 @@ renderDashboardCharts();
 <button type="submit">Importar O.S</button>
 </form>
 </div>
+
+<div class="card">
+<h3>Importar Processos de Producao (XLSX)</h3>
+<form method="POST" action="/importar_os_processos" enctype="multipart/form-data">
+<input type="hidden" name="next_tab" value="os">
+<label>Arquivos de Processo</label>
+<input type="file" name="arquivo_os_processos" accept=".xlsx" multiple required>
+<br><br>
+<button type="submit">Importar Processos</button>
+</form>
+<br>
+<form method="GET" action="/exportar_modelo_os_processos">
+<button type="submit">Baixar Modelo (XLSX)</button>
+</form>
+{% if os_processos_status %}
+<div class="total-box" style="margin-top:16px;">
+{{ os_processos_status }}
+</div>
+{% endif %}
+</div>
 <form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data" onsubmit="setTimeout(limparOSForm, 500)">
 
 <div class="card">
@@ -2280,12 +3238,11 @@ renderDashboardCharts();
 <div class="grid-4">
 <div>
 <label>Cliente</label>
-<select name="os_cliente">
-<option value=""></option>
-{% for key, f in os_fornecedores.items() %}
-<option value="{{ key }}">{{ f["cliente"] if "cliente" in f else key }}</option>
-{% endfor %}
-</select>
+<input type="hidden" name="os_cliente">
+<div class="lookup-field">
+<input name="os_cliente_busca" data-lookup-source="clientes" autocomplete="off" placeholder="Digite codigo ou nome do cliente">
+<div class="lookup-menu"></div>
+</div>
 </div>
 </div>
 </div>
@@ -2294,7 +3251,7 @@ renderDashboardCharts();
 <h3>Dados da O.S</h3>
 <div class="grid-4">
 <div>
-<label>Nº O.S (opcional)</label>
+<label>No. O.S (opcional)</label>
 <input name="os_numero">
 </div>
 <div>
@@ -2308,6 +3265,12 @@ renderDashboardCharts();
 <div>
 <label>MMV</label>
 <input name="os_mmv">
+</div>
+<div>
+<label>Processo Vinculado</label>
+<input type="hidden" id="os_processo_conjunto" name="os_processo_conjunto" value="">
+<div id="os_processo_conjunto_display" class="auto-process-display is-empty">Aguardando transformacao vinculada</div>
+<div id="os_processo_auto_hint" style="margin-top:6px;font-size:12px;color:#475569;"></div>
 </div>
 <div>
 <label>Previsao Inicio</label>
@@ -2329,19 +3292,29 @@ renderDashboardCharts();
 <h3>Itens da OS</h3>
 <table id="tabela_os" class="tabela-os">
 <tr>
+<th class="os-drag-cell">Mover</th>
 <th>Codigo Produto</th>
 <th>Descricao Produto</th>
 <th>Qtd</th>
-<th>Nº Serie</th>
+<th>No. Serie</th>
 <th>Un</th>
 <th></th>
 </tr>
 <tr>
+<td class="os-drag-cell"><span class="os-drag-handle" draggable="true" title="Arrastar item">⋮⋮</span></td>
 <td>
-<input name="os_codigo[]" list="os-produtos-list">
+<div class="lookup-field">
+<input name="os_codigo[]" data-lookup-source="os-produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
+<div class="lookup-menu"></div>
+</div>
 </td>
-<td><textarea name="os_descricao[]" rows="2" readonly></textarea></td>
-<td><input type="number" step="1" min="0" name="os_qtd[]"></td>
+<td>
+<div class="lookup-field">
+<input name="os_descricao[]" data-lookup-source="os-produtos" data-lookup-mode="descricao" autocomplete="off" placeholder="Descricao do produto">
+<div class="lookup-menu"></div>
+</div>
+</td>
+<td><input type="number" step="1" min="1" name="os_qtd[]" value="1"></td>
 <td><input name="os_serie[]"></td>
 <td><input name="os_unidade[]" readonly></td>
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOS(this)">-</button></td>
@@ -2444,83 +3417,121 @@ renderDashboardCharts();
 </div>
 
 <div class="card">
-<h3>Processo de Producao - Desmontagem e Isolamento</h3>
-<table id="processo_isolamento" class="tabela-componentes">
+<h3>Processo de Producao - Eletrica 1</h3>
+<table id="processo_eletrica1" class="tabela-componentes">
 <tr>
 <th>Atividade</th>
 <th>Responsavel</th>
 </tr>
 <tr>
-<td><input name="proc_isolamento_atividade[]"></td>
+<td><input name="proc_eletrica1_atividade[]"></td>
 <td>
-<input name="proc_isolamento_responsavel[]">
+<input name="proc_eletrica1_responsavel[]">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
 </td>
 </tr>
 </table>
 <br>
-<button type="button" onclick="adicionarProcessoLinha('isolamento')">Adicionar Atividade</button>
+<button type="button" onclick="adicionarProcessoLinha('eletrica1')">Adicionar Atividade</button>
 </div>
 
 <div class="card">
-<h3>Processo de Producao - Revestimento</h3>
-<table id="processo_revestimento" class="tabela-componentes">
+<h3>Processo de Producao - Desmontagem (Isolamento)</h3>
+<table id="processo_desmontagem" class="tabela-componentes">
 <tr>
 <th>Atividade</th>
 <th>Responsavel</th>
 </tr>
 <tr>
-<td><input name="proc_revestimento_atividade[]"></td>
+<td><input name="proc_desmontagem_atividade[]"></td>
 <td>
-<input name="proc_revestimento_responsavel[]">
+<input name="proc_desmontagem_responsavel[]">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
 </td>
 </tr>
 </table>
 <br>
-<button type="button" onclick="adicionarProcessoLinha('revestimento')">Adicionar Atividade</button>
+<button type="button" onclick="adicionarProcessoLinha('desmontagem')">Adicionar Atividade</button>
 </div>
 
 <div class="card">
-<h3>Processo de Producao - Bancos</h3>
-<table id="processo_bancos" class="tabela-componentes">
+<h3>Processo de Producao - Revestimento 1</h3>
+<table id="processo_revestimento1" class="tabela-componentes">
 <tr>
 <th>Atividade</th>
 <th>Responsavel</th>
 </tr>
 <tr>
-<td><input name="proc_bancos_atividade[]"></td>
+<td><input name="proc_revestimento1_atividade[]"></td>
 <td>
-<input name="proc_bancos_responsavel[]">
+<input name="proc_revestimento1_responsavel[]">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
 </td>
 </tr>
 </table>
 <br>
-<button type="button" onclick="adicionarProcessoLinha('bancos')">Adicionar Atividade</button>
+<button type="button" onclick="adicionarProcessoLinha('revestimento1')">Adicionar Atividade</button>
 </div>
 
 <div class="card">
-<h3>Processo de Producao - Eletrica</h3>
-<table id="processo_eletrica" class="tabela-componentes">
+<h3>Processo de Producao - Revestimento 2</h3>
+<table id="processo_revestimento2" class="tabela-componentes">
 <tr>
 <th>Atividade</th>
 <th>Responsavel</th>
 </tr>
 <tr>
-<td><input name="proc_eletrica_atividade[]"></td>
+<td><input name="proc_revestimento2_atividade[]"></td>
 <td>
-<input name="proc_eletrica_responsavel[]">
+<input name="proc_revestimento2_responsavel[]">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
 </td>
 </tr>
 </table>
 <br>
-<button type="button" onclick="adicionarProcessoLinha('eletrica')">Adicionar Atividade</button>
+<button type="button" onclick="adicionarProcessoLinha('revestimento2')">Adicionar Atividade</button>
 </div>
 
 <div class="card">
-<h3>Processo de Producao - Limpeza/Liberação</h3>
+<h3>Processo de Producao - Banco</h3>
+<table id="processo_banco" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_banco_atividade[]"></td>
+<td>
+<input name="proc_banco_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('banco')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Eletrica 2</h3>
+<table id="processo_eletrica2" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_eletrica2_atividade[]"></td>
+<td>
+<input name="proc_eletrica2_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('eletrica2')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
+<h3>Processo de Producao - Limpeza/Liberacao</h3>
 <table id="processo_limpeza" class="tabela-componentes">
 <tr>
 <th>Atividade</th>
@@ -2546,10 +3557,9 @@ renderDashboardCharts();
 <div class="card footer">
 <div>
 <div class="dashboard-actions os-actions">
-<button type="submit" name="os_mode" value="completa">O.S completa</button>
-<button type="submit" name="os_mode" value="mascara">Mascara</button>
-<button type="submit" name="os_mode" value="resumida">O.S resumida</button>
+<button type="submit">Gerar O.S</button>
 </div>
+<p style="margin:10px 0 0;font-size:12px;color:#64748b;">A geracao baixa um unico ZIP com: O.S Completa, O.S Expedicao, O.S Preparacao, O.S Producao e as planilhas de pendencias.</p>
 </div>
 </div>
 
@@ -2559,7 +3569,7 @@ renderDashboardCharts();
 <div id="tab-cadastro" class="tab-content">
 <div class="card">
 <h3>Cadastros</h3>
-<p>Selecione um cadastro pelos botões flutuantes.</p>
+<p>Selecione um cadastro pelos botoes flutuantes.</p>
 </div>
 <div class="card">
 <h3>Caminhos de Salvamento</h3>
@@ -2570,12 +3580,16 @@ renderDashboardCharts();
 <input name="pedidos_dir" value="{{ save_paths.pedidos_dir if save_paths else '' }}">
 </div>
 <div>
-<label>Caminho Produção (O.S)</label>
+<label>Caminho Producao (O.S)</label>
 <input name="os_dir" value="{{ save_paths.os_dir if save_paths else '' }}">
 </div>
 <div>
 <label>Caminho B.O.M</label>
 <input name="bom_dir" value="{{ save_paths.bom_dir if save_paths else '' }}">
+</div>
+<div>
+<label>Caminho Processos</label>
+<input name="processos_dir" value="{{ save_paths.processos_dir if save_paths else '' }}">
 </div>
 </div>
 <button type="submit">Salvar Caminhos</button>
@@ -2583,7 +3597,7 @@ renderDashboardCharts();
 </div>
 <div class="card">
   <h3>Atualizar B.O.M</h3>
-  <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ bom_dir }}</strong> e importa o conteúdo para os cadastros.</p>
+  <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ bom_dir }}</strong> e importa o conteudo para os cadastros.</p>
   <form method="POST" action="/atualizar_bom">
     <button type="submit">Atualizar B.O.M</button>
   </form>
@@ -2593,11 +3607,24 @@ renderDashboardCharts();
     </div>
   {% endif %}
 </div>
+<div class="card">
+  <h3>Atualizar Base de Processos</h3>
+  <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ processos_dir }}</strong> e atualiza a base de processos para relacionamento com as transformacoes.</p>
+  <form method="POST" action="/atualizar_processos">
+    <input type="hidden" name="next_tab" value="cadastro">
+    <button type="submit">Atualizar Processos</button>
+  </form>
+  {% if os_processos_status %}
+    <div class="total-box" style="margin-top:16px;">
+      {{ os_processos_status }}
+    </div>
+  {% endif %}
+</div>
 <div class="cadastro-sections">
 <div id="panel-fornecedor" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Fornecedor</div>
-<button type="button" id="fechar-fornecedor" class="panel-close">X</button>
+<button type="button" id="fechar-fornecedor" class="panel-close" onclick="return fecharCadastroPainel('panel-fornecedor')">X</button>
 </div>
 <form method="POST" action="/cadastrar_fornecedor">
 <div class="grid">
@@ -2661,7 +3688,7 @@ renderDashboardCharts();
 <div id="panel-item" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Item</div>
-<button type="button" id="fechar-item" class="panel-close">X</button>
+<button type="button" id="fechar-item" class="panel-close" onclick="return fecharCadastroPainel('panel-item')">X</button>
 </div>
 <form method="POST" action="/cadastrar_item">
 <div class="grid">
@@ -2676,6 +3703,14 @@ renderDashboardCharts();
 <div>
 <label>Unidade</label>
 <input name="unidade" value="UN">
+</div>
+<div>
+<label>Grupo</label>
+<input name="grupo">
+</div>
+<div>
+<label>Categoria</label>
+<input name="categoria">
 </div>
 <div>
 <label>Valor Unitario</label>
@@ -2704,6 +3739,7 @@ renderDashboardCharts();
 <br><br>
 <button type="submit">Importar Itens</button>
 </form>
+<p style="margin:10px 0 0;font-size:12px;color:#64748b;">Modelo atualizado: <strong>codigo, descricao, unidade, grupo, categoria</strong> e campos fiscais.</p>
 <br>
 <form method="GET" action="/exportar_modelo_produtos">
 <button type="submit">Baixar Modelo (XLSX)</button>
@@ -2713,7 +3749,7 @@ renderDashboardCharts();
 <div id="panel-os-fornecedor" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Cliente (OS)</div>
-<button type="button" id="fechar-os-fornecedor" class="panel-close">X</button>
+<button type="button" id="fechar-os-fornecedor" class="panel-close" onclick="return fecharCadastroPainel('panel-os-fornecedor')">X</button>
 </div>
 <form method="POST" action="/cadastrar_os_fornecedor">
 <div class="grid">
@@ -2741,7 +3777,7 @@ renderDashboardCharts();
 <div id="panel-os-item" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Item (OS)</div>
-<button type="button" id="fechar-os-item" class="panel-close">X</button>
+<button type="button" id="fechar-os-item" class="panel-close" onclick="return fecharCadastroPainel('panel-os-item')">X</button>
 </div>
 <form method="POST" action="/cadastrar_os_item">
 <div class="grid">
@@ -2756,6 +3792,14 @@ renderDashboardCharts();
 <div>
 <label>Unidade</label>
 <input name="os_item_unidade" value="UN">
+</div>
+<div>
+<label>Grupo</label>
+<input name="os_item_grupo">
+</div>
+<div>
+<label>Categoria</label>
+<input name="os_item_categoria">
 </div>
 </div>
 <br>
@@ -2786,6 +3830,7 @@ renderDashboardCharts();
 <br><br>
 <button type="submit">Importar Itens (OS)</button>
 </form>
+<p style="margin:10px 0 0;font-size:12px;color:#64748b;">Nova carga de itens aceita: <strong>codigo, descricao, unidade, grupo, categoria</strong>.</p>
 <br>
 <form method="GET" action="/exportar_modelo_os_itens">
 <button type="submit">Baixar Modelo (XLSX)</button>
@@ -2806,11 +3851,12 @@ renderDashboardCharts();
 <div id="panel-os-processos" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Processos Padrao (OS)</div>
-<button type="button" id="fechar-os-processos" class="panel-close">X</button>
+<button type="button" id="fechar-os-processos" class="panel-close" onclick="return fecharCadastroPainel('panel-os-processos')">X</button>
 </div>
 <form method="POST" action="/importar_os_processos" enctype="multipart/form-data">
+<input type="hidden" name="next_tab" value="cadastro">
 <label>Importar Processos (XLSX)</label>
-<input type="file" name="arquivo_os_processos" accept=".xlsx">
+<input type="file" name="arquivo_os_processos" accept=".xlsx" multiple>
 <br><br>
 <button type="submit">Importar Processos</button>
 </form>
@@ -2818,28 +3864,168 @@ renderDashboardCharts();
 <form method="GET" action="/exportar_modelo_os_processos">
 <button type="submit">Baixar Modelo (XLSX)</button>
 </form>
+{% if os_processos_status %}
+<div class="total-box" style="margin-top:16px;">
+{{ os_processos_status }}
+</div>
+{% endif %}
 </div>
 </div>
 </div>
 
 <div id="cadastro-actions" class="floating-actions" style="display:none">
 <div class="fab-group">
-<button id="cadastro-compras-toggle" class="fab fab-parent" type="button" title="Cadastro - Compras">Cadastro - Compras</button>
+<button id="cadastro-compras-toggle" class="fab fab-parent" type="button" title="Cadastro - Compras" onclick="return toggleCadastroMenu('cadastro-compras-menu', 'cadastro-producao-menu')">Cadastro - Compras</button>
 <div id="cadastro-compras-menu" class="fab-menu">
-<button id="abrir-fornecedor" class="fab fab-child" type="button" title="Cadastro Fornecedor">Cadastro Fornecedor</button>
-<button id="abrir-item" class="fab fab-child" type="button" title="Cadastro Produto">Cadastro Produto</button>
+<a id="abrir-fornecedor" class="fab fab-child" href="#panel-fornecedor" title="Cadastro Fornecedor">Cadastro Fornecedor</a>
+<a id="abrir-item" class="fab fab-child" href="#panel-item" title="Cadastro Produto">Cadastro Produto</a>
 </div>
 </div>
 <div class="fab-group">
-<button id="cadastro-producao-toggle" class="fab fab-parent" type="button" title="Cadastro - Produção">Cadastro - Produção</button>
+<button id="cadastro-producao-toggle" class="fab fab-parent" type="button" title="Cadastro - Producao" onclick="return toggleCadastroMenu('cadastro-producao-menu', 'cadastro-compras-menu')">Cadastro - Producao</button>
 <div id="cadastro-producao-menu" class="fab-menu">
-<button id="abrir-os-fornecedor" class="fab fab-child" type="button" title="Cadastro de Cliente">Cadastro de Cliente</button>
-<button id="abrir-os-item" class="fab fab-child" type="button" title="Cadastro de itens">Cadastro de itens</button>
-<button id="abrir-os-processos" class="fab fab-child" type="button" title="Processos">Processos</button>
+<a id="abrir-os-fornecedor" class="fab fab-child" href="#panel-os-fornecedor" title="Cadastro de Cliente">Cadastro de Cliente</a>
+<a id="abrir-os-item" class="fab fab-child" href="#panel-os-item" title="Cadastro de itens">Cadastro de itens</a>
+<a id="abrir-os-processos" class="fab fab-child" href="#panel-os-processos" title="Processos">Processos</a>
 </div>
 </div>
 </div>
+
+<script>
+(() => {
+const buttons = document.querySelectorAll(".tab-btn");
+const panes = document.querySelectorAll(".tab-content");
+const cadastroActions = document.getElementById("cadastro-actions");
+const cadastroSections = [
+document.getElementById("panel-fornecedor"),
+document.getElementById("panel-item"),
+document.getElementById("panel-os-fornecedor"),
+document.getElementById("panel-os-item"),
+document.getElementById("panel-os-processos")
+].filter(Boolean);
+const cadastroComprasToggle = document.getElementById("cadastro-compras-toggle");
+const cadastroComprasMenu = document.getElementById("cadastro-compras-menu");
+const cadastroProducaoToggle = document.getElementById("cadastro-producao-toggle");
+const cadastroProducaoMenu = document.getElementById("cadastro-producao-menu");
+
+function bindClickOnce(element, key, handler){
+if (!element || element.dataset[key] === "1"){
+return;
+}
+element.dataset[key] = "1";
+element.addEventListener("click", handler);
+}
+
+function fecharMenusCadastro(){
+if (cadastroComprasMenu){
+cadastroComprasMenu.classList.remove("open");
+}
+if (cadastroProducaoMenu){
+cadastroProducaoMenu.classList.remove("open");
+}
+}
+
+function abrirCadastro(panel){
+cadastroSections.forEach((section) => {
+section.classList.remove("active");
+section.setAttribute("aria-hidden", "true");
+});
+if (!panel){
+return;
+}
+panel.classList.add("active");
+panel.setAttribute("aria-hidden", "false");
+panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function fecharCadastro(panel){
+if (!panel){
+return;
+}
+panel.classList.remove("active");
+panel.setAttribute("aria-hidden", "true");
+}
+
+function toggleMenu(menu, otherMenu){
+if (!menu){
+return;
+}
+const abrir = !menu.classList.contains("open");
+if (otherMenu){
+otherMenu.classList.remove("open");
+}
+menu.classList.toggle("open", abrir);
+}
+
+window.toggleCadastroMenu = (menuId, otherMenuId) => {
+const menu = document.getElementById(menuId);
+const otherMenu = otherMenuId ? document.getElementById(otherMenuId) : null;
+toggleMenu(menu, otherMenu);
+return false;
+};
+
+window.abrirCadastroPainel = (panelId) => {
+const panel = document.getElementById(panelId);
+abrirCadastro(panel);
+fecharMenusCadastro();
+return false;
+};
+
+window.fecharCadastroPainel = (panelId) => {
+const panel = document.getElementById(panelId);
+fecharCadastro(panel);
+return false;
+};
+
+function ativarAba(target){
+if (!target){
+return;
+}
+buttons.forEach((btn) => {
+btn.classList.toggle("active", btn.getAttribute("data-tab") === target);
+});
+panes.forEach((pane) => {
+pane.classList.toggle("active", pane.id === target);
+});
+if (cadastroActions){
+cadastroActions.style.display = target === "tab-cadastro" ? "flex" : "none";
+}
+if (target !== "tab-cadastro"){
+fecharMenusCadastro();
+}
+if (target === "tab-os" && typeof initOsTab === "function"){
+try {
+initOsTab();
+} catch (error) {
+console.error("Falha ao inicializar aba de producao", error);
+}
+}
+if (target === "tab-dashboard" && typeof renderDashboardCharts === "function"){
+try {
+renderDashboardCharts();
+} catch (error) {
+console.error("Falha ao renderizar dashboard", error);
+}
+}
+}
+
+buttons.forEach((btn) => {
+bindClickOnce(btn, "fallbackBound", () => {
+ativarAba(btn.getAttribute("data-tab"));
+});
+});
+
+const defaultTab = document.body?.getAttribute("data-default-tab") || "oc";
+const targetInicial = defaultTab.startsWith("tab-") ? defaultTab : `tab-${defaultTab}`;
+ativarAba(targetInicial);
+})();
+</script>
 
 </body>
 
 </html>
+
+
+
+
+
