@@ -5,6 +5,8 @@ from composicao import normalizar_codigo, parse_quantidade
 
 SETOR_EXPEDICAO = "EXPEDICAO"
 SETOR_PREPARACAO = "PREPARACAO"
+TIPO_REQUISICAO_MATERIAL = "MATERIAL"
+TIPO_REQUISICAO_FATURAMENTO_DIRETO = "FATURAMENTO DIRETO"
 
 _MARCADORES_PREPARACAO = (
     "ISOLAMENTO",
@@ -33,29 +35,56 @@ def classificar_item(item_info):
     return SETOR_EXPEDICAO
 
 
+def classificar_tipo_requisicao(item_info, descricao=""):
+    referencia = normalizar_texto(
+        descricao
+        or (item_info or {}).get("descricao", "")
+        or ""
+    )
+    if "FATURAMENTO DIRETO" in referencia:
+        return TIPO_REQUISICAO_FATURAMENTO_DIRETO
+    return TIPO_REQUISICAO_MATERIAL
+
+
 def enriquecer_composicao(composicao, catalogo):
     linhas = []
     for comp in composicao or []:
         codigo = normalizar_codigo(comp.get("codigo", ""))
         item_info = catalogo.get(codigo, {}) if catalogo else {}
+        descricao = comp.get("descricao", "") or item_info.get("descricao", "") or ""
         linhas.append(
             {
                 "item": normalizar_codigo(comp.get("item", "")),
                 "codigo": codigo,
-                "descricao": comp.get("descricao", "") or item_info.get("descricao", "") or "",
+                "descricao": descricao,
                 "unidade": comp.get("unidade", "") or item_info.get("unidade", "") or "",
                 "qtd": comp.get("qtd", ""),
                 "level": comp.get("level", 0),
                 "grupo": item_info.get("grupo", "") or "",
                 "categoria": item_info.get("categoria", "") or "",
+                "fornecedor": item_info.get("fornecedor", "") or "",
                 "setor": classificar_item(item_info),
+                "tipo_requisicao": classificar_tipo_requisicao(item_info, descricao),
             }
         )
     return linhas
 
 
 def filtrar_linhas_setor(linhas, setor):
-    return [linha for linha in (linhas or []) if linha.get("setor") == setor]
+    return [
+        linha
+        for linha in (linhas or [])
+        if linha.get("setor") == setor
+        and linha.get("tipo_requisicao") != TIPO_REQUISICAO_FATURAMENTO_DIRETO
+    ]
+
+
+def filtrar_linhas_faturamento_direto(linhas):
+    return [
+        linha
+        for linha in (linhas or [])
+        if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO
+    ]
 
 
 def agrupar_linhas_setor(linhas):
@@ -72,13 +101,27 @@ def agrupar_linhas_setor(linhas):
                 "unidade": unidade,
                 "grupo": linha.get("grupo", "") or "",
                 "categoria": linha.get("categoria", "") or "",
+                "fornecedor": linha.get("fornecedor", "") or "",
                 "setor": linha.get("setor", "") or "",
+                "tipo_requisicao": linha.get("tipo_requisicao", "") or "",
                 "qtd": 0.0,
             }
             ordem.append(chave)
         agrupado[chave]["qtd"] += parse_quantidade(linha.get("qtd", 0))
 
     return [agrupado[chave] for chave in ordem]
+
+
+def agrupar_linhas_por_fornecedor(linhas):
+    agrupado = {}
+    ordem = []
+    for linha in linhas or []:
+        fornecedor = str(linha.get("fornecedor", "") or "").strip() or "SEM FORNECEDOR"
+        if fornecedor not in agrupado:
+            agrupado[fornecedor] = []
+            ordem.append(fornecedor)
+        agrupado[fornecedor].append(linha)
+    return [(fornecedor, agrupado[fornecedor]) for fornecedor in ordem]
 
 
 def construir_itens_os_setor(linhas_agrupadas):
@@ -93,7 +136,9 @@ def construir_itens_os_setor(linhas_agrupadas):
                 "unidade": linha.get("unidade", "") or "",
                 "grupo": linha.get("grupo", "") or "",
                 "categoria": linha.get("categoria", "") or "",
+                "fornecedor": linha.get("fornecedor", "") or "",
                 "setor": linha.get("setor", "") or "",
+                "tipo_requisicao": linha.get("tipo_requisicao", "") or "",
             }
         )
     return itens

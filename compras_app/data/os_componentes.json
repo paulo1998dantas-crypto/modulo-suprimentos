@@ -3091,6 +3091,26 @@
       "quantidade": "1"
     }
   ],
+  "30140008": [
+    {
+      "codigo": "2-0011",
+      "descricao": "PP ASSOALHO DEGRAU ENTRADA TRANSIT COMPENSADO NAVAL 12 MM",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0563",
+      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "unidade": "m",
+      "quantidade": "0.5"
+    },
+    {
+      "codigo": "1-0538",
+      "descricao": "MP CANTONEIRA PVC PRETA PERFIL DEGRAU ESCADA 6000MM",
+      "unidade": "m",
+      "quantidade": "1"
+    }
+  ],
   "30140009": [
     {
       "codigo": "20140005",
@@ -3112,6 +3132,26 @@
     }
   ],
   "3-0320": [
+    {
+      "codigo": "2-0001",
+      "descricao": "PP PISO CN 12 MM MASTER L3H2 - UNIVERSAL - R00",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0547",
+      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "unidade": "m",
+      "quantidade": "3.4"
+    },
+    {
+      "codigo": "1-0500",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "l",
+      "quantidade": "0.25"
+    }
+  ],
+  "30140010": [
     {
       "codigo": "2-0001",
       "descricao": "PP PISO CN 12 MM MASTER L3H2 - UNIVERSAL - R00",
@@ -3613,6 +3653,26 @@
       "quantidade": "0.25"
     }
   ],
+  "30140030": [
+    {
+      "codigo": "2-0020",
+      "descricao": "PP PISO CN 12 MM E/S/J TB - UNIVERSAL - R00",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0547",
+      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "unidade": "m",
+      "quantidade": "3.2"
+    },
+    {
+      "codigo": "1-0500",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "l",
+      "quantidade": "0.25"
+    }
+  ],
   "30140031": [
     {
       "codigo": "20140017",
@@ -3690,6 +3750,26 @@
     }
   ],
   "3-0344": [
+    {
+      "codigo": "2-0023",
+      "descricao": "PP PISO CN 12 MM B/J/D VITRE - UNIVERSAL - R00",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0547",
+      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "unidade": "m",
+      "quantidade": "3.9"
+    },
+    {
+      "codigo": "1-0500",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "l",
+      "quantidade": "0.25"
+    }
+  ],
+  "30140034": [
     {
       "codigo": "2-0023",
       "descricao": "PP PISO CN 12 MM B/J/D VITRE - UNIVERSAL - R00",
@@ -3834,6 +3914,26 @@
     }
   ],
   "3-0350": [
+    {
+      "codigo": "2-0026",
+      "descricao": "PP PISO CN 12 MM TRANSIT L3H3 - UNIVERSAL - R00",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "1-0547",
+      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "unidade": "m",
+      "quantidade": "3.9"
+    },
+    {
+      "codigo": "1-0500",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "l",
+      "quantidade": "0.25"
+    }
+  ],
+  "30140040": [
     {
       "codigo": "2-0026",
       "descricao": "PP PISO CN 12 MM TRANSIT L3H3 - UNIVERSAL - R00",
@@ -9961,6 +10061,26 @@
       "descricao": "BCO MC LB FIXO 3 L NORMAL C/ AP BRACO LD 330 MM 2P TECIDO",
       "unidade": "pc",
       "quantidade": "2"
+    }
+  ],
+  "30200002": [
+    {
+      "codigo": "10200001",
+      "descricao": "BCO MC LB FIXO 3 L NORMAL S/ AP BRACO 220 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200002",
+      "descricao": "BCO MC LB RECLINAVEL 2 L NORMAL C/ AP BRACO LD 220 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200003",
+      "descricao": "BCO MC LB RECLINAVEL 3 L (2REC / 1 REB) C/ AP BRACO LD 195 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
     }
   ]
 }

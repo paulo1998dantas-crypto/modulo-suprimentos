@@ -9,6 +9,7 @@ import sys
 import shutil
 import zipfile
 import subprocess
+import unicodedata
 from datetime import date, timedelta, datetime
 import tempfile
 import zipfile
@@ -58,9 +59,12 @@ from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, ident
 from os_setores import (
     SETOR_EXPEDICAO,
     SETOR_PREPARACAO,
+    TIPO_REQUISICAO_FATURAMENTO_DIRETO,
     agrupar_linhas_setor,
+    agrupar_linhas_por_fornecedor,
     construir_itens_os_setor,
     enriquecer_composicao,
+    filtrar_linhas_faturamento_direto,
     filtrar_linhas_setor,
 )
 from processos_transformacao import PROCESSO_POR_ITEM, RELACOES_PROCESSO_TRANSFORMACAO, resolver_processo_transformacao
@@ -72,12 +76,116 @@ RELEASE_BUILD_NAME = "ModuloSuprimentos"
 RELEASE_ENVIO_DIR_NAME = "ModuloSuprimentos_envio"
 RELEASE_ZIP_NAME = "ModuloSuprimentos_envio.zip"
 RELEASE_BUILD_SCRIPT = "gerar_modulo_suprimentos_envio.bat"
+ITEM_CAMPOS_BASE = [
+    "descricao",
+    "unidade",
+    "unidade_comercial",
+    "unidade_interna",
+    "grupo",
+    "categoria",
+    "tipo",
+    "fornecedor",
+    "ncm",
+    "origem",
+    "valor",
+    "ipi",
+    "icms",
+    "cofins",
+    "observacao",
+]
+MODELO_ITENS_HEADERS = [
+    "CODIGO",
+    "DESCRICAO",
+    "UNIDADE",
+    "UNIDADE COMERCIAL",
+    "UNIDADE INTERNA",
+    "GRUPO",
+    "CATEGORIA",
+    "TIPO",
+    "FORNECEDOR",
+    "NCM",
+    "ORIGEM",
+    "VALOR",
+    "IPI",
+    "ICMS",
+    "COFINS",
+    "OBSERVACAO",
+]
+HEADER_ALIASES = {
+    "codigo": {
+        "codigo",
+        "cod",
+        "cod_item",
+        "codigo_item",
+        "codigo_produto",
+        "novo_cod",
+        "novo_codigo",
+        "cod_novo",
+        "novo_cod_",
+    },
+    "descricao": {
+        "descricao",
+        "descricao_item",
+        "descricao_produto",
+        "item_descricao",
+        "produto",
+        "material",
+    },
+    "unidade": {
+        "unidade",
+        "un",
+        "um",
+        "und",
+        "unidade_medida",
+        "un_medida",
+    },
+    "unidade_comercial": {
+        "unidade_comercial",
+        "unidade_medida_comercial",
+        "un_med_comercial",
+        "un_medi_comercial",
+        "un_med_comerc",
+        "un_comercial",
+    },
+    "unidade_interna": {
+        "unidade_interna",
+        "unidade_medida_interna",
+        "un_med_interna",
+        "un_medi_interna",
+        "un_interna",
+    },
+    "grupo": {"grupo", "grupo_produto"},
+    "categoria": {"categoria", "categorias", "classificacao", "classificacao_item"},
+    "tipo": {"tipo", "tipo_item"},
+    "fornecedor": {
+        "fornecedor",
+        "fornecedor_principal",
+        "nome_fornecedor",
+        "fabricante",
+    },
+    "ncm": {"ncm"},
+    "origem": {"origem"},
+    "valor": {"valor", "valor_unitario", "preco", "preco_unitario", "vl_unitario"},
+    "ipi": {"ipi"},
+    "icms": {"icms"},
+    "cofins": {"cofins"},
+    "observacao": {"observacao", "observacoes", "obs"},
+    "cliente": {"cliente"},
+}
 
 def _is_in_dir(path, base):
     try:
         return os.path.commonpath([os.path.abspath(path), os.path.abspath(base)]) == os.path.abspath(base)
     except Exception:
         return False
+
+
+def _sanitize_output_name(texto):
+    texto = "" if texto is None else str(texto).strip()
+    if not texto:
+        return ""
+    texto = re.sub(r'[<>:"/\\\\|?*]+', " ", texto)
+    return " ".join(texto.split())
 
 
 def _win_long_path(path):
@@ -564,7 +672,9 @@ def _agrupar_linhas_requisicao(linhas):
         codigo = normalizar_codigo(linha.get("codigo", ""))
         unidade = str(linha.get("unidade", "") or "").strip()
         setor = str(linha.get("setor", "") or "").strip()
-        chave = (codigo, unidade, setor)
+        fornecedor = str(linha.get("fornecedor", "") or "").strip()
+        tipo_requisicao = str(linha.get("tipo_requisicao", "") or "").strip()
+        chave = (codigo, unidade, setor, fornecedor, tipo_requisicao)
         if chave not in agrupado:
             agrupado[chave] = {
                 "codigo": codigo,
@@ -572,7 +682,9 @@ def _agrupar_linhas_requisicao(linhas):
                 "unidade": unidade,
                 "grupo": linha.get("grupo", "") or "",
                 "categoria": linha.get("categoria", "") or "",
+                "fornecedor": fornecedor,
                 "setor": setor,
+                "tipo_requisicao": tipo_requisicao,
                 "qtd": 0.0,
             }
             ordem.append(chave)
@@ -609,7 +721,7 @@ def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquiv
     wb = Workbook()
     ws_detalhe = wb.active
     ws_detalhe.title = "Requisicao"
-    _formatar_titulo_planilha(ws_detalhe, "REQUISI\u00c7\u00c3O DE MATERIAIS", 12)
+    _formatar_titulo_planilha(ws_detalhe, "REQUISI\u00c7\u00c3O DE MATERIAIS", 14)
     ws_detalhe.append(
         [
             "numero_os",
@@ -621,12 +733,14 @@ def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquiv
             "descricao",
             "grupo",
             "categoria",
+            "fornecedor",
+            "tipo_requisicao",
             "setor",
             "unidade",
             "qtd",
         ]
     )
-    _formatar_cabecalho_planilha(ws_detalhe, 2, 12)
+    _formatar_cabecalho_planilha(ws_detalhe, 2, 14)
 
     if not linhas:
         ws_detalhe.append(
@@ -638,6 +752,8 @@ def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquiv
                 "",
                 "",
                 "Sem itens classificados para requisicao de materiais.",
+                "",
+                "",
                 "",
                 "",
                 "",
@@ -658,6 +774,8 @@ def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquiv
                     linha.get("descricao", ""),
                     linha.get("grupo", ""),
                     linha.get("categoria", ""),
+                    linha.get("fornecedor", ""),
+                    linha.get("tipo_requisicao", ""),
                     linha.get("setor", ""),
                     linha.get("unidade", ""),
                     _formatar_qtd_saida(linha.get("qtd", "")),
@@ -665,9 +783,9 @@ def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquiv
             )
 
     ws_resumo = wb.create_sheet("Somatorio")
-    _formatar_titulo_planilha(ws_resumo, "REQUISI\u00c7\u00c3O DE MATERIAIS", 7)
-    ws_resumo.append(["codigo", "descricao", "grupo", "categoria", "setor", "unidade", "qtd_total"])
-    _formatar_cabecalho_planilha(ws_resumo, 2, 7)
+    _formatar_titulo_planilha(ws_resumo, "REQUISI\u00c7\u00c3O DE MATERIAIS", 9)
+    ws_resumo.append(["codigo", "descricao", "grupo", "categoria", "fornecedor", "tipo_requisicao", "setor", "unidade", "qtd_total"])
+    _formatar_cabecalho_planilha(ws_resumo, 2, 9)
     for linha in _agrupar_linhas_requisicao(linhas):
         ws_resumo.append(
             [
@@ -675,6 +793,8 @@ def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquiv
                 linha.get("descricao", ""),
                 linha.get("grupo", ""),
                 linha.get("categoria", ""),
+                linha.get("fornecedor", ""),
+                linha.get("tipo_requisicao", ""),
                 linha.get("setor", ""),
                 linha.get("unidade", ""),
                 _formatar_qtd_saida(linha.get("qtd", "")),
@@ -1279,10 +1399,13 @@ def parse_os_pdf(file_storage):
 
 
 
-def _criar_modelo_xlsx(headers, nome_arquivo):
+def _criar_modelo_xlsx(headers, nome_arquivo, header_row=1):
     wb = Workbook()
     ws = wb.active
+    for _ in range(max(header_row - 1, 0)):
+        ws.append(["" for _ in headers])
     ws.append(headers)
+    _formatar_cabecalho_planilha(ws, header_row, len(headers))
 
     temp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
     temp.close()
@@ -1352,42 +1475,187 @@ def ler_linhas_arquivo(file_storage):
     return []
 
 
+def _corrigir_mojibake(texto):
+    texto = "" if texto is None else str(texto).strip()
+    if not texto:
+        return ""
+    if any(token in texto for token in ("Ã", "Â", "�")):
+        for encoding in ("latin1", "cp1252"):
+            try:
+                convertido = texto.encode(encoding).decode("utf-8")
+            except Exception:
+                continue
+            if convertido:
+                texto = convertido
+                break
+    return texto
+
+
+def normalizar_header(texto):
+    if texto is None:
+        return ""
+    texto = _corrigir_mojibake(texto)
+    texto = unicodedata.normalize("NFKD", str(texto).strip().lower())
+    texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
+    texto = re.sub(r"[^a-z0-9]+", "_", texto)
+    return texto.strip("_")
+
+
+def _canonicalizar_header(texto):
+    normalizado = normalizar_header(texto)
+    if not normalizado:
+        return ""
+    for canonico, aliases in HEADER_ALIASES.items():
+        if normalizado == canonico or normalizado in aliases:
+            return canonico
+    return normalizado
+
+
+def _resolver_header_importacao(linhas, campos_esperados=None):
+    campos_esperados = set(campos_esperados or [])
+    melhor_idx = 0
+    melhor_score = -1
+    for idx in range(min(len(linhas), 5)):
+        headers_canonicos = [_canonicalizar_header(valor) for valor in linhas[idx]]
+        score = 0
+        for header in headers_canonicos:
+            if not header:
+                continue
+            if header in campos_esperados:
+                score += 3
+            elif header in HEADER_ALIASES:
+                score += 2
+            elif any(header in aliases for aliases in HEADER_ALIASES.values()):
+                score += 1
+        if score > melhor_score:
+            melhor_idx = idx
+            melhor_score = score
+
+    header_raw = linhas[melhor_idx]
+    header = [_canonicalizar_header(h) for h in header_raw]
+    mapa = {}
+    for idx, nome in enumerate(header):
+        if nome and nome not in mapa:
+            mapa[nome] = idx
+    return header_raw, header, mapa, linhas[melhor_idx + 1:]
+
+
+def _valor_coluna(row, mapa, *colunas):
+    for coluna in colunas:
+        idx = mapa.get(coluna)
+        if idx is None or idx >= len(row):
+            continue
+        valor = _corrigir_mojibake(row[idx])
+        if valor != "":
+            return valor
+    return ""
+
+
+def _coletar_campos_extras(row, header_raw, header, usados):
+    extras = {}
+    for idx, _ in enumerate(header_raw):
+        nome = header[idx] if idx < len(header) else ""
+        if not nome or nome in usados or idx >= len(row):
+            continue
+        valor = _corrigir_mojibake(row[idx])
+        if valor == "":
+            continue
+        extras[nome] = valor
+    return extras
+
+
+def _mesclar_dados_item(atual, novos, extras=None):
+    item = dict(atual or {})
+    for campo in ITEM_CAMPOS_BASE:
+        valor = novos.get(campo, "")
+        if valor != "":
+            item[campo] = valor
+        else:
+            item[campo] = item.get(campo, "")
+
+    extras_existentes = dict(item.get("campos_extras", {}) or {})
+    for chave, valor in (extras or {}).items():
+        if valor != "":
+            extras_existentes[chave] = valor
+    if extras_existentes:
+        item["campos_extras"] = extras_existentes
+    elif "campos_extras" in item:
+        item["campos_extras"] = item.get("campos_extras", {})
+    return item
+
+
+def ler_linhas_arquivo(file_storage):
+    filename = secure_filename(file_storage.filename or "")
+    ext = os.path.splitext(filename)[1].lower()
+
+    if ext in [".xlsx", ".xlsm", ".xltx", ".xltm"]:
+        wb = load_workbook(file_storage, data_only=True)
+        ws = wb.active
+        linhas = []
+        for row in ws.iter_rows(values_only=True):
+            linha = [_corrigir_mojibake(cell) for cell in row]
+            if any(linha):
+                linhas.append(linha)
+        return linhas
+
+    return []
+
+
 def importar_produtos(file_storage):
     linhas = ler_linhas_arquivo(file_storage)
     if not linhas:
         return 0
 
-    header = [normalizar_header(h) for h in linhas[0]]
-    mapa = {name: idx for idx, name in enumerate(header)}
+    header_raw, header, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={"codigo", "descricao", "unidade", "grupo", "categoria", "fornecedor"},
+    )
 
     produtos = carregar_produtos()
     count = 0
 
-    for row in linhas[1:]:
-        codigo = row[mapa.get("codigo", 0)] if mapa else ""
-        codigo = str(codigo).strip()
+    for row in rows:
+        codigo = normalizar_codigo(_valor_coluna(row, mapa, "codigo"))
         if not codigo:
             continue
-
-        def pegar(col):
-            idx = mapa.get(col)
-            if idx is None or idx >= len(row):
-                return ""
-            return str(row[idx]).strip()
-
         atual = produtos.get(codigo, {})
-        def _pick(campo, valor):
-            return valor if valor != "" else atual.get(campo, "")
-        produtos[codigo] = {
-            "descricao": _pick("descricao", pegar("descricao")),
-            "unidade": _pick("unidade", pegar("unidade")),
-            "grupo": _pick("grupo", pegar("grupo")),
-            "categoria": _pick("categoria", pegar("categoria")),
-            "valor": _pick("valor", pegar("valor")),
-            "ipi": _pick("ipi", pegar("ipi")),
-            "icms": _pick("icms", pegar("icms")),
-            "cofins": _pick("cofins", pegar("cofins")),
+        usados = {
+            "codigo",
+            "descricao",
+            "unidade",
+            "unidade_comercial",
+            "unidade_interna",
+            "grupo",
+            "categoria",
+            "tipo",
+            "fornecedor",
+            "ncm",
+            "origem",
+            "valor",
+            "ipi",
+            "icms",
+            "cofins",
+            "observacao",
         }
+        novos = {
+            "descricao": _valor_coluna(row, mapa, "descricao"),
+            "unidade": _valor_coluna(row, mapa, "unidade", "unidade_comercial", "unidade_interna"),
+            "unidade_comercial": _valor_coluna(row, mapa, "unidade_comercial"),
+            "unidade_interna": _valor_coluna(row, mapa, "unidade_interna"),
+            "grupo": _valor_coluna(row, mapa, "grupo"),
+            "categoria": _valor_coluna(row, mapa, "categoria"),
+            "tipo": _valor_coluna(row, mapa, "tipo"),
+            "fornecedor": _valor_coluna(row, mapa, "fornecedor"),
+            "ncm": _valor_coluna(row, mapa, "ncm"),
+            "origem": _valor_coluna(row, mapa, "origem"),
+            "valor": _valor_coluna(row, mapa, "valor"),
+            "ipi": _valor_coluna(row, mapa, "ipi"),
+            "icms": _valor_coluna(row, mapa, "icms"),
+            "cofins": _valor_coluna(row, mapa, "cofins"),
+            "observacao": _valor_coluna(row, mapa, "observacao"),
+        }
+        extras = _coletar_campos_extras(row, header_raw, header, usados)
+        produtos[codigo] = _mesclar_dados_item(atual, novos, extras=extras)
         count += 1
 
     salvar_json(PRODUTOS_FILE, produtos)
@@ -1399,21 +1667,17 @@ def importar_fornecedores(file_storage):
     if not linhas:
         return 0
 
-    header = [normalizar_header(h) for h in linhas[0]]
-    mapa = {name: idx for idx, name in enumerate(header)}
+    _, _, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={"fornecedor", "cnpj", "razao_social", "email"},
+    )
 
     fornecedores = carregar_fornecedores()
     count = 0
 
-    for row in linhas[1:]:
-        def pegar(col):
-            idx = mapa.get(col)
-            if idx is None or idx >= len(row):
-                return ""
-            return str(row[idx]).strip()
-
-        fornecedor = pegar("fornecedor")
-        cnpj = pegar("cnpj")
+    for row in rows:
+        fornecedor = _valor_coluna(row, mapa, "fornecedor")
+        cnpj = _valor_coluna(row, mapa, "cnpj")
         chave = cnpj if cnpj else fornecedor
         if not chave:
             continue
@@ -1423,15 +1687,15 @@ def importar_fornecedores(file_storage):
             return valor if valor != "" else atual.get(campo, "")
         fornecedores[chave] = {
             "fornecedor": _pick("fornecedor", fornecedor),
-            "razao_social": _pick("razao_social", pegar("razao_social")),
+            "razao_social": _pick("razao_social", _valor_coluna(row, mapa, "razao_social")),
             "cnpj": _pick("cnpj", cnpj),
-            "email": _pick("email", pegar("email")),
-            "telefone": _pick("telefone", pegar("telefone")),
-            "endereco": _pick("endereco", pegar("endereco")),
-            "bairro": _pick("bairro", pegar("bairro")),
-            "cidade": _pick("cidade", pegar("cidade")),
-            "uf": _pick("uf", pegar("uf")),
-            "cep": _pick("cep", pegar("cep")),
+            "email": _pick("email", _valor_coluna(row, mapa, "email")),
+            "telefone": _pick("telefone", _valor_coluna(row, mapa, "telefone")),
+            "endereco": _pick("endereco", _valor_coluna(row, mapa, "endereco")),
+            "bairro": _pick("bairro", _valor_coluna(row, mapa, "bairro")),
+            "cidade": _pick("cidade", _valor_coluna(row, mapa, "cidade")),
+            "uf": _pick("uf", _valor_coluna(row, mapa, "uf")),
+            "cep": _pick("cep", _valor_coluna(row, mapa, "cep")),
         }
         count += 1
 
@@ -1444,32 +1708,56 @@ def importar_os_produtos(file_storage):
     if not linhas:
         return 0
 
-    header = [normalizar_header(h) for h in linhas[0]]
-    mapa = {name: idx for idx, name in enumerate(header)}
+    header_raw, header, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={"codigo", "descricao", "unidade", "grupo", "categoria", "fornecedor"},
+    )
 
     produtos = carregar_os_produtos()
     count = 0
 
-    for row in linhas[1:]:
-        codigo = row[mapa.get("codigo", 0)] if mapa else ""
-        codigo = str(codigo).strip()
+    for row in rows:
+        codigo = normalizar_codigo(_valor_coluna(row, mapa, "codigo"))
         if not codigo:
             continue
-
-        def pegar(col):
-            idx = mapa.get(col)
-            if idx is None or idx >= len(row):
-                return ""
-            return str(row[idx]).strip()
-
         atual = produtos.get(codigo, {})
-        def _pick(campo, valor):
-            return valor if valor != "" else atual.get(campo, "")
-        produtos[codigo] = dict(atual)
-        produtos[codigo]["descricao"] = _pick("descricao", pegar("descricao"))
-        produtos[codigo]["unidade"] = _pick("unidade", pegar("unidade"))
-        produtos[codigo]["grupo"] = _pick("grupo", pegar("grupo"))
-        produtos[codigo]["categoria"] = _pick("categoria", pegar("categoria"))
+        usados = {
+            "codigo",
+            "descricao",
+            "unidade",
+            "unidade_comercial",
+            "unidade_interna",
+            "grupo",
+            "categoria",
+            "tipo",
+            "fornecedor",
+            "ncm",
+            "origem",
+            "valor",
+            "ipi",
+            "icms",
+            "cofins",
+            "observacao",
+        }
+        novos = {
+            "descricao": _valor_coluna(row, mapa, "descricao"),
+            "unidade": _valor_coluna(row, mapa, "unidade", "unidade_comercial", "unidade_interna"),
+            "unidade_comercial": _valor_coluna(row, mapa, "unidade_comercial"),
+            "unidade_interna": _valor_coluna(row, mapa, "unidade_interna"),
+            "grupo": _valor_coluna(row, mapa, "grupo"),
+            "categoria": _valor_coluna(row, mapa, "categoria"),
+            "tipo": _valor_coluna(row, mapa, "tipo"),
+            "fornecedor": _valor_coluna(row, mapa, "fornecedor"),
+            "ncm": _valor_coluna(row, mapa, "ncm"),
+            "origem": _valor_coluna(row, mapa, "origem"),
+            "valor": _valor_coluna(row, mapa, "valor"),
+            "ipi": _valor_coluna(row, mapa, "ipi"),
+            "icms": _valor_coluna(row, mapa, "icms"),
+            "cofins": _valor_coluna(row, mapa, "cofins"),
+            "observacao": _valor_coluna(row, mapa, "observacao"),
+        }
+        extras = _coletar_campos_extras(row, header_raw, header, usados)
+        produtos[codigo] = _mesclar_dados_item(atual, novos, extras=extras)
         count += 1
 
     salvar_json(OS_PRODUTOS_FILE, produtos)
@@ -1481,20 +1769,16 @@ def importar_os_fornecedores(file_storage):
     if not linhas:
         return 0
 
-    header = [normalizar_header(h) for h in linhas[0]]
-    mapa = {name: idx for idx, name in enumerate(header)}
+    _, _, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={"cliente", "fornecedor"},
+    )
 
     fornecedores = carregar_os_fornecedores()
     count = 0
 
-    for row in linhas[1:]:
-        def pegar(col):
-            idx = mapa.get(col)
-            if idx is None or idx >= len(row):
-                return ""
-            return str(row[idx]).strip()
-
-        fornecedor = pegar("fornecedor") or pegar("cliente")
+    for row in rows:
+        fornecedor = _valor_coluna(row, mapa, "fornecedor", "cliente")
         chave = fornecedor
         if not chave:
             continue
@@ -2052,6 +2336,7 @@ def gerar_os():
                 "unidade": unidade_final or item_info.get("unidade", ""),
                 "grupo": item_info.get("grupo", "") or "",
                 "categoria": item_info.get("categoria", "") or "",
+                "fornecedor": item_info.get("fornecedor", "") or "",
                 "valor": 0,
                 "total": calcular_total_item(qtd, 0, 0),
             }
@@ -2143,9 +2428,10 @@ def gerar_os():
 
     composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
     composicao_enriquecida = enriquecer_composicao(composicao_final, os_produtos)
+    pendencias_faturamento_direto = filtrar_linhas_faturamento_direto(composicao_enriquecida)
     pendencias_expedicao = filtrar_linhas_setor(composicao_enriquecida, SETOR_EXPEDICAO)
     pendencias_preparacao = filtrar_linhas_setor(composicao_enriquecida, SETOR_PREPARACAO)
-    requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao]
+    requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
 
     itens_expedicao = construir_itens_os_setor(agrupar_linhas_setor(pendencias_expedicao))
     itens_preparacao = construir_itens_os_setor(agrupar_linhas_setor(pendencias_preparacao))
@@ -2166,17 +2452,20 @@ def gerar_os():
             pass
         layout_bytes = layout_pdf.read() or b""
 
+    def _criar_layout_clone():
+        if not layout_bytes:
+            return None
+        return FileStorage(
+            stream=io.BytesIO(layout_bytes),
+            filename=layout_pdf.filename,
+            content_type=layout_pdf.content_type,
+        )
+
     arquivos_docx = []
     for modo_key in modos_pacote:
         config_modo = OS_MODE_CONFIGS[modo_key]
         itens_saida = itens_por_modo.get(config_modo["itens_source"], itens)
-        layout_clone = None
-        if layout_bytes:
-            layout_clone = FileStorage(
-                stream=io.BytesIO(layout_bytes),
-                filename=layout_pdf.filename,
-                content_type=layout_pdf.content_type,
-            )
+        layout_clone = _criar_layout_clone()
         arquivos_docx.append(
             gerar_os_docx(
                 numero_os,
@@ -2188,6 +2477,27 @@ def gerar_os():
                 composicao_final or None,
                 modo=config_modo["doc_mode"],
                 titulo_arquivo=config_modo["titulo"],
+            )
+        )
+
+    for fornecedor, linhas_fornecedor in agrupar_linhas_por_fornecedor(pendencias_faturamento_direto):
+        itens_fornecedor = construir_itens_os_setor(agrupar_linhas_setor(linhas_fornecedor))
+        for item in itens_fornecedor:
+            item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
+        fornecedor_titulo = _sanitize_output_name(fornecedor) or "SEM FORNECEDOR"
+        dados_requisicao = dict(dados)
+        dados_requisicao["fornecedor_requisicao"] = fornecedor
+        arquivos_docx.append(
+            gerar_os_docx(
+                numero_os,
+                dados_requisicao,
+                itens_fornecedor,
+                componentes,
+                processos_final,
+                _criar_layout_clone(),
+                composicao_resolvida=[],
+                modo="expedicao",
+                titulo_arquivo=f"Requisicao Faturamento Direto - {fornecedor_titulo}",
             )
         )
     arquivo_requisicao_materiais = _criar_planilha_requisicao_materiais(
@@ -2286,18 +2596,24 @@ def cadastrar_item():
     codigo = request.form.get("codigo", "").strip()
     if codigo:
         atual = produtos.get(codigo, {})
-        def _pick(campo, valor):
-            return valor if valor != "" else atual.get(campo, "")
-        produtos[codigo] = {
-            "descricao": _pick("descricao", request.form.get("descricao", "").strip()),
-            "unidade": _pick("unidade", request.form.get("unidade", "").strip()),
-            "grupo": _pick("grupo", request.form.get("grupo", "").strip()),
-            "categoria": _pick("categoria", request.form.get("categoria", "").strip()),
-            "valor": _pick("valor", request.form.get("valor", "").strip()),
-            "ipi": _pick("ipi", request.form.get("ipi", "").strip()),
-            "icms": _pick("icms", request.form.get("icms", "").strip()),
-            "cofins": _pick("cofins", request.form.get("cofins", "").strip()),
+        novos = {
+            "descricao": request.form.get("descricao", "").strip(),
+            "unidade": request.form.get("unidade", "").strip(),
+            "unidade_comercial": request.form.get("unidade", "").strip(),
+            "unidade_interna": "",
+            "grupo": request.form.get("grupo", "").strip(),
+            "categoria": request.form.get("categoria", "").strip(),
+            "tipo": request.form.get("tipo", "").strip(),
+            "fornecedor": request.form.get("fornecedor", "").strip(),
+            "ncm": request.form.get("ncm", "").strip(),
+            "origem": request.form.get("origem", "").strip(),
+            "valor": request.form.get("valor", "").strip(),
+            "ipi": request.form.get("ipi", "").strip(),
+            "icms": request.form.get("icms", "").strip(),
+            "cofins": request.form.get("cofins", "").strip(),
+            "observacao": request.form.get("observacao", "").strip(),
         }
+        produtos[codigo] = _mesclar_dados_item(atual, novos)
 
         salvar_json(PRODUTOS_FILE, produtos)
 
@@ -2330,6 +2646,7 @@ def cadastrar_os_item():
     unidade = request.form.get("os_item_unidade", "").strip()
     grupo = request.form.get("os_item_grupo", "").strip()
     categoria = request.form.get("os_item_categoria", "").strip()
+    fornecedor = request.form.get("os_item_fornecedor", "").strip()
 
     comp_codigos = request.form.getlist("os_comp_codigo[]")
     comp_descricoes = request.form.getlist("os_comp_descricao[]")
@@ -2349,11 +2666,26 @@ def cadastrar_os_item():
 
     if codigo and descricao:
         atual_prod = produtos.get(codigo, {})
-        produtos[codigo] = dict(atual_prod)
-        produtos[codigo]["descricao"] = descricao if descricao != "" else atual_prod.get("descricao", "")
-        produtos[codigo]["unidade"] = (unidade or "").strip() or atual_prod.get("unidade", "UN") or "UN"
-        produtos[codigo]["grupo"] = grupo if grupo != "" else atual_prod.get("grupo", "")
-        produtos[codigo]["categoria"] = categoria if categoria != "" else atual_prod.get("categoria", "")
+        produtos[codigo] = _mesclar_dados_item(
+            atual_prod,
+            {
+                "descricao": descricao,
+                "unidade": (unidade or "").strip() or atual_prod.get("unidade", "UN") or "UN",
+                "unidade_comercial": (unidade or "").strip() or atual_prod.get("unidade_comercial", "") or atual_prod.get("unidade", "UN") or "UN",
+                "unidade_interna": atual_prod.get("unidade_interna", ""),
+                "grupo": grupo,
+                "categoria": categoria,
+                "tipo": atual_prod.get("tipo", ""),
+                "fornecedor": fornecedor,
+                "ncm": "",
+                "origem": "",
+                "valor": "",
+                "ipi": "",
+                "icms": "",
+                "cofins": "",
+                "observacao": "",
+            },
+        )
         if comps:
             componentes[codigo] = comps
         elif codigo in componentes:
@@ -2596,8 +2928,9 @@ def importar_os_documento():
 @app.route("/exportar_modelo_produtos")
 def exportar_modelo_produtos():
     path, nome = _criar_modelo_xlsx(
-        ["codigo", "descricao", "unidade", "grupo", "categoria", "valor", "ipi", "icms", "cofins"],
+        MODELO_ITENS_HEADERS,
         "modelo_produtos.xlsx",
+        header_row=2,
     )
     return send_file(path, as_attachment=True, download_name=nome)
 
@@ -2620,8 +2953,9 @@ def exportar_modelo_os_clientes():
 @app.route("/exportar_modelo_os_itens")
 def exportar_modelo_os_itens():
     path, nome = _criar_modelo_xlsx(
-        ["codigo", "descricao", "unidade", "grupo", "categoria"],
+        MODELO_ITENS_HEADERS,
         "modelo_os_itens.xlsx",
+        header_row=2,
     )
     return send_file(path, as_attachment=True, download_name=nome)
 
