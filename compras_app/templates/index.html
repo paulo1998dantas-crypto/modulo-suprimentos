@@ -720,23 +720,23 @@ white-space:nowrap;
 
 .tabela-os th:nth-child(2),
 .tabela-os td:nth-child(2){
-width:11%;
+width:10%;
 white-space:nowrap;
 }
 
 .tabela-os th:nth-child(3),
 .tabela-os td:nth-child(3){
-width:50%;
+width:39%;
 }
 
 .tabela-os th:nth-child(4),
 .tabela-os td:nth-child(4){
-width:7%;
+width:6%;
 }
 
 .tabela-os th:nth-child(5),
 .tabela-os td:nth-child(5){
-width:13%;
+width:10%;
 }
 
 .tabela-os th:nth-child(6),
@@ -746,7 +746,89 @@ width:5%;
 
 .tabela-os th:nth-child(7),
 .tabela-os td:nth-child(7){
+width:16%;
+}
+
+.tabela-os th:nth-child(8),
+.tabela-os td:nth-child(8){
 width:8%;
+}
+
+.os-fornecedor-header,
+.os-fornecedor-cell{
+display:none;
+}
+
+.os-luminaria-header,
+.os-luminaria-cell{
+display:none;
+}
+
+.modal-fornecedor-direto,
+.modal-luminaria-os,
+.modal-processo-os,
+.modal-regra-item-os{
+position:fixed;
+inset:0;
+display:none;
+align-items:center;
+justify-content:center;
+background:rgba(15,23,42,0.38);
+z-index:1200;
+}
+
+.modal-fornecedor-direto.is-open,
+.modal-luminaria-os.is-open,
+.modal-processo-os.is-open,
+.modal-regra-item-os.is-open{
+display:flex;
+}
+
+.modal-fornecedor-direto .modal-box,
+.modal-luminaria-os .modal-box,
+.modal-processo-os .modal-box,
+.modal-regra-item-os .modal-box{
+width:min(92vw, 420px);
+background:#fff;
+border-radius:10px;
+box-shadow:0 22px 60px rgba(15,23,42,0.24);
+padding:18px;
+border:1px solid #dbe4f0;
+}
+
+.modal-fornecedor-direto h4,
+.modal-luminaria-os h4,
+.modal-processo-os h4,
+.modal-regra-item-os h4{
+margin:0 0 10px;
+font-size:16px;
+}
+
+.modal-fornecedor-direto .modal-desc,
+.modal-luminaria-os .modal-desc,
+.modal-processo-os .modal-desc,
+.modal-regra-item-os .modal-desc{
+font-size:13px;
+color:#475569;
+margin-bottom:12px;
+}
+
+.modal-fornecedor-direto .modal-actions,
+.modal-luminaria-os .modal-actions,
+.modal-processo-os .modal-actions,
+.modal-regra-item-os .modal-actions{
+display:flex;
+gap:10px;
+justify-content:flex-end;
+margin-top:14px;
+}
+
+.modal-fornecedor-direto select,
+.modal-luminaria-os select,
+.modal-processo-os select,
+.modal-regra-item-os select{
+width:100%;
+height:38px;
 }
 
 .tabela-os td:nth-child(2) input{
@@ -951,6 +1033,7 @@ const osComponentes = {{ os_componentes|tojson }};
 const osProcessos = {{ os_processos|tojson }};
 const osProcessoDefs = {{ processos_os|tojson }};
 const osProcessoPorItem = {{ processo_transformacao_por_item|tojson }};
+const osRegrasPopupItem = {{ regras_popup_item|tojson }};
 const ocPrefill = {{ oc_prefill|tojson }};
 const osPrefill = {{ os_prefill|tojson }};
 let ocPrefillApplied = false;
@@ -958,6 +1041,7 @@ let osPrefillApplied = false;
 const hasOsPrefill = osPrefill && Object.keys(osPrefill).length > 0;
 let osComposicaoSource = "bom";
 let osTabInitialized = false;
+let osPopupRegraFila = [];
 const osProcessoMap = Object.fromEntries(osProcessoDefs.map((processo) => [processo.nome, processo.key]));
 const osProcessoTableIds = osProcessoDefs.map((processo) => `processo_${processo.key}`);
 
@@ -992,6 +1076,418 @@ if (!raw){
 return "";
 }
 return raw.split(" - ")[0].trim();
+}
+
+function componentesItemOS(codigo){
+const codigoNorm = normalizarCodigoOS(codigo);
+const componentes = codigoNorm ? osComponentes[codigoNorm] : null;
+return Array.isArray(componentes) && componentes.length ? componentes : null;
+}
+
+function isFaturamentoDiretoOS(produto){
+const descricao = normalizarBusca((produto && (produto.descricao || produto.nome)) || "");
+return descricao.startsWith("faturamento direto");
+}
+
+function isCategoriaArCondicionadoOS(produto){
+const categoria = normalizarBusca((produto && produto.categoria) || "");
+return categoria.startsWith("10") && categoria.includes("ar condicionado");
+}
+
+function fornecedorArCondicionadoOS(produto){
+const descricao = String((produto && (produto.descricao || produto.nome)) || "").trim();
+if (!descricao.includes(" - ")){
+return "";
+}
+const sufixo = descricao.split(" - ").pop().trim().toUpperCase();
+const partes = sufixo.split(/[^A-Z0-9]+/).filter(Boolean);
+const ultimo = partes.length ? partes[partes.length - 1] : "";
+if (ultimo === "GE" || ultimo.includes("GE")){
+return "GE";
+}
+if (ultimo === "CLIM" || ultimo.includes("CLIM")){
+return "CLIM";
+}
+return "";
+}
+
+function fornecedorFaturamentoDiretoPadrao(){
+return "SJ";
+}
+
+function abrirPopupFornecedorDireto(row, produto){
+if (!row || !produto){
+return;
+}
+const modal = document.getElementById("modal-fornecedor-direto");
+const select = document.getElementById("fornecedor_direto_select");
+const okBtn = document.getElementById("fornecedor_direto_ok");
+const cancelBtn = document.getElementById("fornecedor_direto_cancel");
+const title = document.getElementById("fornecedor_direto_titulo");
+const display = document.getElementById("fornecedor_direto_desc");
+const input = row.querySelector('input[name="os_fornecedor_item[]"]');
+if (!modal || !select || !okBtn || !cancelBtn || !input){
+return;
+}
+if (isCategoriaArCondicionadoOS(produto)){
+const valor = fornecedorArCondicionadoOS(produto);
+input.value = valor;
+modal.classList.remove("is-open");
+return;
+}
+if (title){
+title.textContent = "Fornecedor do faturamento direto";
+}
+if (display){
+display.textContent = produto.descricao || "";
+}
+select.value = input.value || fornecedorFaturamentoDiretoPadrao();
+modal.classList.add("is-open");
+
+const finalizar = () => {
+input.value = select.value || fornecedorFaturamentoDiretoPadrao();
+modal.classList.remove("is-open");
+okBtn.removeEventListener("click", onOk);
+cancelBtn.removeEventListener("click", onCancel);
+modal.removeEventListener("click", onBackdrop);
+};
+const onOk = () => finalizar();
+const onCancel = () => {
+modal.classList.remove("is-open");
+okBtn.removeEventListener("click", onOk);
+cancelBtn.removeEventListener("click", onCancel);
+modal.removeEventListener("click", onBackdrop);
+};
+const onBackdrop = (event) => {
+if (event.target === modal){
+onCancel();
+}
+};
+okBtn.addEventListener("click", onOk);
+cancelBtn.addEventListener("click", onCancel);
+modal.addEventListener("click", onBackdrop);
+}
+
+function atualizarFornecedorDiretoLinha(row){
+if (!row){
+return;
+}
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const codigo = codigoInput ? normalizarCodigoOS(codigoInput.value) : "";
+const produto = getProdutoInfo(osProdutos, codigo) || {};
+const cell = row.querySelector(".os-fornecedor-cell");
+const input = row.querySelector('input[name="os_fornecedor_item[]"]');
+if (!cell || !input){
+return;
+}
+const direto = isFaturamentoDiretoOS(produto);
+const arCondicionado = direto && isCategoriaArCondicionadoOS(produto);
+cell.classList.add("is-hidden");
+input.required = direto && !arCondicionado;
+input.readOnly = arCondicionado;
+if (arCondicionado){
+input.value = fornecedorArCondicionadoOS(produto) || produto.fornecedor || "";
+} else if (!direto){
+input.value = "";
+input.required = false;
+input.readOnly = false;
+} else if (!input.value){
+abrirPopupFornecedorDireto(row, produto);
+}
+}
+
+function produtoRequerLuminariaOS(produto, codigo){
+const codigoNorm = normalizarCodigoOS(codigo);
+if (!codigoNorm || !codigoNorm.startsWith("4034")){
+return false;
+}
+return true;
+}
+
+function regrasPopupItemParaCodigo(codigo){
+const codigoNorm = normalizarCodigoOS(codigo);
+return (osRegrasPopupItem || []).filter((regra) => normalizarCodigoOS(regra.gatilho) === codigoNorm);
+}
+
+function lerSelecoesPopupItem(row){
+const input = row ? row.querySelector('input[name="os_popup_itens[]"]') : null;
+if (!input || !input.value){
+return [];
+}
+try {
+const data = JSON.parse(input.value);
+return Array.isArray(data) ? data : [];
+} catch (error) {
+return [];
+}
+}
+
+function salvarSelecoesPopupItem(row, selecoes){
+const input = row ? row.querySelector('input[name="os_popup_itens[]"]') : null;
+if (input){
+input.value = JSON.stringify(selecoes || []);
+}
+}
+
+function abrirProximoPopupItemOS(){
+if (!osPopupRegraFila.length){
+return;
+}
+const atual = osPopupRegraFila[0];
+const modal = document.getElementById("modal-regra-item-os");
+const select = document.getElementById("regra_item_os_select");
+const qtdInput = document.getElementById("regra_item_os_qtd");
+const qtdWrap = document.getElementById("regra_item_os_qtd_wrap");
+const display = document.getElementById("regra_item_os_desc");
+const okBtn = document.getElementById("regra_item_os_ok");
+const cancelBtn = document.getElementById("regra_item_os_cancel");
+if (!modal || !select || !qtdInput || !qtdWrap || !display || !okBtn || !cancelBtn){
+return;
+}
+select.innerHTML = '<option value="" selected disabled>Selecione</option>';
+(atual.regra.opcoes || []).forEach((codigo) => {
+const item = getProdutoInfo(produtos, codigo) || getProdutoInfo(osProdutos, codigo) || {};
+const option = document.createElement("option");
+option.value = codigo;
+option.textContent = `${codigo} - ${item.descricao || item.nome || "Item"}`;
+select.appendChild(option);
+});
+display.textContent = `Item obrigatório relacionado a ${atual.codigoGatilho}`;
+qtdInput.value = String(atual.regra.quantidade || 1);
+qtdInput.readOnly = !atual.regra.quantidade_editavel;
+qtdWrap.style.display = atual.regra.quantidade_editavel ? "block" : "none";
+modal.classList.add("is-open");
+
+const limparEventos = () => {
+okBtn.removeEventListener("click", onOk);
+cancelBtn.removeEventListener("click", onCancel);
+modal.removeEventListener("click", onBackdrop);
+};
+const onOk = () => {
+const codigo = select.value || "";
+const qtd = parseNumber(qtdInput.value);
+if (!codigo){
+select.focus();
+return;
+}
+if (!qtd || qtd <= 0){
+qtdInput.focus();
+return;
+}
+const selecoes = lerSelecoesPopupItem(atual.row).filter((selecao) => selecao.regra_id !== atual.regra.id);
+selecoes.push({ regra_id: atual.regra.id, codigo, qtd });
+salvarSelecoesPopupItem(atual.row, selecoes);
+modal.classList.remove("is-open");
+limparEventos();
+osPopupRegraFila.shift();
+renderComponentes();
+abrirProximoPopupItemOS();
+};
+const onCancel = () => {
+modal.classList.remove("is-open");
+limparEventos();
+osPopupRegraFila = [];
+};
+const onBackdrop = (event) => {
+if (event.target === modal){
+onCancel();
+}
+};
+okBtn.addEventListener("click", onOk);
+cancelBtn.addEventListener("click", onCancel);
+modal.addEventListener("click", onBackdrop);
+}
+
+function iniciarPopupsItemOS(row, codigo, options){
+if (!row || (options && options.semPopup)){
+return;
+}
+const regras = regrasPopupItemParaCodigo(codigo);
+if (!regras.length){
+salvarSelecoesPopupItem(row, []);
+return;
+}
+const selecoes = lerSelecoesPopupItem(row);
+const regrasPendentes = regras.filter((regra) => !selecoes.some((selecao) => (
+selecao.regra_id === regra.id
+&& selecao.codigo
+&& parseNumber(selecao.qtd) > 0
+)));
+if (!regrasPendentes.length){
+return;
+}
+const modal = document.getElementById("modal-regra-item-os");
+if (osPopupRegraFila.length && modal && modal.classList.contains("is-open")){
+return;
+}
+osPopupRegraFila = regrasPendentes.map((regra) => ({ row, regra, codigoGatilho: codigo }));
+abrirProximoPopupItemOS();
+}
+
+function validarPopupsItensObrigatoriosOS(){
+const linhas = document.querySelectorAll("#tabela_os tr");
+for (let index = 1; index < linhas.length; index += 1){
+const row = linhas[index];
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const codigo = codigoInput ? normalizarCodigoOS(codigoInput.value) : "";
+const regras = regrasPopupItemParaCodigo(codigo);
+const selecoes = lerSelecoesPopupItem(row);
+if (regras.every((regra) => selecoes.some((selecao) => selecao.regra_id === regra.id && selecao.codigo && parseNumber(selecao.qtd) > 0))){
+continue;
+}
+iniciarPopupsItemOS(row, codigo);
+return false;
+}
+return true;
+}
+
+function abrirPopupLuminariaOS(row, produto){
+if (!row || !produto){
+return;
+}
+const modal = document.getElementById("modal-luminaria-os");
+const select = document.getElementById("luminaria_os_select");
+const qtdInput = document.getElementById("luminaria_os_qtd");
+const okBtn = document.getElementById("luminaria_os_ok");
+const cancelBtn = document.getElementById("luminaria_os_cancel");
+const title = document.getElementById("luminaria_os_titulo");
+const display = document.getElementById("luminaria_os_desc");
+const input = row.querySelector('input[name="os_luminaria[]"]');
+const qtdHidden = row.querySelector('input[name="os_luminaria_qtd[]"]');
+if (!modal || !select || !qtdInput || !okBtn || !cancelBtn || !input || !qtdHidden){
+return;
+}
+if (title){
+title.textContent = "Selecione a luminaria";
+}
+if (display){
+display.textContent = produto.descricao || produto.nome || "";
+}
+select.value = input.value || "";
+qtdInput.value = qtdHidden.value || "1";
+modal.classList.add("is-open");
+
+const finalizar = () => {
+const valor = select.value || "";
+const qtd = parseNumber(qtdInput.value);
+if (!valor){
+select.focus();
+return;
+}
+if (!qtd || qtd <= 0){
+qtdInput.focus();
+return;
+}
+input.value = valor;
+qtdHidden.value = String(Math.max(1, Math.round(qtd)));
+modal.classList.remove("is-open");
+renderComponentes();
+okBtn.removeEventListener("click", onOk);
+cancelBtn.removeEventListener("click", onCancel);
+modal.removeEventListener("click", onBackdrop);
+iniciarPopupsItemOS(row, normalizarCodigoOS(row.querySelector('input[name="os_codigo[]"]').value));
+};
+const onOk = () => finalizar();
+const onCancel = () => {
+modal.classList.remove("is-open");
+okBtn.removeEventListener("click", onOk);
+cancelBtn.removeEventListener("click", onCancel);
+modal.removeEventListener("click", onBackdrop);
+};
+const onBackdrop = (event) => {
+if (event.target === modal){
+onCancel();
+}
+};
+okBtn.addEventListener("click", onOk);
+cancelBtn.addEventListener("click", onCancel);
+modal.addEventListener("click", onBackdrop);
+}
+
+function atualizarLuminariaLinhaOS(row, options){
+if (!row){
+return false;
+}
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const codigo = codigoInput ? normalizarCodigoOS(codigoInput.value) : "";
+const produto = getProdutoInfo(osProdutos, codigo) || {};
+const input = row.querySelector('input[name="os_luminaria[]"]');
+const qtdHidden = row.querySelector('input[name="os_luminaria_qtd[]"]');
+if (!input){
+return false;
+}
+const requer = produtoRequerLuminariaOS(produto, codigo);
+const semPopup = Boolean(options && options.semPopup);
+if (!requer){
+input.value = "";
+if (qtdHidden){
+qtdHidden.value = "";
+}
+return false;
+}
+if ((!input.value || !qtdHidden || !qtdHidden.value) && !semPopup){
+abrirPopupLuminariaOS(row, produto);
+}
+return requer;
+}
+
+function validarLuminariasObrigatoriasOS(){
+const linhas = document.querySelectorAll("#tabela_os tr");
+for (let index = 1; index < linhas.length; index += 1){
+const row = linhas[index];
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const codigo = codigoInput ? normalizarCodigoOS(codigoInput.value) : "";
+const produto = getProdutoInfo(osProdutos, codigo) || {};
+if (!produtoRequerLuminariaOS(produto, codigo)){
+continue;
+}
+const luminaria = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
+if (luminaria && luminaria.value && luminariaQtd && luminariaQtd.value){
+continue;
+}
+const modal = document.getElementById("modal-luminaria-os");
+if (modal && modal.classList.contains("is-open")){
+const select = document.getElementById("luminaria_os_select");
+if (select){
+select.focus();
+}
+return false;
+}
+abrirPopupLuminariaOS(row, produto);
+if (codigoInput){
+codigoInput.focus();
+}
+return false;
+}
+return true;
+}
+
+function adicionarOpcaoRegraPopupItem(){
+const container = document.getElementById("popup-regra-opcoes");
+if (!container){
+return;
+}
+const input = document.createElement("input");
+input.name = "popup_regra_opcao[]";
+input.setAttribute("list", "produtos-list");
+input.setAttribute("autocomplete", "off");
+input.placeholder = "Item relacionado";
+input.style.marginTop = "6px";
+container.appendChild(input);
+}
+
+function adicionarOpcaoRelacaoProcesso(){
+const container = document.getElementById("relacao-processo-opcoes");
+if (!container){
+return;
+}
+const input = document.createElement("input");
+input.name = "relacao_processo_conjunto[]";
+input.setAttribute("list", "os-processos-conjuntos");
+input.placeholder = "Processo permitido";
+input.style.marginTop = "6px";
+container.appendChild(input);
 }
 
 function quantidadeOSValor(input){
@@ -1039,6 +1535,14 @@ display.classList.toggle("is-empty", !valor);
 }
 }
 
+function opcoesProcessoItemOS(codigo){
+const valor = codigo ? osProcessoPorItem[codigo] : "";
+if (!valor){
+return [];
+}
+return Array.isArray(valor) ? valor.filter(Boolean) : [valor];
+}
+
 function resolverProcessoAutomaticoOS(){
 const linhas = document.querySelectorAll("#tabela_os tr");
 const conjuntos = new Set();
@@ -1048,18 +1552,15 @@ return;
 }
 const input = row.querySelector('input[name="os_codigo[]"]');
 const codigo = input ? normalizarCodigoOS(input.value) : "";
-const conjunto = codigo ? osProcessoPorItem[codigo] : "";
-if (conjunto){
-conjuntos.add(conjunto);
-}
+opcoesProcessoItemOS(codigo).forEach((conjunto) => conjuntos.add(conjunto));
 });
 if (conjuntos.size === 1){
-return { conjunto: Array.from(conjuntos)[0], conflito: false };
+return { conjunto: Array.from(conjuntos)[0], opcoes: Array.from(conjuntos), conflito: false };
 }
 if (conjuntos.size > 1){
-return { conjunto: "", conflito: true };
+return { conjunto: "", opcoes: Array.from(conjuntos).sort(), conflito: true };
 }
-return { conjunto: "", conflito: false };
+return { conjunto: "", opcoes: [], conflito: false };
 }
 
 function atualizarHintProcessoAutomatico(info){
@@ -1068,7 +1569,7 @@ if (!hint){
 return;
 }
 if (info && info.conflito){
-hint.textContent = "Mais de uma transformacao com processos diferentes foi selecionada.";
+hint.textContent = "Selecione um dos processos permitidos para esta O.S.";
 return;
 }
 if (info && info.conjunto){
@@ -1076,6 +1577,60 @@ hint.textContent = `Processo automatico pela transformacao: ${info.conjunto}`;
 return;
 }
 hint.textContent = "Sem vinculacao previa entre transformacao e processo. Processos permanecem em branco.";
+}
+
+function abrirPopupProcessoOS(opcoes){
+const modal = document.getElementById("modal-processo-os");
+const select = document.getElementById("processo_os_select");
+const okBtn = document.getElementById("processo_os_ok");
+const cancelBtn = document.getElementById("processo_os_cancel");
+if (!modal || !select || !okBtn || !cancelBtn || !opcoes || opcoes.length < 2){
+return;
+}
+select.innerHTML = '<option value="" selected disabled>Selecione</option>';
+opcoes.forEach((processo) => {
+const option = document.createElement("option");
+option.value = processo;
+option.textContent = processo;
+select.appendChild(option);
+});
+const atual = conjuntoProcessoAtual();
+if (opcoes.includes(atual)){
+select.value = atual;
+}
+if (modal.classList.contains("is-open")){
+return;
+}
+modal.classList.add("is-open");
+const limparEventos = () => {
+okBtn.removeEventListener("click", onOk);
+cancelBtn.removeEventListener("click", onCancel);
+modal.removeEventListener("click", onBackdrop);
+};
+const onOk = () => {
+const processo = select.value || "";
+if (!processo){
+select.focus();
+return;
+}
+definirProcessoConjuntoUI(processo);
+preencherProcessosPadrao(processo, { forcar: true });
+modal.classList.remove("is-open");
+limparEventos();
+atualizarHintProcessoAutomatico({ conjunto: processo, opcoes, conflito: false });
+};
+const onCancel = () => {
+modal.classList.remove("is-open");
+limparEventos();
+};
+const onBackdrop = (event) => {
+if (event.target === modal){
+onCancel();
+}
+};
+okBtn.addEventListener("click", onOk);
+cancelBtn.addEventListener("click", onCancel);
+modal.addEventListener("click", onBackdrop);
 }
 
 function aplicarProcessoAutomaticoOS(options){
@@ -1090,6 +1645,15 @@ return;
 const info = resolverProcessoAutomaticoOS();
 atualizarHintProcessoAutomatico(info);
 if (!info.conjunto){
+if (info.opcoes && info.opcoes.length > 1){
+const atual = conjuntoProcessoAtual();
+if (!info.opcoes.includes(atual)){
+definirProcessoConjuntoUI("");
+preencherProcessosPadrao("", { forcar: true });
+}
+abrirPopupProcessoOS(info.opcoes);
+return;
+}
 definirProcessoConjuntoUI("");
 preencherProcessosPadrao("", { forcar: true });
 return;
@@ -1101,15 +1665,28 @@ definirProcessoConjuntoUI(info.conjunto);
 preencherProcessosPadrao(info.conjunto, { forcar: true });
 }
 
+function validarProcessoObrigatorioOS(){
+const info = resolverProcessoAutomaticoOS();
+if (!info.opcoes || info.opcoes.length <= 1){
+return true;
+}
+if (info.opcoes.includes(conjuntoProcessoAtual())){
+return true;
+}
+abrirPopupProcessoOS(info.opcoes);
+return false;
+}
+
 function expandComposicao(codigoItem, quantidade){
   const codigoRaiz = normalizarCodigoOS(codigoItem);
-  if (!codigoRaiz || !osComponentes[codigoRaiz]){
+  const componentesRaiz = componentesItemOS(codigoRaiz);
+  if (!codigoRaiz || !componentesRaiz){
     return [];
   }
   const rows = [];
   function visit(codigo, multiplier, level, ancestors){
     const codigoPai = normalizarCodigoOS(codigo);
-    const componentes = osComponentes[codigoPai] || [];
+    const componentes = componentesItemOS(codigoPai) || [];
     componentes.forEach((comp) => {
       const codigoComp = normalizarCodigoOS(comp.codigo || "");
       const qtdBase = parseNumber(comp.quantidade);
@@ -1122,7 +1699,7 @@ function expandComposicao(codigoItem, quantidade){
         qtd: total ? total : "",
         level,
       });
-      if (codigoComp && total && !ancestors.has(codigoComp) && osComponentes[codigoComp]){
+      if (codigoComp && total && !ancestors.has(codigoComp) && componentesItemOS(codigoComp)){
         const nextAncestors = new Set(ancestors);
         nextAncestors.add(codigoComp);
         visit(codigoComp, total, level + 1, nextAncestors);
@@ -1135,6 +1712,12 @@ function expandComposicao(codigoItem, quantidade){
 
 function coletarComposicaoBom(){
 const rows = [];
+function adicionarRelacionadoComBom(base){
+if (!base.codigo || rows.some((linha) => linha.item === base.item && linha.codigo === base.codigo)){
+return;
+}
+rows.push(...expandirComposicaoImportada([base]));
+}
 const linhas = document.querySelectorAll("#tabela_os tr");
 linhas.forEach((row, index) => {
 if (index === 0){
@@ -1144,10 +1727,53 @@ const sel = row.querySelector('input[name="os_codigo[]"]');
 const qtdInput = row.querySelector('input[name="os_qtd[]"]');
 const codigoItem = sel ? normalizarCodigoOS(sel.value) : "";
 const qtdItem = quantidadeOSValor(qtdInput);
-if (!codigoItem || !osComponentes[codigoItem]){
+if (!codigoItem){
 return;
 }
+const componentes = componentesItemOS(codigoItem);
+if (componentes){
 rows.push(...expandComposicao(codigoItem, qtdItem));
+} else {
+const produto = getProdutoInfo(osProdutos, codigoItem) || {};
+rows.push({
+item: codigoItem,
+codigo: codigoItem,
+descricao: produto.descricao || produto.nome || "",
+unidade: produto.unidade || "",
+qtd: qtdItem,
+level: 0,
+});
+}
+const luminariaInput = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtdInput = row.querySelector('input[name="os_luminaria_qtd[]"]');
+const luminariaCodigo = luminariaInput ? normalizarCodigoOS(luminariaInput.value) : "";
+const luminariaQtd = luminariaCodigo ? quantidadeOSValor(luminariaQtdInput) : 0;
+if (luminariaCodigo && luminariaQtd && !rows.some((linha) => linha.item === codigoItem && linha.codigo === luminariaCodigo)){
+const luminariaProduto = getProdutoInfo(produtos, luminariaCodigo) || getProdutoInfo(osProdutos, luminariaCodigo) || {};
+adicionarRelacionadoComBom({
+item: codigoItem,
+codigo: luminariaCodigo,
+descricao: luminariaProduto.descricao || luminariaProduto.nome || "",
+unidade: luminariaProduto.unidade || "",
+qtd: luminariaQtd,
+level: 0,
+});
+}
+lerSelecoesPopupItem(row).forEach((selecao) => {
+const codigoRelacionado = normalizarCodigoOS(selecao.codigo);
+if (!codigoRelacionado || rows.some((linha) => linha.item === codigoItem && linha.codigo === codigoRelacionado)){
+return;
+}
+const itemRelacionado = getProdutoInfo(produtos, codigoRelacionado) || getProdutoInfo(osProdutos, codigoRelacionado) || {};
+adicionarRelacionadoComBom({
+item: codigoItem,
+codigo: codigoRelacionado,
+descricao: itemRelacionado.descricao || itemRelacionado.nome || "",
+unidade: itemRelacionado.unidade || "",
+qtd: parseNumber(selecao.qtd) || 1,
+level: 0,
+});
+});
 });
 return rows;
 }
@@ -1167,7 +1793,7 @@ level: baseLevel,
 expanded.push(base);
 const codigo = normalizarCodigoOS(base.codigo);
 const qtd = parseNumber(base.qtd);
-if (!codigo || !qtd || !osComponentes[codigo]){
+if (!codigo || !qtd || !componentesItemOS(codigo)){
 return;
 }
 expandComposicao(codigo, qtd).forEach((filho) => {
@@ -1942,6 +2568,9 @@ linha.innerHTML = `
 <td><input type="number" step="1" min="1" name="os_qtd[]" value="1"></td>
 <td><input name="os_serie[]"></td>
 <td><input name="os_unidade[]" readonly></td>
+<td class="os-fornecedor-cell is-hidden"><input name="os_fornecedor_item[]" value="" tabindex="-1" aria-hidden="true"></td>
+<td class="os-luminaria-cell is-hidden"><input name="os_luminaria[]" value="" tabindex="-1" aria-hidden="true"><input name="os_luminaria_qtd[]" value="" tabindex="-1" aria-hidden="true"></td>
+<td class="is-hidden"><input name="os_popup_itens[]" value="[]" tabindex="-1" aria-hidden="true"></td>
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOS(this)">-</button></td>
 `;
 
@@ -1960,11 +2589,19 @@ const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
+const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
+const luminaria = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (select) select.value = "";
 if (desc) desc.value = "";
 if (qtd) qtd.value = "1";
 if (serie) serie.value = "";
 if (unidade) unidade.value = "";
+if (fornecedor) fornecedor.value = "";
+if (luminaria) luminaria.value = "";
+if (luminariaQtd) luminariaQtd.value = "";
+salvarSelecoesPopupItem(row, []);
+atualizarFornecedorDiretoLinha(row);
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
 return;
@@ -1974,7 +2611,7 @@ renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
 }
 
-function aplicarProdutoLinhaOS(row, codigo){
+function aplicarProdutoLinhaOS(row, codigo, options){
 if (!row || !codigo){
 return;
 }
@@ -1986,6 +2623,11 @@ const codigoInput = row.querySelector('input[name="os_codigo[]"]');
 const descricaoInput = row.querySelector('input[name="os_descricao[]"]');
 const unidadeInput = row.querySelector('input[name="os_unidade[]"]');
 const qtdInput = row.querySelector('input[name="os_qtd[]"]');
+const fornecedorInput = row.querySelector('input[name="os_fornecedor_item[]"]');
+const luminariaInput = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtdInput = row.querySelector('input[name="os_luminaria_qtd[]"]');
+const codigoAnterior = codigoInput ? normalizarCodigoOS(codigoInput.value) : "";
+const semPopup = Boolean(options && options.semPopup);
 if (codigoInput){
 codigoInput.value = codigo;
 }
@@ -1997,6 +2639,23 @@ unidadeInput.value = produto.unidade || "UN";
 }
 if (qtdInput && (!String(qtdInput.value || "").trim() || parseNumber(qtdInput.value) <= 0)){
 qtdInput.value = "1";
+}
+if (fornecedorInput && codigoAnterior !== codigo){
+fornecedorInput.value = "";
+}
+if (luminariaInput && codigoAnterior !== codigo){
+luminariaInput.value = "";
+}
+if (luminariaQtdInput && codigoAnterior !== codigo){
+luminariaQtdInput.value = "";
+}
+if (codigoAnterior !== codigo){
+salvarSelecoesPopupItem(row, []);
+}
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup });
+if (!produtoRequerLuminariaOS(produto, codigo)){
+iniciarPopupsItemOS(row, codigo, { semPopup });
 }
 osComposicaoSource = "bom";
 renderComponentes();
@@ -2016,8 +2675,15 @@ if (!codigo){
 if (!(input.value || "").trim()){
 const desc = row.querySelector('input[name="os_descricao[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
+const luminaria = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (desc) desc.value = "";
 if (unidade) unidade.value = "";
+if (luminaria) luminaria.value = "";
+if (luminariaQtd) luminariaQtd.value = "";
+salvarSelecoesPopupItem(row, []);
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup: true });
 osComposicaoSource = "bom";
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
@@ -2040,8 +2706,14 @@ if (!codigo){
 if (!(input.value || "").trim()){
 const codigoInput = row.querySelector('input[name="os_codigo[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
+const luminaria = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (codigoInput) codigoInput.value = "";
 if (unidade) unidade.value = "";
+if (luminaria) luminaria.value = "";
+if (luminariaQtd) luminariaQtd.value = "";
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup: true });
 osComposicaoSource = "bom";
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
@@ -2094,10 +2766,10 @@ return;
 }
 const row = tabela.insertRow();
 row.innerHTML = `
-<td><input name="os_comp_codigo[]" required></td>
-<td><input name="os_comp_descricao[]" required></td>
+<td><input name="os_comp_codigo[]"></td>
+<td><input name="os_comp_descricao[]"></td>
 <td><input name="os_comp_unidade[]" value="UN"></td>
-<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0" required></td>
+<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0"></td>
 `;
 }
 
@@ -2191,11 +2863,19 @@ const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
+const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
+const luminaria = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (select) select.value = "";
 if (desc) desc.value = "";
 if (qtd) qtd.value = "1";
 if (serie) serie.value = "";
 if (unidade) unidade.value = "";
+if (fornecedor) fornecedor.value = "";
+if (luminaria) luminaria.value = "";
+if (luminariaQtd) luminariaQtd.value = "";
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup: true });
 }
 }
 
@@ -2418,9 +3098,12 @@ const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
 const unidade = row.querySelector('input[name="os_unidade[]"]');
+const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
+const luminaria = row.querySelector('input[name="os_luminaria[]"]');
+const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (item.codigo){
 setSelectValue(sel, item.codigo);
-aplicarProdutoLinhaOS(row, item.codigo);
+aplicarProdutoLinhaOS(row, item.codigo, { semPopup: true });
 } else if (desc && item.descricao){
 desc.value = item.descricao;
 preencherOSDescricao(desc);
@@ -2434,6 +3117,12 @@ qtd.value = qtdItem > 0 ? item.qtd : "1";
 }
 if (serie && item.serie) serie.value = item.serie;
 if (unidade && item.unidade) unidade.value = item.unidade;
+if (fornecedor && item.fornecedor) fornecedor.value = item.fornecedor;
+if (luminaria && item.luminaria) luminaria.value = item.luminaria;
+if (luminaria && item.luminaria_codigo) luminaria.value = item.luminaria_codigo;
+if (luminariaQtd && item.luminaria_qtd !== undefined) luminariaQtd.value = item.luminaria_qtd;
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup: true });
 }
 }
 
@@ -2858,8 +3547,21 @@ monitorSaveStatus();
 
 const formOs = document.getElementById("form-os");
 if (formOs){
-formOs.addEventListener("submit", () => {
+formOs.addEventListener("submit", (event) => {
+if (!validarLuminariasObrigatoriasOS()){
+event.preventDefault();
+return;
+}
+if (!validarPopupsItensObrigatoriosOS()){
+event.preventDefault();
+return;
+}
+if (!validarProcessoObrigatorioOS()){
+event.preventDefault();
+return;
+}
 monitorSaveStatus();
+setTimeout(limparOSForm, 500);
 });
 }
 
@@ -3231,7 +3933,7 @@ renderDashboardCharts();
 </div>
 {% endif %}
 </div>
-<form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data" onsubmit="setTimeout(limparOSForm, 500)">
+<form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data">
 
 <div class="card">
 <h3>Dados do Cliente</h3>
@@ -3298,6 +4000,9 @@ renderDashboardCharts();
 <th>Qtd</th>
 <th>No. Serie</th>
 <th>Un</th>
+<th class="os-fornecedor-header">Fornecedor</th>
+<th class="os-luminaria-header">Luminaria</th>
+<th class="is-hidden">Relacionados</th>
 <th></th>
 </tr>
 <tr>
@@ -3317,6 +4022,9 @@ renderDashboardCharts();
 <td><input type="number" step="1" min="1" name="os_qtd[]" value="1"></td>
 <td><input name="os_serie[]"></td>
 <td><input name="os_unidade[]" readonly></td>
+<td class="os-fornecedor-cell is-hidden"><input name="os_fornecedor_item[]" placeholder="Fornecedor"></td>
+<td class="os-luminaria-cell is-hidden"><input name="os_luminaria[]" value="" tabindex="-1" aria-hidden="true"><input name="os_luminaria_qtd[]" value="" tabindex="-1" aria-hidden="true"></td>
+<td class="is-hidden"><input name="os_popup_itens[]" value="[]" tabindex="-1" aria-hidden="true"></td>
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOS(this)">-</button></td>
 </tr>
 </table>
@@ -3329,6 +4037,90 @@ renderDashboardCharts();
 <option value="{{ key }}{% if p.get('descricao') %} - {{ p.get('descricao') }}{% endif %}"></option>
 {% endfor %}
 </datalist>
+<datalist id="produtos-list">
+{% for key, p in produtos.items() %}
+<option value="{{ key }}{% if p.get('descricao') %} - {{ p.get('descricao') }}{% endif %}"></option>
+{% endfor %}
+{% for key, p in os_produtos.items() %}
+{% if key not in produtos %}
+<option value="{{ key }}{% if p.get('descricao') %} - {{ p.get('descricao') }}{% endif %}"></option>
+{% endif %}
+{% endfor %}
+</datalist>
+<datalist id="os-processos-conjuntos">
+{% for key in os_processos.keys() %}
+<option value="{{ key }}"></option>
+{% endfor %}
+</datalist>
+
+<div id="modal-fornecedor-direto" class="modal-fornecedor-direto" aria-hidden="true">
+<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="fornecedor_direto_titulo">
+<h4 id="fornecedor_direto_titulo">Fornecedor do faturamento direto</h4>
+<div id="fornecedor_direto_desc" class="modal-desc"></div>
+<label for="fornecedor_direto_select">Selecione o fornecedor</label>
+<select id="fornecedor_direto_select">
+<option value="SJ">SJ</option>
+<option value="INSTALL TECH">INSTALL TECH</option>
+</select>
+<div class="modal-actions">
+<button type="button" id="fornecedor_direto_cancel">Cancelar</button>
+<button type="button" id="fornecedor_direto_ok">Confirmar</button>
+</div>
+</div>
+</div>
+
+<div id="modal-luminaria-os" class="modal-luminaria-os" aria-hidden="true">
+<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="luminaria_os_titulo">
+<h4 id="luminaria_os_titulo">Selecione a luminaria</h4>
+<div id="luminaria_os_desc" class="modal-desc"></div>
+<label for="luminaria_os_select">Escolha uma luminaria</label>
+<select id="luminaria_os_select">
+<option value="" selected disabled>Selecione</option>
+<option value="10260092">10260092 - ELETRICA LUMINARIA ALURE 30</option>
+<option value="10260095">10260095 - ELETRICA LUMINARIA VAN TAMANHO M</option>
+</select>
+<label for="luminaria_os_qtd" style="margin-top:10px;display:block;">Quantidade</label>
+<input id="luminaria_os_qtd" type="number" min="1" step="1" value="1">
+<div class="modal-actions">
+<button type="button" id="luminaria_os_cancel">Cancelar</button>
+<button type="button" id="luminaria_os_ok">Confirmar</button>
+</div>
+</div>
+</div>
+
+<div id="modal-processo-os" class="modal-processo-os" aria-hidden="true">
+<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="processo_os_titulo">
+<h4 id="processo_os_titulo">Selecione o processo</h4>
+<div class="modal-desc">Escolha o processo aplicável para esta O.S.</div>
+<label for="processo_os_select">Processo relacionado</label>
+<select id="processo_os_select">
+<option value="" selected disabled>Selecione</option>
+</select>
+<div class="modal-actions">
+<button type="button" id="processo_os_cancel">Cancelar</button>
+<button type="button" id="processo_os_ok">Confirmar</button>
+</div>
+</div>
+</div>
+
+<div id="modal-regra-item-os" class="modal-regra-item-os" aria-hidden="true">
+<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="regra_item_os_titulo">
+<h4 id="regra_item_os_titulo">Selecione o item relacionado</h4>
+<div id="regra_item_os_desc" class="modal-desc"></div>
+<label for="regra_item_os_select">Item obrigatório</label>
+<select id="regra_item_os_select">
+<option value="" selected disabled>Selecione</option>
+</select>
+<div id="regra_item_os_qtd_wrap">
+<label for="regra_item_os_qtd" style="margin-top:10px;display:block;">Quantidade</label>
+<input id="regra_item_os_qtd" type="number" min="0.01" step="0.01" value="1">
+</div>
+<div class="modal-actions">
+<button type="button" id="regra_item_os_cancel">Cancelar</button>
+<button type="button" id="regra_item_os_ok">Confirmar</button>
+</div>
+</div>
+</div>
 
 <div class="card">
 <h3>Componentes</h3>
@@ -3550,6 +4342,25 @@ renderDashboardCharts();
 </div>
 
 <div class="card">
+<h3>Processo de Producao - Acessorios</h3>
+<table id="processo_acessorios" class="tabela-componentes">
+<tr>
+<th>Atividade</th>
+<th>Responsavel</th>
+</tr>
+<tr>
+<td><input name="proc_acessorios_atividade[]"></td>
+<td>
+<input name="proc_acessorios_responsavel[]">
+<button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
+</td>
+</tr>
+</table>
+<br>
+<button type="button" onclick="adicionarProcessoLinha('acessorios')">Adicionar Atividade</button>
+</div>
+
+<div class="card">
 <h3>Observacoes</h3>
 <textarea name="os_obs" rows="4"></textarea>
 </div>
@@ -3713,24 +4524,8 @@ renderDashboardCharts();
 <input name="categoria">
 </div>
 <div>
-<label>Fornecedor</label>
-<input name="fornecedor" placeholder="Fornecedor principal ou faturamento direto">
-</div>
-<div>
-<label>Valor Unitario</label>
-<div class="input-group"><span class="input-prefix">R$</span><input name="valor" type="number" step="0.01" min="0"></div>
-</div>
-<div>
-<label>IPI (%)</label>
-<input name="ipi" type="number" step="0.01" min="0">
-</div>
-<div>
-<label>ICMS (%)</label>
-<input name="icms" type="number" step="0.01" min="0">
-</div>
-<div>
-<label>COFINS (%)</label>
-<input name="cofins" type="number" step="0.01" min="0">
+<label>Processo Vinculado</label>
+<input name="processo_conjunto" list="os-processos-conjuntos" placeholder="Opcional">
 </div>
 </div>
 <br>
@@ -3743,7 +4538,7 @@ renderDashboardCharts();
 <br><br>
 <button type="submit">Importar Itens</button>
 </form>
-<p style="margin:10px 0 0;font-size:12px;color:#64748b;">Modelo atualizado: cabeçalho na <strong>linha 2</strong>, com <strong>fornecedor</strong>, grupo, categoria, unidades e campos fiscais. O importador também aceita colunas extras da base.</p>
+<p style="margin:10px 0 0;font-size:12px;color:#64748b;">Modelo atualizado: cabeçalho na <strong>linha 2</strong>, com <strong>codigo</strong>, <strong>descricao</strong>, <strong>unidade</strong>, grupo, categoria e o vínculo de processo. O importador continua aceitando arquivos antigos, mas ignora os campos que não entram mais na regra do aplicativo.</p>
 <br>
 <form method="GET" action="/exportar_modelo_produtos">
 <button type="submit">Baixar Modelo (XLSX)</button>
@@ -3809,6 +4604,10 @@ renderDashboardCharts();
 <label>Fornecedor</label>
 <input name="os_item_fornecedor" placeholder="Obrigatorio para faturamento direto">
 </div>
+<div>
+<label>Processo Vinculado</label>
+<input name="os_item_processo_conjunto" list="os-processos-conjuntos" placeholder="Opcional">
+</div>
 </div>
 <br>
 <label>Componentes</label>
@@ -3820,10 +4619,10 @@ renderDashboardCharts();
 <th>Qtd</th>
 </tr>
 <tr>
-<td><input name="os_comp_codigo[]" required></td>
-<td><input name="os_comp_descricao[]" required></td>
+<td><input name="os_comp_codigo[]"></td>
+<td><input name="os_comp_descricao[]"></td>
 <td><input name="os_comp_unidade[]" value="UN"></td>
-<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0" required></td>
+<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0"></td>
 </tr>
 </table>
 <br>
@@ -3877,6 +4676,110 @@ renderDashboardCharts();
 {{ os_processos_status }}
 </div>
 {% endif %}
+</div>
+
+<div class="card">
+<h3>Parâmetros de Item Relacionado</h3>
+<form method="POST" action="/cadastrar_regra_popup_item">
+<table class="tabela-componentes">
+<tr>
+<th>Item gatilho</th>
+<th>Itens disponíveis no popup</th>
+<th>Qtd.</th>
+<th>Alterável</th>
+<th></th>
+</tr>
+<tr>
+<td><input name="popup_regra_gatilho" list="produtos-list" autocomplete="off" placeholder="Codigo ou descricao" required></td>
+<td id="popup-regra-opcoes">
+<input name="popup_regra_opcao[]" list="produtos-list" autocomplete="off" placeholder="Item relacionado" required>
+<button type="button" style="margin-top:6px;" onclick="adicionarOpcaoRegraPopupItem()">Adicionar opção</button>
+</td>
+<td><input name="popup_regra_quantidade" type="number" min="0.01" step="0.01" value="1" required></td>
+<td><label><input name="popup_regra_quantidade_editavel" type="checkbox" value="1"> Sim</label></td>
+<td><button type="submit">Cadastrar</button></td>
+</tr>
+</table>
+</form>
+<div style="margin-top:14px; overflow:auto;">
+<table class="tabela-componentes">
+<tr>
+<th>ID</th>
+<th>Item gatilho</th>
+<th>Itens disponíveis no popup</th>
+<th>Qtd.</th>
+<th>Modo</th>
+<th></th>
+</tr>
+{% for regra in regras_popup_item %}
+<tr>
+<td>{{ regra.id }}</td>
+<td>{{ regra.gatilho }} - {{ produtos.get(regra.gatilho, os_produtos.get(regra.gatilho, {})).get('descricao', '') }}</td>
+<td>
+{% for codigo in regra.opcoes %}
+<div>{{ codigo }} - {{ produtos.get(codigo, os_produtos.get(codigo, {})).get('descricao', '') }}</div>
+{% endfor %}
+</td>
+<td>{{ regra.quantidade }}</td>
+<td>{{ 'Alterável no popup' if regra.quantidade_editavel else 'Fixa' }}</td>
+<td>
+<form method="POST" action="/excluir_regra_popup_item" onsubmit="return confirm('Excluir esta regra?');">
+<input type="hidden" name="popup_regra_id" value="{{ regra.id }}">
+<button type="submit">Excluir</button>
+</form>
+</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+</div>
+
+<div class="card">
+<h3>Relação Processo x Item</h3>
+<form method="POST" action="/cadastrar_relacao_processo_item">
+<table class="tabela-componentes">
+<tr>
+<th>Item</th>
+<th>Processo</th>
+<th></th>
+</tr>
+<tr>
+<td><input name="relacao_item" list="os-produtos-list" autocomplete="off" placeholder="Codigo ou descricao"></td>
+<td id="relacao-processo-opcoes">
+<input name="relacao_processo_conjunto[]" list="os-processos-conjuntos" placeholder="Processo permitido">
+<button type="button" style="margin-top:6px;" onclick="adicionarOpcaoRelacaoProcesso()">Adicionar opção</button>
+</td>
+<td><button type="submit">Vincular</button></td>
+</tr>
+</table>
+</form>
+<div style="margin-top:14px; overflow:auto;">
+<table class="tabela-componentes">
+<tr>
+<th>Codigo</th>
+<th>Descricao</th>
+<th>Processo</th>
+<th></th>
+</tr>
+{% for codigo, processos in relacoes_processo_item.items() %}
+<tr>
+<td>{{ codigo }}</td>
+<td>{{ os_produtos.get(codigo, {}).get('descricao', '') }}</td>
+<td>
+{% for processo in processos %}
+<div>{{ processo }}</div>
+{% endfor %}
+</td>
+<td>
+<form method="POST" action="/excluir_relacao_processo_item" onsubmit="return confirm('Excluir esta relacao?');">
+<input type="hidden" name="relacao_item" value="{{ codigo }}">
+<button type="submit">Excluir</button>
+</form>
+</td>
+</tr>
+{% endfor %}
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -4032,8 +4935,3 @@ ativarAba(targetInicial);
 </body>
 
 </html>
-
-
-
-
-

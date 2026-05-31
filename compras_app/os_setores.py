@@ -5,6 +5,7 @@ from composicao import normalizar_codigo, parse_quantidade
 
 SETOR_EXPEDICAO = "EXPEDICAO"
 SETOR_PREPARACAO = "PREPARACAO"
+SETOR_FATURAMENTO_DIRETO = "F.D"
 TIPO_REQUISICAO_MATERIAL = "MATERIAL"
 TIPO_REQUISICAO_FATURAMENTO_DIRETO = "FATURAMENTO DIRETO"
 
@@ -52,6 +53,20 @@ def enriquecer_composicao(composicao, catalogo):
         codigo = normalizar_codigo(comp.get("codigo", ""))
         item_info = catalogo.get(codigo, {}) if catalogo else {}
         descricao = comp.get("descricao", "") or item_info.get("descricao", "") or ""
+        grupo = comp.get("grupo", "") or item_info.get("grupo", "") or ""
+        categoria = comp.get("categoria", "") or item_info.get("categoria", "") or ""
+        fornecedor = comp.get("fornecedor", "") or item_info.get("fornecedor", "") or ""
+        info_classificacao = dict(item_info or {})
+        if grupo:
+            info_classificacao["grupo"] = grupo
+        if categoria:
+            info_classificacao["categoria"] = categoria
+        if descricao:
+            info_classificacao["descricao"] = descricao
+        setor = comp.get("setor", "") or classificar_item(info_classificacao)
+        tipo_requisicao = comp.get("tipo_requisicao", "") or classificar_tipo_requisicao(info_classificacao, descricao)
+        if tipo_requisicao == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
+            setor = SETOR_FATURAMENTO_DIRETO
         linhas.append(
             {
                 "item": normalizar_codigo(comp.get("item", "")),
@@ -60,11 +75,11 @@ def enriquecer_composicao(composicao, catalogo):
                 "unidade": comp.get("unidade", "") or item_info.get("unidade", "") or "",
                 "qtd": comp.get("qtd", ""),
                 "level": comp.get("level", 0),
-                "grupo": item_info.get("grupo", "") or "",
-                "categoria": item_info.get("categoria", "") or "",
-                "fornecedor": item_info.get("fornecedor", "") or "",
-                "setor": classificar_item(item_info),
-                "tipo_requisicao": classificar_tipo_requisicao(item_info, descricao),
+                "grupo": grupo,
+                "categoria": categoria,
+                "fornecedor": fornecedor,
+                "setor": setor,
+                "tipo_requisicao": tipo_requisicao,
             }
         )
     return linhas

@@ -1,6 +1,8 @@
 import logging
 import os
+import struct
 import tempfile
+from copy import deepcopy
 from datetime import datetime, timedelta
 
 import pypdfium2 as pdfium
@@ -12,7 +14,7 @@ from docx.shared import Inches
 
 from composicao import resolver_composicao_final
 from config import TEMPLATE_OS, pasta_os
-from os_template import mapear_tabelas_os
+from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +53,27 @@ def _set_cell_text(cell, texto):
 def _set_cell_align(cell, alignment):
     for paragraph in cell.paragraphs:
         paragraph.alignment = alignment
+
+
+def _formatar_cell_atividade(cell):
+    for paragraph in cell.paragraphs:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        paragraph.paragraph_format.left_indent = Inches(0.08)
+        paragraph.paragraph_format.first_line_indent = Inches(0)
+        paragraph.paragraph_format.space_before = 0
+        paragraph.paragraph_format.space_after = 0
+
+
+def _celulas_unicas_linha(row):
+    vistas = set()
+    celulas = []
+    for cell in row.cells:
+        chave = id(cell._tc)
+        if chave in vistas:
+            continue
+        vistas.add(chave)
+        celulas.append(cell)
+    return celulas
 
 
 def _set_vertical_merge(cell, mode=None):
@@ -157,8 +180,9 @@ def _configurar_cabecalho_requisicao(doc, refs, dados):
 
     tabela_dados = doc.tables[refs["dados"]]
     if tabela_dados.rows:
+        titulo = dados.get("titulo_requisicao", "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O")
         for cell in tabela_dados.rows[0].cells:
-            _set_cell_text(cell, "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O")
+            _set_cell_text(cell, titulo)
     if len(tabela_dados.rows) > 3 and len(tabela_dados.rows[3].cells) >= 4:
         _set_cell_text(tabela_dados.cell(3, 0), "DATA DE NECESSIDADE:")
         _set_cell_text(
@@ -201,47 +225,42 @@ def _preencher_tabela_componentes(tabela, composicao):
 
 
 def _preencher_tabela_processo(tabela, linhas):
-    _limpar_linhas_apos(tabela, 1)
     linhas = list(linhas or [])
-    if not linhas:
-        return
+    header_idx = encontrar_linha_cabecalho(tabela, "ATIVIDADE")
+    if header_idx is None:
+        header_idx = 3 if len(tabela.rows) >= 4 else max(len(tabela.rows) - 1, 0)
 
-    responsavel = next((str(linha.get("responsavel", "") or "").strip() for linha in linhas if str(linha.get("responsavel", "") or "").strip()), "")
-    data = next((str(linha.get("data", "") or "").strip() for linha in linhas if str(linha.get("data", "") or "").strip()), "")
-    inicio = next((str(linha.get("inicio", "") or "").strip() for linha in linhas if str(linha.get("inicio", "") or "").strip()), "")
-    fim = next((str(linha.get("fim", "") or "").strip() for linha in linhas if str(linha.get("fim", "") or "").strip()), "")
-    feito = next((str(linha.get("feito", "") or "").strip() for linha in linhas if str(linha.get("feito", "") or "").strip()), "")
+    modelo_idx = header_idx + 1 if header_idx + 1 < len(tabela.rows) else header_idx
+    modelo_idx = max(0, min(modelo_idx, len(tabela.rows) - 1))
+    modelo_tr = deepcopy(tabela.rows[modelo_idx]._tr)
 
-    for idx, linha in enumerate(linhas, start=1):
-        row = tabela.add_row().cells
-        _set_cell_text(row[0], idx)
-        if len(row) > 1:
-            _set_cell_text(row[1], linha.get("atividade", ""))
-        for col_idx in range(2, len(row)):
-            _set_cell_text(row[col_idx], "")
-        for cell in row:
+    def _clonar_linha_formato():
+        novo_tr = deepcopy(modelo_tr)
+        tabela._tbl.append(novo_tr)
+
+    atividade_inicio = header_idx + 1
+    while len(tabela.rows) > atividade_inicio:
+        tabela._tbl.remove(tabela.rows[-1]._tr)
+
+    while len(tabela.rows) < atividade_inicio + max(len(linhas), 1):
+        _clonar_linha_formato()
+
+    total_linhas = max(len(linhas), 1)
+    for idx in range(atividade_inicio, atividade_inicio + total_linhas):
+        row = tabela.rows[idx]
+        for cell in _celulas_unicas_linha(row):
+            _set_cell_text(cell, "")
             _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
-    first_data_row = 2
-    last_data_row = len(tabela.rows) - 1
-    for col_idx, valor in (
-        (2, responsavel),
-        (3, data),
-        (4, inicio),
-        (5, fim),
-        (6, feito),
-    ):
-        if col_idx >= len(tabela.columns):
-            continue
-        cell = tabela.rows[first_data_row].cells[col_idx]
-        if last_data_row > first_data_row:
-            _set_vertical_merge(cell, "restart")
-            for row_idx in range(first_data_row + 1, last_data_row + 1):
-                cont_cell = tabela.rows[row_idx].cells[col_idx]
-                _set_cell_text(cont_cell, "")
-                _set_vertical_merge(cont_cell)
-        _set_cell_text(cell, valor)
-        _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
+    for offset, linha in enumerate(linhas):
+        row = tabela.rows[atividade_inicio + offset]
+        cells_reais = _celulas_unicas_linha(row)
+        if len(cells_reais) > 0:
+            _set_cell_text(cells_reais[0], str(offset + 1))
+            _set_cell_align(cells_reais[0], WD_ALIGN_PARAGRAPH.CENTER)
+        if len(cells_reais) > 1:
+            _set_cell_text(cells_reais[1], linha.get("atividade", ""))
+            _formatar_cell_atividade(cells_reais[1])
 
 
 def _limpar_layout(tabela):
@@ -254,6 +273,31 @@ def _limpar_layout(tabela):
             run.text = ""
 
 
+def _salvar_bitmap_bmp(bitmap, path):
+    import numpy as np
+
+    pixels = bitmap.to_numpy()
+    if pixels.ndim == 2:
+        pixels = np.repeat(pixels[:, :, None], 3, axis=2)
+    if pixels.shape[2] < 3:
+        pixels = np.repeat(pixels[:, :, :1], 3, axis=2)
+    pixels = pixels[:, :, :3]
+    if str(bitmap.mode).upper().startswith("RGB"):
+        pixels = pixels[:, :, ::-1]
+    pixels = np.ascontiguousarray(pixels[::-1])
+    altura, largura = pixels.shape[:2]
+    padding = (4 - (largura * 3) % 4) % 4
+    row_padding = b"\x00" * padding
+    tamanho_pixels = (largura * 3 + padding) * altura
+    offset = 14 + 40
+    with open(path, "wb") as arquivo:
+        arquivo.write(struct.pack("<2sIHHI", b"BM", offset + tamanho_pixels, 0, 0, offset))
+        arquivo.write(struct.pack("<IIIHHIIIIII", 40, largura, altura, 1, 24, 0, tamanho_pixels, 2835, 2835, 0, 0))
+        for linha in pixels:
+            arquivo.write(linha.tobytes())
+            arquivo.write(row_padding)
+
+
 def _inserir_layout_pdf(tabela, file_storage):
     if not tabela or not file_storage or not file_storage.filename:
         return
@@ -262,31 +306,67 @@ def _inserir_layout_pdf(tabela, file_storage):
     tmp_pdf.close()
     file_storage.save(tmp_pdf.name)
 
-    try:
-        from PIL import Image  # noqa: F401
-    except Exception:
-        logger.warning("Pillow nao encontrado. Ignorando insercao do layout PDF.")
-        return
-
     pdf = pdfium.PdfDocument(tmp_pdf.name)
     if len(pdf) == 0:
         return
 
     page = pdf[0]
     try:
-        pil_image = page.render(scale=2).to_pil()
+        bitmap = page.render(scale=2)
     except Exception as exc:
         logger.warning("Falha ao renderizar PDF para imagem: %s", exc)
         return
 
-    tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    tmp_img.close()
-    pil_image.save(tmp_img.name)
+    try:
+        pil_image = bitmap.to_pil()
+        tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        tmp_img.close()
+        pil_image.save(tmp_img.name)
+        largura_px, altura_px = pil_image.size
+    except Exception:
+        tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".bmp")
+        tmp_img.close()
+        _salvar_bitmap_bmp(bitmap, tmp_img.name)
+        largura_px, altura_px = bitmap.width, bitmap.height
 
     cell = tabela.cell(1, 0)
     cell.text = ""
     paragraph = cell.paragraphs[0] if cell.paragraphs else cell.add_paragraph()
-    paragraph.add_run().add_picture(tmp_img.name, width=Inches(6.8))
+    largura_max = 6.8
+    altura_max = 8.4
+    proporcao = min(largura_max / largura_px, altura_max / altura_px)
+    paragraph.add_run().add_picture(
+        tmp_img.name,
+        width=Inches(largura_px * proporcao),
+        height=Inches(altura_px * proporcao),
+    )
+
+
+def _isolar_layout_na_ultima_pagina(doc, tabela):
+    if not tabela:
+        return
+    body = doc._body._element
+    tabela_xml = tabela._tbl
+    parent = tabela_xml.getparent()
+    if parent is None:
+        return
+    parent.remove(tabela_xml)
+    for quebra_antiga in tabela_xml.xpath('.//w:br[@w:type="page"]'):
+        quebra_antiga.getparent().remove(quebra_antiga)
+    sect_pr = body.sectPr
+    while len(body):
+        ultimo = body[-2] if sect_pr is not None and body[-1] is sect_pr else body[-1]
+        if ultimo.tag != qn("w:p"):
+            break
+        if "".join(ultimo.itertext()).strip() or ultimo.xpath(".//w:drawing"):
+            break
+        body.remove(ultimo)
+    quebra = doc.add_paragraph()
+    quebra._p.get_or_add_pPr().append(OxmlElement("w:pageBreakBefore"))
+    if sect_pr is not None:
+        body.insert(body.index(sect_pr), tabela_xml)
+    else:
+        body.append(tabela_xml)
 
 
 def _remover_tabela(doc, tabela):
@@ -320,10 +400,11 @@ def _alinhar_tabelas_processo(refs, doc):
             continue
         tabela = doc.tables[idx]
         for row in tabela.rows[2:]:
-            for cell_idx, cell in enumerate(row.cells):
-                alinhamento = WD_ALIGN_PARAGRAPH.LEFT if cell_idx == 1 else WD_ALIGN_PARAGRAPH.CENTER
-                for paragraph in cell.paragraphs:
-                    paragraph.alignment = alinhamento
+            for cell_idx, cell in enumerate(_celulas_unicas_linha(row)):
+                if cell_idx == 1:
+                    _formatar_cell_atividade(cell)
+                else:
+                    _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
 
 def _salvar_documento_os(doc, numero_os, dados, titulo_arquivo="O.S"):
@@ -349,6 +430,11 @@ def gerar_os_docx(
 ):
     doc = Document(TEMPLATE_OS)
     refs = mapear_tabelas_os(doc)
+    processo_preparacao = None
+    for nome in processos.keys():
+        if "PREPARA" in str(nome).upper():
+            processo_preparacao = nome
+            break
 
     if refs.get("cabecalho") is not None:
         _set_os_numero(doc.tables[refs["cabecalho"]].cell(0, 2), numero_os)
@@ -363,7 +449,12 @@ def gerar_os_docx(
         _set_cell_text(tabela_dados.cell(3, 3), _formatar_datetime_local(dados.get("previsao_termino", "")))
 
     if modo in {"expedicao", "preparacao"}:
-        _configurar_cabecalho_requisicao(doc, refs, dados)
+        dados_requisicao = dict(dados)
+        if modo == "expedicao":
+            dados_requisicao["titulo_requisicao"] = "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O EXPEDI\u00c7\u00c3O"
+        elif modo == "preparacao":
+            dados_requisicao["titulo_requisicao"] = "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O PREPARA\u00c7\u00c3O"
+        _configurar_cabecalho_requisicao(doc, refs, dados_requisicao)
 
     if refs.get("itens") is not None:
         _preencher_tabela_produtos(doc.tables[refs["itens"]], itens)
@@ -371,7 +462,27 @@ def gerar_os_docx(
     composicao_final = composicao_resolvida or resolver_composicao_final(itens, componentes)
     ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao"}
     ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao"}
-    ocultar_processos = modo in {"mascara", "expedicao", "preparacao"}
+
+    if modo in {"completa", "producao"}:
+        ocultar_processos = False
+        processos_exibicao = processos
+    elif modo == "preparacao":
+        ocultar_processos = False
+        processos_exibicao = (
+            {
+                nome: processos.get(nome, [])
+                for nome in processos.keys()
+                if nome == processo_preparacao
+            }
+            if processo_preparacao
+            else {}
+        )
+    elif modo == "expedicao":
+        ocultar_processos = False
+        processos_exibicao = {}
+    else:
+        ocultar_processos = True
+        processos_exibicao = {nome: [] for nome in processos.keys()}
 
     if not ocultar_composicao and refs.get("composicao") is not None:
         _preencher_tabela_componentes(doc.tables[refs["composicao"]], composicao_final)
@@ -393,6 +504,7 @@ def gerar_os_docx(
             tabela_layout = doc.tables[refs["layout"]]
             _limpar_layout(tabela_layout)
             _inserir_layout_pdf(tabela_layout, layout_pdf)
+            _isolar_layout_na_ultima_pagina(doc, tabela_layout)
         _alinhar_tudo_centro(doc)
         if refs.get("itens") is not None and refs["itens"] < len(doc.tables):
             _alinhar_descricao_esquerda(doc.tables[refs["itens"]], 1)
@@ -414,7 +526,7 @@ def gerar_os_docx(
         indices_processos_vazios = [
             idx
             for nome, idx in refs.get("processos", {}).items()
-            if not (processos.get(nome) or [])
+            if not (processos_exibicao.get(nome) or [])
         ]
     for idx in sorted(set(indices_processos_vazios), reverse=True):
         if idx < len(doc.tables):
@@ -422,7 +534,7 @@ def gerar_os_docx(
 
     refs = mapear_tabelas_os(doc)
     for nome, idx in refs.get("processos", {}).items():
-        linhas = processos.get(nome, [])
+        linhas = processos_exibicao.get(nome, [])
         if idx < len(doc.tables) and linhas:
             _preencher_tabela_processo(doc.tables[idx], linhas)
 
@@ -434,6 +546,7 @@ def gerar_os_docx(
         tabela_layout = doc.tables[refs["layout"]]
         _limpar_layout(tabela_layout)
         _inserir_layout_pdf(tabela_layout, layout_pdf)
+        _isolar_layout_na_ultima_pagina(doc, tabela_layout)
 
     _alinhar_tudo_centro(doc)
     refs = mapear_tabelas_os(doc)

@@ -30,13 +30,32 @@ def normalizar_componentes(componentes):
 
 
 def normalizar_linha_composicao(comp, item="", level=0):
-    return {
+    linha = {
         "item": normalizar_codigo(item),
         "codigo": normalizar_codigo(comp.get("codigo", "")),
         "descricao": comp.get("descricao", "") or "",
         "unidade": comp.get("unidade", "") or "",
         "qtd": comp.get("qtd", comp.get("quantidade", "")),
         "level": level or 0,
+    }
+    for campo in ("grupo", "categoria", "fornecedor", "setor", "tipo_requisicao"):
+        if comp.get(campo, "") != "":
+            linha[campo] = comp.get(campo, "")
+    return linha
+
+
+def _linha_item_sem_bom(item):
+    codigo = normalizar_codigo(item.get("codigo", ""))
+    return {
+        "item": codigo,
+        "codigo": codigo,
+        "descricao": item.get("descricao", "") or "",
+        "unidade": item.get("unidade", "") or "",
+        "qtd": item.get("qtd", item.get("quantidade", "")),
+        "level": 0,
+        "grupo": item.get("grupo", "") or "",
+        "categoria": item.get("categoria", "") or "",
+        "fornecedor": item.get("fornecedor", "") or "",
     }
 
 
@@ -74,13 +93,17 @@ def expandir_composicao_item(codigo_item, quantidade, componentes):
 def expandir_composicao_itens(itens, componentes):
     linhas = []
     for item in itens:
-        linhas.extend(
-            expandir_composicao_item(
-                item.get("codigo", ""),
-                item.get("qtd", 0),
-                componentes,
+        codigo_item = normalizar_codigo(item.get("codigo", ""))
+        if codigo_item and componentes.get(codigo_item):
+            linhas.extend(
+                expandir_composicao_item(
+                    codigo_item,
+                    item.get("qtd", 0),
+                    componentes,
+                )
             )
-        )
+        elif codigo_item:
+            linhas.append(_linha_item_sem_bom(item))
     return linhas
 
 

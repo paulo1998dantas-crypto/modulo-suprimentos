@@ -32,6 +32,8 @@ from config import (
     OS_FORNECEDORES_FILE,
     OS_COMPONENTES_FILE,
     OS_PROCESSOS_FILE,
+    OS_PROCESSO_RELACOES_FILE,
+    OS_ITEM_POPUP_REGRAS_FILE,
     COUNTER_FILE,
     OS_COUNTER_FILE,
     HISTORICO_FILE,
@@ -47,6 +49,7 @@ from config import (
 )
 from calculos import calcular_total_item
 from composicao import (
+    expandir_composicao_referenciada,
     normalizar_codigo,
     normalizar_componentes,
     parse_quantidade,
@@ -67,7 +70,13 @@ from os_setores import (
     filtrar_linhas_faturamento_direto,
     filtrar_linhas_setor,
 )
-from processos_transformacao import PROCESSO_POR_ITEM, RELACOES_PROCESSO_TRANSFORMACAO, resolver_processo_transformacao
+from processos_transformacao import (
+    PROCESSO_POR_ITEM,
+    RELACOES_PROCESSO_TRANSFORMACAO,
+    construir_processo_por_item,
+    resolver_processo_transformacao,
+    resolver_processos_transformacao,
+)
 
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.secret_key = "emissor_documentos"
@@ -79,37 +88,17 @@ RELEASE_BUILD_SCRIPT = "gerar_modulo_suprimentos_envio.bat"
 ITEM_CAMPOS_BASE = [
     "descricao",
     "unidade",
-    "unidade_comercial",
-    "unidade_interna",
     "grupo",
     "categoria",
-    "tipo",
-    "fornecedor",
-    "ncm",
-    "origem",
-    "valor",
-    "ipi",
-    "icms",
-    "cofins",
-    "observacao",
+    "processo_conjunto",
 ]
 MODELO_ITENS_HEADERS = [
     "CODIGO",
     "DESCRICAO",
     "UNIDADE",
-    "UNIDADE COMERCIAL",
-    "UNIDADE INTERNA",
     "GRUPO",
     "CATEGORIA",
-    "TIPO",
-    "FORNECEDOR",
-    "NCM",
-    "ORIGEM",
-    "VALOR",
-    "IPI",
-    "ICMS",
-    "COFINS",
-    "OBSERVACAO",
+    "PROCESSO CONJUNTO",
 ]
 HEADER_ALIASES = {
     "codigo": {
@@ -139,38 +128,29 @@ HEADER_ALIASES = {
         "unidade_medida",
         "un_medida",
     },
-    "unidade_comercial": {
-        "unidade_comercial",
-        "unidade_medida_comercial",
-        "un_med_comercial",
-        "un_medi_comercial",
-        "un_med_comerc",
-        "un_comercial",
-    },
-    "unidade_interna": {
-        "unidade_interna",
-        "unidade_medida_interna",
-        "un_med_interna",
-        "un_medi_interna",
-        "un_interna",
-    },
     "grupo": {"grupo", "grupo_produto"},
     "categoria": {"categoria", "categorias", "classificacao", "classificacao_item"},
-    "tipo": {"tipo", "tipo_item"},
-    "fornecedor": {
-        "fornecedor",
-        "fornecedor_principal",
-        "nome_fornecedor",
-        "fabricante",
+    "processo_conjunto": {
+        "processo_conjunto",
+        "processo",
+        "processo_vinculado",
+        "arquivo_processo",
     },
-    "ncm": {"ncm"},
-    "origem": {"origem"},
-    "valor": {"valor", "valor_unitario", "preco", "preco_unitario", "vl_unitario"},
-    "ipi": {"ipi"},
-    "icms": {"icms"},
-    "cofins": {"cofins"},
-    "observacao": {"observacao", "observacoes", "obs"},
     "cliente": {"cliente"},
+}
+
+CAMPOS_PRODUTO_DESCARTADOS = {
+    "unidade_comercial",
+    "unidade_interna",
+    "tipo",
+    "fornecedor",
+    "ncm",
+    "origem",
+    "valor",
+    "ipi",
+    "icms",
+    "cofins",
+    "observacao",
 }
 
 def _is_in_dir(path, base):
@@ -275,6 +255,8 @@ def ensure_data_storage():
     _ensure_json_file(OS_FORNECEDORES_FILE, {})
     _ensure_json_file(OS_COMPONENTES_FILE, {})
     _ensure_json_file(OS_PROCESSOS_FILE, {})
+    _ensure_json_file(OS_PROCESSO_RELACOES_FILE, {})
+    _ensure_json_file(OS_ITEM_POPUP_REGRAS_FILE, [])
     _ensure_json_file(HISTORICO_FILE, [])
     _ensure_json_file(OC_IMPORT_FILE, {})
     _ensure_json_file(OS_IMPORT_FILE, {})
@@ -364,6 +346,8 @@ def _reset_base_data():
         OS_FORNECEDORES_FILE,
         OS_COMPONENTES_FILE,
         OS_PROCESSOS_FILE,
+        OS_PROCESSO_RELACOES_FILE,
+        OS_ITEM_POPUP_REGRAS_FILE,
         HISTORICO_FILE,
         OC_IMPORT_FILE,
         OS_IMPORT_FILE,
@@ -557,6 +541,102 @@ def carregar_os_processos():
     return normalizado
 
 
+def carregar_relacoes_processo_item():
+    if not os.path.exists(OS_PROCESSO_RELACOES_FILE):
+        return {}
+    try:
+        with open(OS_PROCESSO_RELACOES_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return {}
+    if isinstance(data, dict):
+        relacoes = {}
+        for chave, valor in data.items():
+            codigo = normalizar_codigo(chave)
+            processos = valor if isinstance(valor, list) else [valor]
+            processos = [
+                str(processo or "").strip()
+                for processo in processos
+                if str(processo or "").strip()
+            ]
+            if codigo and processos:
+                relacoes[codigo] = list(dict.fromkeys(processos))
+        return relacoes
+    if isinstance(data, list):
+        relacoes = {}
+        for relacao in data:
+            if not isinstance(relacao, dict):
+                continue
+            codigo = normalizar_codigo(
+                relacao.get("codigo")
+                or relacao.get("item_codigo")
+                or relacao.get("item")
+                or ""
+            )
+            processos = relacao.get("processos") or relacao.get("opcoes") or [
+                relacao.get("processo_conjunto") or relacao.get("processo") or ""
+            ]
+            if not isinstance(processos, list):
+                processos = [processos]
+            processos = [
+                str(processo or "").strip()
+                for processo in processos
+                if str(processo or "").strip()
+            ]
+            if codigo and processos:
+                relacoes[codigo] = list(dict.fromkeys(processos))
+        return relacoes
+    return {}
+
+
+def salvar_relacoes_processo_item(relacoes):
+    salvar_json(OS_PROCESSO_RELACOES_FILE, relacoes or {})
+
+
+def carregar_regras_popup_item():
+    if not os.path.exists(OS_ITEM_POPUP_REGRAS_FILE):
+        return []
+    try:
+        with open(OS_ITEM_POPUP_REGRAS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return []
+    if not isinstance(data, list):
+        return []
+    regras = []
+    for idx, regra in enumerate(data):
+        if not isinstance(regra, dict):
+            continue
+        gatilho = normalizar_codigo(regra.get("gatilho") or regra.get("item_gatilho") or "")
+        opcoes = [
+            normalizar_codigo(codigo)
+            for codigo in (regra.get("opcoes") or [])
+            if normalizar_codigo(codigo)
+        ]
+        if not gatilho or not opcoes:
+            continue
+        try:
+            quantidade = float(regra.get("quantidade", 1) or 1)
+        except Exception:
+            quantidade = 1
+        if quantidade <= 0:
+            quantidade = 1
+        regras.append(
+            {
+                "id": str(regra.get("id") or f"regra-{idx + 1}"),
+                "gatilho": gatilho,
+                "opcoes": list(dict.fromkeys(opcoes)),
+                "quantidade": quantidade,
+                "quantidade_editavel": bool(regra.get("quantidade_editavel", False)),
+            }
+        )
+    return regras
+
+
+def salvar_regras_popup_item(regras):
+    salvar_json(OS_ITEM_POPUP_REGRAS_FILE, regras or [])
+
+
 def carregar_os_processos():
 
     if not os.path.exists(OS_PROCESSOS_FILE):
@@ -635,6 +715,39 @@ def _formatar_qtd_saida(valor):
         return int(numero)
     texto = f"{numero:.4f}".rstrip("0").rstrip(".")
     return texto.replace(".", ",")
+
+
+def _eh_faturamento_direto(descricao):
+    texto = _corrigir_mojibake(descricao)
+    texto = unicodedata.normalize("NFKD", str(texto or "").strip().upper())
+    texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
+    return texto.startswith("FATURAMENTO DIRETO")
+
+
+def _categoria_ar_condicionado(categoria):
+    texto = _corrigir_mojibake(categoria)
+    texto = unicodedata.normalize("NFKD", str(texto or "").strip().upper())
+    texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
+    return texto.startswith("10") and "AR CONDICIONADO" in texto
+
+
+def _fornecedor_faturamento_direto(descricao, categoria, fornecedor_informado="", fornecedor_cadastro=""):
+    fornecedor_informado = str(fornecedor_informado or "").strip()
+    fornecedor_cadastro = str(fornecedor_cadastro or "").strip()
+    if _categoria_ar_condicionado(categoria):
+        texto = _corrigir_mojibake(descricao)
+        texto_norm = unicodedata.normalize("NFKD", str(texto or "").strip().upper())
+        texto_norm = "".join(ch for ch in texto_norm if not unicodedata.combining(ch))
+        partes = [parte for parte in re.split(r"[^A-Z0-9]+", texto_norm) if parte]
+        if partes:
+            ultimo = partes[-1]
+            if ultimo in {"GE", "CLIM"}:
+                return ultimo
+            if ultimo in {"EURO", "GRUPOEURO"}:
+                return "GE"
+            if ultimo in {"CLIMAUTO", "CLIMATIZAR"}:
+                return "CLIM"
+    return fornecedor_informado or fornecedor_cadastro
 
 
 def _resolve_output_path(path):
@@ -1555,7 +1668,7 @@ def _coletar_campos_extras(row, header_raw, header, usados):
     extras = {}
     for idx, _ in enumerate(header_raw):
         nome = header[idx] if idx < len(header) else ""
-        if not nome or nome in usados or idx >= len(row):
+        if not nome or nome in usados or nome in CAMPOS_PRODUTO_DESCARTADOS or idx >= len(row):
             continue
         valor = _corrigir_mojibake(row[idx])
         if valor == "":
@@ -1566,6 +1679,8 @@ def _coletar_campos_extras(row, header_raw, header, usados):
 
 def _mesclar_dados_item(atual, novos, extras=None):
     item = dict(atual or {})
+    for campo in CAMPOS_PRODUTO_DESCARTADOS:
+        item.pop(campo, None)
     for campo in ITEM_CAMPOS_BASE:
         valor = novos.get(campo, "")
         if valor != "":
@@ -1608,7 +1723,7 @@ def importar_produtos(file_storage):
 
     header_raw, header, mapa, rows = _resolver_header_importacao(
         linhas,
-        campos_esperados={"codigo", "descricao", "unidade", "grupo", "categoria", "fornecedor"},
+        campos_esperados={"codigo", "descricao", "unidade", "grupo", "categoria"},
     )
 
     produtos = carregar_produtos()
@@ -1623,36 +1738,16 @@ def importar_produtos(file_storage):
             "codigo",
             "descricao",
             "unidade",
-            "unidade_comercial",
-            "unidade_interna",
             "grupo",
             "categoria",
-            "tipo",
-            "fornecedor",
-            "ncm",
-            "origem",
-            "valor",
-            "ipi",
-            "icms",
-            "cofins",
-            "observacao",
+            "processo_conjunto",
         }
         novos = {
             "descricao": _valor_coluna(row, mapa, "descricao"),
-            "unidade": _valor_coluna(row, mapa, "unidade", "unidade_comercial", "unidade_interna"),
-            "unidade_comercial": _valor_coluna(row, mapa, "unidade_comercial"),
-            "unidade_interna": _valor_coluna(row, mapa, "unidade_interna"),
+            "unidade": _valor_coluna(row, mapa, "unidade"),
             "grupo": _valor_coluna(row, mapa, "grupo"),
             "categoria": _valor_coluna(row, mapa, "categoria"),
-            "tipo": _valor_coluna(row, mapa, "tipo"),
-            "fornecedor": _valor_coluna(row, mapa, "fornecedor"),
-            "ncm": _valor_coluna(row, mapa, "ncm"),
-            "origem": _valor_coluna(row, mapa, "origem"),
-            "valor": _valor_coluna(row, mapa, "valor"),
-            "ipi": _valor_coluna(row, mapa, "ipi"),
-            "icms": _valor_coluna(row, mapa, "icms"),
-            "cofins": _valor_coluna(row, mapa, "cofins"),
-            "observacao": _valor_coluna(row, mapa, "observacao"),
+            "processo_conjunto": _valor_coluna(row, mapa, "processo_conjunto"),
         }
         extras = _coletar_campos_extras(row, header_raw, header, usados)
         produtos[codigo] = _mesclar_dados_item(atual, novos, extras=extras)
@@ -1710,7 +1805,7 @@ def importar_os_produtos(file_storage):
 
     header_raw, header, mapa, rows = _resolver_header_importacao(
         linhas,
-        campos_esperados={"codigo", "descricao", "unidade", "grupo", "categoria", "fornecedor"},
+        campos_esperados={"codigo", "descricao", "unidade", "grupo", "categoria"},
     )
 
     produtos = carregar_os_produtos()
@@ -1725,36 +1820,14 @@ def importar_os_produtos(file_storage):
             "codigo",
             "descricao",
             "unidade",
-            "unidade_comercial",
-            "unidade_interna",
             "grupo",
             "categoria",
-            "tipo",
-            "fornecedor",
-            "ncm",
-            "origem",
-            "valor",
-            "ipi",
-            "icms",
-            "cofins",
-            "observacao",
         }
         novos = {
             "descricao": _valor_coluna(row, mapa, "descricao"),
-            "unidade": _valor_coluna(row, mapa, "unidade", "unidade_comercial", "unidade_interna"),
-            "unidade_comercial": _valor_coluna(row, mapa, "unidade_comercial"),
-            "unidade_interna": _valor_coluna(row, mapa, "unidade_interna"),
+            "unidade": _valor_coluna(row, mapa, "unidade"),
             "grupo": _valor_coluna(row, mapa, "grupo"),
             "categoria": _valor_coluna(row, mapa, "categoria"),
-            "tipo": _valor_coluna(row, mapa, "tipo"),
-            "fornecedor": _valor_coluna(row, mapa, "fornecedor"),
-            "ncm": _valor_coluna(row, mapa, "ncm"),
-            "origem": _valor_coluna(row, mapa, "origem"),
-            "valor": _valor_coluna(row, mapa, "valor"),
-            "ipi": _valor_coluna(row, mapa, "ipi"),
-            "icms": _valor_coluna(row, mapa, "icms"),
-            "cofins": _valor_coluna(row, mapa, "cofins"),
-            "observacao": _valor_coluna(row, mapa, "observacao"),
         }
         extras = _coletar_campos_extras(row, header_raw, header, usados)
         produtos[codigo] = _mesclar_dados_item(atual, novos, extras=extras)
@@ -2136,6 +2209,13 @@ def index():
     os_fornecedores = carregar_os_fornecedores()
     os_componentes = carregar_os_componentes()
     os_processos = carregar_os_processos()
+    relacoes_processo_item = carregar_relacoes_processo_item()
+    regras_popup_item = carregar_regras_popup_item()
+    processo_por_item = construir_processo_por_item(
+        os_produtos,
+        os_processos.keys(),
+        relacoes_processo_item,
+    )
     oc_prefill = carregar_importacao(OC_IMPORT_FILE)
     os_prefill = carregar_importacao(OS_IMPORT_FILE)
     tab = request.args.get("tab", "oc")
@@ -2176,8 +2256,10 @@ def index():
         bom_status=bom_status,
         os_processos_status=os_processos_status,
         processos_os=PROCESSOS_OS,
-        processo_transformacao_por_item=PROCESSO_POR_ITEM,
+        processo_transformacao_por_item=processo_por_item,
         relacoes_processo_transformacao=RELACOES_PROCESSO_TRANSFORMACAO,
+        relacoes_processo_item=relacoes_processo_item,
+        regras_popup_item=regras_popup_item,
     )
 
 
@@ -2305,6 +2387,7 @@ def gerar_oc():
 def gerar_os():
     cliente = request.form.get("os_cliente", "")
     os_produtos = carregar_os_produtos()
+    produtos_catalogo = carregar_produtos()
     itens = []
 
     codigos = request.form.getlist("os_codigo[]")
@@ -2312,6 +2395,15 @@ def gerar_os():
     series = request.form.getlist("os_serie[]")
     unidades = request.form.getlist("os_unidade[]")
     descricoes = request.form.getlist("os_descricao[]")
+    fornecedores_linha = request.form.getlist("os_fornecedor_item[]")
+    luminarias_linha = request.form.getlist("os_luminaria[]")
+    luminarias_qtd_linha = request.form.getlist("os_luminaria_qtd[]")
+    popup_itens_linha = request.form.getlist("os_popup_itens[]")
+    luminarias_extra = []
+    popup_itens_extra = []
+    regras_popup_por_gatilho = {}
+    for regra in carregar_regras_popup_item():
+        regras_popup_por_gatilho.setdefault(regra.get("gatilho", ""), []).append(regra)
     for idx in range(len(codigos)):
         codigo_item = normalizar_codigo(codigos[idx])
         if not codigo_item:
@@ -2327,6 +2419,16 @@ def gerar_os():
         item_info = os_produtos.get(codigo_item, {})
         descricao_final = item_info.get("descricao") or (descricoes[idx] if idx < len(descricoes) else "")
         unidade_final = unidades[idx] if idx < len(unidades) else item_info.get("unidade", "")
+        categoria_final = item_info.get("categoria", "") or ""
+        fornecedor_linha = fornecedores_linha[idx].strip() if idx < len(fornecedores_linha) else ""
+        fornecedor_final = item_info.get("fornecedor", "") or ""
+        if _eh_faturamento_direto(descricao_final):
+            fornecedor_final = _fornecedor_faturamento_direto(
+                descricao_final,
+                categoria_final,
+                fornecedor_linha,
+                item_info.get("fornecedor", ""),
+            )
         itens.append(
             {
                 "codigo": codigo_item,
@@ -2335,22 +2437,110 @@ def gerar_os():
                 "serie": series[idx] if idx < len(series) else "",
                 "unidade": unidade_final or item_info.get("unidade", ""),
                 "grupo": item_info.get("grupo", "") or "",
-                "categoria": item_info.get("categoria", "") or "",
-                "fornecedor": item_info.get("fornecedor", "") or "",
+                "categoria": categoria_final,
+                "fornecedor": fornecedor_final,
                 "valor": 0,
                 "total": calcular_total_item(qtd, 0, 0),
             }
         )
 
+        luminaria_codigo = normalizar_codigo(luminarias_linha[idx]) if idx < len(luminarias_linha) else ""
+        if luminaria_codigo:
+            luminaria_info = produtos_catalogo.get(luminaria_codigo, {}) or os_produtos.get(luminaria_codigo, {})
+            luminaria_qtd_raw = str(luminarias_qtd_linha[idx]).strip() if idx < len(luminarias_qtd_linha) else ""
+            try:
+                luminaria_qtd = float(luminaria_qtd_raw) if luminaria_qtd_raw else 1.0
+            except Exception:
+                luminaria_qtd = 1.0
+            if luminaria_qtd <= 0:
+                luminaria_qtd = 1.0
+            luminarias_extra.append(
+                {
+                    "item": codigo_item,
+                    "codigo": luminaria_codigo,
+                    "descricao": luminaria_info.get("descricao", "") or luminaria_info.get("nome", "") or "",
+                    "qtd": luminaria_qtd,
+                    "serie": "",
+                    "unidade": luminaria_info.get("unidade", "") or "",
+                    "grupo": luminaria_info.get("grupo", "") or "",
+                    "categoria": luminaria_info.get("categoria", "") or "",
+                    "fornecedor": luminaria_info.get("fornecedor", "") or "",
+                    "valor": 0,
+                    "total": calcular_total_item(qtd, 0, 0),
+                    "level": 0,
+                }
+            )
+
+        popup_json = popup_itens_linha[idx] if idx < len(popup_itens_linha) else "[]"
+        try:
+            popup_selecoes = json.loads(popup_json or "[]")
+        except Exception:
+            popup_selecoes = []
+        selecoes_por_regra = {
+            str(selecao.get("regra_id", "") or ""): selecao
+            for selecao in popup_selecoes
+            if isinstance(selecao, dict) and str(selecao.get("regra_id", "") or "")
+        } if isinstance(popup_selecoes, list) else {}
+        for regra in regras_popup_por_gatilho.get(codigo_item, []):
+            regra_id = str(regra.get("id", "") or "")
+            selecao = selecoes_por_regra.get(regra_id, {})
+            selecionado = normalizar_codigo(selecao.get("codigo", ""))
+            if selecionado not in (regra.get("opcoes") or []):
+                return f"Selecione o item relacionado obrigatorio para {codigo_item}.", 400
+        for selecao in popup_selecoes if isinstance(popup_selecoes, list) else []:
+            if not isinstance(selecao, dict):
+                continue
+            relacionado_codigo = normalizar_codigo(selecao.get("codigo", ""))
+            if not relacionado_codigo:
+                continue
+            try:
+                relacionado_qtd = float(selecao.get("qtd", 1) or 1)
+            except Exception:
+                relacionado_qtd = 1
+            if relacionado_qtd <= 0:
+                relacionado_qtd = 1
+            relacionado_info = produtos_catalogo.get(relacionado_codigo, {}) or os_produtos.get(relacionado_codigo, {})
+            popup_itens_extra.append(
+                {
+                    "item": codigo_item,
+                    "codigo": relacionado_codigo,
+                    "descricao": relacionado_info.get("descricao", "") or relacionado_info.get("nome", "") or "",
+                    "qtd": relacionado_qtd,
+                    "serie": "",
+                    "unidade": relacionado_info.get("unidade", "") or "",
+                    "grupo": relacionado_info.get("grupo", "") or "",
+                    "categoria": relacionado_info.get("categoria", "") or "",
+                    "fornecedor": relacionado_info.get("fornecedor", "") or "",
+                    "valor": 0,
+                    "total": calcular_total_item(relacionado_qtd, 0, 0),
+                    "level": 0,
+                }
+            )
+
     total_itens = sum(item["total"] for item in itens)
 
     processos = carregar_os_processos()
+    relacoes_processo_item = carregar_relacoes_processo_item()
+    processo_por_item = construir_processo_por_item(
+        os_produtos,
+        processos.keys(),
+        relacoes_processo_item,
+    )
     conjunto_processo_form = (request.form.get("os_processo_conjunto", "") or "").strip()
+    conjuntos_processo_disponiveis = resolver_processos_transformacao(
+        [item.get("codigo", "") for item in itens],
+        processo_por_item,
+    )
     conjunto_processo_auto = resolver_processo_transformacao(
         [item.get("codigo", "") for item in itens],
-        processos.keys(),
+        processo_por_item,
     )
-    conjunto_processo = conjunto_processo_auto or conjunto_processo_form or ""
+    if len(conjuntos_processo_disponiveis) > 1:
+        if conjunto_processo_form not in conjuntos_processo_disponiveis:
+            return "Selecione o processo relacionado obrigatorio para a O.S.", 400
+        conjunto_processo = conjunto_processo_form
+    else:
+        conjunto_processo = conjunto_processo_auto or conjunto_processo_form or ""
     processos_modelo = processos.get(conjunto_processo) or {}
 
     dados = {
@@ -2427,6 +2617,21 @@ def gerar_os():
         )
 
     composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
+    extras_composicao = expandir_composicao_referenciada(
+        [*luminarias_extra, *popup_itens_extra],
+        componentes,
+    )
+    if extras_composicao:
+        existentes = {
+            (normalizar_codigo(linha.get("item", "")), normalizar_codigo(linha.get("codigo", "")))
+            for linha in composicao_final
+        }
+        for extra in extras_composicao:
+            chave = (normalizar_codigo(extra.get("item", "")), normalizar_codigo(extra.get("codigo", "")))
+            if chave in existentes:
+                continue
+            composicao_final.append(extra)
+            existentes.add(chave)
     composicao_enriquecida = enriquecer_composicao(composicao_final, os_produtos)
     pendencias_faturamento_direto = filtrar_linhas_faturamento_direto(composicao_enriquecida)
     pendencias_expedicao = filtrar_linhas_setor(composicao_enriquecida, SETOR_EXPEDICAO)
@@ -2599,19 +2804,9 @@ def cadastrar_item():
         novos = {
             "descricao": request.form.get("descricao", "").strip(),
             "unidade": request.form.get("unidade", "").strip(),
-            "unidade_comercial": request.form.get("unidade", "").strip(),
-            "unidade_interna": "",
             "grupo": request.form.get("grupo", "").strip(),
             "categoria": request.form.get("categoria", "").strip(),
-            "tipo": request.form.get("tipo", "").strip(),
-            "fornecedor": request.form.get("fornecedor", "").strip(),
-            "ncm": request.form.get("ncm", "").strip(),
-            "origem": request.form.get("origem", "").strip(),
-            "valor": request.form.get("valor", "").strip(),
-            "ipi": request.form.get("ipi", "").strip(),
-            "icms": request.form.get("icms", "").strip(),
-            "cofins": request.form.get("cofins", "").strip(),
-            "observacao": request.form.get("observacao", "").strip(),
+            "processo_conjunto": request.form.get("processo_conjunto", "").strip(),
         }
         produtos[codigo] = _mesclar_dados_item(atual, novos)
 
@@ -2647,6 +2842,7 @@ def cadastrar_os_item():
     grupo = request.form.get("os_item_grupo", "").strip()
     categoria = request.form.get("os_item_categoria", "").strip()
     fornecedor = request.form.get("os_item_fornecedor", "").strip()
+    processo_conjunto = request.form.get("os_item_processo_conjunto", "").strip()
 
     comp_codigos = request.form.getlist("os_comp_codigo[]")
     comp_descricoes = request.form.getlist("os_comp_descricao[]")
@@ -2684,6 +2880,7 @@ def cadastrar_os_item():
                 "icms": "",
                 "cofins": "",
                 "observacao": "",
+                "processo_conjunto": processo_conjunto,
             },
         )
         if comps:
@@ -2691,12 +2888,89 @@ def cadastrar_os_item():
         elif codigo in componentes:
             componentes[codigo] = componentes.get(codigo, [])
         else:
-            return "Informe ao menos um componente para o item da OS.", 400
+            componentes[codigo] = []
 
         salvar_json(OS_PRODUTOS_FILE, produtos)
         salvar_json(OS_COMPONENTES_FILE, componentes)
 
     return index()
+
+
+@app.route("/cadastrar_relacao_processo_item", methods=["POST"])
+def cadastrar_relacao_processo_item():
+    relacoes = carregar_relacoes_processo_item()
+    codigo = normalizar_codigo(request.form.get("relacao_item", ""))
+    processos = [
+        processo.strip()
+        for processo in request.form.getlist("relacao_processo_conjunto[]")
+        if processo.strip()
+    ]
+    if not processos:
+        processo_legado = request.form.get("relacao_processo_conjunto", "").strip()
+        processos = [processo_legado] if processo_legado else []
+    if codigo and processos:
+        relacoes[codigo] = list(dict.fromkeys(processos))
+        salvar_relacoes_processo_item(relacoes)
+    return redirect(url_for("index", tab="cadastro"))
+
+
+@app.route("/excluir_relacao_processo_item", methods=["POST"])
+def excluir_relacao_processo_item():
+    relacoes = carregar_relacoes_processo_item()
+    codigo = normalizar_codigo(request.form.get("relacao_item", ""))
+    if codigo and codigo in relacoes:
+        relacoes.pop(codigo, None)
+        salvar_relacoes_processo_item(relacoes)
+    return redirect(url_for("index", tab="cadastro"))
+
+
+@app.route("/cadastrar_regra_popup_item", methods=["POST"])
+def cadastrar_regra_popup_item():
+    regras = carregar_regras_popup_item()
+    gatilho = normalizar_codigo(request.form.get("popup_regra_gatilho", ""))
+    opcoes = [
+        normalizar_codigo(codigo)
+        for codigo in request.form.getlist("popup_regra_opcao[]")
+        if normalizar_codigo(codigo)
+    ]
+    try:
+        quantidade = float(request.form.get("popup_regra_quantidade", "1") or 1)
+    except Exception:
+        quantidade = 1
+    if quantidade <= 0:
+        quantidade = 1
+    if gatilho and opcoes:
+        proximo_id = max(
+            [
+                int(re.sub(r"\D", "", str(regra.get("id", ""))) or 0)
+                for regra in regras
+            ]
+            or [0]
+        ) + 1
+        regras.append(
+            {
+                "id": f"regra-{proximo_id}",
+                "gatilho": gatilho,
+                "opcoes": list(dict.fromkeys(opcoes)),
+                "quantidade": quantidade,
+                "quantidade_editavel": request.form.get("popup_regra_quantidade_editavel") == "1",
+            }
+        )
+        salvar_regras_popup_item(regras)
+    return redirect(url_for("index", tab="cadastro"))
+
+
+@app.route("/excluir_regra_popup_item", methods=["POST"])
+def excluir_regra_popup_item():
+    regra_id = str(request.form.get("popup_regra_id", "") or "").strip()
+    if regra_id:
+        regras = [
+            regra
+            for regra in carregar_regras_popup_item()
+            if str(regra.get("id", "") or "").strip() != regra_id
+        ]
+        salvar_regras_popup_item(regras)
+    return redirect(url_for("index", tab="cadastro"))
 
 
 @app.route("/importar_produtos", methods=["POST"])

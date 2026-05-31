@@ -123,6 +123,20 @@ PROCESSOS_OS = [
             "90 - LIMPEZA/LIBERAÃ‡ÃƒO",
         ],
     },
+    {
+        "nome": "ACESSÃ“RIOS",
+        "key": "acessorios",
+        "titulo": "AcessÃ³rios",
+        "aliases": [
+            "ACESSÃ“RIOS",
+            "ACESSORIOS",
+            "ACESSÃƒâ€°RIOS",
+            "ACESSÃƒÆ’Ã¢â‚¬Â°RIOS",
+            "95 - ACESSÃ“RIOS",
+            "95 - ACESSORIOS",
+            "95 - ACESSÃƒâ€°RIOS",
+        ],
+    },
 ]
 
 PROCESSOS_ORDEM = [processo["nome"] for processo in PROCESSOS_OS]
