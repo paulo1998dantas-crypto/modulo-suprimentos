@@ -218,8 +218,6 @@ compras_app/data/os_counter.txt
 compras_app/data/oc_import.json
 compras_app/data/os_import.json
 compras_app/data/settings.json
-compras_app/data/os_regras_popup_item.json
-compras_app/data/os_relacoes_processo_item.json
 
 # Marimo
 marimo/_static/

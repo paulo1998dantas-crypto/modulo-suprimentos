@@ -1,0 +1,191 @@
+[
+  {
+    "id": "regra-1",
+    "gatilho": "40340029",
+    "opcoes": [
+      "30140027",
+      "30140029"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-2",
+    "gatilho": "10240170",
+    "opcoes": [
+      "10260140"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": true
+  },
+  {
+    "id": "regra-3",
+    "gatilho": "40340051",
+    "opcoes": [
+      "30140027",
+      "30140029"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-4",
+    "gatilho": "40340029",
+    "opcoes": [
+      "30140042",
+      "30140045"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-5",
+    "gatilho": "40340051",
+    "opcoes": [
+      "30140043",
+      "30140044"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-6",
+    "gatilho": "40340046",
+    "opcoes": [
+      "30140043",
+      "30140044"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-7",
+    "gatilho": "40340047",
+    "opcoes": [
+      "30140044",
+      "30140043"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-8",
+    "gatilho": "40340048",
+    "opcoes": [
+      "30140044",
+      "30140043"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-9",
+    "gatilho": "40340049",
+    "opcoes": [
+      "30140044",
+      "30140043"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-10",
+    "gatilho": "40340050",
+    "opcoes": [
+      "30140044",
+      "30140043"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-11",
+    "gatilho": "40340028",
+    "opcoes": [
+      "30140042",
+      "30140045"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-12",
+    "gatilho": "40340027",
+    "opcoes": [
+      "30140042",
+      "30140045"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-13",
+    "gatilho": "40340008",
+    "opcoes": [
+      "30140042",
+      "30140045"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-14",
+    "gatilho": "40340007",
+    "opcoes": [
+      "30140042",
+      "30140045"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-15",
+    "gatilho": "40340015",
+    "opcoes": [
+      "30140015",
+      "30140017"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-16",
+    "gatilho": "40340023",
+    "opcoes": [
+      "30140031",
+      "30140033"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-17",
+    "gatilho": "40340010",
+    "opcoes": [
+      "30140011",
+      "30140013"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-18",
+    "gatilho": "40340045",
+    "opcoes": [
+      "30140037",
+      "30140038"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-19",
+    "gatilho": "40340042",
+    "opcoes": [
+      "30140035",
+      "30140036"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  }
+]
