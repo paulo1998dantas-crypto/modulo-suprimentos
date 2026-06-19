@@ -65,10 +65,12 @@ from os_setores import (
     TIPO_REQUISICAO_FATURAMENTO_DIRETO,
     agrupar_linhas_setor,
     agrupar_linhas_por_fornecedor,
+    construir_itens_os_preparacao,
     construir_itens_os_setor,
     enriquecer_composicao,
     filtrar_linhas_faturamento_direto,
     filtrar_linhas_setor,
+    propagar_setor_preparacao,
 )
 from processos_transformacao import (
     PROCESSO_POR_ITEM,
@@ -165,6 +167,16 @@ def _sanitize_output_name(texto):
     if not texto:
         return ""
     texto = re.sub(r'[<>:"/\\\\|?*]+', " ", texto)
+    return " ".join(texto.split())
+
+
+def _limpar_valor_busca(texto):
+    texto = "" if texto is None else str(texto).strip()
+    if not texto:
+        return ""
+    match = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", texto)
+    if match:
+        texto = match.group(1).strip() or match.group(2).strip()
     return " ".join(texto.split())
 
 
@@ -677,21 +689,25 @@ OS_MODE_CONFIGS = {
         "titulo": "O.S Completa",
         "doc_mode": "completa",
         "itens_source": "originais",
+        "incluir_cliente_nome": False,
     },
     "expedicao": {
-        "titulo": "Requisi\u00e7\u00e3o Expedi\u00e7\u00e3o",
+        "titulo": "REQUISI\u00c7\u00c3O EXPEDI\u00c7\u00c3O",
         "doc_mode": "expedicao",
         "itens_source": "expedicao",
+        "incluir_cliente_nome": False,
     },
     "preparacao": {
-        "titulo": "Requisi\u00e7\u00e3o Prepara\u00e7\u00e3o",
+        "titulo": "REQUISI\u00c7\u00c3O PREPARA\u00c7\u00c3O",
         "doc_mode": "preparacao",
         "itens_source": "preparacao",
+        "incluir_cliente_nome": False,
     },
     "producao": {
         "titulo": "O.S Producao",
         "doc_mode": "producao",
         "itens_source": "originais",
+        "incluir_cliente_nome": False,
     },
     "mascara": {
         "titulo": "Mascara",
@@ -771,11 +787,16 @@ def _save_workbook_safe(wb, path):
         wb.save(path)
         return path
     except Exception:
-        fallback_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-        os.makedirs(fallback_dir, exist_ok=True)
-        fallback_path = _resolve_output_path(os.path.join(fallback_dir, os.path.basename(path)))
-        wb.save(fallback_path)
-        return fallback_path
+        try:
+            long_path = _win_long_path(path)
+            wb.save(long_path)
+            return path
+        except Exception:
+            fallback_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+            os.makedirs(fallback_dir, exist_ok=True)
+            fallback_path = _resolve_output_path(os.path.join(fallback_dir, os.path.basename(path)))
+            wb.save(fallback_path)
+            return fallback_path
 
 
 def _agrupar_linhas_requisicao(linhas):
@@ -825,10 +846,13 @@ def _formatar_cabecalho_planilha(ws, row_idx, total_colunas):
 
 def _criar_planilha_requisicao_materiais(numero_os, dados, linhas, titulo_arquivo):
     pasta_destino = pasta_os(numero_os, dados)
-    cliente = (dados.get("cliente", "") or "").strip()
     chassi = (dados.get("chassis", "") or "").strip()
+    partes_nome = [titulo_arquivo]
+    if chassi:
+        partes_nome.append(chassi)
+    nome_arquivo = " - ".join(partes_nome).strip(" -") + ".xlsx"
     caminho = _resolve_output_path(
-        os.path.join(pasta_destino, f"{titulo_arquivo} - {cliente} - {chassi}.xlsx")
+        os.path.join(pasta_destino, nome_arquivo)
     )
 
     wb = Workbook()
@@ -1530,15 +1554,17 @@ def _criar_modelo_os_processos_xlsx():
     wb = Workbook()
     ws = wb.active
     headers = [
-        "OPERAÇÃO", "10 - CORTE",
-        "OPERAÇÃO", "20 - AR CONDICIONADO",
-        "OPERAÇÃO", "30 - PREPARAÇÃO DE PEÇAS",
-        "OPERAÇÃO", "40 - ELETRICA 1",
-        "OPERAÇÃO", "50 - ISOLAMENTO",
-        "OPERAÇÃO", "60 - REVESTIMENTO 1",
-        "OPERAÇÃO", "70 - REVESTIMENTO 2",
-        "OPERAÇÃO", "80 - ELÉTRICA 2",
-        "OPERAÇÃO", "90 - LIMPEZA/LIBERAÇÃO",
+        "OPERACAO", "10 - CORTE",
+        "OPERACAO", "20 - AR CONDICIONADO",
+        "OPERACAO", "30 - PREPARACAO DE PECAS",
+        "OPERACAO", "40 - ELETRICA 1",
+        "OPERACAO", "50 - ISOLAMENTO",
+        "OPERACAO", "60 - REVESTIMENTO 1",
+        "OPERACAO", "70 - REVESTIMENTO 2",
+        "OPERACAO", "80 - ELETRICA 2",
+        "OPERACAO", "90 - LIMPEZA/LIBERACAO",
+        "OPERACAO", "95 - ACESSORIOS",
+        "OPERACAO", "100 - BANCO",
     ]
     ws.append(headers)
 
@@ -1949,6 +1975,92 @@ def importar_os_componentes(file_storage):
     return count
 
 
+EXCEL_EXTS_IMPORTACAO = {".xls", ".xlsx", ".xlsm", ".xltx", ".xltm"}
+
+
+def listar_arquivos_excel_base(pasta):
+    arquivos = []
+    for root, _, nomes in os.walk(pasta):
+        for nome in nomes:
+            if nome.startswith("~$"):
+                continue
+            if os.path.splitext(nome)[1].lower() in EXCEL_EXTS_IMPORTACAO:
+                arquivos.append(os.path.join(root, nome))
+    arquivos.sort()
+    return arquivos
+
+
+def importar_bom_diretorio(bom_dir, somente_se_mais_novo=False):
+    arquivos = listar_arquivos_excel_base(bom_dir)
+    if not arquivos:
+        return {
+            "arquivos": 0,
+            "linhas": 0,
+            "falhas": 0,
+            "em_uso": [],
+            "com_erro": [],
+            "atualizado": False,
+        }
+
+    if somente_se_mais_novo and os.path.exists(OS_COMPONENTES_FILE):
+        base_mtime = os.path.getmtime(OS_COMPONENTES_FILE)
+        mtimes = []
+        for caminho in arquivos:
+            try:
+                mtimes.append(os.path.getmtime(caminho))
+            except FileNotFoundError:
+                app.logger.warning("B.O.M. ignorada porque nao esta mais acessivel: %s", caminho)
+        if not mtimes:
+            return {
+                "arquivos": 0,
+                "linhas": 0,
+                "falhas": 0,
+                "em_uso": [],
+                "com_erro": [],
+                "atualizado": False,
+            }
+        mais_novo = max(mtimes)
+        if mais_novo <= base_mtime:
+            return {
+                "arquivos": len(arquivos),
+                "linhas": 0,
+                "falhas": 0,
+                "em_uso": [],
+                "com_erro": [],
+                "atualizado": False,
+            }
+
+    arquivos_processados = 0
+    linhas_importadas = 0
+    falhas = 0
+    arquivos_em_uso = []
+    arquivos_com_erro = []
+    for caminho in arquivos:
+        try:
+            with _open_for_read(caminho) as arquivo:
+                storage = FileStorage(stream=arquivo, filename=os.path.basename(caminho))
+                linhas_importadas += importar_os_componentes(storage)
+            arquivos_processados += 1
+            app.logger.info("Importado B.O.M. %s", caminho)
+        except PermissionError:
+            app.logger.exception("Falha ao importar B.O.M. (arquivo em uso) %s", caminho)
+            arquivos_em_uso.append(os.path.basename(caminho))
+            falhas += 1
+        except Exception:
+            app.logger.exception("Falha ao importar B.O.M. %s", caminho)
+            arquivos_com_erro.append(os.path.basename(caminho))
+            falhas += 1
+
+    return {
+        "arquivos": arquivos_processados,
+        "linhas": linhas_importadas,
+        "falhas": falhas,
+        "em_uso": arquivos_em_uso,
+        "com_erro": arquivos_com_erro,
+        "atualizado": arquivos_processados > 0,
+    }
+
+
 def importar_os_processos(file_storage):
     linhas = ler_linhas_arquivo(file_storage)
     if not linhas:
@@ -1963,6 +2075,7 @@ def importar_os_processos(file_storage):
     # formato "longo": colunas processo/atividade/responsavel
     if "processo" in header_norm:
         mapa = {name: idx for idx, name in enumerate(header_norm)}
+        staged_por_conjunto = {}
 
         for row in linhas[1:]:
             def pegar(col):
@@ -1994,7 +2107,7 @@ def importar_os_processos(file_storage):
                 "LIMPEZA/LIBERACAO": "LIMPEZA/LIBERAÇÃO",
                 "LIMPEZA/LIBERAÇÃO": "LIMPEZA/LIBERAÇÃO",
             }
-            processo_key = mapa_proc.get(processo_norm, processo)
+            processo_key = normalizar_nome_processo(mapa_proc.get(processo_norm, processo))
 
             processos.setdefault(conjunto, {})
             processos[conjunto].setdefault(processo_key, []).append({
@@ -2030,7 +2143,7 @@ def importar_os_processos(file_storage):
             "LIMPEZA/LIBERACAO": "LIMPEZA/LIBERAÇÃO",
             "LIMPEZA/LIBERAÇÃO": "LIMPEZA/LIBERAÇÃO",
         }
-        processo_key = mapa_proc.get(processo_norm, processo)
+        processo_key = normalizar_nome_processo(mapa_proc.get(processo_norm, processo))
         processos[conjunto].setdefault(processo_key, [])
 
         for row in linhas[1:]:
@@ -2094,6 +2207,7 @@ def importar_os_processos_atualizado(file_storage):
 
     if "processo" in header_norm:
         mapa = {name: idx for idx, name in enumerate(header_norm)}
+        staged_por_conjunto = {}
 
         for row in linhas[1:]:
             def pegar(col):
@@ -2109,12 +2223,20 @@ def importar_os_processos_atualizado(file_storage):
             if processo not in PROCESSOS_ORDEM or not atividade:
                 continue
 
-            preparar_conjunto(conjunto, reset_all=True)
-            processos[conjunto][processo].append({
+            staged_por_conjunto.setdefault(conjunto, {}).setdefault(processo, []).append({
                 "atividade": atividade,
                 "responsavel": responsavel,
             })
             count += 1
+
+        if count == 0:
+            return 0
+
+        for conjunto, staged in staged_por_conjunto.items():
+            preservar = set(PROCESSOS_ORDEM) - set(staged)
+            preparar_conjunto(conjunto, reset_all=True, preservar_processos=preservar)
+            for processo, linhas_processo in staged.items():
+                processos[conjunto][processo] = linhas_processo
 
         salvar_json(OS_PROCESSOS_FILE, processos)
         return count
@@ -2154,14 +2276,36 @@ def importar_os_processos_atualizado(file_storage):
     somente_banco = nomes_importados == {"BANCO"}
     if somente_banco:
         conjunto = remover_sufixo_banco(conjunto)
-    preservar = {"BANCO"} if not somente_banco and "BANCO" not in nomes_importados else set()
-    preparar_conjunto(conjunto, reset_all=not somente_banco, preservar_processos=preservar)
+    preservar = set(PROCESSOS_ORDEM) - nomes_importados
+    preparar_conjunto(conjunto, reset_all=True, preservar_processos=preservar)
 
     for processo_nome, linhas_processo in staged.items():
         processos[conjunto][processo_nome] = linhas_processo
 
     salvar_json(OS_PROCESSOS_FILE, processos)
     return count
+
+
+def mesclar_processos_modelo(processos, conjuntos):
+    processos_final = {nome: [] for nome in PROCESSOS_ORDEM}
+    vistos = {nome: set() for nome in PROCESSOS_ORDEM}
+    for conjunto in conjuntos or []:
+        modelo = processos.get(conjunto) or {}
+        for nome in PROCESSOS_ORDEM:
+            for linha in modelo.get(nome) or []:
+                atividade = str((linha or {}).get("atividade", "")).strip()
+                responsavel = str((linha or {}).get("responsavel", "")).strip()
+                if not atividade:
+                    continue
+                chave = (atividade, responsavel)
+                if chave in vistos[nome]:
+                    continue
+                processos_final[nome].append({
+                    "atividade": atividade,
+                    "responsavel": responsavel,
+                })
+                vistos[nome].add(chave)
+    return processos_final
 
 
 def proximo_numero_oc():
@@ -2385,9 +2529,22 @@ def gerar_oc():
 
 @app.route("/gerar_os", methods=["POST"])
 def gerar_os():
-    cliente = request.form.get("os_cliente", "")
+    cliente = _limpar_valor_busca(
+        request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
+    )
     os_produtos = carregar_os_produtos()
     produtos_catalogo = carregar_produtos()
+    bom_dir = get_bom_dir()
+    if bom_dir and os.path.isdir(bom_dir):
+        resultado_bom = importar_bom_diretorio(bom_dir, somente_se_mais_novo=True)
+        if resultado_bom.get("falhas"):
+            detalhes = []
+            if resultado_bom.get("em_uso"):
+                detalhes.append(f"arquivos em uso: {', '.join(resultado_bom['em_uso'][:3])}")
+            if resultado_bom.get("com_erro"):
+                detalhes.append(f"arquivos com erro: {', '.join(resultado_bom['com_erro'][:3])}")
+            resumo = "; ".join(detalhes) or "falha ao ler a base"
+            return f"Nao foi possivel atualizar a B.O.M antes de gerar a O.S. ({resumo}).", 400
     itens = []
 
     codigos = request.form.getlist("os_codigo[]")
@@ -2527,21 +2684,20 @@ def gerar_os():
         relacoes_processo_item,
     )
     conjunto_processo_form = (request.form.get("os_processo_conjunto", "") or "").strip()
+    codigos_para_processo = [
+        item.get("codigo", "")
+        for item in [*itens, *luminarias_extra, *popup_itens_extra]
+        if item.get("codigo", "")
+    ]
     conjuntos_processo_disponiveis = resolver_processos_transformacao(
-        [item.get("codigo", "") for item in itens],
+        codigos_para_processo,
         processo_por_item,
     )
-    conjunto_processo_auto = resolver_processo_transformacao(
-        [item.get("codigo", "") for item in itens],
-        processo_por_item,
-    )
-    if len(conjuntos_processo_disponiveis) > 1:
-        if conjunto_processo_form not in conjuntos_processo_disponiveis:
-            return "Selecione o processo relacionado obrigatorio para a O.S.", 400
-        conjunto_processo = conjunto_processo_form
-    else:
-        conjunto_processo = conjunto_processo_auto or conjunto_processo_form or ""
-    processos_modelo = processos.get(conjunto_processo) or {}
+    if conjunto_processo_form and conjunto_processo_form in processos:
+        conjuntos_processo_disponiveis.append(conjunto_processo_form)
+    conjuntos_processo_disponiveis = list(dict.fromkeys(conjuntos_processo_disponiveis))
+    conjunto_processo = " + ".join(conjuntos_processo_disponiveis)
+    processos_modelo = mesclar_processos_modelo(processos, conjuntos_processo_disponiveis)
 
     dados = {
         "cliente": cliente,
@@ -2575,11 +2731,8 @@ def gerar_os():
             algum_processo_informado = True
         processos_final[nome] = linhas
 
-    if not algum_processo_informado and processos_modelo:
-        processos_final = {
-            nome: [dict(linha) for linha in (processos_modelo.get(nome) or [])]
-            for nome in PROCESSOS_ORDEM
-        }
+    if not algum_processo_informado and any(processos_modelo.values()):
+        processos_final = processos_modelo
 
     numero_manual = request.form.get("os_numero", "").strip()
     numero_os = numero_manual or proximo_numero_os()
@@ -2632,14 +2785,18 @@ def gerar_os():
                 continue
             composicao_final.append(extra)
             existentes.add(chave)
-    composicao_enriquecida = enriquecer_composicao(composicao_final, os_produtos)
+    composicao_enriquecida = propagar_setor_preparacao(
+        enriquecer_composicao(composicao_final, os_produtos),
+        os_produtos,
+        componentes,
+    )
     pendencias_faturamento_direto = filtrar_linhas_faturamento_direto(composicao_enriquecida)
     pendencias_expedicao = filtrar_linhas_setor(composicao_enriquecida, SETOR_EXPEDICAO)
     pendencias_preparacao = filtrar_linhas_setor(composicao_enriquecida, SETOR_PREPARACAO)
     requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
 
     itens_expedicao = construir_itens_os_setor(agrupar_linhas_setor(pendencias_expedicao))
-    itens_preparacao = construir_itens_os_setor(agrupar_linhas_setor(pendencias_preparacao))
+    itens_preparacao = construir_itens_os_preparacao(pendencias_preparacao)
     for item in itens_expedicao + itens_preparacao:
         item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
 
@@ -2682,6 +2839,8 @@ def gerar_os():
                 composicao_final or None,
                 modo=config_modo["doc_mode"],
                 titulo_arquivo=config_modo["titulo"],
+                incluir_cliente_nome=config_modo.get("incluir_cliente_nome", True),
+                cliente_nome_limite=config_modo.get("cliente_nome_limite"),
             )
         )
 
@@ -2702,7 +2861,8 @@ def gerar_os():
                 _criar_layout_clone(),
                 composicao_resolvida=[],
                 modo="expedicao",
-                titulo_arquivo=f"Requisicao Faturamento Direto - {fornecedor_titulo}",
+                titulo_arquivo=f"FATURAMENTO DIRETO - {fornecedor_titulo}",
+                incluir_cliente_nome=False,
             )
         )
     arquivo_requisicao_materiais = _criar_planilha_requisicao_materiais(
@@ -2714,7 +2874,6 @@ def gerar_os():
 
     limpar_importacao(OS_IMPORT_FILE)
 
-    cliente_nome = (dados.get("cliente", "") or "").strip()
     chassi_nome = (dados.get("chassis", "") or "").strip()
     dados_historico = dict(dados)
     dados_historico["modo_os"] = "pacote_os"
@@ -2732,7 +2891,7 @@ def gerar_os():
         *arquivos_docx,
         arquivo_requisicao_materiais,
     ]
-    nome_zip = f"02 - Pacote O.S - {cliente_nome} - {chassi_nome}.zip".strip(" -")
+    nome_zip = f"02 - Pacote O.S - {chassi_nome}.zip".strip(" -")
     zip_path, download_name = _criar_zip_temporario(arquivos_saida, nome_zip)
 
     @after_this_request
@@ -3033,38 +3192,18 @@ def atualizar_bom():
         status = f"Caminho da B.O.M. inválido: {bom_dir}"
         return redirect(url_for("index", tab="cadastro", bom_status=status))
 
-    excel_exts = {".xls", ".xlsx", ".xlsm", ".xltx", ".xltm"}
-    arquivos = []
-    for root, _, nomes in os.walk(bom_dir):
-        for nome in nomes:
-            if os.path.splitext(nome)[1].lower() in excel_exts:
-                arquivos.append(os.path.join(root, nome))
-    arquivos.sort()
+    arquivos = listar_arquivos_excel_base(bom_dir)
 
     if not arquivos:
         status = f"Nenhuma planilha Excel (.xls/.xlsx/.xlsm/.xltx/.xltm) encontrada em {bom_dir}"
         return redirect(url_for("index", tab="cadastro", bom_status=status))
 
-    arquivos_processados = 0
-    linhas_importadas = 0
-    falhas = 0
-    arquivos_em_uso = []
-    arquivos_com_erro = []
-    for caminho in arquivos:
-        try:
-            with _open_for_read(caminho) as arquivo:
-                storage = FileStorage(stream=arquivo, filename=os.path.basename(caminho))
-                linhas_importadas += importar_os_componentes(storage)
-            arquivos_processados += 1
-            app.logger.info("Importado B.O.M. %s", caminho)
-        except PermissionError:
-            app.logger.exception("Falha ao importar B.O.M. (arquivo em uso) %s", caminho)
-            arquivos_em_uso.append(os.path.basename(caminho))
-            falhas += 1
-        except Exception:
-            app.logger.exception("Falha ao importar B.O.M. %s", caminho)
-            arquivos_com_erro.append(os.path.basename(caminho))
-            falhas += 1
+    resultado = importar_bom_diretorio(bom_dir)
+    arquivos_processados = resultado["arquivos"]
+    linhas_importadas = resultado["linhas"]
+    falhas = resultado["falhas"]
+    arquivos_em_uso = resultado["em_uso"]
+    arquivos_com_erro = resultado["com_erro"]
 
     if arquivos_processados == 0:
         status = f"Nenhum arquivo válido encontrado em {bom_dir}"

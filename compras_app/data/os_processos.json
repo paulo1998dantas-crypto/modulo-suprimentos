@@ -238,7 +238,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "SPRINTER 517 - SELADO-VISTA - PLUS": {
     "CORTE": [
@@ -479,7 +480,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "SPRINTER 417 14 - SELADO-VISTA - PLUS": {
     "CORTE": [
@@ -720,7 +722,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "TRANSIT L4H3": {
     "CORTE": [],
@@ -915,7 +918,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "MASTER L3H2 - SELADO-VISTA- ESSENCIAL": {
     "CORTE": [
@@ -1132,7 +1136,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "MASTER L3H2 - VITRE - ESSENCIAL": {
     "CORTE": [],
@@ -1315,7 +1320,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "MASTER L2H2 - SELADO-VISTA- ESSENCIAL": {
     "CORTE": [
@@ -1540,7 +1546,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "SPRINTER 517 - VITRE - PLUS": {
     "CORTE": [],
@@ -1764,7 +1771,8 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
-    ]
+    ],
+    "ACESSÃ“RIOS": []
   },
   "E S J TB - SELADO-VISTA": {
     "CORTE": [
@@ -1981,6 +1989,574 @@
         "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
         "responsavel": ""
       }
+    ],
+    "ACESSÃ“RIOS": []
+  },
+  "E S J TB - SELADO-VITRE": {
+    "CORTE": [],
+    "AR CONDICIONADO": [
+      {
+        "atividade": "CONFERÊNCIA DA INSTALAÇÃO DO AR CONDICIONADO CONFORME OS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "TESTE DE FUNCIONAMENTO DO AR CONDICIONADO",
+        "responsavel": ""
+      }
+    ],
+    "PREPARAÇÃO DE PEÇAS": [
+      {
+        "atividade": "UTILIZAR O GABARITO DE CORTE MATERIAL ISOLAMENTO PARA PREPARAR MATERIAIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "USINAR CHAPA DE COMPENSADO NAVAL CONFORME DESENHO TÉCNICO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR CHAPA DE COMPENSADO NAVAL USINADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR PÓS LIXAMENTO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NA MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR MANTA VINÍLICA (PASSADEIRA) NO ASSOALHO DE COMPENSADO NAVAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS DA MANTA VINÍLICA (PASSADEIRA) E FAZER RODAPÉ PARA ESTANQUIEDADE",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "PASSAGEM DO CHICOTE LUMINARIA NO SALÃO",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [
+      {
+        "atividade": "REMOVER DIVISÓRIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO NAS COLUNAS SUPERIORES DA PORTA DE CORRER",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO NA LATERAL PARA ASSOALHO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FURAÇÃO PISO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR ISOLAMENTO TÉRMICO NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR GALVANIZADOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR NIVELADOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU DE PARABRISA NO ASSOALHO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR CHAPA DE COMPENSADO JÁ COM MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS PASSADEIRAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PARAFUSAR CHAPA DE COMPENSADO NAVAL NA PORTA LATERAL E TRASEIRA",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 1": [
+      {
+        "atividade": "PASSAR CHICOTE TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR BORRACHA DE ACABAMENTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAL LE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAL LD",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO DA CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO COLUNA LD",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO DAS PORTAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA DA PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA TRASEIRA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA DO PORTA-MALAS",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 2": [
+      {
+        "atividade": "INSTALAR OS MARTELOS DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "BATER TAMPINHAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO FAIXA REFLETIVA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR MAÇANETA DA PORTA DE CORRER",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR EXTINTOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO RETROVISOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO ADESIVO QUEBRA VIDRO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ESTRIBO",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "INSTALAR LUMINÁRIAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR FIO DAS LUMINARIAS ATÉ O INTERRUPTOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR INTERRUPTOR DAS LUMINARIAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE DE TACOGRAFO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SINAL DO TACOGRAFO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR TACOGRAFO",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [
+      {
+        "atividade": "REALIZAR LAVAGEM EXTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR LIMPEZA INTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
+        "responsavel": ""
+      }
+    ],
+    "ACESSÃ“RIOS": []
+  },
+  "11 - PROCESSO ACESSORIO - USB NH 1 5A": {
+    "CORTE": [],
+    "AR CONDICIONADO": [],
+    "PREPARAÇÃO DE PEÇAS": [],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "PASSAGEM CHICOTE TOMADA USB",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [],
+    "REVESTIMENTO 1": [],
+    "REVESTIMENTO 2": [],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "INSTALAR TOMADAS USB",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [],
+    "ACESSÃ“RIOS": [
+      {
+        "atividade": "INSTALAR ACESSORIOS CONFORME ORDEM DE SERVIÇO",
+        "responsavel": ""
+      }
     ]
+  },
+  "12 - PROCESSO BANCO - LB MC 3,2,3 - ESJ": {
+    "CORTE": [],
+    "AR CONDICIONADO": [],
+    "PREPARAÇÃO DE PEÇAS": [],
+    "ELÉTRICA 1": [],
+    "ISOLAMENTO": [],
+    "REVESTIMENTO 1": [],
+    "REVESTIMENTO 2": [],
+    "ELÉTRICA 2": [],
+    "BANCO": [
+      {
+        "atividade": "INSTALAR BUCHAS ESPAÇADORAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "POSICIONAR O BANCO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR COM PARAFUSO M10 COM ARUELA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLOCAR CHAPINHA REFORÇO COM PORCA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAÇÃO FINAL COM PNEUMATICA",
+        "responsavel": ""
+      }
+    ],
+    "LIMPEZA/LIBERAÇÃO": [],
+    "ACESSÃ“RIOS": []
+  },
+  "13 - PROCESSO FATURAMENTO DIRETO GERAL": {
+    "CORTE": [],
+    "AR CONDICIONADO": [],
+    "PREPARAÇÃO DE PEÇAS": [],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "PASSAGEM CHICOTE CONFORME FATURAMENTO DIRETO",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [],
+    "REVESTIMENTO 1": [],
+    "REVESTIMENTO 2": [],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "INSTALAÇÃO FATURAMENTO DIRETO CONFORME FORNECEDOR",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [],
+    "ACESSÃ“RIOS": [
+      {
+        "atividade": "INSTALAR ACESSORIOS CONFORME ORDEM DE SERVIÇO",
+        "responsavel": ""
+      }
+    ]
+  },
+  "14 - PROCESSO BANCO - LB MC 3,3 - ESJ": {
+    "CORTE": [],
+    "AR CONDICIONADO": [],
+    "PREPARAÇÃO DE PEÇAS": [],
+    "ELÉTRICA 1": [],
+    "ISOLAMENTO": [],
+    "REVESTIMENTO 1": [],
+    "REVESTIMENTO 2": [],
+    "ELÉTRICA 2": [],
+    "BANCO": [
+      {
+        "atividade": "INSTALAR BUCHAS ESPAÇADORAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "POSICIONAR O BANCO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR COM PARAFUSO M10 COM ARUELA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLOCAR CHAPINHA REFORÇO COM PORCA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAÇÃO FINAL COM PNEUMATICA",
+        "responsavel": ""
+      }
+    ],
+    "LIMPEZA/LIBERAÇÃO": [],
+    "ACESSÃ“RIOS": []
+  },
+  "BJD - SELADO-VISTA- ESSENCIAL": {
+    "CORTE": [
+      {
+        "atividade": "CORTAR LATERAIS DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR LATERAIS DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR TRATAMENTO SUPERFICIAL COM GALVANIZADOR A FRIO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ASPIRAR LIMALHA RESULTANTE DO CORTE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU NA LATERAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR VIDROS NO VEÍCULO",
+        "responsavel": ""
+      }
+    ],
+    "AR CONDICIONADO": [
+      {
+        "atividade": "CONFERÊNCIA DA INSTALAÇÃO DO AR CONDICIONADO CONFORME OS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "TESTE DE FUNCIONAMENTO DO AR CONDICIONADO",
+        "responsavel": ""
+      }
+    ],
+    "PREPARAÇÃO DE PEÇAS": [
+      {
+        "atividade": "UTILIZAR O GABARITO DE CORTE MATERIAL ISOLAMENTO PARA PREPARAR MATERIAIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "USINAR CHAPA DE COMPENSADO NAVAL CONFORME DESENHO TÉCNICO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR CHAPA DE COMPENSADO NAVAL USINADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR PÓS LIXAMENTO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NA MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR MANTA VINÍLICA (PASSADEIRA) NO ASSOALHO DE COMPENSADO NAVAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS DA MANTA VINÍLICA (PASSADEIRA) E FAZER RODAPÉ PARA ESTANQUIEDADE",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "COLAR LED NO DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR DEFLETOR DE AR NO DUTO",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [
+      {
+        "atividade": "REMOVER DIVISORIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REMOVER GANCHOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO LE/LD SUPERIOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR ISOLAMENTO TÉRMICO NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR GALVANIZADOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU DE PARABRISA NO ASSOALHO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR CHAPA DE COMPENSADO JÁ COM MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS PASSADEIRAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PARAFUSAR CHAPA DE COMPENSADO NAVAL NA PORTA LATERAL E TRASEIRA",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 1": [
+      {
+        "atividade": "PASSAR CHICOTE TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAIS INFERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR BORRACHA DE ACABAMENTO LATERAIS SUPERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAIS SUPERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR COIFA DO DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR CONSOLE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO DO CINTO LD",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO DO CINTO LE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO SUPERIOR PORTAS",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 2": [
+      {
+        "atividade": "INSTALAR CANTONEIRAS LATERAIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR CANTONEIRAS TRASEIRA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR OS MARTELOS DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "BATER TAMPINHAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO FAIXA REFLETIVA",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "FAZER LIGAÇÃO LED DUTO NO CHICOTE ORIGINAL ILUMINAÇÃO SALÃO PARA LIGAÇÃO LED DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR DUTO DE AR CONDICIONADO JÁ PREPARADO PELA ELÉTRICA 1",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO DO TACOGRAFO",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [
+      {
+        "atividade": "REALIZAR LAVAGEM EXTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR LIMPEZA INTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
+        "responsavel": ""
+      }
+    ],
+    "ACESSÃ“RIOS": []
   }
 }

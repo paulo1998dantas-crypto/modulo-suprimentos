@@ -30,6 +30,46 @@ def _resolve_unique_path(path):
     return path
 
 
+def _sanitize_nome_arquivo(texto):
+    texto = "" if texto is None else str(texto).strip()
+    invalid = '<>:"/\\\\|?*'
+    for ch in invalid:
+        texto = texto.replace(ch, " ")
+    return " ".join(texto.split())
+
+
+def _limitar_nome_arquivo(pasta, nome, limite_path=245):
+    nome = _sanitize_nome_arquivo(nome) or "documento.docx"
+    base, ext = os.path.splitext(nome)
+    disponivel = limite_path - len(os.path.abspath(pasta)) - 1
+    if disponivel <= len(ext) + 8:
+        return f"02 - OS{ext or '.docx'}"
+    if len(nome) <= disponivel:
+        return nome
+    base_limite = max(8, disponivel - len(ext))
+    return f"{base[:base_limite].strip(' -')}{ext}"
+
+
+def _cliente_resumido_nome(cliente, limite=6):
+    cliente = _sanitize_nome_arquivo(cliente)
+    if not cliente:
+        return ""
+    primeiro = cliente.split()[0] if cliente.split() else cliente
+    return primeiro[:limite].strip(" -")
+
+
+def _montar_nome_documento_os(titulo_arquivo, cliente, chassi, incluir_cliente=False, cliente_limite=None):
+    partes = ["02", titulo_arquivo]
+    if incluir_cliente:
+        cliente_nome = _cliente_resumido_nome(cliente, cliente_limite) if cliente_limite else _sanitize_nome_arquivo(cliente)
+        if cliente_nome:
+            partes.append(cliente_nome)
+    chassi_nome = _sanitize_nome_arquivo(chassi)
+    if chassi_nome:
+        partes.append(chassi_nome)
+    return " - ".join(parte for parte in partes if parte).strip(" -") + ".docx"
+
+
 def _safe_save_doc(doc, path):
     try:
         doc.save(path)
@@ -407,11 +447,25 @@ def _alinhar_tabelas_processo(refs, doc):
                     _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
 
-def _salvar_documento_os(doc, numero_os, dados, titulo_arquivo="O.S"):
+def _salvar_documento_os(
+    doc,
+    numero_os,
+    dados,
+    titulo_arquivo="O.S",
+    incluir_cliente_nome=True,
+    cliente_nome_limite=None,
+):
     pasta = pasta_os(numero_os, dados)
     cliente = (dados.get("cliente", "") or "").strip()
     chassi = (dados.get("chassis", "") or "").strip()
-    nome = f"02 - {titulo_arquivo} - {cliente} - {chassi}.docx"
+    nome = _montar_nome_documento_os(
+        titulo_arquivo,
+        cliente,
+        chassi,
+        incluir_cliente=incluir_cliente_nome,
+        cliente_limite=cliente_nome_limite,
+    )
+    nome = _limitar_nome_arquivo(pasta, nome)
     path = os.path.join(pasta, nome)
     path = _resolve_unique_path(path)
     return _safe_save_doc(doc, path)
@@ -427,6 +481,8 @@ def gerar_os_docx(
     composicao_resolvida=None,
     modo="completa",
     titulo_arquivo="O.S",
+    incluir_cliente_nome=True,
+    cliente_nome_limite=None,
 ):
     doc = Document(TEMPLATE_OS)
     refs = mapear_tabelas_os(doc)
@@ -463,9 +519,16 @@ def gerar_os_docx(
     ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao"}
     ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao"}
 
-    if modo in {"completa", "producao"}:
+    if modo == "completa":
         ocultar_processos = False
         processos_exibicao = processos
+    elif modo == "producao":
+        ocultar_processos = False
+        processos_exibicao = {
+            nome: linhas
+            for nome, linhas in processos.items()
+            if nome != processo_preparacao
+        }
     elif modo == "preparacao":
         ocultar_processos = False
         processos_exibicao = (
@@ -510,7 +573,14 @@ def gerar_os_docx(
             _alinhar_descricao_esquerda(doc.tables[refs["itens"]], 1)
         if refs.get("composicao") is not None and refs["composicao"] < len(doc.tables):
             _alinhar_descricao_esquerda(doc.tables[refs["composicao"]], 1, inicio_linha=1)
-        return _salvar_documento_os(doc, numero_os, dados, titulo_arquivo=titulo_arquivo)
+        return _salvar_documento_os(
+            doc,
+            numero_os,
+            dados,
+            titulo_arquivo=titulo_arquivo,
+            incluir_cliente_nome=incluir_cliente_nome,
+            cliente_nome_limite=cliente_nome_limite,
+        )
 
     if ocultar_observacoes and refs.get("observacoes") is not None:
         _remover_tabela(doc, doc.tables[refs["observacoes"]])
@@ -564,4 +634,11 @@ def gerar_os_docx(
                 _set_cell_align(tabela_dados.rows[row_idx].cells[col_idx], WD_ALIGN_PARAGRAPH.LEFT)
 
     _alinhar_tabelas_processo(refs, doc)
-    return _salvar_documento_os(doc, numero_os, dados, titulo_arquivo=titulo_arquivo)
+    return _salvar_documento_os(
+        doc,
+        numero_os,
+        dados,
+        titulo_arquivo=titulo_arquivo,
+        incluir_cliente_nome=incluir_cliente_nome,
+        cliente_nome_limite=cliente_nome_limite,
+    )

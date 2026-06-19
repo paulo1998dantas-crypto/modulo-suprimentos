@@ -64,7 +64,7 @@ ENDERECO_ENTREGA = {
 def pasta_ano():
     ano = str(datetime.now().year)
     pedidos_dir, _ = get_save_paths()
-    path = os.path.join(pedidos_dir, ano)
+    path = _dir_com_ano(pedidos_dir, ano)
     try:
         os.makedirs(path, exist_ok=True)
         return path
@@ -78,7 +78,7 @@ def pasta_ano():
 def pasta_ano_os():
     ano = str(datetime.now().year)
     _, os_dir = get_save_paths()
-    path = os.path.join(os_dir, ano)
+    path = _dir_com_ano(os_dir, ano)
     try:
         os.makedirs(path, exist_ok=True)
         return path
@@ -108,6 +108,44 @@ def _sanitize_pasta(texto):
     for ch in invalid:
         texto = texto.replace(ch, " ")
     return " ".join(texto.split())
+
+
+def _dir_com_ano(base_dir, ano):
+    base_dir = os.path.normpath(base_dir)
+    if os.path.basename(base_dir) == str(ano):
+        return base_dir
+    return os.path.join(base_dir, str(ano))
+
+
+def _limitar_nome_pasta(base_dir, nome, limite_path=210):
+    nome = _sanitize_pasta(nome).strip(" -") or "OS"
+    disponivel = limite_path - len(os.path.abspath(base_dir)) - 1
+    if disponivel <= 0:
+        return nome[:20].strip(" -") or "OS"
+    if len(nome) <= disponivel:
+        return nome
+    return nome[:max(12, disponivel)].strip(" -") or "OS"
+
+
+def _nome_pasta_os(base_dir, numero, cliente, chassi, mmv="", municipio=""):
+    numero = _sanitize_pasta(numero)
+    cliente = _sanitize_pasta(cliente)
+    chassi = _sanitize_pasta(chassi)
+    mmv = _sanitize_pasta(mmv)
+    municipio = _sanitize_pasta(municipio)
+
+    if cliente and chassi:
+        disponivel = 210 - len(os.path.abspath(base_dir)) - 1
+        fixo = f"{numero} -  - {chassi}"
+        limite_cliente = max(0, disponivel - len(fixo))
+        if limite_cliente and len(cliente) > limite_cliente:
+            cliente = cliente[:limite_cliente].strip(" -")
+        nome = f"{numero} - {cliente} - {chassi}" if cliente else f"{numero} - {chassi}"
+    elif chassi:
+        nome = f"{numero} - {chassi}"
+    else:
+        nome = f"{numero} - {mmv} - {municipio}"
+    return _limitar_nome_pasta(base_dir, nome)
 
 
 def _carregar_settings():
@@ -175,7 +213,7 @@ def set_processos_dir(processos_dir):
 def pasta_os(numero_os, dados):
     ano = str(datetime.now().year)
     _, os_dir = get_save_paths()
-    base_ano = os.path.join(os_dir, ano)
+    base_ano = _dir_com_ano(os_dir, ano)
     try:
         os.makedirs(base_ano, exist_ok=True)
     except PermissionError:
@@ -214,8 +252,9 @@ def pasta_os(numero_os, dados):
                 or nome_trim.startswith(f"{numero_str}-")
                 or nome_trim.startswith(f"{numero_str} -")
             ):
-                pasta_os_existente = full
-                break
+                if len(os.path.abspath(full)) <= 210:
+                    pasta_os_existente = full
+                    break
     except FileNotFoundError:
         pasta_os_existente = None
 
@@ -226,8 +265,7 @@ def pasta_os(numero_os, dados):
     chassi = _sanitize_pasta(dados.get("chassis", ""))
     mmv = _sanitize_pasta(dados.get("mmv", ""))
     municipio = _sanitize_pasta(dados.get("municipio", ""))
-    nome_pasta = f"{numero_str} - {cliente} - {chassi} - {mmv} - {municipio}"
-    nome_pasta = nome_pasta.strip(" -")
+    nome_pasta = _nome_pasta_os(mes_dir, numero_str, cliente, chassi, mmv, municipio)
     path = os.path.join(mes_dir, nome_pasta)
     os.makedirs(path, exist_ok=True)
     return path

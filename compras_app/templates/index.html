@@ -1281,6 +1281,7 @@ modal.classList.remove("is-open");
 limparEventos();
 osPopupRegraFila.shift();
 renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
 abrirProximoPopupItemOS();
 };
 const onCancel = () => {
@@ -1382,6 +1383,7 @@ input.value = valor;
 qtdHidden.value = String(Math.max(1, Math.round(qtd)));
 modal.classList.remove("is-open");
 renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
 modal.removeEventListener("click", onBackdrop);
@@ -1524,7 +1526,7 @@ return conjuntos.includes(conjunto);
 function definirProcessoConjuntoUI(conjunto){
 const input = document.getElementById("os_processo_conjunto");
 const display = document.getElementById("os_processo_conjunto_display");
-const valor = conjunto || "";
+const valor = Array.isArray(conjunto) ? conjunto.filter(Boolean).join(" + ") : (conjunto || "");
 if (input){
 input.value = valor;
 input.dataset.autoProcesso = valor;
@@ -1546,21 +1548,32 @@ return Array.isArray(valor) ? valor.filter(Boolean) : [valor];
 function resolverProcessoAutomaticoOS(){
 const linhas = document.querySelectorAll("#tabela_os tr");
 const conjuntos = new Set();
+function adicionarProcessosCodigo(codigo){
+opcoesProcessoItemOS(normalizarCodigoOS(codigo)).forEach((conjunto) => {
+if (processoConjuntoDisponivel(conjunto)){
+conjuntos.add(conjunto);
+}
+});
+}
 linhas.forEach((row, index) => {
 if (index === 0){
 return;
 }
 const input = row.querySelector('input[name="os_codigo[]"]');
 const codigo = input ? normalizarCodigoOS(input.value) : "";
-opcoesProcessoItemOS(codigo).forEach((conjunto) => conjuntos.add(conjunto));
+adicionarProcessosCodigo(codigo);
+const luminariaInput = row.querySelector('input[name="os_luminaria[]"]');
+if (luminariaInput){
+adicionarProcessosCodigo(luminariaInput.value);
+}
+lerSelecoesPopupItem(row).forEach((selecao) => {
+if (selecao && selecao.codigo){
+adicionarProcessosCodigo(selecao.codigo);
+}
 });
-if (conjuntos.size === 1){
-return { conjunto: Array.from(conjuntos)[0], opcoes: Array.from(conjuntos), conflito: false };
-}
-if (conjuntos.size > 1){
-return { conjunto: "", opcoes: Array.from(conjuntos).sort(), conflito: true };
-}
-return { conjunto: "", opcoes: [], conflito: false };
+});
+const opcoes = Array.from(conjuntos).sort();
+return { conjunto: opcoes.join(" + "), opcoes, conflito: false };
 }
 
 function atualizarHintProcessoAutomatico(info){
@@ -1568,15 +1581,11 @@ const hint = document.getElementById("os_processo_auto_hint");
 if (!hint){
 return;
 }
-if (info && info.conflito){
-hint.textContent = "Selecione um dos processos permitidos para esta O.S.";
+if (info && info.opcoes && info.opcoes.length){
+hint.textContent = `Processos consolidados automaticamente: ${info.opcoes.join(" + ")}`;
 return;
 }
-if (info && info.conjunto){
-hint.textContent = `Processo automatico pela transformacao: ${info.conjunto}`;
-return;
-}
-hint.textContent = "Sem vinculacao previa entre transformacao e processo. Processos permanecem em branco.";
+hint.textContent = "Sem vinculacao previa entre item e processo. Processos permanecem em branco.";
 }
 
 function abrirPopupProcessoOS(opcoes){
@@ -1644,37 +1653,17 @@ return;
 }
 const info = resolverProcessoAutomaticoOS();
 atualizarHintProcessoAutomatico(info);
-if (!info.conjunto){
-if (info.opcoes && info.opcoes.length > 1){
-const atual = conjuntoProcessoAtual();
-if (!info.opcoes.includes(atual)){
-definirProcessoConjuntoUI("");
-preencherProcessosPadrao("", { forcar: true });
-}
-abrirPopupProcessoOS(info.opcoes);
-return;
-}
+if (!info.opcoes || !info.opcoes.length){
 definirProcessoConjuntoUI("");
 preencherProcessosPadrao("", { forcar: true });
 return;
 }
-if (!processoConjuntoDisponivel(info.conjunto)){
-return;
-}
-definirProcessoConjuntoUI(info.conjunto);
-preencherProcessosPadrao(info.conjunto, { forcar: true });
+definirProcessoConjuntoUI(info.opcoes);
+preencherProcessosPadrao(info.opcoes, { forcar: true });
 }
 
 function validarProcessoObrigatorioOS(){
-const info = resolverProcessoAutomaticoOS();
-if (!info.opcoes || info.opcoes.length <= 1){
 return true;
-}
-if (info.opcoes.includes(conjuntoProcessoAtual())){
-return true;
-}
-abrirPopupProcessoOS(info.opcoes);
-return false;
 }
 
 function expandComposicao(codigoItem, quantidade){
@@ -2251,7 +2240,7 @@ const chave = extrairChaveCadastro(input.value, osFornecedores, obterDisplayClie
 if (!chave){
 const hidden = document.querySelector('input[name="os_cliente"]');
 if (hidden){
-hidden.value = "";
+hidden.value = (input.value || "").trim();
 }
 return;
 }
@@ -2773,12 +2762,41 @@ row.innerHTML = `
 `;
 }
 
+function mesclarProcessosPadrao(conjuntos){
+const resultado = {};
+const vistos = {};
+osProcessoDefs.forEach((processo) => {
+resultado[processo.nome] = [];
+vistos[processo.nome] = new Set();
+});
+(Array.isArray(conjuntos) ? conjuntos : [conjuntos]).filter(Boolean).forEach((conjunto) => {
+const data = osProcessos && osProcessos[conjunto] ? osProcessos[conjunto] : {};
+osProcessoDefs.forEach((processo) => {
+const linhas = data[processo.nome] || [];
+linhas.forEach((linha) => {
+const atividade = String((linha && linha.atividade) || "").trim();
+const responsavel = String((linha && linha.responsavel) || "").trim();
+if (!atividade){
+return;
+}
+const chave = `${atividade}\u0001${responsavel}`;
+if (vistos[processo.nome].has(chave)){
+return;
+}
+resultado[processo.nome].push({ atividade, responsavel });
+vistos[processo.nome].add(chave);
+});
+});
+});
+return resultado;
+}
+
 function preencherProcessosPadrao(conjunto, options){
 const forcar = Boolean(options && options.forcar);
 if (!forcar && hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
 return;
 }
-const data = osProcessos && osProcessos[conjunto] ? osProcessos[conjunto] : {};
+const data = mesclarProcessosPadrao(conjunto);
 osProcessoDefs.forEach((processo) => {
 const linhas = data[processo.nome] || [];
 aplicarProcessoTabela(processo.key, linhas);
