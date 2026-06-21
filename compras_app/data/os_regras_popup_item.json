@@ -187,5 +187,35 @@
     ],
     "quantidade": 1.0,
     "quantidade_editavel": false
+  },
+  {
+    "id": "regra-20",
+    "gatilho": "40340019",
+    "opcoes": [
+      "30140023",
+      "30140025"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-21",
+    "gatilho": "40340027",
+    "opcoes": [
+      "30140027",
+      "30140029"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
+  },
+  {
+    "id": "regra-22",
+    "gatilho": "40340022",
+    "opcoes": [
+      "30140024",
+      "30140026"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
   }
 ]

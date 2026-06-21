@@ -2569,14 +2569,14 @@
     "processo_conjunto": ""
   },
   "10380008": {
-    "descricao": "FATURAMENTO DIRETO DPM ELEVITTA DISPOSITIVO DE POLTRONA MOVEL",
+    "descricao": "FATURAMENTO DIRETO - DPM ELEVITTA DISPOSITIVO DE POLTRONA MOVEL",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "38 - ITENS ACESSIBILIDADE",
     "processo_conjunto": ""
   },
   "10380009": {
-    "descricao": "FATURAMENTO DIRETO DPM FOCA DISPOSITIVO DE POLTRONA MOVEL",
+    "descricao": "FATURAMENTO DIRETO - DPM FOCA DISPOSITIVO DE POLTRONA MOVEL",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "38 - ITENS ACESSIBILIDADE",
@@ -3227,15 +3227,15 @@
     "processo_conjunto": ""
   },
   "10380016": {
-    "descricao": "ACESSORIO PLATAFORMA ELEVATORIA ELETRO-HIDRAULICA BIPARTIDA",
-    "unidade": "pc",
+    "descricao": "FATURAMENTO DIRETO - PLATAFORMA ELEVATORIA ELETRO-HIDRAULICA BIPARTIDA",
+    "unidade": "un",
     "grupo": "10 - INSUMO",
     "categoria": "38 - ITENS ACESSIBILIDADE",
     "processo_conjunto": ""
   },
   "10380017": {
-    "descricao": "ACESSORIO PLATAFORMA ELEVATORIA ELETRO-HIDRAULICA FECHADA",
-    "unidade": "pc",
+    "descricao": "FATURAMENTO DIRETO - PLATAFORMA ELEVATORIA ELETRO-HIDRAULICA FECHADA",
+    "unidade": "un",
     "grupo": "10 - INSUMO",
     "categoria": "38 - ITENS ACESSIBILIDADE",
     "processo_conjunto": ""
@@ -9268,7 +9268,7 @@
     "processo_conjunto": ""
   },
   "30240042": {
-    "descricao": "CJ TRILHO ALUMINIO FIXACAO 417 14 - 4,3,3,2,2-1 DPM FOCA",
+    "descricao": "CJ TRILHO ALUMINIO FIXACAO 417 14 - 4,3,3,2,2-1 DPM",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "24 - ACESSÓRIOS",
@@ -9597,7 +9597,7 @@
     "processo_conjunto": ""
   },
   "30200013": {
-    "descricao": "CJ BANCOS FIXOS  - MC - LB - 4;3;3;3  - 2P - TECIDO - TRILHO",
+    "descricao": "CJ BANCOS FIXOS  - MC - LB - 4,3,3,3  - 2P - TECIDO - TRILHO",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -9688,7 +9688,7 @@
     "processo_conjunto": ""
   },
   "20180001": {
-    "descricao": "PP ABS TETO FLOCADO PRETO PC E/S/J TB",
+    "descricao": "PP ABS TETO VELUDO PRETO PC E/S/J TB",
     "unidade": "pc",
     "grupo": "20 - PRODUTO EM PROCESSO",
     "categoria": "18 - REVESTIMENTO",
@@ -9807,14 +9807,14 @@
     "processo_conjunto": ""
   },
   "20180004": {
-    "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LE E/S/J PRETO FOSCO VINÍLICA",
+    "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LE E/S/J VELUDO PRETO",
     "unidade": "pc",
     "grupo": "20 - PRODUTO EM PROCESSO",
     "categoria": "18 - REVESTIMENTO",
     "processo_conjunto": ""
   },
   "20180005": {
-    "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LD E/S/J PRETO FOSCO VINÍLICA",
+    "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LD E/S/J VELUDO PRETO",
     "unidade": "pc",
     "grupo": "20 - PRODUTO EM PROCESSO",
     "categoria": "18 - REVESTIMENTO",
@@ -9835,14 +9835,14 @@
     "processo_conjunto": ""
   },
   "20180006": {
-    "descricao": "PP COLUNA A ORIGINAL LE E/S/J PRETO FOSCO VINÍLICA",
+    "descricao": "PP COLUNA A ORIGINAL LE E/S/J VELUDO PRETO",
     "unidade": "pc",
     "grupo": "20 - PRODUTO EM PROCESSO",
     "categoria": "18 - REVESTIMENTO",
     "processo_conjunto": ""
   },
   "20180007": {
-    "descricao": "PP COLUNA A ORIGINAL LD E/S/J PRETO FOSCO VINÍLICA",
+    "descricao": "PP COLUNA A ORIGINAL LD E/S/J VELUDO PRETO",
     "unidade": "pc",
     "grupo": "20 - PRODUTO EM PROCESSO",
     "categoria": "18 - REVESTIMENTO",
@@ -9933,7 +9933,7 @@
     "processo_conjunto": ""
   },
   "30180023": {
-    "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/ PRETO TETO CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
+    "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "18 - REVESTIMENTO",
@@ -10049,6 +10049,1511 @@
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200056": {
+    "descricao": "BCO MC LB FIXO 1 L ELEVITTA C/ AP BRACO LD/LE 60 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200057": {
+    "descricao": "BCO MC LB FIXO 1 L ELEVITTA C/ AP BRACO LD/LE 60 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200058": {
+    "descricao": "BCO MC LB FIXO 2 L ELEVITTA C/ AP BRACO LD 60 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200059": {
+    "descricao": "BCO MC LB FIXO 2 L ELEVITTA C/ AP BRACO LD 60 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200060": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L ELEVITTA C/ AP BRACO LD 60 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200061": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L ELEVITTA C/ AP BRACO LD 60 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200062": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 370 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200063": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 370 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200064": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200065": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220008": {
+    "descricao": "APOIO BRACO LD PLASTICO INJETADO GRAFITE ACRYLIS RODOVIARIO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220009": {
+    "descricao": "ACABAMENTO LATERAL LD PLASTICO INJETADO GRAFITE ACRYLIS RODOVIARIO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220010": {
+    "descricao": "PE BCO MCA 220 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220011": {
+    "descricao": "PE BCO MCA 195 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220012": {
+    "descricao": "PE BCO MCA 60 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220013": {
+    "descricao": "PE BCO MCA 100 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220014": {
+    "descricao": "PEGA MAO PLASTICO PU ACRYLS RODOVIARIO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10200066": {
+    "descricao": "BCO JL LE RECLINAVEL 4 L PME S/ AP BRACO 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220015": {
+    "descricao": "PE BCO JL 330 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10260143": {
+    "descricao": "ELETRICA CHICOTE BOTOES E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260144": {
+    "descricao": "ELETRICA CHICOTE CENTRAL ELETRICA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260145": {
+    "descricao": "ELETRICA CHICOTE INTERRUPTOR DE PORTA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260146": {
+    "descricao": "ELETRICA CHICOTE ALIMENTAÇÃO LED RGB MÓVEL LATERAL E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260147": {
+    "descricao": "ELETRICA CHICOTE INTERLIGAÇÃO LED RGB MÓVEL LATERAL LE/LD E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260148": {
+    "descricao": "ELETRICA CHICOTE ALIMENTAÇÃO RELE POS IGNIÇÃO E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260149": {
+    "descricao": "ELETRICA CHICOTE ALIMENTAÇÃO 4 ARANDELAS E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260150": {
+    "descricao": "ELETRICA CHICOTE TOMADA USB E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10200067": {
+    "descricao": "BCO JL LE RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10260151": {
+    "descricao": "ELETRICA CHICOTE LUZES CORTESIA E/S/J - DEGRAU, SOLEIRA PM, SOB BCO 1º FIL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260152": {
+    "descricao": "ELETRICA CHICOTE LUZ CORTESIA E/S/J SOB PAINEL CABINE",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260153": {
+    "descricao": "ELETRICA CHICOTE PORTA FUSIVEL ACESSORIOS INTERNOS E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260154": {
+    "descricao": "ELETRICA CHICOTE TOMADA 110/220V CORRENTE ALTERNADA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260002": {
+    "descricao": "CJ CHICOTE ELETRICO CABINE E/S/J P/ LIGAÇÃO ACESSORIOS",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260155": {
+    "descricao": "ELETRICA CHICOTE GELADEIRA ELBER CAB 18 E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260156": {
+    "descricao": "SUPORTE PÇ INTERNA JI BOTOEIRA 8 TECLAS CABINE E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260157": {
+    "descricao": "SUPORTE PÇ EXTERNA JI BOTOEIRA 8 TECLAS CABINE E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260158": {
+    "descricao": "TAMPA CEGA JI BOTOEIRA CABINE E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260003": {
+    "descricao": "CJ BOTOEIRA PLASTICA JI E/S/J CABINE 8 TECLAS",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260005": {
+    "descricao": "CJ 3 TOMADAS USB ORBE DUPLA E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260006": {
+    "descricao": "CJ LUZES CORTESIA E/S/J - DEGRAU, SOLEIRA PM, SOB BCO 1º FIL",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260159": {
+    "descricao": "ELETRICA CONECTOR EMENDA DERIVAÇÃO FIO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260007": {
+    "descricao": "CJ LUZ CORTESIA CABINE E/S/J SOB PAINEL",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260008": {
+    "descricao": "CJ LUZ LED RGB MOVEIS LATERAIS JI C-CLASS E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260009": {
+    "descricao": "CJ LUZ AZUL 4 ARANDELAS LATERAIS JI",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260160": {
+    "descricao": "ELETRICA DIODO1N5822 MIC",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260161": {
+    "descricao": "ELETRICA RESISTOR 110 OHMS POTÊNCIA 1/4W",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10200068": {
+    "descricao": "BCO CARONA JL LE RECLINAVEL 2 L SPRINTER S/ AP BRACO 270 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200069": {
+    "descricao": "BCO CARONA JL LE RECLINAVEL 2 L MASTER S/ AP BRACO 262 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200070": {
+    "descricao": "BCO JL LE RECLINAVEL 3 L NORMAL C/ AP BRACO LD 255 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200071": {
+    "descricao": "BCO JL LE RECLINAVEL 1 L PME S/ AP BRACO 65 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200072": {
+    "descricao": "BCO JL LE RECLINAVEL 2 L PME S/ AP BRACO 120 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200073": {
+    "descricao": "BCO JL LE RECLINAVEL 1 L PME S/ AP BRACO 120 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200074": {
+    "descricao": "BCO JL LE RECLINAVEL 2 L NORMAL S/ AP BRACO 330 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200075": {
+    "descricao": "BCO JL LE RECLINAVEL 1 L NORMAL S/ AP BRACO 330 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220016": {
+    "descricao": "PE BCO JL 370 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220017": {
+    "descricao": "PE BCO JL 65 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220018": {
+    "descricao": "PE BCO JL 120 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220019": {
+    "descricao": "PE BCO JL 262 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220020": {
+    "descricao": "PE BCO JL 270 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220021": {
+    "descricao": "PE BCO JL 255 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10200076": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200077": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220022": {
+    "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30240055": {
+    "descricao": "CJ ARANDELA PLASTICA JI MONTADORA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10260162": {
+    "descricao": "ELETRICA LUZ BALIZADORA INFERIOR EMBUTIR REDONDO LED 2W LUZ AMARELA IP 65",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10260163": {
+    "descricao": "ELETRICA CHICOTE LUZ BALIZADOR INFERIOR E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "30260010": {
+    "descricao": "CJ LUZ BALIZADORA INFERIOR E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "26 - ELÉTRICA",
+    "processo_conjunto": ""
+  },
+  "10200078": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L NORMAL C/ AP BRACO LD 370 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200079": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L NORMAL C/ AP BRACO LD 370 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220023": {
+    "descricao": "CAPAS DIANTEIRAS COURVIN SPRINTER 14/15",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30200016": {
+    "descricao": "CJ BANCOS REC - MC - LB - 4,2,2,3,3,3 - REC - 3P - COURVIN - NORMAL",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200080": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 370 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200081": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 370 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200082": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200083": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200084": {
+    "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200085": {
+    "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "20240007": {
+    "descricao": "PP CAIXA MADEIRA SUPORTE GELADEIRA CAB 18L E/S/J REVESTIDA CARPETE PRETO RESINADO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240056": {
+    "descricao": "CJ COMPLETO CAPACHO PORTAS E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240008": {
+    "descricao": "PP CAPACHO E/S/J PORTA LATERAL MOTORISTA LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240009": {
+    "descricao": "PP CAPACHO E/S/J PORTA LATERAL CARONA LD",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240010": {
+    "descricao": "PP CAPACHO E/S/J PORTA LATERAL CORREDICA LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10280060": {
+    "descricao": "MP CAPACHO VINÍLICO PRETO 1200 x 1000 x 10",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "28 - MÁTERIA PRIMA",
+    "processo_conjunto": ""
+  },
+  "10300081": {
+    "descricao": "FX BOTAO PRESSÃO METAL NIQUELADO 16 MM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "30 - FX - FIXADORES",
+    "processo_conjunto": ""
+  },
+  "30140046": {
+    "descricao": "CJ SOLEIRA PORTA MALA E/S/J LE 8/9 L - AMADEIRADO",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "14 - PISO",
+    "processo_conjunto": ""
+  },
+  "30140047": {
+    "descricao": "CJ SOLEIRA PORTA MALA E/S/J LE 8/9 L - LG BRIGHT",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "14 - PISO",
+    "processo_conjunto": ""
+  },
+  "20140027": {
+    "descricao": "PP SOLEIRA PORTA MALA E/S/J LE 8/9 L",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "14 - PISO",
+    "processo_conjunto": ""
+  },
+  "20140028": {
+    "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA LE E/S/J C/ LED",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "14 - PISO",
+    "processo_conjunto": ""
+  },
+  "10300082": {
+    "descricao": "ARGOLA ORIGINAL E/S/J FIXACAO CARGA C/ PARAFUSO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "30 - FX - FIXADORES",
+    "processo_conjunto": ""
+  },
+  "10240227": {
+    "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J PÇ 1 PORTA LATERAL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240228": {
+    "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J PÇ 2 SALAO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240229": {
+    "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J PÇ 3 PORTA MALAS",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240230": {
+    "descricao": "ACESSORIO SUPORTE FIXO CABIDE - GANCHO CABIDEIRO MARCOPOLO CINZA ORIGINAL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10320166": {
+    "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "10320167": {
+    "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "10320168": {
+    "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "10320169": {
+    "descricao": "CM TINTA BEGE RAL 1013 PU - C-CLASS - TI.01.J85",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "20180014": {
+    "descricao": "PP ARO JANELA PVC 1º VAO LE E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180015": {
+    "descricao": "PP ARO JANELA PVC 2º VAO LE E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180016": {
+    "descricao": "PP ARO JANELA PVC 2º VAO LD E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20240011": {
+    "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA 1º VAO LE E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240012": {
+    "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA 2º VAO LE E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240013": {
+    "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA 2º VAO LD E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240014": {
+    "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA 1º VAO LE E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240015": {
+    "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA 2º VAO LE E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240016": {
+    "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA 2º VAO LD E/S/J C-CLASS",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240017": {
+    "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240018": {
+    "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240019": {
+    "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240020": {
+    "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240021": {
+    "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240022": {
+    "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240057": {
+    "descricao": "CJ CORTINA VELUDO PRETA SALAO E/S/J C-CLASS SEM PORTAS",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240231": {
+    "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J C-CLASS 1º VAO LE 550X440",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240232": {
+    "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J C-CLASS 2º VAO LE/LD 600X400",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240233": {
+    "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J PORTA LATERAL 550X500",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240058": {
+    "descricao": "CJ CORTINA VELUDO PRETA PORTAS E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240234": {
+    "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J PT LE 600X(450,430)",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240235": {
+    "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J PT LD 600X(450,430)",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240059": {
+    "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J C/ CORTINA VELUDO PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10300083": {
+    "descricao": "FX PASSA FIO APITO SUPORTE CORTINA COR PRETO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "30 - FX - FIXADORES",
+    "processo_conjunto": ""
+  },
+  "30240060": {
+    "descricao": "CJ TUBO ALUMINIO DOBRADO CORTINA E/S/J EMBUTIDA C-CLASS",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240236": {
+    "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO 3D TAMPA TUBO CORTINA",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20180017": {
+    "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL MOTORISTA LE 1º/2º VAO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180018": {
+    "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL PASSAGEIRO LD 2º VAO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180019": {
+    "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL MOTORISTA LE 1º/2º VAO CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180020": {
+    "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL PASSAGEIRO LD 2º VAO CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180021": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA LATERAL PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180022": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180023": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180024": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO ARO PORTA LATERAL PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180025": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA MOTORISTA LE CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180026": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "20180027": {
+    "descricao": "PP ABS PC E/S/J TB ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "10320170": {
+    "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "10320171": {
+    "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "10320172": {
+    "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "32 - CM - CONSUMÍVEIS",
+    "processo_conjunto": ""
+  },
+  "30180025": {
+    "descricao": "CJ REVESTIMENTO E/S/J TB CINZA RAL C/ MOLDURA P/ CORTINAS EMBUTIDAS E TETO C/ VELUDO PRETO (C/ CORTINA)",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "30180026": {
+    "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J CINZA RAL 7021 PU - TI.01.J04 C/ CORTINA VELUDO PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "30180027": {
+    "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "18 - REVESTIMENTO",
+    "processo_conjunto": ""
+  },
+  "10240237": {
+    "descricao": "PP SUPORTE FIXO CABIDE - GANCHO CABIDEIRO MARCOPOLO CINZA RAL 7021 PU - TI.01.J04",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30200017": {
+    "descricao": "CJ BANCOS REC - MC - LB - 4,2,3,3,3 - REC - 2P - COURVIN - PME 2A",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30240061": {
+    "descricao": "CJ MOVEL LATERAL MARROM E/S/J C-CLASS 1º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240062": {
+    "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 1º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240063": {
+    "descricao": "CJ MOVEL LATERAL BEGE E/S/J C-CLASS 1º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240238": {
+    "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240239": {
+    "descricao": "PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240240": {
+    "descricao": "PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240023": {
+    "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE INTERNA REVESTIDA CARPETE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240024": {
+    "descricao": "PP PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO CARPETE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240025": {
+    "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO MARROM",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240026": {
+    "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO MARROM",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240027": {
+    "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO PRETO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240028": {
+    "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO PRETO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240029": {
+    "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO BEGE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240030": {
+    "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO BEGE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240064": {
+    "descricao": "CJ MOVEL LATERAL MARROM E/S/J C-CLASS 2º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240065": {
+    "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 2º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240066": {
+    "descricao": "CJ MOVEL LATERAL BEGE E/S/J C-CLASS 2º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240241": {
+    "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240031": {
+    "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO MARROM",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240032": {
+    "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO PRETO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240033": {
+    "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO BEGE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240067": {
+    "descricao": "CJ MOVEL LATERAL MARROM E/S/J C-CLASS 2º VAO LD",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240068": {
+    "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 2º VAO LD",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240069": {
+    "descricao": "CJ MOVEL LATERAL BEGE E/S/J C-CLASS 2º VAO LD",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240242": {
+    "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240243": {
+    "descricao": "PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240034": {
+    "descricao": "PP FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240035": {
+    "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240036": {
+    "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD REVESTIDO MARROM",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240037": {
+    "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD REVESTIDO PRETO",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240038": {
+    "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD REVESTIDO BEGE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240070": {
+    "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240039": {
+    "descricao": "PP PC TAMPO SUP ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240040": {
+    "descricao": "PP PC TAMPO INF ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240041": {
+    "descricao": "PP PC TAMPO CENTRAL ACRILICO CRISTAL MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240071": {
+    "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240042": {
+    "descricao": "PP PC TAMPO SUP ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240043": {
+    "descricao": "PP PC TAMPO INF ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240044": {
+    "descricao": "PP PC TAMPO CENTRAL ACRILICO CRISTAL MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240072": {
+    "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240045": {
+    "descricao": "PP PC TAMPO SUP ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240046": {
+    "descricao": "PP PC TAMPO INF ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "20240047": {
+    "descricao": "PP PC TAMPO CENTRAL ACRILICO CRISTAL MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10200086": {
+    "descricao": "BCO MC LB RECLINAVEL 4 L PME S/ AP BRACO 100 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200087": {
+    "descricao": "BCO MC LB RECLINAVEL 4 L PME S/ AP BRACO 100 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200088": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L PME C/ AP BRACO LD 65 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200089": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L PME C/ AP BRACO LD 65 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10280061": {
+    "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
+    "unidade": "m",
+    "grupo": "10 - INSUMO",
+    "categoria": "28 - MÁTERIA PRIMA",
+    "processo_conjunto": ""
+  },
+  "10280062": {
+    "descricao": "MP COURVIN LISO PRETO URUGUAI",
+    "unidade": "m",
+    "grupo": "10 - INSUMO",
+    "categoria": "28 - MÁTERIA PRIMA",
+    "processo_conjunto": ""
+  },
+  "10280063": {
+    "descricao": "MP COURVIN LISO BEGE URUGUAI",
+    "unidade": "m",
+    "grupo": "10 - INSUMO",
+    "categoria": "28 - MÁTERIA PRIMA",
+    "processo_conjunto": ""
+  },
+  "10220024": {
+    "descricao": "PEGA MAO AMARELO ACO E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220025": {
+    "descricao": "APOIO BRACO PU AMARELO C/ APLIQUE PRETO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10100006": {
+    "descricao": "FATURAMENTO DIRETO - AR QUENTE - GE",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "10 - AR CONDICIONADO",
+    "processo_conjunto": ""
+  },
+  "20240048": {
+    "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDA CARPETE",
+    "unidade": "pc",
+    "grupo": "20 - PRODUTO EM PROCESSO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10100007": {
+    "descricao": "FATURAMENTO DIRETO - AR QUENTE - CLIM",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "10 - AR CONDICIONADO",
+    "processo_conjunto": ""
+  },
+  "30240073": {
+    "descricao": "CJ COMPLETO LIGACAO GELADEIRA ELBER CAB 18L E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30200018": {
+    "descricao": "CJ BANCOS REC - MC - LB - 1E,1E,1D,1D,3,3  - 3P - TECIDO - BJD",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200090": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L BJD C/ AP BRACO LD 330 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200091": {
+    "descricao": "BCO MC LB RECLINAVEL 3 L BJD C/ AP BRACO LD 330 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30200019": {
+    "descricao": "CJ BANCOS REC - MC - LB - 4,2-1,2,3,3,3  - 2P - TECIDO - NORMAL",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200092": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200093": {
+    "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200094": {
+    "descricao": "BCO MC LB RECLINAVEL 1 L NORMAL C/ AP BRACO LE 370 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200095": {
+    "descricao": "BCO MC LB RECLINAVEL 1 L NORMAL C/ AP BRACO LE 370 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30240074": {
+    "descricao": "CJ TRILHO ALUMINIO FIXACAO 417 14 - 1E,1E,1E,1D PTA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10200096": {
+    "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LD 370 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200097": {
+    "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LD 370 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200098": {
+    "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LE 370 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200099": {
+    "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LE 370 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30200020": {
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 1E,1E,1E,1D  - 2P - TECIDO - TRILHO",
+    "unidade": "pc",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30240075": {
+    "descricao": "CJ TRILHO ALUMINIO FIXACAO 417 10 - 4,3,3,2-1 DPM",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30200021": {
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 4,3,3,2-1 - 2P - TECIDO - TRILHO - ELEVITTA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30240076": {
+    "descricao": "CJ TRILHO ALUMINIO FIXACAO 517 15 - 4,2-1,2,3,3,3",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
     "processo_conjunto": ""
   }
 }

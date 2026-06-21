@@ -14,8 +14,9 @@ from datetime import date, timedelta, datetime
 import tempfile
 import zipfile
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font
+from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.datavalidation import DataValidation
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 from werkzeug.datastructures import FileStorage
@@ -101,6 +102,20 @@ MODELO_ITENS_HEADERS = [
     "GRUPO",
     "CATEGORIA",
     "PROCESSO CONJUNTO",
+]
+MODELO_REGRAS_POPUP_HEADERS = [
+    "ID_REGRA",
+    "ITEM_GATILHO",
+    "DESCRICAO_GATILHO",
+    "ITENS_OPCOES",
+    "DESCRICOES_OPCOES",
+    "QUANTIDADE",
+    "QUANTIDADE_EDITAVEL",
+]
+MODELO_RELACOES_PROCESSO_HEADERS = [
+    "ITEM_CODIGO",
+    "DESCRICAO_ITEM",
+    "PROCESSOS",
 ]
 HEADER_ALIASES = {
     "codigo": {
@@ -1574,6 +1589,134 @@ def _criar_modelo_os_processos_xlsx():
     return temp.name, "modelo_os_processos.xlsx"
 
 
+def _catalogo_itens_regras():
+    catalogo = dict(carregar_produtos() or {})
+    catalogo.update(carregar_os_produtos() or {})
+    return catalogo
+
+
+def _descricao_item_regras(codigo, catalogo):
+    info = (catalogo or {}).get(normalizar_codigo(codigo), {}) or {}
+    return str(info.get("descricao", "") or "").strip()
+
+
+def _formatar_planilha_regras(ws, headers):
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(headers))}1"
+    ws.sheet_view.showGridLines = False
+    fill = PatternFill("solid", fgColor="1F4E78")
+    for col_idx, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_idx, value=header)
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = fill
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[1].height = 24
+
+
+def _adicionar_instrucoes_planilha(wb, titulo, instrucoes):
+    ws = wb.create_sheet("Instrucoes")
+    ws.sheet_view.showGridLines = False
+    ws["A1"] = titulo
+    ws["A1"].font = Font(bold=True, size=14, color="1F4E78")
+    for idx, instrucao in enumerate(instrucoes, 3):
+        ws.cell(row=idx, column=1, value=f"{idx - 2}.")
+        ws.cell(row=idx, column=2, value=instrucao)
+        ws.cell(row=idx, column=2).alignment = Alignment(wrap_text=True, vertical="top")
+    ws.column_dimensions["A"].width = 5
+    ws.column_dimensions["B"].width = 110
+
+
+def _salvar_planilha_temporaria(wb, nome_arquivo):
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+    temp.close()
+    wb.save(temp.name)
+    return temp.name, nome_arquivo
+
+
+def _criar_planilha_regras_popup_item(regras=None, nome_arquivo="modelo_parametros_item_relacionado.xlsx"):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Parametros Item Relacionado"
+    _formatar_planilha_regras(ws, MODELO_REGRAS_POPUP_HEADERS)
+    catalogo = _catalogo_itens_regras()
+
+    for regra in regras or []:
+        gatilho = normalizar_codigo(regra.get("gatilho", ""))
+        opcoes = [normalizar_codigo(codigo) for codigo in regra.get("opcoes", []) if normalizar_codigo(codigo)]
+        ws.append(
+            [
+                str(regra.get("id", "") or ""),
+                gatilho,
+                _descricao_item_regras(gatilho, catalogo),
+                "; ".join(opcoes),
+                " | ".join(_descricao_item_regras(codigo, catalogo) for codigo in opcoes),
+                regra.get("quantidade", 1),
+                "SIM" if regra.get("quantidade_editavel") else "NAO",
+            ]
+        )
+
+    widths = [16, 18, 54, 42, 72, 14, 24]
+    for idx, width in enumerate(widths, 1):
+        ws.column_dimensions[get_column_letter(idx)].width = width
+    for row_idx in range(2, ws.max_row + 1):
+        ws.cell(row=row_idx, column=2).number_format = "@"
+        ws.cell(row=row_idx, column=4).number_format = "@"
+    ws.auto_filter.ref = f"A1:G{max(ws.max_row, 1)}"
+    validacao = DataValidation(type="list", formula1='"SIM,NAO"', allow_blank=False)
+    ws.add_data_validation(validacao)
+    validacao.add("G2:G1000")
+
+    _adicionar_instrucoes_planilha(
+        wb,
+        "Parametros de Item Relacionado",
+        [
+            "Use uma linha por regra. Separe varios codigos em ITENS_OPCOES com ponto e virgula (;).",
+            "ID_REGRA e opcional para regras novas. No arquivo exportado, mantenha o ID para atualizar a regra existente.",
+            "QUANTIDADE deve ser maior que zero. QUANTIDADE_EDITAVEL aceita SIM ou NAO.",
+            "A importacao mescla os dados: atualiza IDs existentes e adiciona novas regras sem apagar as demais.",
+            "As colunas de descricao servem apenas para conferencia e nao sao usadas na importacao.",
+        ],
+    )
+    return _salvar_planilha_temporaria(wb, nome_arquivo)
+
+
+def _criar_planilha_relacoes_processo_item(relacoes=None, nome_arquivo="modelo_relacao_processo_item.xlsx"):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Relacao Processo x Item"
+    _formatar_planilha_regras(ws, MODELO_RELACOES_PROCESSO_HEADERS)
+    catalogo = _catalogo_itens_regras()
+
+    for codigo, processos in (relacoes or {}).items():
+        codigo = normalizar_codigo(codigo)
+        ws.append(
+            [
+                codigo,
+                _descricao_item_regras(codigo, catalogo),
+                "; ".join(str(processo or "").strip() for processo in processos if str(processo or "").strip()),
+            ]
+        )
+
+    widths = [18, 58, 96]
+    for idx, width in enumerate(widths, 1):
+        ws.column_dimensions[get_column_letter(idx)].width = width
+    for row_idx in range(2, ws.max_row + 1):
+        ws.cell(row=row_idx, column=1).number_format = "@"
+    ws.auto_filter.ref = f"A1:C{max(ws.max_row, 1)}"
+
+    _adicionar_instrucoes_planilha(
+        wb,
+        "Relacao Processo x Item",
+        [
+            "Use uma linha por item. Separe varios processos na coluna PROCESSOS com ponto e virgula (;).",
+            "O nome do processo deve ser identico ao nome do arquivo/conjunto importado na base de processos.",
+            "A importacao mescla os dados: substitui os processos dos itens informados e preserva os demais itens.",
+            "A coluna DESCRICAO_ITEM serve apenas para conferencia e nao e usada na importacao.",
+        ],
+    )
+    return _salvar_planilha_temporaria(wb, nome_arquivo)
+
+
 def normalizar_header(texto):
     if texto is None:
         return ""
@@ -1890,6 +2033,213 @@ def importar_os_fornecedores(file_storage):
 
     salvar_json(OS_FORNECEDORES_FILE, fornecedores)
     return count
+
+
+def _normalizar_codigo_planilha(valor):
+    texto = _corrigir_mojibake(valor)
+    if re.fullmatch(r"\d+\.0+", texto):
+        texto = texto.split(".", 1)[0]
+    return normalizar_codigo(texto)
+
+
+def _separar_lista_planilha(valor):
+    texto = _corrigir_mojibake(valor)
+    valores = []
+    for parte in re.split(r"[;\r\n]+", texto):
+        parte = str(parte or "").strip()
+        if parte and parte not in valores:
+            valores.append(parte)
+    return valores
+
+
+def _quantidade_regra_planilha(valor):
+    texto = _corrigir_mojibake(valor).replace(",", ".")
+    if not texto:
+        return 1.0
+    try:
+        quantidade = float(texto)
+    except Exception as exc:
+        raise ValueError("quantidade invalida") from exc
+    if quantidade <= 0:
+        raise ValueError("quantidade deve ser maior que zero")
+    return quantidade
+
+
+def _booleano_planilha(valor):
+    texto = normalizar_header(_corrigir_mojibake(valor))
+    if texto in {"sim", "s", "1", "true", "verdadeiro", "x"}:
+        return True
+    if texto in {"", "nao", "n", "0", "false", "falso"}:
+        return False
+    raise ValueError("quantidade_editavel deve ser SIM ou NAO")
+
+
+def _assinatura_regra_popup(regra):
+    return (
+        normalizar_codigo(regra.get("gatilho", "")),
+        tuple(normalizar_codigo(codigo) for codigo in regra.get("opcoes", []) if normalizar_codigo(codigo)),
+        float(regra.get("quantidade", 1) or 1),
+        bool(regra.get("quantidade_editavel", False)),
+    )
+
+
+def importar_regras_popup_item_planilha(file_storage):
+    linhas = ler_linhas_arquivo(file_storage)
+    if not linhas:
+        raise ValueError("A planilha esta vazia ou nao esta em formato XLSX.")
+
+    _, _, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={
+            "id_regra",
+            "item_gatilho",
+            "itens_opcoes",
+            "quantidade",
+            "quantidade_editavel",
+        },
+    )
+    if "item_gatilho" not in mapa or "itens_opcoes" not in mapa:
+        raise ValueError("Cabecalho invalido. Use ITEM_GATILHO e ITENS_OPCOES.")
+
+    regras = carregar_regras_popup_item()
+    resultado = [dict(regra) for regra in regras]
+    indice_por_id = {
+        str(regra.get("id", "") or "").strip(): idx
+        for idx, regra in enumerate(resultado)
+        if str(regra.get("id", "") or "").strip()
+    }
+    ids_usados = set(indice_por_id)
+    assinaturas = {_assinatura_regra_popup(regra) for regra in resultado}
+    proximo_numero = max(
+        [int(re.sub(r"\D", "", regra_id) or 0) for regra_id in ids_usados] or [0]
+    ) + 1
+    novas = 0
+    atualizadas = 0
+    ignoradas = 0
+    erros = []
+
+    for numero_linha, row in enumerate(rows, 2):
+        gatilho = _normalizar_codigo_planilha(_valor_coluna(row, mapa, "item_gatilho", "gatilho"))
+        opcoes = [
+            _normalizar_codigo_planilha(valor)
+            for valor in _separar_lista_planilha(_valor_coluna(row, mapa, "itens_opcoes", "opcoes", "item_opcao"))
+        ]
+        opcoes = list(dict.fromkeys(codigo for codigo in opcoes if codigo))
+        regra_id = _valor_coluna(row, mapa, "id_regra", "id").strip()
+        if not gatilho and not opcoes and not regra_id:
+            continue
+        if not gatilho or not opcoes:
+            ignoradas += 1
+            erros.append(f"linha {numero_linha}: informe gatilho e opcoes")
+            continue
+        try:
+            quantidade = _quantidade_regra_planilha(_valor_coluna(row, mapa, "quantidade"))
+            quantidade_editavel = _booleano_planilha(
+                _valor_coluna(row, mapa, "quantidade_editavel", "alteravel")
+            )
+        except ValueError as exc:
+            ignoradas += 1
+            erros.append(f"linha {numero_linha}: {exc}")
+            continue
+
+        registro = {
+            "id": regra_id,
+            "gatilho": gatilho,
+            "opcoes": opcoes,
+            "quantidade": quantidade,
+            "quantidade_editavel": quantidade_editavel,
+        }
+        if regra_id and regra_id in indice_por_id:
+            resultado[indice_por_id[regra_id]] = registro
+            atualizadas += 1
+            assinaturas.add(_assinatura_regra_popup(registro))
+            continue
+
+        assinatura = _assinatura_regra_popup(registro)
+        if not regra_id and assinatura in assinaturas:
+            ignoradas += 1
+            continue
+        if not regra_id:
+            while f"regra-{proximo_numero}" in ids_usados:
+                proximo_numero += 1
+            regra_id = f"regra-{proximo_numero}"
+            proximo_numero += 1
+            registro["id"] = regra_id
+
+        ids_usados.add(regra_id)
+        indice_por_id[regra_id] = len(resultado)
+        resultado.append(registro)
+        assinaturas.add(assinatura)
+        novas += 1
+
+    if novas == 0 and atualizadas == 0 and ignoradas == 0:
+        raise ValueError("Nenhuma regra foi encontrada na planilha.")
+    if novas or atualizadas:
+        salvar_regras_popup_item(resultado)
+    return {
+        "novas": novas,
+        "atualizadas": atualizadas,
+        "ignoradas": ignoradas,
+        "erros": erros,
+    }
+
+
+def importar_relacoes_processo_item_planilha(file_storage):
+    linhas = ler_linhas_arquivo(file_storage)
+    if not linhas:
+        raise ValueError("A planilha esta vazia ou nao esta em formato XLSX.")
+
+    _, _, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={"item_codigo", "processos"},
+    )
+    if "item_codigo" not in mapa or not any(campo in mapa for campo in ("processos", "processo", "processo_conjunto")):
+        raise ValueError("Cabecalho invalido. Use ITEM_CODIGO e PROCESSOS.")
+
+    importadas = {}
+    ignoradas = 0
+    erros = []
+    for numero_linha, row in enumerate(rows, 2):
+        codigo = _normalizar_codigo_planilha(_valor_coluna(row, mapa, "item_codigo", "codigo", "item"))
+        processos = _separar_lista_planilha(
+            _valor_coluna(row, mapa, "processos", "processo", "processo_conjunto")
+        )
+        if not codigo and not processos:
+            continue
+        if not codigo or not processos:
+            ignoradas += 1
+            erros.append(f"linha {numero_linha}: informe item e processos")
+            continue
+        destino = importadas.setdefault(codigo, [])
+        for processo in processos:
+            if processo not in destino:
+                destino.append(processo)
+
+    if not importadas and ignoradas == 0:
+        raise ValueError("Nenhuma relacao foi encontrada na planilha.")
+
+    relacoes = carregar_relacoes_processo_item()
+    novas = 0
+    atualizadas = 0
+    sem_alteracao = 0
+    for codigo, processos in importadas.items():
+        atuais = relacoes.get(codigo)
+        if atuais is None:
+            novas += 1
+        elif atuais == processos:
+            sem_alteracao += 1
+        else:
+            atualizadas += 1
+        relacoes[codigo] = processos
+
+    if novas or atualizadas:
+        salvar_relacoes_processo_item(relacoes)
+    return {
+        "novas": novas,
+        "atualizadas": atualizadas,
+        "ignoradas": ignoradas + sem_alteracao,
+        "erros": erros,
+    }
 
 
 def importar_os_componentes(file_storage):
@@ -2381,6 +2731,8 @@ def index():
     }
     bom_status = request.args.get("bom_status")
     os_processos_status = request.args.get("os_processos_status")
+    regras_popup_status = request.args.get("regras_popup_status")
+    relacoes_processo_status = request.args.get("relacoes_processo_status")
 
     return render_template(
         "index.html",
@@ -2399,6 +2751,8 @@ def index():
         processos_dir=processos_dir,
         bom_status=bom_status,
         os_processos_status=os_processos_status,
+        regras_popup_status=regras_popup_status,
+        relacoes_processo_status=relacoes_processo_status,
         processos_os=PROCESSOS_OS,
         processo_transformacao_por_item=processo_por_item,
         relacoes_processo_transformacao=RELACOES_PROCESSO_TRANSFORMACAO,
@@ -3132,6 +3486,56 @@ def excluir_regra_popup_item():
     return redirect(url_for("index", tab="cadastro"))
 
 
+def _status_importacao_planilha(resultado, nome):
+    status = (
+        f"{nome}: {resultado['novas']} nova(s), "
+        f"{resultado['atualizadas']} atualizada(s) e "
+        f"{resultado['ignoradas']} ignorada(s)."
+    )
+    erros = resultado.get("erros") or []
+    if erros:
+        status += " " + "; ".join(erros[:3])
+        if len(erros) > 3:
+            status += f"; mais {len(erros) - 3} erro(s)."
+    return status
+
+
+@app.route("/importar_regras_popup_item", methods=["POST"])
+def importar_regras_popup_item_route():
+    arquivo = request.files.get("arquivo_regras_popup_item")
+    if not arquivo or not arquivo.filename:
+        status = "Selecione uma planilha XLSX de parametros de item relacionado."
+    else:
+        try:
+            resultado = importar_regras_popup_item_planilha(arquivo)
+            status = _status_importacao_planilha(resultado, "Parametros importados")
+        except ValueError as exc:
+            status = f"Falha na importacao: {exc}"
+        except Exception:
+            app.logger.exception("Falha ao importar parametros de item relacionado")
+            status = "Falha inesperada ao importar os parametros. Consulte o log."
+    destino = url_for("index", tab="cadastro", regras_popup_status=status)
+    return redirect(f"{destino}#parametros-item-relacionado")
+
+
+@app.route("/importar_relacoes_processo_item", methods=["POST"])
+def importar_relacoes_processo_item_route():
+    arquivo = request.files.get("arquivo_relacoes_processo_item")
+    if not arquivo or not arquivo.filename:
+        status = "Selecione uma planilha XLSX de relacao processo x item."
+    else:
+        try:
+            resultado = importar_relacoes_processo_item_planilha(arquivo)
+            status = _status_importacao_planilha(resultado, "Relacoes importadas")
+        except ValueError as exc:
+            status = f"Falha na importacao: {exc}"
+        except Exception:
+            app.logger.exception("Falha ao importar relacoes processo x item")
+            status = "Falha inesperada ao importar as relacoes. Consulte o log."
+    destino = url_for("index", tab="cadastro", relacoes_processo_status=status)
+    return redirect(f"{destino}#relacao-processo-item")
+
+
 @app.route("/importar_produtos", methods=["POST"])
 def importar_produtos_route():
 
@@ -3385,6 +3789,36 @@ def exportar_modelo_os_componentes():
 @app.route("/exportar_modelo_os_processos")
 def exportar_modelo_os_processos():
     path, nome = _criar_modelo_os_processos_xlsx()
+    return send_file(path, as_attachment=True, download_name=nome)
+
+
+@app.route("/exportar_modelo_regras_popup_item")
+def exportar_modelo_regras_popup_item():
+    path, nome = _criar_planilha_regras_popup_item()
+    return send_file(path, as_attachment=True, download_name=nome)
+
+
+@app.route("/exportar_regras_popup_item")
+def exportar_regras_popup_item():
+    path, nome = _criar_planilha_regras_popup_item(
+        carregar_regras_popup_item(),
+        nome_arquivo="parametros_item_relacionado_atuais.xlsx",
+    )
+    return send_file(path, as_attachment=True, download_name=nome)
+
+
+@app.route("/exportar_modelo_relacoes_processo_item")
+def exportar_modelo_relacoes_processo_item():
+    path, nome = _criar_planilha_relacoes_processo_item()
+    return send_file(path, as_attachment=True, download_name=nome)
+
+
+@app.route("/exportar_relacoes_processo_item")
+def exportar_relacoes_processo_item():
+    path, nome = _criar_planilha_relacoes_processo_item(
+        carregar_relacoes_processo_item(),
+        nome_arquivo="relacao_processo_item_atual.xlsx",
+    )
     return send_file(path, as_attachment=True, download_name=nome)
 
 

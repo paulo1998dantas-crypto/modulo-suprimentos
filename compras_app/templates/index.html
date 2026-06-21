@@ -139,6 +139,45 @@ margin:0 0 14px 0;
 font-size:16px;
 }
 
+.rule-sheet-tools{
+display:flex;
+align-items:flex-end;
+flex-wrap:wrap;
+gap:10px;
+padding:12px 0 16px;
+margin-bottom:14px;
+border-bottom:1px solid var(--line);
+}
+
+.rule-sheet-tools form{
+margin:0;
+}
+
+.rule-upload-form{
+display:flex;
+align-items:flex-end;
+flex:1 1 520px;
+gap:10px;
+}
+
+.rule-upload-form label{
+display:flex;
+flex:1 1 300px;
+flex-direction:column;
+gap:6px;
+}
+
+.rule-upload-form input[type="file"]{
+width:100%;
+}
+
+@media (max-width:720px){
+.rule-upload-form{
+align-items:stretch;
+flex-direction:column;
+}
+}
+
 .dashboard-grid{
 display:grid;
 grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -4696,8 +4735,25 @@ renderDashboardCharts();
 {% endif %}
 </div>
 
-<div class="card">
+<div id="parametros-item-relacionado" class="card">
 <h3>Parâmetros de Item Relacionado</h3>
+<div class="rule-sheet-tools">
+<form class="rule-upload-form" method="POST" action="/importar_regras_popup_item" enctype="multipart/form-data">
+<label>Planilha de regras
+<input type="file" name="arquivo_regras_popup_item" accept=".xlsx" required>
+</label>
+<button type="submit">Importar XLSX</button>
+</form>
+<form method="GET" action="/exportar_modelo_regras_popup_item">
+<button type="submit">Baixar modelo</button>
+</form>
+<form method="GET" action="/exportar_regras_popup_item">
+<button type="submit">Baixar regras atuais</button>
+</form>
+</div>
+{% if regras_popup_status %}
+<div class="total-box" style="margin-bottom:14px;">{{ regras_popup_status }}</div>
+{% endif %}
 <form method="POST" action="/cadastrar_regra_popup_item">
 <table class="tabela-componentes">
 <tr>
@@ -4752,8 +4808,25 @@ renderDashboardCharts();
 </div>
 </div>
 
-<div class="card">
+<div id="relacao-processo-item" class="card">
 <h3>Relação Processo x Item</h3>
+<div class="rule-sheet-tools">
+<form class="rule-upload-form" method="POST" action="/importar_relacoes_processo_item" enctype="multipart/form-data">
+<label>Planilha de relações
+<input type="file" name="arquivo_relacoes_processo_item" accept=".xlsx" required>
+</label>
+<button type="submit">Importar XLSX</button>
+</form>
+<form method="GET" action="/exportar_modelo_relacoes_processo_item">
+<button type="submit">Baixar modelo</button>
+</form>
+<form method="GET" action="/exportar_relacoes_processo_item">
+<button type="submit">Baixar relações atuais</button>
+</form>
+</div>
+{% if relacoes_processo_status %}
+<div class="total-box" style="margin-bottom:14px;">{{ relacoes_processo_status }}</div>
+{% endif %}
 <form method="POST" action="/cadastrar_relacao_processo_item">
 <table class="tabela-componentes">
 <tr>

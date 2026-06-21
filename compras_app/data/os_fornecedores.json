@@ -1,5 +1,53 @@
 {
   "SAFRA MARQUES": {
     "cliente": "SAFRA MARQUES"
+  },
+  "GRUPO ALLMA": {
+    "cliente": "GRUPO ALLMA"
+  },
+  "NOROESTE VERDE": {
+    "cliente": "NOROESTE VERDE"
+  },
+  "DIVERSAL": {
+    "cliente": "DIVERSAL"
+  },
+  "ST. CATARINA": {
+    "cliente": "ST. CATARINA"
+  },
+  "LOCAR UTIL": {
+    "cliente": "LOCAR UTIL"
+  },
+  "TRANSFORMERS": {
+    "cliente": "TRANSFORMERS"
+  },
+  "DINAMICA": {
+    "cliente": "DINAMICA"
+  },
+  "REAVEL": {
+    "cliente": "REAVEL"
+  },
+  "MBR": {
+    "cliente": "MBR"
+  },
+  "BELISA": {
+    "cliente": "BELISA"
+  },
+  "ROMA": {
+    "cliente": "ROMA"
+  },
+  "GAMMAPAR": {
+    "cliente": "GAMMAPAR"
+  },
+  "CADORE": {
+    "cliente": "CADORE"
+  },
+  "M7 COMERCIO": {
+    "cliente": "M7 COMERCIO"
+  },
+  "CONCEITO": {
+    "cliente": "CONCEITO"
+  },
+  "AG. CHEGADA": {
+    "cliente": "AG. CHEGADA"
   }
 }

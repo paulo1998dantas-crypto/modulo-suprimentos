@@ -1225,6 +1225,30 @@
       "descricao": "",
       "unidade": "",
       "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
     }
   ],
   "30180001": [
@@ -1596,6 +1620,54 @@
     },
     {
       "codigo": "10180059",
+      "descricao": "ABS TETO PC E/S/J TB",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180060",
+      "descricao": "ABS PC REFORCO ACO PORTA LATERAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180050",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180054",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA FRONTAL CABINE/SALAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180055",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA LATERAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180056",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA TRASEIRA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180057",
+      "descricao": "ABS PC E/S/J TB LATERAL MOTORISTA LE 1º/2º VAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180058",
+      "descricao": "ABS PC E/S/J TB LATERAL PASSAGEIRO LD 2º VAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180059",
       "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/ PRETO TETO CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
       "unidade": "pc",
       "quantidade": "1"
@@ -1608,6 +1680,108 @@
     }
   ],
   "30180005": [
+    {
+      "codigo": "10180061",
+      "descricao": "CJ ABS FORROS E/S/J PL/PTS",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO ASSOALHO",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180176",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO CAPUCINO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO LATERAL MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA MOTORISTA LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO PORTA LATERAL LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180184",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO SOLEIRA PORTA LATERAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180185",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO COIFA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180186",
+      "descricao": "ABS PC IVECO 50-180 LATERAL DIANTEIRA 1º VAO MOTORISTA LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180187",
+      "descricao": "ABS PC IVECO 50-180 LATERAL TRASEIRA 2º/3º VAO MOTORISTA LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180188",
+      "descricao": "ABS PC IVECO 50-180 LATERAL TRASEIRA 2º/3º VAO MOTORISTA LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 TAMPA INSPECAO PASSAGEIRO LD",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "ABS PC IVECO 50-180 TAMPA INSPECAO PASSAGEIRO LE",
+      "unidade": "Un",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180191",
+      "descricao": "ABS TETO PC IVECO 50-180",
+      "unidade": "pc",
+      "quantidade": ""
+    },
     {
       "codigo": "10180175",
       "descricao": "ABS PC IVECO 50-180 ACABAMENTO ASSOALHO COLUNA MOTORISTA",
@@ -2821,6 +2995,12 @@
       "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
       "unidade": "un",
       "quantidade": "0.25"
+    },
+    {
+      "codigo": "10280018",
+      "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
+      "unidade": "ch",
+      "quantidade": "1"
     }
   ],
   "30140003": [
@@ -2839,10 +3019,10 @@
   ],
   "20520001": [
     {
-      "codigo": "20520006",
+      "codigo": "10280013",
       "descricao": "MP CANTONEIRA PVC PRETA PERFIL DEGRAU ESCADA 6000MM",
       "unidade": "pc",
-      "quantidade": "0.4"
+      "quantidade": ""
     }
   ],
   "20520002": [
@@ -2910,9 +3090,9 @@
   "20140002": [
     {
       "codigo": "10280018",
-      "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
-      "unidade": "ch",
-      "quantidade": "1"
+      "descricao": "MP CHAPA DE COMPENSADO RETALHO",
+      "unidade": "mm",
+      "quantidade": "1500"
     }
   ],
   "30140005": [
@@ -3334,6 +3514,18 @@
     }
   ],
   "20140012": [
+    {
+      "codigo": "10280018",
+      "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
+      "unidade": "ch",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280019",
+      "descricao": "MP CHAPA COMPENSADO 3270X2200X12MM",
+      "unidade": "ch",
+      "quantidade": "0.17"
+    },
     {
       "codigo": "10280018",
       "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
@@ -5912,6 +6104,132 @@
     },
     {
       "codigo": "30180004",
+      "descricao": "CJ REVESTIMENTO E/S/J TB",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300032",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X19MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10300040",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X32MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10300034",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X38MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10300030",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,9X25MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520005",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA CHUMBO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520007",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA PLATINA",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280006",
+      "descricao": "MP BORRACHA PERFIL U ACABAMENTO ABS 12X9X7MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10240088",
+      "descricao": "ACESSORIO LACRE EMERGENCIA MARTELINHO 2023",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10240002",
+      "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10240001",
+      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240041",
+      "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30120008",
+      "descricao": "CJ VIDROS SELADO EXPERT/JUMPY/SCUDO - SELADO - VIDROFORTE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320036",
+      "descricao": "CM COLA PU PARABRISA TERESON BOND 180 3H CURA 600ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280009",
+      "descricao": "MP BORRACHA PERFIL U PORTA LATERAL/TRASEIRA 19X15MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320065",
+      "descricao": "CM GALVANIZADOR A FRIO SPRAY",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10260018",
+      "descricao": "ELETRICA CHICOTE ILUMINACAO E/S/J TB",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260004",
+      "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 LIGA DESLIGA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30160002",
+      "descricao": "CJ ISOLAMENTO TERMICO P/ E/S/J TB C/ MANTA AUTOADESIVA ALUMINIZADA",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240023",
+      "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO RENEGADE RT1I29PR",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240032",
+      "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30180004",
       "descricao": "CJ REVESTIMENTO E/S/J TB TETO C/ VELUDO PRETO",
       "unidade": "cj",
       "quantidade": "1"
@@ -5981,9 +6299,141 @@
       "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
       "unidade": "cj",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
     }
   ],
   "40340050": [
+    {
+      "codigo": "30120017",
+      "descricao": "CJ VIDROS VISTA EXPERT/JUMPY/SCUDO - VIDROFORTE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320036",
+      "descricao": "CM COLA PU PARABRISA TERESON BOND 180 3H CURA 600ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280009",
+      "descricao": "MP BORRACHA PERFIL U PORTA LATERAL/TRASEIRA 19X15MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320065",
+      "descricao": "CM GALVANIZADOR A FRIO SPRAY",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10260018",
+      "descricao": "ELETRICA CHICOTE ILUMINACAO E/S/J TB",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260004",
+      "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 LIGA DESLIGA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30160002",
+      "descricao": "CJ ISOLAMENTO TERMICO P/ E/S/J TB C/ MANTA AUTOADESIVA ALUMINIZADA",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240023",
+      "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO RENEGADE RT1I29PR",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240032",
+      "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30180004",
+      "descricao": "CJ REVESTIMENTO E/S/J TB",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300032",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X19MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10300040",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X32MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10300034",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X38MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10300030",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 3,9X25MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520005",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA CHUMBO",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520007",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA PLATINA",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280006",
+      "descricao": "MP BORRACHA PERFIL U ACABAMENTO ABS 12X9X7MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10240088",
+      "descricao": "ACESSORIO LACRE EMERGENCIA MARTELINHO 2023",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10240002",
+      "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10240001",
+      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240041",
+      "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
     {
       "codigo": "30120017",
       "descricao": "CJ VIDROS VISTA EXPERT/JUMPY/SCUDO - VIDROFORTE",
@@ -6109,9 +6559,141 @@
       "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
       "unidade": "cj",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
     }
   ],
   "40340051": [
+    {
+      "codigo": "10260018",
+      "descricao": "ELETRICA CHICOTE ILUMINACAO E/S/J TB",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260004",
+      "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 LIGA DESLIGA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30160002",
+      "descricao": "CJ ISOLAMENTO TERMICO P/ E/S/J TB C/ MANTA AUTOADESIVA ALUMINIZADA",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240023",
+      "descricao": "ACESSORIO ESPELHO RETROVISOR INTERNO RENEGADE RT1I29PR",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240032",
+      "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30180004",
+      "descricao": "CJ REVESTIMENTO E/S/J TB",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300032",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X19MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": "15"
+    },
+    {
+      "codigo": "10300040",
+      "descricao": "FX PARAFUSO AUTO BROCANTE FLANGEADO PHILIPS 4,2X32MM ZINCO BRANCO",
+      "unidade": "pc",
+      "quantidade": "60"
+    },
+    {
+      "codigo": "10300044",
+      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X35MM FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "10"
+    },
+    {
+      "codigo": "10300043",
+      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X25MM FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "20"
+    },
+    {
+      "codigo": "10520005",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA CHUMBO",
+      "unidade": "pc",
+      "quantidade": "16"
+    },
+    {
+      "codigo": "10520007",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO PHILIPS 3,5MM CINZA PLATINA",
+      "unidade": "pc",
+      "quantidade": "17"
+    },
+    {
+      "codigo": "10280006",
+      "descricao": "MP BORRACHA PERFIL U ACABAMENTO ABS 12X9X7MM",
+      "unidade": "pc",
+      "quantidade": "12"
+    },
+    {
+      "codigo": "10240088",
+      "descricao": "ACESSORIO LACRE EMERGENCIA MARTELINHO 2023",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10240002",
+      "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10240001",
+      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240041",
+      "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260113",
+      "descricao": "ELETRICA RELE UNIVERSAL 4 PINOS 40A COM SUPORTE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20440001",
+      "descricao": "PP REFORÇO SUPORTE METALON 40X20",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20140022",
+      "descricao": "PP NIVELADOR DE PISO",
+      "unidade": "pc",
+      "quantidade": "12"
+    },
+    {
+      "codigo": "30140041",
+      "descricao": "CJ APOIO LATERAL PISO",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
     {
       "codigo": "10260018",
       "descricao": "ELETRICA CHICOTE ILUMINACAO E/S/J TB",
@@ -6237,6 +6819,12 @@
       "descricao": "CJ APOIO LATERAL PISO",
       "unidade": "cj",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
     }
   ],
   "40340007": [
@@ -9733,6 +10321,24 @@
       "descricao": "CHAPA PRONTA TRILHO ALUMÍNIO BCO INCOR. FIXO 166X29 MM - 63.05.11-0001",
       "unidade": "cj",
       "quantidade": "2"
+    },
+    {
+      "codigo": "30300001",
+      "descricao": "CHAPA PRONTA TRILHO ALUMÍNIO BCO INCOR. FIXO SOB BANCO 1L CX RODAS SPRINTER 517 104X29 MM - 63.05.11-0003",
+      "unidade": "cj",
+      "quantidade": "3"
+    },
+    {
+      "codigo": "30300002",
+      "descricao": "CHAPA PRONTA TRILHO ALUMÍNIO BCO INCOR. RECLINAVEL 234X29 MM - 63.05.11-0002",
+      "unidade": "cj",
+      "quantidade": "13"
+    },
+    {
+      "codigo": "30300003",
+      "descricao": "CHAPA PRONTA TRILHO ALUMÍNIO BCO INCOR. FIXO 166X29 MM - 63.05.11-0001",
+      "unidade": "cj",
+      "quantidade": "2"
     }
   ],
   "30300006": [
@@ -9921,8 +10527,14 @@
   ],
   "30200004": [
     {
-      "codigo": "10200010",
-      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL S/ AP BRACO 220 MM 3P TECIDO",
+      "codigo": "10200007",
+      "descricao": "BCO MC LB FIXO 3 L NORMAL S/ AP BRACO 220 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200008",
+      "descricao": "BCO MC LB RECLINAVEL 2 L NORMAL C/ AP BRACO LD 220 MM 3P TECIDO",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -9934,6 +10546,12 @@
     }
   ],
   "20140023": [
+    {
+      "codigo": "10280053",
+      "descricao": "MP CHAPA DE COMPENSADO RETALHO",
+      "unidade": "mm",
+      "quantidade": "700"
+    },
     {
       "codigo": "10280053",
       "descricao": "MP CHAPA DE COMPENSADO RETALHO",
@@ -9982,13 +10600,13 @@
   "30140042": [
     {
       "codigo": "20140025",
-      "descricao": "PP SOLEIRA PORTA MALA EXPERT",
+      "descricao": "PP SOLEIRA PORTA MALA E/S/J LB 11 L",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "20520006",
-      "descricao": "PP CANTONEIRA PVC PRETA PORTA TRASEIRA E/S/J",
+      "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -10072,7 +10690,7 @@
   "NA": [],
   "20520006": [
     {
-      "codigo": "20520006",
+      "codigo": "10280013",
       "descricao": "MP CANTONEIRA PVC PRETA PERFIL DEGRAU ESCADA 6000MM",
       "unidade": "pc",
       "quantidade": "0.4"
@@ -10168,58 +10786,10 @@
   ],
   "20140026": [
     {
-      "codigo": "20140026",
-      "descricao": "PP SOLEIRA PORTA MALA E/S/J LB 9 L",
-      "unidade": "pc",
-      "quantidade": "1"
-    },
-    {
-      "codigo": "20520006",
-      "descricao": "PP CANTONEIRA PVC PRETA PORTA TRASEIRA E/S/J",
-      "unidade": "pc",
-      "quantidade": "1"
-    },
-    {
-      "codigo": "10280038",
-      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "codigo": "10280053",
+      "descricao": "MP CHAPA DE COMPENSADO RETALHO",
       "unidade": "mm",
-      "quantidade": "1247"
-    },
-    {
-      "codigo": "10280057",
-      "descricao": "BOBINA CARPETE RESINADO",
-      "unidade": "m²",
-      "quantidade": "1.2"
-    },
-    {
-      "codigo": "10300043",
-      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X25MM FOSFATIZADO PRETO",
-      "unidade": "pc",
-      "quantidade": "8"
-    },
-    {
-      "codigo": "10300044",
-      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X35MM FOSFATIZADO PRETO",
-      "unidade": "pc",
-      "quantidade": "4"
-    },
-    {
-      "codigo": "10320026",
-      "descricao": "CM CAIXA GRAMPO GRAMPEADOR 26/6",
-      "unidade": "un",
-      "quantidade": "0.1"
-    },
-    {
-      "codigo": "10280007",
-      "descricao": "MP BORRACHA PERFIL L ACABAMENTO PME 14,49X9MM - 75º",
-      "unidade": "mm",
-      "quantidade": "1467"
-    },
-    {
-      "codigo": "10280058",
-      "descricao": "CALÇO MADEIRA PALLET",
-      "unidade": "pc",
-      "quantidade": "2"
+      "quantidade": "1300"
     }
   ],
   "30140043": [
@@ -10231,7 +10801,7 @@
     },
     {
       "codigo": "20520006",
-      "descricao": "PP CANTONEIRA PVC PRETA PORTA TRASEIRA E/S/J",
+      "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -10287,7 +10857,7 @@
     },
     {
       "codigo": "20520006",
-      "descricao": "PP CANTONEIRA PVC PRETA PORTA TRASEIRA E/S/J",
+      "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -10337,13 +10907,13 @@
   "30140045": [
     {
       "codigo": "20140025",
-      "descricao": "PP SOLEIRA PORTA MALA EXPERT",
+      "descricao": "PP SOLEIRA PORTA MALA E/S/J LB 11 L",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "20520006",
-      "descricao": "PP CANTONEIRA PVC PRETA PORTA TRASEIRA E/S/J",
+      "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -10616,7 +11186,7 @@
       "codigo": "10280050",
       "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI MONTADORA 50X17X16X6000 MM",
       "unidade": "pc",
-      "quantidade": "0.08"
+      "quantidade": "0.4"
     }
   ],
   "20240006": [
@@ -10678,19 +11248,19 @@
       "codigo": "10280059",
       "descricao": "MP FLOCO DE NYLON - 012 PRETO - 1 KG",
       "unidade": "un",
-      "quantidade": "0.5"
+      "quantidade": "0.35"
     },
     {
       "codigo": "10320030",
       "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
       "unidade": "un",
-      "quantidade": "0.8"
+      "quantidade": "0.6"
     },
     {
       "codigo": "10320032",
       "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
       "unidade": "un",
-      "quantidade": "0.1"
+      "quantidade": "0.05"
     },
     {
       "codigo": "10320155",
@@ -10757,6 +11327,18 @@
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
       "unidade": "un",
       "quantidade": "0.01"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR ALTO SOLIDOS SHERWIN WILLIANS",
+      "unidade": "un",
+      "quantidade": "0.066"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM CATALISADOR ENDURECEDOR H0010 P/ VERNIZ PU FOSCO LAZZUDUR ALTO SOLIDOS SHERWIN WILLIANS",
+      "unidade": "un",
+      "quantidade": "0.133"
     }
   ],
   "20180003": [
@@ -10769,14 +11351,26 @@
     {
       "codigo": "10320155",
       "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.05"
     },
     {
       "codigo": "10320029",
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": "0.053"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": "0.133"
     }
   ],
   "20180004": [
@@ -10797,6 +11391,24 @@
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
       "unidade": "pc",
       "quantidade": "0.05"
+    },
+    {
+      "codigo": "10280059",
+      "descricao": "MP FLOCO DE NYLON - 012 PRETO - 1 KG",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320030",
+      "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320032",
+      "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
+      "unidade": "un",
+      "quantidade": "0.025"
     }
   ],
   "20180005": [
@@ -10817,6 +11429,24 @@
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
       "unidade": "pc",
       "quantidade": "0.05"
+    },
+    {
+      "codigo": "10280059",
+      "descricao": "MP FLOCO DE NYLON - 012 PRETO - 1 KG",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320030",
+      "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320032",
+      "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
+      "unidade": "un",
+      "quantidade": "0.025"
     }
   ],
   "20180006": [
@@ -10837,6 +11467,24 @@
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
       "unidade": "pc",
       "quantidade": "0.1"
+    },
+    {
+      "codigo": "10280059",
+      "descricao": "MP FLOCO DE NYLON - 012 PRETO - 1 KG",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320030",
+      "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320032",
+      "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
+      "unidade": "un",
+      "quantidade": "0.025"
     }
   ],
   "20180007": [
@@ -10857,6 +11505,24 @@
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
       "unidade": "pc",
       "quantidade": "0.1"
+    },
+    {
+      "codigo": "10280059",
+      "descricao": "MP FLOCO DE NYLON - 012 PRETO - 1 KG",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320030",
+      "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
+      "unidade": "un",
+      "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320032",
+      "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
+      "unidade": "un",
+      "quantidade": "0.025"
     }
   ],
   "10180218": [
@@ -10881,47 +11547,71 @@
   ],
   "20180010": [
     {
-      "codigo": "10180217",
-      "descricao": "COLUNA A ORIGINAL LD E/S/J",
+      "codigo": "10180220",
+      "descricao": "QUEBRA SOL ORIGINAL CABINE E/S/J LD",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "10320155",
       "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.08"
     },
     {
       "codigo": "10320029",
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.08"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": "0.06"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": "0.166"
     }
   ],
   "20180009": [
     {
-      "codigo": "10180216",
-      "descricao": "COLUNA A ORIGINAL LE E/S/J",
+      "codigo": "10180219",
+      "descricao": "QUEBRA SOL ORIGINAL CABINE E/S/J LE",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "10320155",
       "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.08"
     },
     {
       "codigo": "10320029",
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.08"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": "0.06"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": "0.166"
     }
   ],
   "20180012": [
     {
-      "codigo": "10180223",
+      "codigo": "10180222",
       "descricao": "ACABAMENTO PLASTICO ORIGINAL MICROFONE SOM E/S/J",
       "unidade": "pc",
       "quantidade": "1"
@@ -10929,14 +11619,26 @@
     {
       "codigo": "10320155",
       "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.02"
     },
     {
       "codigo": "10320029",
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.02"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": "0.053"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": "0.133"
     }
   ],
   "20180013": [
@@ -10949,14 +11651,26 @@
     {
       "codigo": "10320155",
       "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.05"
     },
     {
       "codigo": "10320029",
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.05"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": "0.053"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": "0.133"
     }
   ],
   "30180024": [
@@ -11195,7 +11909,7 @@
   ],
   "20180011": [
     {
-      "codigo": "10180222",
+      "codigo": "10180221",
       "descricao": "SUPORTE QUEBRA SOL ORIGINAL CABINE E/S/J",
       "unidade": "pc",
       "quantidade": "1"
@@ -11203,20 +11917,32 @@
     {
       "codigo": "10320155",
       "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.01"
     },
     {
       "codigo": "10320029",
       "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-      "unidade": "pc",
+      "unidade": "un",
       "quantidade": "0.01"
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": "0.053"
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": "0.133"
     }
   ],
   "30180023": [
     {
       "codigo": "20180001",
-      "descricao": "PP ABS TETO FLOCADO PRETO PC E/S/J TB",
+      "descricao": "PP ABS TETO VELUDO PRETO PC E/S/J TB",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -11234,25 +11960,25 @@
     },
     {
       "codigo": "20180004",
-      "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LE E/S/J PRETO FOSCO VINÍLICA",
+      "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LE E/S/J VELUDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "20180005",
-      "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LD E/S/J PRETO FOSCO VINÍLICA",
+      "descricao": "PP COLUNA B ORIGINAL CINTO SEGURANCA LD E/S/J VELUDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "20180006",
-      "descricao": "PP COLUNA A ORIGINAL LE E/S/J PRETO FOSCO VINÍLICA",
+      "descricao": "PP COLUNA A ORIGINAL LE E/S/J VELUDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "20180007",
-      "descricao": "PP COLUNA A ORIGINAL LD E/S/J PRETO FOSCO VINÍLICA",
+      "descricao": "PP COLUNA A ORIGINAL LD E/S/J VELUDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -11275,13 +12001,13 @@
       "quantidade": "1"
     },
     {
-      "codigo": "20180013",
+      "codigo": "20180011",
       "descricao": "PP SUPORTE QUEBRA SOL ORIGINAL CABINE E/S/J PRETO FOSCO VINÍLICA",
       "unidade": "pc",
       "quantidade": "2"
     },
     {
-      "codigo": "20180013",
+      "codigo": "20180012",
       "descricao": "PP ACABAMENTO PLASTICO ORIGINAL MICROFONE SOM E/S/J PRETO FOSCO VINÍLICA",
       "unidade": "pc",
       "quantidade": "1"
@@ -11425,6 +12151,12 @@
       "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
       "unidade": "cj",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
     }
   ],
   "40340054": [
@@ -11553,6 +12285,12 @@
       "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
       "unidade": "cj",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
     }
   ],
   "40340055": [
@@ -11681,6 +12419,12 @@
       "descricao": "CJ APOIO LATERAL PISO",
       "unidade": "cj",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
     }
   ],
   "30200015": [
@@ -11713,6 +12457,2817 @@
       "descricao": "BCO MC LB FIXO 2 L NORMAL C/ AP BRACO LD 330 MM 2P TECIDO",
       "unidade": "pc",
       "quantidade": "1"
+    }
+  ],
+  "30240055": [
+    {
+      "codigo": "10240128",
+      "descricao": "ACESSORIO ARANDELA BASE IMPRESSAO 3D",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240129",
+      "descricao": "ACESSORIO ARANDELA CAPA IMPRESSAO 3D",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30200016": [
+    {
+      "codigo": "10200077",
+      "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10200080",
+      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 370 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200082",
+      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10200084",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 3P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30260002": [
+    {
+      "codigo": "10260143",
+      "descricao": "ELETRICA CHICOTE BOTOES E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260144",
+      "descricao": "ELETRICA CHICOTE CENTRAL ELETRICA E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260148",
+      "descricao": "ELETRICA CHICOTE ALIMENTAÇÃO RELE POS IGNIÇÃO E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260153",
+      "descricao": "ELETRICA CHICOTE PORTA FUSIVEL ACESSORIOS INTERNOS E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260145",
+      "descricao": "ELETRICA CHICOTE INTERRUPTOR DE PORTA E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260113",
+      "descricao": "ELETRICA RELE UNIVERSAL 4 PINOS 40A COM SUPORTE",
+      "unidade": "pc",
+      "quantidade": "3"
+    },
+    {
+      "codigo": "10260159",
+      "descricao": "ELETRICA CONECTOR EMENDA DERIVAÇÃO FIO",
+      "unidade": "pc",
+      "quantidade": "3"
+    }
+  ],
+  "30260003": [
+    {
+      "codigo": "10260156",
+      "descricao": "SUPORTE PÇ INTERNA JI BOTOEIRA 8 TECLAS CABINE E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260157",
+      "descricao": "SUPORTE PÇ EXTERNA JI BOTOEIRA 8 TECLAS CABINE E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260158",
+      "descricao": "TAMPA CEGA JI BOTOEIRA CABINE E/S/J",
+      "unidade": "pc",
+      "quantidade": "4"
+    }
+  ],
+  "30260005": [
+    {
+      "codigo": "10260150",
+      "descricao": "ELETRICA CHICOTE TOMADA USB E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240171",
+      "descricao": "TOMADA USB A ORBE 3 1 LUZ AZUL DUPLA EMBUTIR TAMPA REDONDA 1 5A",
+      "unidade": "pc",
+      "quantidade": "3"
+    }
+  ],
+  "30260006": [
+    {
+      "codigo": "10260151",
+      "descricao": "ELETRICA CHICOTE LUZES CORTESIA E/S/J - DEGRAU, SOLEIRA PM, SOB BCO 1º FIL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260070",
+      "descricao": "ELETRICA FITA LED 2835 BRANCO FRIO 6000 K MONOCROMATICA SEM SILICONE PROTECAO IP65 5M",
+      "unidade": "pc",
+      "quantidade": "0.5"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "3"
+    }
+  ],
+  "30260007": [
+    {
+      "codigo": "10260152",
+      "descricao": "ELETRICA CHICOTE LUZ CORTESIA E/S/J SOB PAINEL CABINE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10260159",
+      "descricao": "ELETRICA CONECTOR EMENDA DERIVAÇÃO FIO",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30260008": [
+    {
+      "codigo": "10260146",
+      "descricao": "ELETRICA CHICOTE ALIMENTAÇÃO LED RGB MÓVEL LATERAL E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260147",
+      "descricao": "ELETRICA CHICOTE INTERLIGAÇÃO LED RGB MÓVEL LATERAL LE/LD E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260072",
+      "descricao": "ELETRICA FITA LED WS2811 5050 RGB ENDERECAVEL COM SILICONE PROTECAO IP65 5M",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30260009": [
+    {
+      "codigo": "30240055",
+      "descricao": "CJ ARANDELA PLASTICA JI MONTADORA",
+      "unidade": "cj",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10260096",
+      "descricao": "ELETRICA LUZ LED AZUL DIODO 5MM",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10260161",
+      "descricao": "ELETRICA RESISTOR 110 OHMS POTÊNCIA 1/4W",
+      "unidade": "pc",
+      "quantidade": "4"
+    }
+  ],
+  "30260010": [
+    {
+      "codigo": "10260163",
+      "descricao": "ELETRICA CHICOTE LUZ BALIZADOR INFERIOR E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260162",
+      "descricao": "ELETRICA LUZ BALIZADORA INFERIOR EMBUTIR REDONDO LED 2W LUZ AMARELA IP 65",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10260111",
+      "descricao": "ELETRICA REGULADOR TENSAO CORRENTE STEP DOWN BUCK DC 300W 9A",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "10200070": [
+    {
+      "codigo": "10220008",
+      "descricao": "APOIO BRACO LD PLASTICO INJETADO GRAFITE ACRYLIS RODOVIARIO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "3"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200071": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200072": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200073": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200074": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200075": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200066": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200067": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "3"
+    },
+    {
+      "codigo": "10220008",
+      "descricao": "APOIO BRACO LD PLASTICO INJETADO GRAFITE ACRYLIS RODOVIARIO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "10200068": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10200069": [
+    {
+      "codigo": "10220022",
+      "descricao": "CINTO SEGURANÇA 3P RETRATIL JL BANCOS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10240116": [
+    {
+      "codigo": "10240227",
+      "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J PÇ 1 PORTA LATERAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240228",
+      "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J PÇ 2 SALAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240229",
+      "descricao": "ACESSORIO TAPETE SALAO BOUCLE E/S/J PÇ 3 PORTA MALAS",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "20180014": [
+    {
+      "codigo": "10280030",
+      "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+      "unidade": "ch",
+      "quantidade": "0.3"
+    }
+  ],
+  "10180192": [
+    {
+      "codigo": "10280030",
+      "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+      "unidade": "ch",
+      "quantidade": "0.3"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20180015": [
+    {
+      "codigo": "10280030",
+      "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+      "unidade": "ch",
+      "quantidade": "0.3"
+    }
+  ],
+  "10180193": [
+    {
+      "codigo": "10280030",
+      "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+      "unidade": "ch",
+      "quantidade": "0.3"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20180016": [
+    {
+      "codigo": "10280030",
+      "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+      "unidade": "ch",
+      "quantidade": "0.4"
+    }
+  ],
+  "10180194": [
+    {
+      "codigo": "10280030",
+      "descricao": "MP CHAPA PVC EXPANDIDO BRANCO C/ LINER EM 1 FACE 2440X1220X25MM",
+      "unidade": "ch",
+      "quantidade": "0.4"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "30240059": [
+    {
+      "codigo": "30180020",
+      "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240017",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240018",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240019",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240020",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240021",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240022",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240058",
+      "descricao": "CJ CORTINA VELUDO PRETA PORTAS E/S/J",
+      "unidade": "cj",
+      "quantidade": "1"
+    }
+  ],
+  "20180017": [
+    {
+      "codigo": "10180057",
+      "descricao": "ABS PC E/S/J TB LATERAL MOTORISTA LE 1º/2º VAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180014",
+      "descricao": "PP ARO JANELA PVC 1º VAO LE E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180015",
+      "descricao": "PP ARO JANELA PVC 2º VAO LE E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300026",
+      "descricao": "FX PARAFUSO AUTO BROCANTE 3,5X35MM PHILIPS FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "100"
+    },
+    {
+      "codigo": "10320037",
+      "descricao": "CM COLA PU PARABRISA IMPACTA 24H CURA 400G",
+      "unidade": "un",
+      "quantidade": "0.6"
+    }
+  ],
+  "20180018": [
+    {
+      "codigo": "10180058",
+      "descricao": "ABS PC E/S/J TB LATERAL PASSAGEIRO LD 2º VAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180016",
+      "descricao": "PP ARO JANELA PVC 2º VAO LD E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300026",
+      "descricao": "FX PARAFUSO AUTO BROCANTE 3,5X35MM PHILIPS FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "100"
+    },
+    {
+      "codigo": "10320037",
+      "descricao": "CM COLA PU PARABRISA IMPACTA 24H CURA 400G",
+      "unidade": "un",
+      "quantidade": "0.4"
+    }
+  ],
+  "20180020": [
+    {
+      "codigo": "20180018",
+      "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL PASSAGEIRO LD 2º VAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180021": [
+    {
+      "codigo": "10180051",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA LATERAL PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180022": [
+    {
+      "codigo": "10180052",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180023": [
+    {
+      "codigo": "10180053",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180024": [
+    {
+      "codigo": "10180047",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA LATERAL PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180025": [
+    {
+      "codigo": "10180048",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA MOTORISTA LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180026": [
+    {
+      "codigo": "10180049",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20180027": [
+    {
+      "codigo": "10180050",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "30180026": [
+    {
+      "codigo": "30180027",
+      "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240017",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240018",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240019",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240020",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240021",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240022",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240058",
+      "descricao": "CJ CORTINA VELUDO PRETA PORTAS E/S/J",
+      "unidade": "cj",
+      "quantidade": "1"
+    }
+  ],
+  "30180027": [
+    {
+      "codigo": "20180024",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO ARO PORTA LATERAL PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pç",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180025",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA MOTORISTA LE CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pç",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180026",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO ARO PORTA TRASEIRA PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pç",
+      "quantidade": "1"
+    }
+  ],
+  "20140027": [
+    {
+      "codigo": "10280053",
+      "descricao": "MP CHAPA DE COMPENSADO RETALHO",
+      "unidade": "mm",
+      "quantidade": "1300"
+    }
+  ],
+  "20140028": [
+    {
+      "codigo": "10280010",
+      "descricao": "MP CANTONEIRA PVC PRETA C/ SUPORTE LED 6000MM",
+      "unidade": "pc",
+      "quantidade": "0.4"
+    }
+  ],
+  "30140046": [
+    {
+      "codigo": "20140027",
+      "descricao": "PP SOLEIRA PORTA MALA E/S/J LE 8/9 L",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20140028",
+      "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA LE E/S/J C/ LED",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280038",
+      "descricao": "MP PASSADEIRA AMADEIRADA TARKETT DARK BROWN REF 5087",
+      "unidade": "mm",
+      "quantidade": "1500"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1.5"
+    },
+    {
+      "codigo": "10300043",
+      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X25MM FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "8"
+    },
+    {
+      "codigo": "10300044",
+      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X35MM FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10320026",
+      "descricao": "CM CAIXA GRAMPO GRAMPEADOR 26/6",
+      "unidade": "un",
+      "quantidade": "0.1"
+    },
+    {
+      "codigo": "10280007",
+      "descricao": "MP BORRACHA PERFIL L ACABAMENTO PME 14,49X9MM - 75º",
+      "unidade": "mm",
+      "quantidade": "1665"
+    },
+    {
+      "codigo": "10280058",
+      "descricao": "CALÇO MADEIRA PALLET",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30140047": [
+    {
+      "codigo": "20140027",
+      "descricao": "PP SOLEIRA PORTA MALA E/S/J LE 8/9 L",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20140028",
+      "descricao": "PP CANTONEIRA PVC PRETA SOLEIRA PORTA MALA LE E/S/J C/ LED",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280039",
+      "descricao": "MP PASSADEIRA LG BRIGHT GRAFITE 92402",
+      "unidade": "mm",
+      "quantidade": "1247"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1.2"
+    },
+    {
+      "codigo": "10300043",
+      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X25MM FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "8"
+    },
+    {
+      "codigo": "10300044",
+      "descricao": "FX PARAFUSO PONTA AGULHA 3,5X35MM FOSFATIZADO PRETO",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10320026",
+      "descricao": "CM CAIXA GRAMPO GRAMPEADOR 26/6",
+      "unidade": "un",
+      "quantidade": "0.1"
+    },
+    {
+      "codigo": "10280007",
+      "descricao": "MP BORRACHA PERFIL L ACABAMENTO PME 14,49X9MM - 75º",
+      "unidade": "mm",
+      "quantidade": "1467"
+    },
+    {
+      "codigo": "10280058",
+      "descricao": "CALÇO MADEIRA PALLET",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "20240007": [
+    {
+      "codigo": "10280053",
+      "descricao": "MP CHAPA DE COMPENSADO RETALHO",
+      "unidade": "mm",
+      "quantidade": "1500"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1.5"
+    }
+  ],
+  "20240008": [
+    {
+      "codigo": "10280060",
+      "descricao": "MP CAPACHO VINÍLICO PRETO 1200 x 1000 x 10",
+      "unidade": "pc",
+      "quantidade": "0.15"
+    }
+  ],
+  "10240180": [
+    {
+      "codigo": "10280060",
+      "descricao": "MP CAPACHO VINÍLICO PRETO 1200 x 1000 x 10",
+      "unidade": "pc",
+      "quantidade": "0.15"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240009": [
+    {
+      "codigo": "10280060",
+      "descricao": "MP CAPACHO VINÍLICO PRETO 1200 x 1000 x 10",
+      "unidade": "pc",
+      "quantidade": "0.15"
+    }
+  ],
+  "10240181": [
+    {
+      "codigo": "10280060",
+      "descricao": "MP CAPACHO VINÍLICO PRETO 1200 x 1000 x 10",
+      "unidade": "pc",
+      "quantidade": "0.15"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240010": [
+    {
+      "codigo": "10280060",
+      "descricao": "MP CAPACHO VINÍLICO PRETO 1200 x 1000 x 10",
+      "unidade": "pc",
+      "quantidade": "0.2"
+    }
+  ],
+  "30240056": [
+    {
+      "codigo": "20240008",
+      "descricao": "PP CAPACHO E/S/J PORTA LATERAL MOTORISTA LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240009",
+      "descricao": "PP CAPACHO E/S/J PORTA LATERAL CARONA LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240010",
+      "descricao": "PP CAPACHO E/S/J PORTA LATERAL CORREDICA LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300081",
+      "descricao": "FX BOTAO PRESSÃO METAL NIQUELADO 16 MM",
+      "unidade": "pc",
+      "quantidade": "16"
+    }
+  ],
+  "30240058": [
+    {
+      "codigo": "10240202",
+      "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J PORTA LATERAL 550X500",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10240203",
+      "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J PT LE 600X(450,430)",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240204",
+      "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J PT LD 600X(450,430)",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10300083",
+      "descricao": "FX PASSA FIO APITO SUPORTE CORTINA COR PRETO",
+      "unidade": "pc",
+      "quantidade": "14"
+    },
+    {
+      "codigo": "10240236",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO 3D TAMPA TUBO CORTINA",
+      "unidade": "pc",
+      "quantidade": "12"
+    }
+  ],
+  "30240060": [
+    {
+      "codigo": "20240011",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA 1º VAO LE E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240012",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA 2º VAO LE E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240013",
+      "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA 2º VAO LD E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240014",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA 1º VAO LE E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240015",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA 2º VAO LE E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240016",
+      "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA 2º VAO LD E/S/J C-CLASS",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240057": [
+    {
+      "codigo": "10240200",
+      "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J C-CLASS 1º VAO LE 550X440",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10240201",
+      "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J C-CLASS 2º VAO LE/LD 600X400",
+      "unidade": "pc",
+      "quantidade": "4"
+    },
+    {
+      "codigo": "10300083",
+      "descricao": "FX PASSA FIO APITO SUPORTE CORTINA COR PRETO",
+      "unidade": "pc",
+      "quantidade": "18"
+    }
+  ],
+  "20240011": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.2"
+    }
+  ],
+  "10240188": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.2"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240012": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240189": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240013": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240190": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240014": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.2"
+    }
+  ],
+  "10240191": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.2"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240015": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240192": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240016": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240193": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240017": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240194": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240020": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240197": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240018": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240195": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240019": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240196": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240021": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "10240198": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20240022": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    }
+  ],
+  "10240199": [
+    {
+      "codigo": "10280049",
+      "descricao": "MP TUBO ALUMINIO CORTINA 9,5X6000MM - PAREDE 1,58MM",
+      "unidade": "pc",
+      "quantidade": "0.25"
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    },
+    {
+      "codigo": "0",
+      "descricao": "",
+      "unidade": "",
+      "quantidade": ""
+    }
+  ],
+  "20180019": [
+    {
+      "codigo": "20180017",
+      "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL MOTORISTA LE 1º/2º VAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "30180025": [
+    {
+      "codigo": "20180021",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA LATERAL PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180022",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA MOTORISTA LE CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180023",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO INFERIOR PORTA TRASEIRA PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180027",
+      "descricao": "PP ABS PC E/S/J TB ACABAMENTO COLUNA CINTO SEGURANCA PASSAGEIRO LD CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180019",
+      "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL MOTORISTA LE 1º/2º VAO CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20180020",
+      "descricao": "PP ABS PC C/ MOLDURA CORTINA PVC E/S/J C-CLASS TB LATERAL PASSAGEIRO LD 2º VAO CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180054",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA FRONTAL CABINE/SALAO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180055",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA LATERAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180056",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO SOLEIRA TRASEIRA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180060",
+      "descricao": "ABS PC REFORCO ACO PORTA LATERAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30180023",
+      "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30180026",
+      "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J CINZA RAL 7021 PU - TI.01.J04 C/ CORTINA VELUDO PRETA",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240060",
+      "descricao": "CJ TUBO ALUMINIO DOBRADO CORTINA E/S/J EMBUTIDA C-CLASS",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "30240057",
+      "descricao": "CJ CORTINA VELUDO PRETA SALAO E/S/J C-CLASS SEM PORTAS",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240102",
+      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10240237",
+      "descricao": "PP SUPORTE FIXO CABIDE - GANCHO CABIDEIRO MARCOPOLO CINZA RAL 7021 PU - TI.01.J04",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "10240237": [
+    {
+      "codigo": "10240230",
+      "descricao": "ACESSORIO SUPORTE FIXO CABIDE - GANCHO CABIDEIRO MARCOPOLO CINZA ORIGINAL",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320170",
+      "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320168",
+      "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320171",
+      "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320172",
+      "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320166",
+      "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10320167",
+      "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "30200017": [
+    {
+      "codigo": "10200088",
+      "descricao": "BCO MC LB RECLINAVEL 2 L PME C/ AP BRACO LD 65 MM 2P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200086",
+      "descricao": "BCO MC LB RECLINAVEL 4 L PME S/ AP BRACO 100 MM 2P COURVIN",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200065",
+      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 2P COURVIN",
+      "unidade": "pc",
+      "quantidade": "3"
+    }
+  ],
+  "20240023": [
+    {
+      "codigo": "10240239",
+      "descricao": "PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240024": [
+    {
+      "codigo": "10240240",
+      "descricao": "PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240034": [
+    {
+      "codigo": "10240243",
+      "descricao": "PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240035": [
+    {
+      "codigo": "10240242",
+      "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240048": [
+    {
+      "codigo": "10240238",
+      "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280057",
+      "descricao": "BOBINA CARPETE RESINADO",
+      "unidade": "m²",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240025": [
+    {
+      "codigo": "20240048",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280061",
+      "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "20240048",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280062",
+      "descricao": "MP COURVIN LISO PRETO URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240026": [
+    {
+      "codigo": "20240023",
+      "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280061",
+      "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
+      "unidade": "m",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240031": [
+    {
+      "codigo": "10240241",
+      "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280061",
+      "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
+      "unidade": "m",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240036": [
+    {
+      "codigo": "20240035",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280061",
+      "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    },
+    {
+      "codigo": "20240035",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280063",
+      "descricao": "MP COURVIN LISO BEGE URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240028": [
+    {
+      "codigo": "20240023",
+      "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280062",
+      "descricao": "MP COURVIN LISO PRETO URUGUAI",
+      "unidade": "m",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240032": [
+    {
+      "codigo": "10240241",
+      "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280062",
+      "descricao": "MP COURVIN LISO PRETO URUGUAI",
+      "unidade": "m",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240037": [
+    {
+      "codigo": "20240035",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280062",
+      "descricao": "MP COURVIN LISO PRETO URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240029": [
+    {
+      "codigo": "20240048",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280063",
+      "descricao": "MP COURVIN LISO BEGE URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240030": [
+    {
+      "codigo": "20240023",
+      "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280063",
+      "descricao": "MP COURVIN LISO BEGE URUGUAI",
+      "unidade": "m",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240033": [
+    {
+      "codigo": "10240241",
+      "descricao": "PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280063",
+      "descricao": "MP COURVIN LISO BEGE URUGUAI",
+      "unidade": "m",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "10220024": [],
+  "20240039": [
+    {
+      "codigo": "10280016",
+      "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+      "unidade": "ch",
+      "quantidade": "0.2"
+    }
+  ],
+  "20240040": [
+    {
+      "codigo": "10280016",
+      "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+      "unidade": "ch",
+      "quantidade": "0.2"
+    }
+  ],
+  "20240045": [
+    {
+      "codigo": "10280016",
+      "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+      "unidade": "ch",
+      "quantidade": "0.2"
+    }
+  ],
+  "20240046": [
+    {
+      "codigo": "10280016",
+      "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+      "unidade": "ch",
+      "quantidade": "0.2"
+    }
+  ],
+  "20240042": [
+    {
+      "codigo": "10280016",
+      "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+      "unidade": "ch",
+      "quantidade": "0.1"
+    }
+  ],
+  "20240043": [
+    {
+      "codigo": "10280016",
+      "descricao": "MP CHAPA ACRILICO PRETO 2000X1000X10MM",
+      "unidade": "ch",
+      "quantidade": "0.1"
+    }
+  ],
+  "20240041": [
+    {
+      "codigo": "10280014",
+      "descricao": "MP CHAPA ACRILICO CRISTAL 3050X2050X5MM",
+      "unidade": "ch",
+      "quantidade": "0.05"
+    }
+  ],
+  "20240047": [
+    {
+      "codigo": "10280014",
+      "descricao": "MP CHAPA ACRILICO CRISTAL 3050X2050X5MM",
+      "unidade": "ch",
+      "quantidade": "0.05"
+    }
+  ],
+  "20240044": [
+    {
+      "codigo": "10280014",
+      "descricao": "MP CHAPA ACRILICO CRISTAL 3050X2050X5MM",
+      "unidade": "ch",
+      "quantidade": "0.025"
+    }
+  ],
+  "30240070": [
+    {
+      "codigo": "20240039",
+      "descricao": "PP PC TAMPO SUP ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240040",
+      "descricao": "PP PC TAMPO INF ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240041",
+      "descricao": "PP PC TAMPO CENTRAL ACRILICO CRISTAL MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320031",
+      "descricao": "CM COLA ACRILICO FINA CA-60 1L",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "10100006": [],
+  "30240071": [
+    {
+      "codigo": "20240042",
+      "descricao": "PP PC TAMPO SUP ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240043",
+      "descricao": "PP PC TAMPO INF ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240044",
+      "descricao": "PP PC TAMPO CENTRAL ACRILICO CRISTAL MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320031",
+      "descricao": "CM COLA ACRILICO FINA CA-60 1L",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "30240072": [
+    {
+      "codigo": "20240045",
+      "descricao": "PP PC TAMPO SUP ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240046",
+      "descricao": "PP PC TAMPO INF ACRILICO PRETO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240047",
+      "descricao": "PP PC TAMPO CENTRAL ACRILICO CRISTAL MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10320031",
+      "descricao": "CM COLA ACRILICO FINA CA-60 1L",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "30240061": [
+    {
+      "codigo": "30240070",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240026",
+      "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO MARROM",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240025",
+      "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO MARROM",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240024",
+      "descricao": "PP PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30240062": [
+    {
+      "codigo": "30240070",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240028",
+      "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO PRETO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240027",
+      "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO PRETO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240024",
+      "descricao": "PP PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30240063": [
+    {
+      "codigo": "30240070",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240030",
+      "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO BEGE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240029",
+      "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO BEGE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240024",
+      "descricao": "PP PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30240064": [
+    {
+      "codigo": "30240071",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240031",
+      "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO MARROM",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240065": [
+    {
+      "codigo": "30240071",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240032",
+      "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO PRETO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240066": [
+    {
+      "codigo": "30240071",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LE",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240033",
+      "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO BEGE",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240067": [
+    {
+      "codigo": "30240072",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240034",
+      "descricao": "PP FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240036",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD REVESTIDO MARROM",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240068": [
+    {
+      "codigo": "30240072",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240034",
+      "descricao": "PP FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240037",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD REVESTIDO PRETO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240073": [
+    {
+      "codigo": "10260155",
+      "descricao": "ELETRICA CHICOTE GELADEIRA ELBER CAB 18 E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240007",
+      "descricao": "PP CAIXA MADEIRA SUPORTE GELADEIRA CAB 18L E/S/J REVESTIDA CARPETE PRETO RESINADO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240084",
+      "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 18L",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260155",
+      "descricao": "ELETRICA CHICOTE GELADEIRA ELBER CAB 18 E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240007",
+      "descricao": "PP CAIXA MADEIRA SUPORTE GELADEIRA CAB 18L E/S/J REVESTIDA CARPETE PRETO RESINADO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10240084",
+      "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 18L",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240069": [
+    {
+      "codigo": "30240072",
+      "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 2º VAO LD",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240034",
+      "descricao": "PP FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "20240038",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD REVESTIDO BEGE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10260089",
+      "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30200018": [
+    {
+      "codigo": "10200090",
+      "descricao": "BCO MC LB RECLINAVEL 3 L BJD C/ AP BRACO LD 330 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10200041",
+      "descricao": "BCO MC LB RECLINAVEL 1 L NORMAL C/ AP BRACO LD 370 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10200043",
+      "descricao": "BCO MC LB RECLINAVEL 1 L NORMAL C/ AP BRACO LE 370 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30200019": [
+    {
+      "codigo": "10200048",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200092",
+      "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10200094",
+      "descricao": "BCO MC LB RECLINAVEL 1 L NORMAL C/ AP BRACO LE 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200062",
+      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200064",
+      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "2"
+    }
+  ],
+  "30240074": [
+    {
+      "codigo": "10300079",
+      "descricao": "FX CHAPA FIXACAO M10 BCO - FALTA MEDIDA",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280050",
+      "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI MONTADORA 50X17X16X6000 MM",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "PP TRILHO ALUMINIO FIXACAO BANCO  XXX MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520001",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO TRILHO ALUMINIO PADRAO JI",
+      "unidade": "pc",
+      "quantidade": "6"
+    },
+    {
+      "codigo": "10280008",
+      "descricao": "MP BORRACHA PERFIL T ACABAMENTO TRILHO 39X21X13MM",
+      "unidade": "mm",
+      "quantidade": ""
+    }
+  ],
+  "30200020": [
+    {
+      "codigo": "10200098",
+      "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LE 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200096",
+      "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "3"
+    }
+  ],
+  "10380016": [],
+  "30240075": [
+    {
+      "codigo": "10300079",
+      "descricao": "FX CHAPA FIXACAO M10 BCO - FALTA MEDIDA",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280050",
+      "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI MONTADORA 50X17X16X6000 MM",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "PP TRILHO ALUMINIO FIXACAO BANCO  XXX MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520001",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO TRILHO ALUMINIO PADRAO JI",
+      "unidade": "pc",
+      "quantidade": "6"
+    },
+    {
+      "codigo": "10280008",
+      "descricao": "MP BORRACHA PERFIL T ACABAMENTO TRILHO 39X21X13MM",
+      "unidade": "mm",
+      "quantidade": ""
+    }
+  ],
+  "30200021": [
+    {
+      "codigo": "10200026",
+      "descricao": "BCO MC LB FIXO 4 L TRILHO S/ AP BRACO 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200037",
+      "descricao": "BCO MC LB FIXO 3 L TRILHO C/ AP BRACO LD 330 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200039",
+      "descricao": "BCO MC LB FIXO 3 L TRILHO C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200058",
+      "descricao": "BCO MC LB FIXO 2 L ELEVITTA C/ AP BRACO LD 60 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200056",
+      "descricao": "BCO MC LB FIXO 1 L ELEVITTA C/ AP BRACO LD/LE 60 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30240076": [
+    {
+      "codigo": "10300079",
+      "descricao": "FX CHAPA FIXACAO M10 BCO - FALTA MEDIDA",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10280050",
+      "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI MONTADORA 50X17X16X6000 MM",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "",
+      "descricao": "PP TRILHO ALUMINIO FIXACAO BANCO  XXX MM",
+      "unidade": "pc",
+      "quantidade": ""
+    },
+    {
+      "codigo": "10520001",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO TRILHO ALUMINIO PADRAO JI",
+      "unidade": "pc",
+      "quantidade": "6"
+    },
+    {
+      "codigo": "10280008",
+      "descricao": "MP BORRACHA PERFIL T ACABAMENTO TRILHO 39X21X13MM",
+      "unidade": "mm",
+      "quantidade": ""
     }
   ]
 }
