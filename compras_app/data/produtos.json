@@ -679,7 +679,7 @@
     "processo_conjunto": ""
   },
   "30120008": {
-    "descricao": "CJ VIDROS SELADO EXPERT/JUMPY/SCUDO - SELADO - VIDROFORTE",
+    "descricao": "CJ VIDROS SELADO E/S/J - SELADO - VIDROFORTE",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "12 - VIDROS",
@@ -4551,1148 +4551,1148 @@
   },
   "10320001": {
     "descricao": "CM ACUCAR 1KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320002": {
     "descricao": "CM ADOCANTE LIQUIDO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320003": {
     "descricao": "CM AGUA SANITARIA 5L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320004": {
     "descricao": "CM ALCOOL 70 % 1L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320005": {
     "descricao": "CM SHAMPOO APC AUTOMOTIVO 50L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320006": {
     "descricao": "CM ARAME SOLDA MIG 1 0MM BOBINA 15KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320007": {
     "descricao": "CM ATADURA CREPE",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320008": {
     "descricao": "CM BAND AID",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320009": {
     "descricao": "CM BOBINA PAPEL KRAFT BEGE-MAX",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320010": {
     "descricao": "CM BROCA 1 5MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320011": {
     "descricao": "CM BROCA 10MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320012": {
     "descricao": "CM BROCA 12MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320013": {
     "descricao": "CM BROCA 3MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320014": {
     "descricao": "CM BROCA 5 1MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320015": {
     "descricao": "CM BROCA 7MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320016": {
     "descricao": "CM BROCA 7 1MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320017": {
     "descricao": "CM BROCA 8MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320018": {
     "descricao": "CM BROCA 8MM X 330MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320019": {
     "descricao": "CM BUCHA LIMPEZA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320020": {
     "descricao": "CM BUCHA SIMPLES PRETA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320021": {
     "descricao": "CM CADERNO A4 80 FOLHA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320022": {
     "descricao": "CM CAFE GRAO 1KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320023": {
     "descricao": "CM CAFE PO 500G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320024": {
     "descricao": "CM CAIXA CLIPES DE PAPEL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320025": {
     "descricao": "CM CAIXA DE COTONETES",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320026": {
     "descricao": "CM CAIXA GRAMPO GRAMPEADOR 26/6",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320027": {
     "descricao": "CM CANETA ESFEROGRAFICA AZUL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320028": {
     "descricao": "CM CARNAUBA EXPRESS VONIXX",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320029": {
     "descricao": "CM CATALISADOR P/ TINTA FOSCO VINILICO 300 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320030": {
     "descricao": "CM CATALISADOR COLA FLOCAGEM KISAFIX KB03 750G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320031": {
     "descricao": "CM COLA ACRILICO FINA CA-60 1L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320032": {
     "descricao": "CM COLA PU BASE AGUA P/ FLOCAGEM KISAFIX PU 14000 RO 15KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320033": {
     "descricao": "CM COLA INSTANTANEA 793 20G TEKBOND",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320034": {
     "descricao": "CM COLA MADEIRA BRANCA 500G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320035": {
     "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320036": {
     "descricao": "CM COLA PU PARABRISA TERESON BOND 180 3H CURA 600ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320037": {
     "descricao": "CM COLA PU PARABRISA IMPACTA 24H CURA 400G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320038": {
     "descricao": "CM COLA QUENTE BASTAO 11MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320039": {
     "descricao": "CM COPO PLASTICO DESCARTAVEL 180ML C/ 100UN",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320040": {
     "descricao": "CM COPO PLASTICO DESCARTAVEL 50 ML C/ 100UN",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320041": {
     "descricao": "CM DESENGRAXANTE MAXI RUBBER 900ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320042": {
     "descricao": "CM DESINFETANTE 5L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320043": {
     "descricao": "CM DETERGENTE 500ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320044": {
     "descricao": "CM DETERGENTE CREMOL AUTOMOTIVO 50L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320045": {
     "descricao": "CM DISCO CORTE 115MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320046": {
     "descricao": "CM DISCO CORTE 250MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320047": {
     "descricao": "CM DISCO LIXA 115MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320048": {
     "descricao": "CM DISCO LIXA 250MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320049": {
     "descricao": "CM ENVELOPE KRAFT 240MM X 340MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320050": {
     "descricao": "CM ENVELOPE PLASTICO A4",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320051": {
     "descricao": "CM ESPARADRAPO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320052": {
     "descricao": "CM ESTILETE 18MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320053": {
     "descricao": "CM ESTOPA BRANCA 1KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320054": {
     "descricao": "CM FITA CREPE 18MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320055": {
     "descricao": "CM FITA CREPE AMARELA 18MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320056": {
     "descricao": "CM FITA CREPE AMARELA 5MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320057": {
     "descricao": "CM FITA CREPE 48MM X 50M",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320058": {
     "descricao": "CM FITA DUPLA FACE VHB",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320059": {
     "descricao": "CM FITA DUREX 12MM X 50M",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320060": {
     "descricao": "CM FITA ISOLANTE 19MM X 20M",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320061": {
     "descricao": "CM FITA ZEBRADA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320062": {
     "descricao": "CM FLANELA AMARELA 400MMX600MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320063": {
     "descricao": "CM FLANELA GREEN 400MMX600MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320064": {
     "descricao": "MP FLOCO NYLON 33 PRATA 1KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320065": {
     "descricao": "CM GALVANIZADOR A FRIO SPRAY",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320066": {
     "descricao": "CM GAZE",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320067": {
     "descricao": "CM GIZ",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320068": {
     "descricao": "CM GRAFITE HB 0,5MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320069": {
     "descricao": "CM GUARDANAPO DE PAPEL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320070": {
     "descricao": "CM LAMINA ESTILETE 18MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320071": {
     "descricao": "CM LAMINA SILICONE SECAGEM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320072": {
     "descricao": "CM LAMINA VIDRO MASCARA SOLDA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320073": {
     "descricao": "CM LAPIS CARPINTEIRO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320074": {
     "descricao": "CM LAPIS GRAFITE",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320075": {
     "descricao": "CM LAVA AUTO DESINCRUSTANTE VONIXX",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320076": {
     "descricao": "CM LAVA AUTOS BUBBLE FOAM JACA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320077": {
     "descricao": "CM LIMPA VIDROS SPRAY FINISHER",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320078": {
     "descricao": "CM LIMPADOR CONCENTRADO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320079": {
     "descricao": "CM LIXA A275 P400",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320080": {
     "descricao": "CM LIXA AGUA 1200",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320081": {
     "descricao": "CM LIXA CINTA 75MM X 610MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320082": {
     "descricao": "CM LIXA DAGUA P150",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320083": {
     "descricao": "CM LIXA SECO A275 P120",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320084": {
     "descricao": "CM LIXA SECO A275 P80",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320085": {
     "descricao": "CM LIXA SECO P800",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320086": {
     "descricao": "CM LUVA LATEX TAMANHO G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320087": {
     "descricao": "CM LUVA LATEX TAMANHO M",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320088": {
     "descricao": "CM LUVA LATEX TAMANHO P",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320089": {
     "descricao": "CM LUVA MICROFIBRA 25X16",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320090": {
     "descricao": "CM LUVA MULTITATO SS1003",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320091": {
     "descricao": "CM LUVA RASPA TAMANHO G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320092": {
     "descricao": "CM LUVA RASPA TAMANHO M",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320093": {
     "descricao": "CM LUVA RASPA TAMANHO P",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320094": {
     "descricao": "CM LUVAS MECANICA POLIURETANO TATIL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320095": {
     "descricao": "CM LUVAS TIPO CIRURGICA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320096": {
     "descricao": "CM MARCA TEXTO MULTICOLOR",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320097": {
     "descricao": "CM MASCARA FILTRO QUIMICO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320098": {
     "descricao": "CM MASCARA PURIFICADOR AR",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320099": {
     "descricao": "CM MASSA PLASTICA 400G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320100": {
     "descricao": "CM MASSA POLIR NUMERO 2 900G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320101": {
     "descricao": "CM OCULOS DE PROTECAO INCOLOR C/ CA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320102": {
     "descricao": "CM PACOTE BISCOITOS VARIADOS",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320103": {
     "descricao": "CM PACOTE PAPEL A4 C/ 500 FOLHAS",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320104": {
     "descricao": "CM PANO DE CHAO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320105": {
     "descricao": "CM PAPEL HIGIENICO FOLHA DUPLA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320106": {
     "descricao": "CM PAPEL HIGIENICO FOLHA SIMPLES",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320107": {
     "descricao": "CM PAPEL TOALHA FOLHA DUPLA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320108": {
     "descricao": "CM PAPEL TOALHA FOLHA SIMPLES",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320109": {
     "descricao": "CM PASTA LIMPEZA MAOS 2KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320110": {
     "descricao": "CM PERNEIRA RASPA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320111": {
     "descricao": "CM PILHA ALCALINA AA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320112": {
     "descricao": "CM PILHA ALCALINA AAA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320113": {
     "descricao": "CM PINCEL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320114": {
     "descricao": "CM PINCEL BRUSH EXTERNO 16",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320115": {
     "descricao": "CM PINCEL BRUSH INTERNO 16",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320116": {
     "descricao": "CM PINCA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320117": {
     "descricao": "CM PRETINHO PNEU",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320118": {
     "descricao": "CM TINTA PRETO CADILAC",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320119": {
     "descricao": "CM PROTEGEL PLUS SILICONE GEL PROTELIM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320120": {
     "descricao": "CM PROTETOR AURICULAR",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320121": {
     "descricao": "CM PROTETOR AURICULAR PLUG C/ CORDAO 16DB C/ CA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320122": {
     "descricao": "CM PROTETOR DORSAL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320123": {
     "descricao": "CM QUEROSENE 900ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320124": {
     "descricao": "CM RECIBO COMERCIAL",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320125": {
     "descricao": "CM REJUVEX VONIXX REVITALIZADOR",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320126": {
     "descricao": "CM REMOCOLA REMOVEDOR DE COLAS",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320127": {
     "descricao": "CM REMOVEDOR COLA STRIKE VONIXX",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320128": {
     "descricao": "CM SACHE ACUCAR",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320129": {
     "descricao": "CM SACHE ADOCANTE",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320130": {
     "descricao": "CM SACO CHAO XADRES",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320131": {
     "descricao": "CM SACO DE LIXO 100L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320132": {
     "descricao": "CM SACO DE LIXO 15L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320133": {
     "descricao": "CM SACO DE LIXO 200L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320134": {
     "descricao": "CM SACO DE LIXO 20L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320135": {
     "descricao": "CM SACO DE LIXO 30L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320136": {
     "descricao": "CM SACO DE LIXO 40L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320137": {
     "descricao": "CM SACO DE LIXO 60L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320138": {
     "descricao": "CM SELADOR PET",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320139": {
     "descricao": "CM SELADORA MADEIRA 3600ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320140": {
     "descricao": "CM SERINGA AGULHA",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320141": {
     "descricao": "CM SERRA SABRE",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320142": {
     "descricao": "CM SERRINHA 300MM/12\"",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320143": {
     "descricao": "CM SIKA AKTIVATOR 100 1000ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320144": {
     "descricao": "CM COLA PU SIKAFLEX 256",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320145": {
     "descricao": "CM SILICONE ACETICO INCOLOR 280G",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320146": {
     "descricao": "CM SILICONE GEL 3 6KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320147": {
     "descricao": "CM SILICONE GEL 3,6KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320148": {
     "descricao": "CM SOLUCAO IODO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320149": {
     "descricao": "CM SORO FISIOLOGICO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320150": {
     "descricao": "CM SOLVENTE SINTETICO PARA FLOCAGEM 900ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320151": {
     "descricao": "CM THINNER 5L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320152": {
     "descricao": "CM TINTA BRANCO MERCEDES BENZ",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320153": {
     "descricao": "CM TINTA BRANCO PEUGEOT",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320154": {
     "descricao": "CM TINTA BRANCO RENAULT",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320155": {
     "descricao": "CM TINTA PRETO FOSCO VINILICO 600 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320156": {
     "descricao": "CM TINTA SPRAY BRANCO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320157": {
     "descricao": "CM TINTA SPRAY PRETO FOSCO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320158": {
     "descricao": "CM TOALHA MICROFIBRA 400MMX600MM ZACS",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320159": {
     "descricao": "CM TOALHA SECAGEM TWIST 900MMX600MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320160": {
     "descricao": "CM TINTA SINTETICO BASE SOLVENTE PRETO KL GENESIS PARA FLOCAGEM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320161": {
     "descricao": "CM VASELINA LIQUIDA 1L",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320162": {
     "descricao": "CM VELCRO FEMEA PRETO 25MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320163": {
     "descricao": "CM VELCRO MACHO PRETO 25MM",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320164": {
     "descricao": "CM SHAMPOO AUTOMOTIVO",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
@@ -6734,7 +6734,7 @@
     "processo_conjunto": ""
   },
   "30120017": {
-    "descricao": "CJ VIDROS VISTA EXPERT/JUMPY/SCUDO - VIDROFORTE",
+    "descricao": "CJ VIDROS VISTA E/S/J - VIDROFORTE",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "12 - VIDROS",
@@ -7063,7 +7063,7 @@
     "processo_conjunto": ""
   },
   "30120026": {
-    "descricao": "CJ VIDROS SELADO EXPERT/JUMPY/SCUDO - SELADO - VETROEX",
+    "descricao": "CJ VIDROS SELADO E/S/J - SELADO - VETROEX",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "12 - VIDROS",
@@ -7189,7 +7189,7 @@
     "processo_conjunto": ""
   },
   "30120028": {
-    "descricao": "CJ VIDROS VISTA 1º LD/LE 2º LE EXPERT/JUMPY/SCUDO - STYLLUS",
+    "descricao": "CJ VIDROS VISTA 1º LD/LE 2º LE E/S/J - STYLLUS",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "12 - VIDROS",
@@ -7428,7 +7428,7 @@
   },
   "10320165": {
     "descricao": "CM COLA INSTANTANEA RETROVISOR REPARO 10 ML 50G TEKBOND",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
@@ -8505,7 +8505,7 @@
     "processo_conjunto": ""
   },
   "30200002": {
-    "descricao": "CJ BANCOS REC - MC - LB - 3,2,3 - 3P - COURVIN - EXPERT",
+    "descricao": "CJ BANCOS REC - MC - LB - 3,2,3 - 3P - COURVIN - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -8526,7 +8526,7 @@
     "processo_conjunto": ""
   },
   "10220006": {
-    "descricao": "CAPAS DIANTEIRAS COURVIN ESJ",
+    "descricao": "CAPA ENCOSTO MOTORISTA MC LB COURVIN GRAFITE E/S/J",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "22 - PEÇAS BCO",
@@ -8834,7 +8834,7 @@
     "processo_conjunto": ""
   },
   "30200003": {
-    "descricao": "CJ BANCOS REC - MC - LB - 3,2,3 - 3P - TECIDO - EXPERT",
+    "descricao": "CJ BANCOS REC - MC - LB - 3,2,3 - 3P - TECIDO - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -8862,7 +8862,7 @@
     "processo_conjunto": ""
   },
   "30200004": {
-    "descricao": "CJ BANCOS REC - MC - LB - 3,3 - 3P - TECIDO - EXPERT",
+    "descricao": "CJ BANCOS REC - MC - LB - 3,3 - 3P - TECIDO - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -8898,14 +8898,14 @@
   },
   "10280055": {
     "descricao": "MP METALON 6000X40X20",
-    "unidade": "mm",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "28 - MÁTERIA PRIMA",
     "processo_conjunto": ""
   },
   "10280056": {
     "descricao": "MP CHAPA AÇO CARBONO 6000X80X10",
-    "unidade": "mm",
+    "unidade": "ch",
     "grupo": "10 - INSUMO",
     "categoria": "28 - MÁTERIA PRIMA",
     "processo_conjunto": ""
@@ -8981,21 +8981,21 @@
     "processo_conjunto": ""
   },
   "30200005": {
-    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,3 - 3P - TECIDO - EXPERT",
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,3 - 3P - TECIDO - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
     "processo_conjunto": ""
   },
   "30200006": {
-    "descricao": "CJ BANCOS REC - MC - LB - 3,3 - 3P - COURVIN - EXPERT",
+    "descricao": "CJ BANCOS REC - MC - LB - 3,3 - 3P - COURVIN - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
     "processo_conjunto": ""
   },
   "30200008": {
-    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 2P - COURVIN - EXPERT",
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 2P - COURVIN - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -9037,7 +9037,7 @@
     "processo_conjunto": ""
   },
   "30200007": {
-    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 3P - COURVIN - EXPERT",
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 3P - COURVIN - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -9051,7 +9051,7 @@
     "processo_conjunto": ""
   },
   "30200009": {
-    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 3P - TECIDO - EXPERT",
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 3P - TECIDO - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -9073,21 +9073,21 @@
   },
   "30140043": {
     "descricao": "CJ SOLEIRA PORTA MALA E/S/J LB 9 L -  LG BRIGHT",
-    "unidade": "pc",
+    "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "14 - PISO",
     "processo_conjunto": ""
   },
   "30140044": {
     "descricao": "CJ SOLEIRA PORTA MALA E/S/J LB 9 L - AMADEIRADO",
-    "unidade": "pc",
+    "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "14 - PISO",
     "processo_conjunto": ""
   },
   "30140045": {
     "descricao": "CJ SOLEIRA PORTA MALA E/S/J LB 11 L - AMADEIRADO",
-    "unidade": "pc",
+    "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "14 - PISO",
     "processo_conjunto": ""
@@ -9107,7 +9107,7 @@
     "processo_conjunto": ""
   },
   "30200010": {
-    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 2P - TECIDO - EXPERT",
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,3 - 2P - TECIDO - E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
@@ -9667,7 +9667,7 @@
     "processo_conjunto": ""
   },
   "10220007": {
-    "descricao": "CAPAS DIANTEIRAS COURVIN TRANSIT",
+    "descricao": "CAPA ENCOSTO MOTORISTA MC LB COURVIN GRAFITE TRANSIT",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "22 - PEÇAS BCO",
@@ -9696,7 +9696,7 @@
   },
   "10280059": {
     "descricao": "MP FLOCO DE NYLON - 012 PRETO - 1 KG",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "28 - MÁTERIA PRIMA",
     "processo_conjunto": ""
@@ -10122,7 +10122,7 @@
     "processo_conjunto": ""
   },
   "10220008": {
-    "descricao": "APOIO BRACO LD PLASTICO INJETADO GRAFITE ACRYLIS RODOVIARIO",
+    "descricao": "APOIO BRACO PLASTICO INJETADO GRAFITE ACRYLIS RODOVIARIO",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "22 - PEÇAS BCO",
@@ -10241,7 +10241,7 @@
     "processo_conjunto": ""
   },
   "10200067": {
-    "descricao": "BCO JL LE RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P MISTO",
+    "descricao": "BCO JL LE RECLINAVEL 3 L NORMAL S/ AP BRACO 255 MM 3P MISTO",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "20 - BCO",
@@ -10416,14 +10416,14 @@
     "processo_conjunto": ""
   },
   "10200074": {
-    "descricao": "BCO JL LE RECLINAVEL 2 L NORMAL S/ AP BRACO 330 MM 3P MISTO",
+    "descricao": "BCO JL LE RECLINAVEL 2 L NORMAL S/ AP BRACO 255 MM 3P MISTO",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "20 - BCO",
     "processo_conjunto": ""
   },
   "10200075": {
-    "descricao": "BCO JL LE RECLINAVEL 1 L NORMAL S/ AP BRACO 330 MM 3P MISTO",
+    "descricao": "BCO JL LE RECLINAVEL 1 L NORMAL S/ AP BRACO 255 MM 3P MISTO",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "20 - BCO",
@@ -10535,7 +10535,7 @@
     "processo_conjunto": ""
   },
   "10220023": {
-    "descricao": "CAPAS DIANTEIRAS COURVIN SPRINTER 14/15",
+    "descricao": "CAPA ENCOSTO MOTORISTA MC LB COURVIN GRAFITE SPRINTER",
     "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "22 - PEÇAS BCO",
@@ -10704,28 +10704,28 @@
   },
   "10320166": {
     "descricao": "CM VERNIZ PU FOSCO LAZZUDUR VF001 SHERWIN-WILLIAMS ALTO SÓLIDOS POLIURETANO 750 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320167": {
     "descricao": "CM ENDURECEDOR LAZZUDUR P/ VERNIZ PU FOSCO SHERWIN-WILLIAMS ALTO SÓLIDOS 150 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320168": {
     "descricao": "CM TINTA CINZA RAL 7021 PU - C-CLASS - TI.01.J04",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320169": {
     "descricao": "CM TINTA BEGE RAL 1013 PU - C-CLASS - TI.01.J85",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
@@ -10991,21 +10991,21 @@
   },
   "10320170": {
     "descricao": "CM SELADORA PLÁSTICA AUTOLUKS PROMOTOR DE ADERÊNCIA 500 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320171": {
     "descricao": "CM DILUENTE 454 PU/POLIÉSTER P/ PINTURA AUTOMOTIVA SHERWIN WILLIAMS 900 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
   },
   "10320172": {
     "descricao": "CM CATALISADOR ENDURECEDOR PU LAZZUDUR 061 SHERWIN-WILLIAMS 225 ML",
-    "unidade": "un",
+    "unidade": "pc",
     "grupo": "10 - INSUMO",
     "categoria": "32 - CM - CONSUMÍVEIS",
     "processo_conjunto": ""
@@ -11530,7 +11530,7 @@
   },
   "30200020": {
     "descricao": "CJ BANCOS FIXOS - MC - LB - 1E,1E,1E,1D  - 2P - TECIDO - TRILHO",
-    "unidade": "pc",
+    "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "20 - BCO",
     "processo_conjunto": ""
@@ -11551,6 +11551,797 @@
   },
   "30240076": {
     "descricao": "CJ TRILHO ALUMINIO FIXACAO 517 15 - 4,2-1,2,3,3,3",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30200022": {
+    "descricao": "CJ BANCOS REC - MC - LB - 4,2-1,2,3,3,3  - 2P - TECIDO - TRILHO",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200100": {
+    "descricao": "BCO MC LB RECLINAVEL 1 L TRILHO C/ AP BRACO LE 370 MM 2P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200101": {
+    "descricao": "BCO MC LB RECLINAVEL 1 L TRILHO C/ AP BRACO LE 370 MM 2P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220026": {
+    "descricao": "APOIO BRACO PU CELSIL MARROM",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220027": {
+    "descricao": "ACABAMENTO LATERAL LD PLASTICO INJETADO MARROM CELSIL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220028": {
+    "descricao": "APOIO BRACO PU CELSIL PRETO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220029": {
+    "descricao": "ACABAMENTO LATERAL LD PLASTICO INJETADO PRETO CELSIL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220030": {
+    "descricao": "PEGA MAO BCO MARROM CELSIL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220031": {
+    "descricao": "PEGA MAO BCO PRETO CELSIL",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10200102": {
+    "descricao": "BCO JL LE RECLINAVEL 2 L PME S/ AP BRACO 65 MM 3P MISTO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200103": {
+    "descricao": "BCO CS LE RECLINAVEL 3 L NORMAL C/ AP BRACO AP BRACO INDIVIDUAL 262 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200104": {
+    "descricao": "BCO CS LE RECLINAVEL 3 L (2REC / 1 REB) C/ AP BRACO AP BRACO INDIVIDUAL 262 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30200023": {
+    "descricao": "CJ BANCOS REC - MC - LB - 4,2-1,2,3,3,3 - 3P - COURVIN - NORMAL",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200105": {
+    "descricao": "BCO MC LB RECLINAVEL 1 L SPRINTER C/ AP BRACO LD 370 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200106": {
+    "descricao": "BCO MC LB RECLINAVEL 1 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200107": {
+    "descricao": "BCO MC LB FIXO 1 L SPRINTER C/ AP BRACO LD 370 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200108": {
+    "descricao": "BCO MC LB FIXO 1 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10240244": {
+    "descricao": "FATURAMENTO DIRETO - SENSOR DE RE/VISOR/INSTALAÇÃO",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "10240245": {
+    "descricao": "FATURAMENTO DIRETO - INSULFIM PARABRISA",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30200024": {
+    "descricao": "CJ BANCOS FIXOS - MC - LB - 3,2,2-1 - 2P - TECIDO - E/S/J - FOCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220032": {
+    "descricao": "APOIO BRACO ORIGINAL E/S/J C/ REGULAGEM MILIMETRICA",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220033": {
+    "descricao": "CAPA ENCOSTO ORIGINAL MOTORISTA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220034": {
+    "descricao": "CAPA ASSENTO ORIGINAL MOTORISTA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220035": {
+    "descricao": "CAPA ENCOSTO ORIGINAL CARONA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220036": {
+    "descricao": "CAPA ASSENTO ORIGINAL CARONA E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30200025": {
+    "descricao": "CJ BANCOS REC- LE - 3,3 - 3P -  COURVIN MARROM/DIAMENTE/LINHA DOURADA - E/S/J - EXECUTIVO",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10220037": {
+    "descricao": "CAPA ASSENTO MOTORISTA MC LB COURVIN GRAFITE E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220038": {
+    "descricao": "CAPA ASSENTO MOTORISTA MC LB COURVIN GRAFITE TRANSIT",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220039": {
+    "descricao": "CAPA ASSENTO MOTORISTA MC LB COURVIN GRAFITE SPRINTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220040": {
+    "descricao": "CAPA ENCOSTO CARONA MC LB COURVIN GRAFITE E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220041": {
+    "descricao": "CAPA ENCOSTO CARONA MC LB COURVIN GRAFITE TRANSIT",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220042": {
+    "descricao": "CAPA ENCOSTO CARONA MC LB COURVIN GRAFITE SPRINTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220043": {
+    "descricao": "CAPA ASSENTO CARONA MC LB COURVIN GRAFITE E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220044": {
+    "descricao": "CAPA ASSENTO CARONA MC LB COURVIN GRAFITE TRANSIT",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220045": {
+    "descricao": "CAPA ASSENTO CARONA MC LB COURVIN GRAFITE SPRINTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220046": {
+    "descricao": "CAPA ENCOSTO MOTORISTA MC LB COURVIN GRAFITE MASTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220047": {
+    "descricao": "CAPA ASSENTO MOTORISTA MC LB COURVIN GRAFITE MASTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220048": {
+    "descricao": "CAPA ENCOSTO CARONA MC LB COURVIN GRAFITE MASTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10220049": {
+    "descricao": "CAPA ASSENTO CARONA MC LB COURVIN GRAFITE MASTER",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220001": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CABINE MC LB E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220002": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CABINE MC LB TRANSIT",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220003": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CABINE MC LB SPRINTER",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220004": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CABINE MC LB MASTER",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220005": {
+    "descricao": "CJ CAPA COURVIN GRAFITE MOTORISTA MC LB E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220006": {
+    "descricao": "CJ CAPA COURVIN GRAFITE MOTORISTA MC LB TRANSIT",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220007": {
+    "descricao": "CJ CAPA COURVIN GRAFITE MOTORISTA MC LB SPRINTER",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220008": {
+    "descricao": "CJ CAPA COURVIN GRAFITE MOTORISTA MC LB MASTER",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220009": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CARONA MC LB E/S/J",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220010": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CARONA MC LB TRANSIT",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220011": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CARONA MC LB SPRINTER",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220012": {
+    "descricao": "CJ CAPA COURVIN GRAFITE CARONA MC LB MASTER",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10200109": {
+    "descricao": "BCO MOTORISTA ORIGINAL C/ AP BRACO E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200110": {
+    "descricao": "BCO CARONA ORIGINAL FIXO 2 L E/S/J",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "30220013": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM BOOMERANG LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220014": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM BOOMERANG LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220015": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM BOOMERANG LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220016": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM BOOMERANG LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220017": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM DIAMANTE  LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220018": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM DIAMANTE  LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220019": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM DIAMANTE  LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220020": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM DIAMANTE  LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220021": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM RETILINEA LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220022": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM RETILINEA LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220023": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM RETILINEA LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220024": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE MARROM RETILINEA LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220025": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO BOOMERANG LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220026": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO BOOMERANG LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220027": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO BOOMERANG LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220028": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO BOOMERANG LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220029": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO DIAMANTE  LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220030": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO DIAMANTE  LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220031": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO DIAMANTE  LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220032": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO DIAMANTE  LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220033": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO RETILINEA LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220034": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO RETILINEA LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220035": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO RETILINEA LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220036": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO RETILINEA LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220037": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220038": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220039": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220040": {
+    "descricao": "CJ CAPA MOTORISTA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220041": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM BOOMERANG LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220042": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM BOOMERANG LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220043": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM BOOMERANG LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220044": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM BOOMERANG LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220045": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM DIAMANTE  LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220046": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM DIAMANTE  LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220047": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM DIAMANTE  LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220048": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM DIAMANTE  LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220049": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM RETILINEA LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220050": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM RETILINEA LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220051": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM RETILINEA LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220052": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE MARROM RETILINEA LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220053": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO BOOMERANG LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220054": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO BOOMERANG LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220055": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO BOOMERANG LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220056": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO BOOMERANG LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220057": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO DIAMANTE  LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220058": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO DIAMANTE  LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220059": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO DIAMANTE  LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220060": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO DIAMANTE  LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220061": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO RETILINEA LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220062": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO RETILINEA LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220063": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO RETILINEA LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220064": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO RETILINEA LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220065": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA BRANCA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220066": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA CINZA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220067": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA DOURADA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "30220068": {
+    "descricao": "CJ CAPA CARONA COURVIN CS LE PRETO C/ LINHA CINZA BOOMERANG LINHA PRETA",
+    "unidade": "cj",
+    "grupo": "30 - CONJUNTO / KIT",
+    "categoria": "22 - PEÇAS BCO",
+    "processo_conjunto": ""
+  },
+  "10200111": {
+    "descricao": "BCO MC LB FIXO 1 L FOCA C/ AP BRACO LD/LE 60 MM 3P TECIDO",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10200112": {
+    "descricao": "BCO MC LB FIXO 1 L FOCA C/ AP BRACO LD/LE 60 MM 3P COURVIN",
+    "unidade": "pc",
+    "grupo": "10 - INSUMO",
+    "categoria": "20 - BCO",
+    "processo_conjunto": ""
+  },
+  "10240246": {
+    "descricao": "FATURAMENTO DIRETO -  TV 19 MULTIMIDIA SUPORTE CHICOTE FALANTES CABINE SALAO INSTALACAO",
+    "unidade": "un",
+    "grupo": "10 - INSUMO",
+    "categoria": "24 - ACESSÓRIOS",
+    "processo_conjunto": ""
+  },
+  "30240077": {
+    "descricao": "MECANISMO ABERTURA INTERNA PORTA CORREDICA E/S/J",
     "unidade": "cj",
     "grupo": "30 - CONJUNTO / KIT",
     "categoria": "24 - ACESSÓRIOS",
