@@ -47,6 +47,13 @@ def _limitar_nome_arquivo(pasta, nome, limite_path=245):
     if len(nome) <= disponivel:
         return nome
     base_limite = max(8, disponivel - len(ext))
+    partes = base.split(" - ")
+    if len(partes) >= 3:
+        sufixo = partes[-1].strip()
+        prefixo = " - ".join(partes[:-1]).strip()
+        prefixo_limite = base_limite - len(sufixo) - 3
+        if sufixo and prefixo_limite >= 8:
+            return f"{prefixo[:prefixo_limite].strip(' -')} - {sufixo}{ext}"
     return f"{base[:base_limite].strip(' -')}{ext}"
 
 
@@ -213,7 +220,8 @@ def _configurar_cabecalho_requisicao(doc, refs, dados):
     if refs.get("cabecalho") is not None and refs["cabecalho"] < len(doc.tables):
         tabela_cabecalho = doc.tables[refs["cabecalho"]]
         if tabela_cabecalho.rows and len(tabela_cabecalho.rows[0].cells) > 1:
-            _set_cell_text(tabela_cabecalho.cell(0, 1), "ORDEM DE REQUISI\u00c7\u00c3O")
+            titulo_cabecalho = dados.get("cabecalho_requisicao", "ORDEM DE REQUISI\u00c7\u00c3O")
+            _set_cell_text(tabela_cabecalho.cell(0, 1), titulo_cabecalho)
 
     if refs.get("dados") is None or refs["dados"] >= len(doc.tables):
         return
@@ -490,7 +498,7 @@ def gerar_os_docx(
 ):
     template_path = (
         TEMPLATE_REQUISICAO_EXPEDICAO
-        if modo == "expedicao" and os.path.exists(TEMPLATE_REQUISICAO_EXPEDICAO)
+        if modo in {"expedicao", "faturamento_direto"} and os.path.exists(TEMPLATE_REQUISICAO_EXPEDICAO)
         else TEMPLATE_OS
     )
     doc = Document(template_path)
@@ -513,20 +521,23 @@ def gerar_os_docx(
         _set_cell_text(tabela_dados.cell(3, 1), _formatar_datetime_local(dados.get("previsao_inicio", "")))
         _set_cell_text(tabela_dados.cell(3, 3), _formatar_datetime_local(dados.get("previsao_termino", "")))
 
-    if modo in {"expedicao", "preparacao"}:
+    if modo in {"expedicao", "preparacao", "faturamento_direto"}:
         dados_requisicao = dict(dados)
         if modo == "expedicao":
             dados_requisicao["titulo_requisicao"] = "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O EXPEDI\u00c7\u00c3O"
         elif modo == "preparacao":
             dados_requisicao["titulo_requisicao"] = "DADOS DA ORDEM DE REQUISI\u00c7\u00c3O PREPARA\u00c7\u00c3O"
+        elif modo == "faturamento_direto":
+            dados_requisicao["cabecalho_requisicao"] = "FATURAMENTO DIRETO"
+            dados_requisicao["titulo_requisicao"] = "DADOS DO FATURAMENTO DIRETO"
         _configurar_cabecalho_requisicao(doc, refs, dados_requisicao)
 
     if refs.get("itens") is not None:
         _preencher_tabela_produtos(doc.tables[refs["itens"]], itens)
 
     composicao_final = composicao_resolvida or resolver_composicao_final(itens, componentes)
-    ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao"}
-    ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao"}
+    ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao", "faturamento_direto"}
+    ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao", "faturamento_direto"}
 
     if modo == "completa":
         ocultar_processos = False
@@ -549,7 +560,7 @@ def gerar_os_docx(
             if processo_preparacao
             else {}
         )
-    elif modo == "expedicao":
+    elif modo in {"expedicao", "faturamento_direto"}:
         ocultar_processos = False
         processos_exibicao = {}
     else:

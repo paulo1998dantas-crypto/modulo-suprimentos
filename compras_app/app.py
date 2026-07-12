@@ -3237,7 +3237,7 @@ def gerar_os():
         "expedicao": itens_expedicao,
         "preparacao": itens_preparacao,
     }
-    modos_pacote = ["completa", "expedicao", "preparacao", "producao"]
+    modos_pacote = ["completa", "expedicao", "preparacao"]
     layout_bytes = b""
     if layout_pdf and layout_pdf.filename:
         try:
@@ -3292,7 +3292,7 @@ def gerar_os():
                 processos_final,
                 _criar_layout_clone(),
                 composicao_resolvida=[],
-                modo="expedicao",
+                modo="faturamento_direto",
                 titulo_arquivo=f"FATURAMENTO DIRETO - {fornecedor_titulo}",
                 incluir_cliente_nome=False,
             )
