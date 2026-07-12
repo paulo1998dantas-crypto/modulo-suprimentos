@@ -30,6 +30,7 @@ DEFAULT_PEDIDOS_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAI
 DEFAULT_OS_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 02 Produção\01 Controle de Produção"
 DEFAULT_BOM_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 02 Produção\01 Controle de Produção\01 - Projeto Cadastro\02 - B.O.M"
 DEFAULT_PROCESSOS_DIR = r"C:\Users\PRODUCAO-2.0\J I MONTADORA DE VEICULOS ESPECIAIS LTDA\JI Montadora - 02 Produção\01 Controle de Produção\01 - Projeto Cadastro\03 - PROCESSOS"
+DEFAULT_SKUS_FILENAME = "00. Cadastro R00 - Base de dados.xlsm"
 
 PRODUTOS_FILE = os.path.join(DATA_DIR, "produtos.json")
 FORNECEDORES_FILE = os.path.join(DATA_DIR, "fornecedores.json")
@@ -48,6 +49,7 @@ SETTINGS_FILE = os.path.join(DATA_DIR, "settings.json")
 
 TEMPLATE_WORD = os.path.join(TEMPLATE_DIR, "modelo_oc.docx")
 TEMPLATE_OS = os.path.join(TEMPLATE_DIR, "modelo_os.docx")
+TEMPLATE_REQUISICAO_EXPEDICAO = os.path.join(TEMPLATE_DIR, "modelo_requisicao_expedicao.docx")
 
 EMPRESA_PADRAO = "JI MONTADORA"
 
@@ -193,6 +195,23 @@ def set_bom_dir(bom_dir):
         settings["bom_dir"] = bom_dir.strip()
     else:
         settings.pop("bom_dir", None)
+    salvar_settings(settings)
+
+
+def get_skus_file():
+    settings = _carregar_settings()
+    if settings.get("skus_file"):
+        return settings["skus_file"]
+    cadastro_dir = os.path.dirname(settings.get("bom_dir") or DEFAULT_BOM_DIR)
+    return os.path.join(cadastro_dir, DEFAULT_SKUS_FILENAME)
+
+
+def set_skus_file(skus_file):
+    settings = _carregar_settings()
+    if skus_file and skus_file.strip():
+        settings["skus_file"] = skus_file.strip()
+    else:
+        settings.pop("skus_file", None)
     salvar_settings(settings)
 
 

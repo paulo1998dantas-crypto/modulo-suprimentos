@@ -863,6 +863,7 @@ margin-top:14px;
 }
 
 .modal-fornecedor-direto select,
+.modal-fornecedor-direto input,
 .modal-luminaria-os select,
 .modal-processo-os select,
 .modal-regra-item-os select{
@@ -1160,12 +1161,14 @@ return;
 }
 const modal = document.getElementById("modal-fornecedor-direto");
 const select = document.getElementById("fornecedor_direto_select");
+const outroWrap = document.getElementById("fornecedor_direto_outro_wrap");
+const outroInput = document.getElementById("fornecedor_direto_outro");
 const okBtn = document.getElementById("fornecedor_direto_ok");
 const cancelBtn = document.getElementById("fornecedor_direto_cancel");
 const title = document.getElementById("fornecedor_direto_titulo");
 const display = document.getElementById("fornecedor_direto_desc");
 const input = row.querySelector('input[name="os_fornecedor_item[]"]');
-if (!modal || !select || !okBtn || !cancelBtn || !input){
+if (!modal || !select || !outroWrap || !outroInput || !okBtn || !cancelBtn || !input){
 return;
 }
 if (isCategoriaArCondicionadoOS(produto)){
@@ -1180,15 +1183,43 @@ title.textContent = "Fornecedor do faturamento direto";
 if (display){
 display.textContent = produto.descricao || "";
 }
-select.value = input.value || fornecedorFaturamentoDiretoPadrao();
+const fornecedoresFixos = ["SJ", "INSTALL TECH"];
+const valorAtual = (input.value || "").trim();
+const valorAtualUpper = valorAtual.toUpperCase();
+if (valorAtual && !fornecedoresFixos.includes(valorAtualUpper)){
+select.value = "OUTROS";
+outroInput.value = valorAtual;
+} else {
+select.value = valorAtualUpper || fornecedorFaturamentoDiretoPadrao();
+outroInput.value = "";
+}
+const atualizarOutro = () => {
+const outros = select.value === "OUTROS";
+outroWrap.style.display = outros ? "block" : "none";
+outroInput.required = outros;
+if (outros){
+setTimeout(() => outroInput.focus(), 0);
+}
+};
+atualizarOutro();
 modal.classList.add("is-open");
 
 const finalizar = () => {
+if (select.value === "OUTROS"){
+const fornecedorManual = outroInput.value.trim();
+if (!fornecedorManual){
+outroInput.reportValidity();
+return;
+}
+input.value = fornecedorManual;
+} else {
 input.value = select.value || fornecedorFaturamentoDiretoPadrao();
+}
 modal.classList.remove("is-open");
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
 modal.removeEventListener("click", onBackdrop);
+select.removeEventListener("change", atualizarOutro);
 };
 const onOk = () => finalizar();
 const onCancel = () => {
@@ -1196,6 +1227,7 @@ modal.classList.remove("is-open");
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
 modal.removeEventListener("click", onBackdrop);
+select.removeEventListener("change", atualizarOutro);
 };
 const onBackdrop = (event) => {
 if (event.target === modal){
@@ -1205,6 +1237,7 @@ onCancel();
 okBtn.addEventListener("click", onOk);
 cancelBtn.addEventListener("click", onCancel);
 modal.addEventListener("click", onBackdrop);
+select.addEventListener("change", atualizarOutro);
 }
 
 function atualizarFornecedorDiretoLinha(row){
@@ -4118,7 +4151,12 @@ renderDashboardCharts();
 <select id="fornecedor_direto_select">
 <option value="SJ">SJ</option>
 <option value="INSTALL TECH">INSTALL TECH</option>
+<option value="OUTROS">OUTROS</option>
 </select>
+<div id="fornecedor_direto_outro_wrap" style="display:none;">
+<label for="fornecedor_direto_outro" style="margin-top:10px;display:block;">Nome do fornecedor</label>
+<input id="fornecedor_direto_outro" type="text" autocomplete="off" placeholder="Digite o fornecedor">
+</div>
 <div class="modal-actions">
 <button type="button" id="fornecedor_direto_cancel">Cancelar</button>
 <button type="button" id="fornecedor_direto_ok">Confirmar</button>
@@ -4456,12 +4494,28 @@ renderDashboardCharts();
 <input name="bom_dir" value="{{ save_paths.bom_dir if save_paths else '' }}">
 </div>
 <div>
+<label>Arquivo Base SKUs</label>
+<input name="skus_file" value="{{ save_paths.skus_file if save_paths else '' }}">
+</div>
+<div>
 <label>Caminho Processos</label>
 <input name="processos_dir" value="{{ save_paths.processos_dir if save_paths else '' }}">
 </div>
 </div>
 <button type="submit">Salvar Caminhos</button>
 </form>
+</div>
+<div class="card">
+  <h3>Atualizar SKUs</h3>
+  <p>Importa os SKUs direto de <strong>{{ skus_file }}</strong>, sem upload manual.</p>
+  <form method="POST" action="/atualizar_skus">
+    <button type="submit">Atualizar SKUs</button>
+  </form>
+  {% if skus_status %}
+    <div class="total-box" style="margin-top:16px;">
+      {{ skus_status }}
+    </div>
+  {% endif %}
 </div>
 <div class="card">
   <h3>Atualizar B.O.M</h3>

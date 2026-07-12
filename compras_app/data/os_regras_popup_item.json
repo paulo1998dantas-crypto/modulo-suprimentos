@@ -217,5 +217,15 @@
     ],
     "quantidade": 1.0,
     "quantidade_editavel": false
+  },
+  {
+    "id": "regra-23",
+    "gatilho": "40340018",
+    "opcoes": [
+      "30140016",
+      "30140018"
+    ],
+    "quantidade": 1.0,
+    "quantidade_editavel": false
   }
 ]

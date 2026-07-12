@@ -15,6 +15,12 @@ _MARCADORES_PREPARACAO = (
     "REFORCO",
     "ACABAMENTO",
 )
+_MARCADORES_PREPARACAO_DESCRICAO = (
+    "CJ TRILHO",
+)
+_MARCADORES_EXPEDICAO_DESCRICAO = (
+    "ACESSORIO ACABAMENTO PLASTICO",
+)
 _MARCADOR_PRODUTO_PROCESSO = "PRODUTO EM PROCESSO"
 
 
@@ -30,6 +36,11 @@ def normalizar_texto(valor):
 def classificar_item(item_info):
     categoria = normalizar_texto((item_info or {}).get("categoria", ""))
     grupo = normalizar_texto((item_info or {}).get("grupo", ""))
+    descricao = normalizar_texto((item_info or {}).get("descricao", ""))
+    if any(marcador in descricao for marcador in _MARCADORES_PREPARACAO_DESCRICAO):
+        return SETOR_PREPARACAO
+    if any(marcador in descricao for marcador in _MARCADORES_EXPEDICAO_DESCRICAO):
+        return SETOR_EXPEDICAO
     referencia = categoria or grupo
     for marcador in _MARCADORES_PREPARACAO:
         if marcador and marcador in referencia:
@@ -280,45 +291,61 @@ def construir_itens_os_setor(linhas_agrupadas):
     return itens
 
 
-def construir_itens_os_preparacao(linhas):
-    agrupado = {}
-    ordem = []
+def _nivel_engenharia(linha):
+    try:
+        level = int(linha.get("level", 0) or 0)
+    except Exception:
+        level = 0
+    return max(1, level + 1)
+
+
+def construir_itens_os_expedicao(linhas):
+    itens = []
     for linha in linhas or []:
+        nivel = _nivel_engenharia(linha)
         codigo = normalizar_codigo(linha.get("codigo", ""))
-        unidade = str(linha.get("unidade", "") or "").strip()
-        chave = (codigo, unidade)
-        try:
-            level = int(linha.get("level", 0) or 0)
-        except Exception:
-            level = 0
-        if chave not in agrupado:
-            agrupado[chave] = {
+        pai = normalizar_codigo(linha.get("item", ""))
+        descricao = linha.get("descricao", "") or ""
+        prefixo = ">" * nivel
+        if pai and pai != codigo:
+            descricao = f"{prefixo} {descricao} (consumido por: {pai})".strip()
+        else:
+            descricao = f"{prefixo} {descricao}".strip()
+        itens.append(
+            {
                 "codigo": codigo,
-                "descricao": linha.get("descricao", "") or "",
-                "unidade": unidade,
+                "descricao": descricao,
+                "qtd": linha.get("qtd", "") if linha.get("qtd", "") != 0 else "",
+                "serie": "",
+                "visto": "",
+                "unidade": linha.get("unidade", "") or "",
                 "grupo": linha.get("grupo", "") or "",
                 "categoria": linha.get("categoria", "") or "",
                 "fornecedor": linha.get("fornecedor", "") or "",
                 "setor": linha.get("setor", "") or "",
                 "tipo_requisicao": linha.get("tipo_requisicao", "") or "",
-                "qtd": 0.0,
-                "level": level,
+                "item": pai,
+                "level": nivel,
             }
-            ordem.append(chave)
-        agrupado[chave]["qtd"] += parse_quantidade(linha.get("qtd", 0))
-        agrupado[chave]["level"] = max(agrupado[chave].get("level", 0), level)
+        )
+    return itens
 
+
+def construir_itens_os_preparacao(linhas):
     itens = []
-    for chave in ordem:
-        linha = agrupado[chave]
-        level = max(0, int(linha.get("level", 0) or 0))
-        prefixo = ">" * level
+    for linha in linhas or []:
+        nivel = _nivel_engenharia(linha)
+        codigo = normalizar_codigo(linha.get("codigo", ""))
+        pai = normalizar_codigo(linha.get("item", ""))
         descricao = linha.get("descricao", "") or ""
-        if prefixo:
+        prefixo = ">" * nivel
+        if pai and pai != codigo:
+            descricao = f"{prefixo} {descricao} (consumido por: {pai})".strip()
+        else:
             descricao = f"{prefixo} {descricao}".strip()
         itens.append(
             {
-                "codigo": linha.get("codigo", "") or "",
+                "codigo": codigo,
                 "descricao": descricao,
                 "qtd": linha.get("qtd", "") if linha.get("qtd", "") != 0 else "",
                 "serie": "",
@@ -328,7 +355,8 @@ def construir_itens_os_preparacao(linhas):
                 "fornecedor": linha.get("fornecedor", "") or "",
                 "setor": linha.get("setor", "") or "",
                 "tipo_requisicao": linha.get("tipo_requisicao", "") or "",
-                "level": level,
+                "item": pai,
+                "level": nivel,
             }
         )
     return itens

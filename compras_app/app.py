@@ -44,6 +44,8 @@ from config import (
     set_save_paths,
     get_bom_dir,
     set_bom_dir,
+    get_skus_file,
+    set_skus_file,
     get_processos_dir,
     set_processos_dir,
     pasta_os,
@@ -66,6 +68,7 @@ from os_setores import (
     TIPO_REQUISICAO_FATURAMENTO_DIRETO,
     agrupar_linhas_setor,
     agrupar_linhas_por_fornecedor,
+    construir_itens_os_expedicao,
     construir_itens_os_preparacao,
     construir_itens_os_setor,
     enriquecer_composicao,
@@ -133,10 +136,18 @@ HEADER_ALIASES = {
         "descricao",
         "descricao_item",
         "descricao_produto",
+        "descricao_primaria",
+        "descricao_principal",
         "item_descricao",
         "produto",
         "material",
     },
+    "descricao_secundaria": {
+        "descricao_secundaria",
+        "descricao_complementar",
+        "complemento_descricao",
+    },
+    "sufixo": {"sufixo", "sufixo_descricao"},
     "unidade": {
         "unidade",
         "un",
@@ -144,6 +155,10 @@ HEADER_ALIASES = {
         "und",
         "unidade_medida",
         "un_medida",
+        "un_medi_interna",
+        "unidade_interna",
+        "un_medi_comercial",
+        "unidade_comercial",
     },
     "grupo": {"grupo", "grupo_produto"},
     "categoria": {"categoria", "categorias", "classificacao", "classificacao_item"},
@@ -1846,6 +1861,15 @@ def _coletar_campos_extras(row, header_raw, header, usados):
     return extras
 
 
+def _montar_descricao_importacao(row, mapa):
+    partes = [
+        _valor_coluna(row, mapa, "descricao"),
+        _valor_coluna(row, mapa, "descricao_secundaria"),
+        _valor_coluna(row, mapa, "sufixo"),
+    ]
+    return " ".join(parte for parte in partes if parte).strip()
+
+
 def _mesclar_dados_item(atual, novos, extras=None):
     item = dict(atual or {})
     for campo in CAMPOS_PRODUTO_DESCARTADOS:
@@ -1906,13 +1930,15 @@ def importar_produtos(file_storage):
         usados = {
             "codigo",
             "descricao",
+            "descricao_secundaria",
+            "sufixo",
             "unidade",
             "grupo",
             "categoria",
             "processo_conjunto",
         }
         novos = {
-            "descricao": _valor_coluna(row, mapa, "descricao"),
+            "descricao": _montar_descricao_importacao(row, mapa),
             "unidade": _valor_coluna(row, mapa, "unidade"),
             "grupo": _valor_coluna(row, mapa, "grupo"),
             "categoria": _valor_coluna(row, mapa, "categoria"),
@@ -1924,6 +1950,46 @@ def importar_produtos(file_storage):
 
     salvar_json(PRODUTOS_FILE, produtos)
     return count
+
+
+def atualizar_skus_arquivo(skus_file=None, somente_se_mais_novo=False):
+    skus_file = skus_file or get_skus_file()
+    resultado = {
+        "arquivo": skus_file,
+        "linhas": 0,
+        "atualizado": False,
+        "ignorado": False,
+        "erro": "",
+    }
+    if not skus_file or not os.path.isfile(_win_long_path(skus_file)):
+        resultado["erro"] = f"Arquivo de SKUs nao encontrado: {skus_file}"
+        return resultado
+
+    if somente_se_mais_novo and os.path.exists(PRODUTOS_FILE):
+        try:
+            if os.path.getmtime(_win_long_path(skus_file)) <= os.path.getmtime(PRODUTOS_FILE):
+                resultado["ignorado"] = True
+                return resultado
+        except Exception:
+            pass
+
+    try:
+        with _open_for_read(skus_file) as arquivo:
+            storage = FileStorage(stream=arquivo, filename=os.path.basename(skus_file))
+            resultado["linhas"] = importar_produtos(storage)
+        resultado["atualizado"] = resultado["linhas"] > 0
+        app.logger.info("Importado cadastro de SKUs %s (%s linhas)", skus_file, resultado["linhas"])
+    except PermissionError:
+        app.logger.exception("Falha ao importar cadastro de SKUs (arquivo em uso) %s", skus_file)
+        resultado["erro"] = f"Arquivo de SKUs em uso no Excel: {os.path.basename(skus_file)}"
+    except Exception as exc:
+        app.logger.exception("Falha ao importar cadastro de SKUs %s", skus_file)
+        resultado["erro"] = f"Falha ao importar SKUs: {exc}"
+    return resultado
+
+
+def atualizar_skus_automatico():
+    return atualizar_skus_arquivo(somente_se_mais_novo=True)
 
 
 def importar_fornecedores(file_storage):
@@ -1988,12 +2054,14 @@ def importar_os_produtos(file_storage):
         usados = {
             "codigo",
             "descricao",
+            "descricao_secundaria",
+            "sufixo",
             "unidade",
             "grupo",
             "categoria",
         }
         novos = {
-            "descricao": _valor_coluna(row, mapa, "descricao"),
+            "descricao": _montar_descricao_importacao(row, mapa),
             "unidade": _valor_coluna(row, mapa, "unidade"),
             "grupo": _valor_coluna(row, mapa, "grupo"),
             "categoria": _valor_coluna(row, mapa, "categoria"),
@@ -2697,6 +2765,7 @@ def proximo_numero_os():
 @app.route("/")
 def index():
 
+    resultado_skus_auto = atualizar_skus_automatico()
     produtos = carregar_produtos()
     fornecedores = carregar_fornecedores()
     os_produtos = carregar_os_produtos()
@@ -2722,14 +2791,19 @@ def index():
     }
     pedidos_dir, os_dir = get_save_paths()
     bom_dir = get_bom_dir()
+    skus_file = get_skus_file()
     processos_dir = get_processos_dir()
     save_paths = {
         "pedidos_dir": pedidos_dir,
         "os_dir": os_dir,
         "bom_dir": bom_dir,
+        "skus_file": skus_file,
         "processos_dir": processos_dir,
     }
     bom_status = request.args.get("bom_status")
+    skus_status = request.args.get("skus_status")
+    if not skus_status and resultado_skus_auto.get("atualizado"):
+        skus_status = f"SKUs atualizados automaticamente ({resultado_skus_auto['linhas']} linhas)."
     os_processos_status = request.args.get("os_processos_status")
     regras_popup_status = request.args.get("regras_popup_status")
     relacoes_processo_status = request.args.get("relacoes_processo_status")
@@ -2748,8 +2822,10 @@ def index():
         dashboard=dashboard,
         save_paths=save_paths,
         bom_dir=bom_dir,
+        skus_file=skus_file,
         processos_dir=processos_dir,
         bom_status=bom_status,
+        skus_status=skus_status,
         os_processos_status=os_processos_status,
         regras_popup_status=regras_popup_status,
         relacoes_processo_status=relacoes_processo_status,
@@ -2764,6 +2840,7 @@ def index():
 @app.route("/gerar_oc", methods=["POST"])
 def gerar_oc():
 
+    atualizar_skus_automatico()
     fornecedor = request.form.get("fornecedor", "")
     fornecedores = carregar_fornecedores()
     fornecedor_info = fornecedores.get(fornecedor, {})
@@ -2883,6 +2960,7 @@ def gerar_oc():
 
 @app.route("/gerar_os", methods=["POST"])
 def gerar_os():
+    atualizar_skus_automatico()
     cliente = _limpar_valor_busca(
         request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
     )
@@ -3149,7 +3227,7 @@ def gerar_os():
     pendencias_preparacao = filtrar_linhas_setor(composicao_enriquecida, SETOR_PREPARACAO)
     requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
 
-    itens_expedicao = construir_itens_os_setor(agrupar_linhas_setor(pendencias_expedicao))
+    itens_expedicao = construir_itens_os_expedicao(pendencias_expedicao)
     itens_preparacao = construir_itens_os_preparacao(pendencias_preparacao)
     for item in itens_expedicao + itens_preparacao:
         item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
@@ -3268,9 +3346,11 @@ def salvar_caminhos():
     pedidos_dir = request.form.get("pedidos_dir", "")
     os_dir = request.form.get("os_dir", "")
     bom_dir = request.form.get("bom_dir", "")
+    skus_file = request.form.get("skus_file", "")
     processos_dir = request.form.get("processos_dir", "")
     set_save_paths(pedidos_dir, os_dir)
     set_bom_dir(bom_dir)
+    set_skus_file(skus_file)
     set_processos_dir(processos_dir)
     return redirect(url_for("index", tab="cadastro"))
 
@@ -3626,6 +3706,19 @@ def atualizar_bom():
         status = f"{arquivos_processados} arquivos importados ({linhas_importadas} linhas)."
 
     return redirect(url_for("index", tab="cadastro", bom_status=status))
+
+
+@app.route("/atualizar_skus", methods=["POST"])
+def atualizar_skus():
+    skus_file = get_skus_file()
+    resultado = atualizar_skus_arquivo(skus_file, somente_se_mais_novo=False)
+    if resultado.get("erro"):
+        status = resultado["erro"]
+    elif resultado.get("linhas", 0) == 0:
+        status = f"Nenhum SKU importado de {skus_file}."
+    else:
+        status = f"SKUs atualizados: {resultado['linhas']} linha(s) importada(s) de {skus_file}."
+    return redirect(url_for("index", tab="cadastro", skus_status=status))
 
 
 @app.route("/atualizar_processos", methods=["POST"])

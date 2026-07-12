@@ -13,7 +13,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches
 
 from composicao import resolver_composicao_final
-from config import TEMPLATE_OS, pasta_os
+from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO, pasta_os
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 
 logger = logging.getLogger(__name__)
@@ -241,7 +241,11 @@ def _preencher_tabela_produtos(tabela, itens):
         _set_cell_text(row[1], item.get("descricao", ""))
         _set_cell_text(row[2], item.get("qtd", ""))
         _set_cell_text(row[3], item.get("serie", ""))
-        _set_cell_text(row[4], item.get("unidade", ""))
+        if len(row) >= 6:
+            _set_cell_text(row[4], item.get("visto", ""))
+            _set_cell_text(row[5], item.get("unidade", ""))
+        else:
+            _set_cell_text(row[4], item.get("unidade", ""))
         for cell in row:
             _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
 
@@ -484,7 +488,12 @@ def gerar_os_docx(
     incluir_cliente_nome=True,
     cliente_nome_limite=None,
 ):
-    doc = Document(TEMPLATE_OS)
+    template_path = (
+        TEMPLATE_REQUISICAO_EXPEDICAO
+        if modo == "expedicao" and os.path.exists(TEMPLATE_REQUISICAO_EXPEDICAO)
+        else TEMPLATE_OS
+    )
+    doc = Document(template_path)
     refs = mapear_tabelas_os(doc)
     processo_preparacao = None
     for nome in processos.keys():

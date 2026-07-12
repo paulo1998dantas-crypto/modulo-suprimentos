@@ -59,7 +59,10 @@ def mapear_tabelas_os(doc):
             refs["dados"] = idx
             continue
 
-        if refs["cabecalho"] is None and "ORDEM DE SERVICO" in titulo_tabela:
+        if refs["cabecalho"] is None and (
+            "ORDEM DE SERVICO" in titulo_tabela
+            or "ORDEM DE REQUISICAO" in titulo_tabela
+        ):
             refs["cabecalho"] = idx
             continue
 

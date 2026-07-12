@@ -1620,7 +1620,7 @@
     },
     {
       "codigo": "10180059",
-      "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/ PRETO TETO CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
+      "descricao": "ABS TETO PC E/S/J TB",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -1629,15 +1629,21 @@
       "descricao": "ABS PC REFORCO ACO PORTA LATERAL",
       "unidade": "pc",
       "quantidade": "1"
+    },
+    {
+      "codigo": "30180022",
+      "descricao": "CJ ABS FORROS E/S/J PL/PTS",
+      "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10440013",
+      "descricao": "REFORCO \"U\" ACO GALVANIZADO FIXACAO TETO E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
     }
   ],
   "30180005": [
-    {
-      "codigo": "10180175",
-      "descricao": "ABS PC IVECO 50-180 ACABAMENTO ASSOALHO COLUNA MOTORISTA",
-      "unidade": "pc",
-      "quantidade": "1"
-    },
     {
       "codigo": "10180176",
       "descricao": "ABS PC IVECO 50-180 ACABAMENTO CAPUCINO",
@@ -1669,6 +1675,12 @@
       "quantidade": "1"
     },
     {
+      "codigo": "10180175",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO ASSOALHO COLUNA MOTORISTA",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
       "codigo": "10180181",
       "descricao": "ABS PC IVECO 50-180 ACABAMENTO PARALAMA MOTORISTA/PASSAGEIRO LE/LD",
       "unidade": "pc",
@@ -1677,12 +1689,6 @@
     {
       "codigo": "10180182",
       "descricao": "ABS PC IVECO 50-180 ACABAMENTO SUPERIOR PORTA LATERAL LD",
-      "unidade": "pc",
-      "quantidade": "1"
-    },
-    {
-      "codigo": "10180183",
-      "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA LATERAL LD",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -1717,6 +1723,18 @@
       "quantidade": "1"
     },
     {
+      "codigo": "10180191",
+      "descricao": "ABS TETO PC IVECO 50-180",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180183",
+      "descricao": "ABS PC IVECO 50-180 ACABAMENTO INFERIOR PORTA LATERAL LD",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
       "codigo": "10180189",
       "descricao": "ABS PC IVECO 50-180 ACABAMENTO DESEMBACADOR PASSAGEIRO LD",
       "unidade": "pc",
@@ -1725,14 +1743,8 @@
     {
       "codigo": "10180190",
       "descricao": "ABS PC IVECO 50-180 ACABAMENTO DESEMBACADOR MOTORISTA LE",
-      "unidade": "pc",
-      "quantidade": "1"
-    },
-    {
-      "codigo": "10180191",
-      "descricao": "ABS TETO PC IVECO 50-180",
-      "unidade": "pc",
-      "quantidade": "1"
+      "unidade": "",
+      "quantidade": ""
     }
   ],
   "30180006": [
@@ -2646,7 +2658,7 @@
       "codigo": "10180171",
       "descricao": "ABS TETO PC PLUS MASTER L2H2",
       "unidade": "pc",
-      "quantidade": ""
+      "quantidade": "1"
     }
   ],
   "30180014": [
@@ -2744,7 +2756,7 @@
       "codigo": "10180174",
       "descricao": "ABS TETO PC PLUS MASTER L3H2",
       "unidade": "pc",
-      "quantidade": ""
+      "quantidade": "1"
     }
   ],
   "30160001": [
@@ -3508,7 +3520,7 @@
   "30140027": [
     {
       "codigo": "20140015",
-      "descricao": "PP PISO CN 12 MM E/S/J TB - UNIVERSAL - R00",
+      "descricao": "PP PISO CN 12 MM E/S/J TB - 3,2,3 - MC",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -5585,6 +5597,12 @@
       "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
       "unidade": "pc",
       "quantidade": "1"
+    },
+    {
+      "codigo": "10180130",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO MACANETA PORTA LATERAL PASSAGEIRO LD",
+      "unidade": "pc",
+      "quantidade": "1"
     }
   ],
   "40340028": [
@@ -5736,6 +5754,12 @@
       "codigo": "30240041",
       "descricao": "CJ PUXADOR MACANETA INTERNO E/S/J - SUPNV.",
       "unidade": "cj",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10180130",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO MACANETA PORTA LATERAL PASSAGEIRO LD",
+      "unidade": "pc",
       "quantidade": "1"
     }
   ],
@@ -5936,7 +5960,7 @@
     },
     {
       "codigo": "30180004",
-      "descricao": "CJ REVESTIMENTO E/S/J TB TETO C/ VELUDO PRETO",
+      "descricao": "CJ REVESTIMENTO E/S/J TB",
       "unidade": "cj",
       "quantidade": "1"
     },
@@ -6007,10 +6031,10 @@
       "quantidade": "1"
     },
     {
-      "codigo": "10240102",
-      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "codigo": "10180130",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO MACANETA PORTA LATERAL PASSAGEIRO LD",
       "unidade": "pc",
-      "quantidade": "2"
+      "quantidade": "1"
     }
   ],
   "40340050": [
@@ -6070,7 +6094,7 @@
     },
     {
       "codigo": "30180004",
-      "descricao": "CJ REVESTIMENTO E/S/J TB TETO C/ VELUDO PRETO",
+      "descricao": "CJ REVESTIMENTO E/S/J TB",
       "unidade": "cj",
       "quantidade": "1"
     },
@@ -6141,10 +6165,10 @@
       "quantidade": "1"
     },
     {
-      "codigo": "10240102",
-      "descricao": "ACESSORIO PORTA REVISTA COM REDE COR PRETO",
+      "codigo": "10180130",
+      "descricao": "ABS PC E/S/J TB ACABAMENTO MACANETA PORTA LATERAL PASSAGEIRO LD",
       "unidade": "pc",
-      "quantidade": "2"
+      "quantidade": "1"
     }
   ],
   "40340051": [
@@ -9923,9 +9947,21 @@
   ],
   "#N/A": [
     {
-      "codigo": "10280018",
-      "descricao": "MP CHAPA COMPENSADO 3870X2200X12MM",
-      "unidade": "ch",
+      "codigo": "#N/A",
+      "descricao": "ELETRICA CHICOTE GELADEIRA ELBER CAB 18 E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "#N/A",
+      "descricao": "PP CAIXA MADEIRA SUPORTE GELADEIRA CAB 18L E/S/J REVESTIDA CARPETE PRETO RESINADO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "#N/A",
+      "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 18L",
+      "unidade": "pc",
       "quantidade": "1"
     }
   ],
@@ -11187,26 +11223,8 @@
   ],
   "40340042": [
     {
-      "codigo": "10280009",
-      "descricao": "MP BORRACHA PERFIL U PORTA LATERAL/TRASEIRA 19X15MM",
-      "unidade": "pc",
-      "quantidade": ""
-    },
-    {
-      "codigo": "10320065",
-      "descricao": "CM GALVANIZADOR A FRIO SPRAY",
-      "unidade": "un",
-      "quantidade": ""
-    },
-    {
       "codigo": "10260120",
       "descricao": "ELETRICA TACOGRAFO FIP SPY 32",
-      "unidade": "pc",
-      "quantidade": "1"
-    },
-    {
-      "codigo": "10260004",
-      "descricao": "ELETRICA BOTOEIRA GANGORRA 0/1 LIGA DESLIGA",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -11292,7 +11310,7 @@
       "codigo": "10240002",
       "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
       "unidade": "pc",
-      "quantidade": "4"
+      "quantidade": "2"
     },
     {
       "codigo": "10180101",
@@ -11440,7 +11458,7 @@
   "40340053": [
     {
       "codigo": "30120008",
-      "descricao": "CJ VIDROS SELADO EXPERT/JUMPY/SCUDO - SELADO - VIDROFORTE",
+      "descricao": "CJ VIDROS SELADO E/S/J - SELADO - VIDROFORTE",
       "unidade": "cj",
       "quantidade": "1"
     },
@@ -11493,7 +11511,7 @@
       "quantidade": "1"
     },
     {
-      "codigo": "30180004",
+      "codigo": "30180024",
       "descricao": "CJ REVESTIMENTO E/S/J TB TETO C/ VELUDO PRETO",
       "unidade": "cj",
       "quantidade": "1"
@@ -11547,14 +11565,14 @@
       "quantidade": "4"
     },
     {
-      "codigo": "10240002",
+      "codigo": "10240003",
       "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
       "unidade": "pc",
       "quantidade": "4"
     },
     {
       "codigo": "10240001",
-      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
+      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA 100X40X30 MM",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -11574,7 +11592,7 @@
   "40340054": [
     {
       "codigo": "30120017",
-      "descricao": "CJ VIDROS VISTA EXPERT/JUMPY/SCUDO - VIDROFORTE",
+      "descricao": "CJ VIDROS VISTA E/S/J - VIDROFORTE",
       "unidade": "cj",
       "quantidade": "1"
     },
@@ -11627,7 +11645,7 @@
       "quantidade": "1"
     },
     {
-      "codigo": "30180004",
+      "codigo": "30180024",
       "descricao": "CJ REVESTIMENTO E/S/J TB TETO C/ VELUDO PRETO",
       "unidade": "cj",
       "quantidade": "1"
@@ -11681,14 +11699,14 @@
       "quantidade": "4"
     },
     {
-      "codigo": "10240002",
+      "codigo": "10240003",
       "descricao": "ACESSORIO ADESIVO INSTRUCAO MARTELINHO SEGURANCA",
       "unidade": "pc",
       "quantidade": "4"
     },
     {
       "codigo": "10240001",
-      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA",
+      "descricao": "ACESSORIO ADESIVO IDENTIFICACAO JI MONTADORA 100X40X30 MM",
       "unidade": "pc",
       "quantidade": "1"
     },
@@ -11979,12 +11997,6 @@
       "descricao": "TAMPA CEGA JI BOTOEIRA CABINE E/S/J",
       "unidade": "pc",
       "quantidade": "4"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30260005": [
@@ -11999,12 +12011,6 @@
       "descricao": "TOMADA USB A ORBE 3 1 LUZ AZUL DUPLA EMBUTIR TAMPA REDONDA 1 5A",
       "unidade": "pc",
       "quantidade": "3"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30260006": [
@@ -12395,49 +12401,49 @@
   ],
   "30240059": [
     {
-      "codigo": "30180020",
+      "codigo": "#N/A",
       "descricao": "CJ ABS ACABAMENTO ARO JANELAS E/S/J",
       "unidade": "cj",
       "quantidade": "1"
     },
     {
-      "codigo": "20240017",
+      "codigo": "#N/A",
       "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240018",
+      "codigo": "#N/A",
       "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240019",
+      "codigo": "#N/A",
       "descricao": "PP TUBO INFERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240020",
+      "codigo": "#N/A",
       "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA LATERAL E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240021",
+      "codigo": "#N/A",
       "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LE E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240022",
+      "codigo": "#N/A",
       "descricao": "PP TUBO SUPERIOR ALUMINIO CORTINA PORTA TRASEIRA LD E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "30240058",
+      "codigo": "#N/A",
       "descricao": "CJ CORTINA VELUDO PRETA PORTAS E/S/J",
       "unidade": "cj",
       "quantidade": "1"
@@ -13053,16 +13059,16 @@
   ],
   "20240007": [
     {
-      "codigo": "10280053",
+      "codigo": "#N/A",
       "descricao": "MP CHAPA DE COMPENSADO RETALHO",
       "unidade": "mm",
       "quantidade": "1500"
     },
     {
-      "codigo": "10280057",
+      "codigo": "#N/A",
       "descricao": "BOBINA CARPETE RESINADO",
-      "unidade": "m²",
-      "quantidade": "1.5"
+      "unidade": "pc",
+      "quantidade": "0.007"
     }
   ],
   "20240008": [
@@ -13263,19 +13269,19 @@
   ],
   "30240057": [
     {
-      "codigo": "10240200",
+      "codigo": "#N/A",
       "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J C-CLASS 1º VAO LE 550X440",
       "unidade": "pc",
       "quantidade": "2"
     },
     {
-      "codigo": "10240201",
+      "codigo": "#N/A",
       "descricao": "ACESSORIO PC CORTINA VELUDO PRETA SALAO E/S/J C-CLASS 2º VAO LE/LD 600X400",
       "unidade": "pc",
       "quantidade": "4"
     },
     {
-      "codigo": "10300083",
+      "codigo": "#N/A",
       "descricao": "FX PASSA FIO APITO SUPORTE CORTINA COR PRETO",
       "unidade": "pc",
       "quantidade": "18"
@@ -13901,6 +13907,12 @@
       "descricao": "PP SUPORTE FIXO CABIDE - GANCHO CABIDEIRO MARCOPOLO CINZA RAL 7021 PU - TI.01.J04",
       "unidade": "pc",
       "quantidade": "2"
+    },
+    {
+      "codigo": "10440013",
+      "descricao": "REFORCO \"U\" ACO GALVANIZADO FIXACAO TETO E/S/J",
+      "unidade": "pc",
+      "quantidade": "1"
     }
   ],
   "10240237": [
@@ -14195,8 +14207,8 @@
       "quantidade": "1"
     },
     {
-      "codigo": "10280062",
-      "descricao": "MP COURVIN LISO PRETO URUGUAI",
+      "codigo": "10280061",
+      "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
       "unidade": "m",
       "quantidade": "2"
     },
@@ -14204,30 +14216,6 @@
       "codigo": "10320035",
       "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
       "unidade": "un",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
       "quantidade": ""
     }
   ],
@@ -14327,8 +14315,8 @@
       "quantidade": "1"
     },
     {
-      "codigo": "10280063",
-      "descricao": "MP COURVIN LISO BEGE URUGUAI",
+      "codigo": "10280061",
+      "descricao": "MP COURVIN LISO MARROM CAFE URUGUAI",
       "unidade": "m",
       "quantidade": "2"
     },
@@ -14336,30 +14324,6 @@
       "codigo": "10320035",
       "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
       "unidade": "un",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
       "quantidade": ""
     }
   ],
@@ -15187,50 +15151,38 @@
       "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
       "unidade": "pc",
       "quantidade": "2"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30240062": [
     {
-      "codigo": "30240070",
+      "codigo": "#N/A",
       "descricao": "CJ TAMPO ACRILICO MOVEL LATERAL E/S/J C-CLASS 1º VAO LE",
       "unidade": "cj",
       "quantidade": "1"
     },
     {
-      "codigo": "20240028",
+      "codigo": "#N/A",
       "descricao": "PP PC REVISTEIRO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240027",
+      "codigo": "#N/A",
       "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240024",
+      "codigo": "#N/A",
       "descricao": "PP PC FUNDO MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDO CARPETE",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "10260089",
+      "codigo": "#N/A",
       "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
       "unidade": "pc",
       "quantidade": "2"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30240063": [
@@ -15283,12 +15235,6 @@
       "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO MARROM",
       "unidade": "pc",
       "quantidade": "1"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30240065": [
@@ -15303,12 +15249,6 @@
       "descricao": "PP PC MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LE REVESTIDO PRETO",
       "unidade": "pc",
       "quantidade": "1"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30240066": [
@@ -15355,12 +15295,6 @@
       "descricao": "ELETRICA LANTERNA PLACA CORTESIA",
       "unidade": "pc",
       "quantidade": "1"
-    },
-    {
-      "codigo": "0",
-      "descricao": "",
-      "unidade": "",
-      "quantidade": ""
     }
   ],
   "30240068": [
@@ -15397,19 +15331,19 @@
   ],
   "30240073": [
     {
-      "codigo": "10260155",
+      "codigo": "#N/A",
       "descricao": "ELETRICA CHICOTE GELADEIRA ELBER CAB 18 E/S/J",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "20240007",
+      "codigo": "#N/A",
       "descricao": "PP CAIXA MADEIRA SUPORTE GELADEIRA CAB 18L E/S/J REVESTIDA CARPETE PRETO RESINADO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "10240084",
+      "codigo": "#N/A",
       "descricao": "ACESSORIO GELADEIRA PORTATIL ELBER CAB 18L",
       "unidade": "pc",
       "quantidade": "1"
@@ -15644,26 +15578,32 @@
   ],
   "30200022": [
     {
-      "codigo": "10200077",
-      "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN",
-      "unidade": "pc",
-      "quantidade": "2"
-    },
-    {
-      "codigo": "10200084",
-      "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 3P COURVIN",
+      "codigo": "10200079",
+      "descricao": "BCO MC LB RECLINAVEL 2 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN CAPA LB MC COURVIN PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
-      "codigo": "10200106",
-      "descricao": "BCO MC LB RECLINAVEL 1 L SPRINTER C/ AP BRACO LD 370 MM 3P COURVIN",
+      "codigo": "10200253",
+      "descricao": "BCO MC LB RECLINAVEL 1 L TRAS CX RODAS C/ AP BRACO LE 370 MM 3P COURVIN CAPA LB MC COURVIN PRETO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200252",
+      "descricao": "BCO MC LB RECLINAVEL 2 L TRAS CX RODAS C/ AP BRACO LD 370 MM 3P COURVIN CAPA LB MC COURVIN PRETO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200084",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 3P COURVIN CAPA LB MC COURVIN PRETO",
       "unidade": "pc",
       "quantidade": "1"
     },
     {
       "codigo": "10200082",
-      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P COURVIN",
+      "descricao": "BCO MC LB RECLINAVEL 3 L NORMAL C/ AP BRACO LD 330 MM 3P COURVIN CAPA LB MC COURVIN PRETO",
       "unidade": "pc",
       "quantidade": "3"
     }
@@ -15896,5 +15836,202 @@
       "quantidade": "1"
     }
   ],
-  "10240246": []
+  "10240246": [],
+  "30200026": [
+    {
+      "codigo": "10200113",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL C/ AP BRACO LD 330 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200115",
+      "descricao": "BCO MC LB FIXO 3 L NORMAL C/ AP BRACO LD 330 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "3"
+    },
+    {
+      "codigo": "10200085",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "10240247": [],
+  "20520007": [
+    {
+      "codigo": "10280032",
+      "descricao": "MP FITA ACABAMENTO CANTONEIRA 15,1MM AMARELA PERFIL DEGRAU ESCADA",
+      "unidade": "m",
+      "quantidade": "0.75"
+    }
+  ],
+  "20520008": [
+    {
+      "codigo": "10280032",
+      "descricao": "MP FITA ACABAMENTO CANTONEIRA 15,1MM AMARELA PERFIL DEGRAU ESCADA",
+      "unidade": "m",
+      "quantidade": "0.75"
+    }
+  ],
+  "20140029": [
+    {
+      "codigo": "10280020",
+      "descricao": "MP CHAPA COMPENSADO 3000X1600X12MM",
+      "unidade": "ch",
+      "quantidade": "1"
+    }
+  ],
+  "30140048": [
+    {
+      "codigo": "20140015",
+      "descricao": "PP PISO CN 12 MM E/S/J TB - 3,2,3 - MC",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280039",
+      "descricao": "MP PASSADEIRA LG BRIGHT GRAFITE 92402",
+      "unidade": "mm",
+      "quantidade": "3200"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": "0.25"
+    }
+  ],
+  "30200027": [
+    {
+      "codigo": "10200052",
+      "descricao": "BCO MC LB FIXO 3 L NORMAL C/ AP BRACO LD 330 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200046",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL C/ AP BRACO LD 330 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30200028": [
+    {
+      "codigo": "10200048",
+      "descricao": "BCO MC LB FIXO 4 L NORMAL S/ AP BRACO 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200050",
+      "descricao": "BCO MC LB FIXO 3 L NORMAL C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "20240027": [
+    {
+      "codigo": "20240048",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 1º VAO LE REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280062",
+      "descricao": "MP COURVIN LISO PRETO URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "20240038": [
+    {
+      "codigo": "20240035",
+      "descricao": "PP MOVEL LATERAL PRFV E/S/J C-CLASS 2º VAO LD INTERNA REVESTIDA CARPETE",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10280063",
+      "descricao": "MP COURVIN LISO BEGE URUGUAI",
+      "unidade": "m",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10320035",
+      "descricao": "CM COLA MADEIRA SPRAY ADESIVO CONTATO 14KG",
+      "unidade": "un",
+      "quantidade": ""
+    }
+  ],
+  "10240281": [
+    {
+      "codigo": "10280008",
+      "descricao": "MP BORRACHA PERFIL T ACABAMENTO TRILHO 39X21X13MM",
+      "unidade": "mm",
+      "quantidade": "7000"
+    },
+    {
+      "codigo": "10520001",
+      "descricao": "ACESSORIO ACABAMENTO PLASTICO IMPRESSO TRILHO ALUMINIO PADRAO JI",
+      "unidade": "pc",
+      "quantidade": "6"
+    },
+    {
+      "codigo": "10280050",
+      "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI MONTADORA 50X17X16X6000 MM",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ],
+  "30200029": [
+    {
+      "codigo": "10200056",
+      "descricao": "BCO MC LB FIXO 1 L ELEVITTA C/ AP BRACO LD/LE 60 MM 3P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200058",
+      "descricao": "BCO MC LB FIXO 2 L ELEVITTA C/ AP BRACO LD 60 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200026",
+      "descricao": "BCO MC LB FIXO 4 L TRILHO S/ AP BRACO 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200037",
+      "descricao": "BCO MC LB FIXO 3 L TRILHO C/ AP BRACO LD 330 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "2"
+    },
+    {
+      "codigo": "10200239",
+      "descricao": "BCO MC LB FIXO 2 L TRAS CX RODAS C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200238",
+      "descricao": "BCO MC LB FIXO 2 L SPRINTER C/ AP BRACO LD 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    },
+    {
+      "codigo": "10200098",
+      "descricao": "BCO MC LB FIXO 1 L TRILHO C/ AP BRACO LE 370 MM 2P TECIDO",
+      "unidade": "pc",
+      "quantidade": "1"
+    }
+  ]
 }

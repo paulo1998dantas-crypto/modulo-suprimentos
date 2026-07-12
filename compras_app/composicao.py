@@ -59,7 +59,11 @@ def _linha_item_sem_bom(item):
     }
 
 
-def expandir_composicao_item(codigo_item, quantidade, componentes):
+def _descricao_contem_cj_trilho(item):
+    return "CJ TRILHO" in str((item or {}).get("descricao", "") or "").upper()
+
+
+def expandir_composicao_item(codigo_item, quantidade, componentes, start_level=0):
     codigo_raiz = normalizar_codigo(codigo_item)
     if not codigo_raiz or codigo_raiz not in componentes:
         return []
@@ -86,7 +90,7 @@ def expandir_composicao_item(codigo_item, quantidade, componentes):
                 proximos.add(codigo_comp)
                 visitar(codigo_comp, qtd_total, level + 1, proximos)
 
-    visitar(codigo_raiz, parse_quantidade(quantidade), 0, {codigo_raiz})
+    visitar(codigo_raiz, parse_quantidade(quantidade), start_level, {codigo_raiz})
     return linhas
 
 
@@ -95,11 +99,20 @@ def expandir_composicao_itens(itens, componentes):
     for item in itens:
         codigo_item = normalizar_codigo(item.get("codigo", ""))
         if codigo_item and componentes.get(codigo_item):
+            if _descricao_contem_cj_trilho(item):
+                linhas.append(
+                    normalizar_linha_composicao(
+                        item,
+                        item=codigo_item,
+                        level=0,
+                    )
+                )
             linhas.extend(
                 expandir_composicao_item(
                     codigo_item,
-                    item.get("qtd", 0),
+                    item.get("qtd", item.get("quantidade", 0)),
                     componentes,
+                    start_level=1 if _descricao_contem_cj_trilho(item) else 0,
                 )
             )
         elif codigo_item:
@@ -111,14 +124,14 @@ def expandir_composicao_referenciada(linhas, componentes):
     componentes = normalizar_componentes(componentes)
     resultado = []
 
-    def visitar(codigo_pai, quantidade_pai, item_raiz, level, ancestrais):
+    def visitar(codigo_pai, quantidade_pai, level, ancestrais):
         for comp in componentes.get(codigo_pai, []) or []:
             codigo_comp = normalizar_codigo(comp.get("codigo", ""))
             qtd_base = parse_quantidade(comp.get("quantidade", comp.get("qtd", 0)))
             qtd_total = quantidade_pai * qtd_base
             resultado.append(
                 {
-                    "item": item_raiz,
+                    "item": codigo_pai,
                     "codigo": codigo_comp,
                     "descricao": comp.get("descricao", "") or "",
                     "unidade": comp.get("unidade", "") or "",
@@ -129,7 +142,7 @@ def expandir_composicao_referenciada(linhas, componentes):
             if codigo_comp and qtd_total and codigo_comp not in ancestrais and codigo_comp in componentes:
                 proximos = set(ancestrais)
                 proximos.add(codigo_comp)
-                visitar(codigo_comp, qtd_total, item_raiz, level + 1, proximos)
+                visitar(codigo_comp, qtd_total, level + 1, proximos)
 
     for linha in linhas or []:
         item_raiz = normalizar_codigo(linha.get("item", "")) or normalizar_codigo(linha.get("codigo", ""))
@@ -149,7 +162,7 @@ def expandir_composicao_referenciada(linhas, componentes):
 
         qtd = parse_quantidade(linha.get("qtd", linha.get("quantidade", 0)))
         if codigo and qtd and codigo in componentes:
-            visitar(codigo, qtd, item_raiz, level + 1, {codigo})
+            visitar(codigo, qtd, level + 1, {codigo})
 
     return resultado
 

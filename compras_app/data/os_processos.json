@@ -2558,5 +2558,1469 @@
       }
     ],
     "ACESSÃ“RIOS": []
+  },
+  "17 - JI URBAN ESJ TB SELADO-VISTA TETO C VELUDO PRETO": {
+    "CORTE": [
+      {
+        "atividade": "CORTAR LATERAIS DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR LATERAIS DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR TRATAMENTO SUPERFICIAL COM GALVANIZADOR A FRIO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ASPIRAR LIMALHA RESULTANTE DO CORTE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU NA LATERAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR VIDROS NO VEÍCULO",
+        "responsavel": ""
+      }
+    ],
+    "AR CONDICIONADO": [
+      {
+        "atividade": "CONFERÊNCIA DA INSTALAÇÃO DO AR CONDICIONADO CONFORME OS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "TESTE DE FUNCIONAMENTO DO AR CONDICIONADO",
+        "responsavel": ""
+      }
+    ],
+    "PREPARAÇÃO DE PEÇAS": [
+      {
+        "atividade": "UTILIZAR O GABARITO DE CORTE MATERIAL ISOLAMENTO PARA PREPARAR MATERIAIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "USINAR CHAPA DE COMPENSADO NAVAL CONFORME DESENHO TÉCNICO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR CHAPA DE COMPENSADO NAVAL USINADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR PÓS LIXAMENTO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NA MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR MANTA VINÍLICA (PASSADEIRA) NO ASSOALHO DE COMPENSADO NAVAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS DA MANTA VINÍLICA (PASSADEIRA) E FAZER RODAPÉ PARA ESTANQUIEDADE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR TETO SALÃO ABS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR COLUNAS \"A\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR COLUNAS \"B\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR LUMINARIA ORIGINAL CABINE CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR SUPORTE QUEBRA SOL ORIGINAL CABINE CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR QUEBRA SOL CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR TETO CABINE ORIGINAL CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR ALCA PQP CABINE ORIGINAL LD E/S/J CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR ALETA AR TETO E/S/J PILAR CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR GANCHO CABIDEIRO MARCOPOLO ACRYLIS CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR TETO SALÃO ABS CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR COLUNAS \"A\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR COLUNAS \"B\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA FLOCAGEM TETO SALÃO ABS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA FLOCAGEM COLUNAS \"A\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA FLOCAGEM COLUNAS \"B\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FLOCAGEM TETO SALÃO ABS CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FLOCAGEM COLUNAS \"A\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FLOCAGEM COLUNAS \"B\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR A LIMPEZA TETO SALÃO ABS FLOCADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR A LIMPEZA COLUNAS \"A\" FLOCADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR A LIMPEZA COLUNAS \"B\" FLOCADO",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "RETIRAR COLUNAS \"A\" DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR A ALÇA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR OS 2 (DOIS) QUEBRA SOL ORIGINAL DA CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR LUMINÁRIA ORIGINAL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR SUPORTE LUMINÁRIA ORIGINAL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR TETO ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR COLUNAS \"B\" DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FURAÇÃO PARA INSTALAR INTERRPTOR DE PORTA NA COLUNA PORTA CORREDIÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FURAÇÃO SOLEIRA ORIGINAL PORTA LATERAL P/ ILUMINAÇÃO DEGRAU",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE INTERRUPTOR DE PORTA E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE ALIMENTAÇÃO 4 ARANDELAS E/S/J E FIXA-LOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE LUZES CORTESIA E/S/J - DEGRAU, SOLEIRA PM, SOB BCO 1º FIL E FIXA-LOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE LUZ BALIZADORA INFERIOR E/S/J E FIXA-LOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE ILUMINAÇÃO PRINCIPAL E FIXA-LO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DA ILUMINAÇÃO PRINCIPAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DAS ARANDELAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DO CHICOTE LUZ CORTESIA SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DA LUZ BALIZADORA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR FITA LED NA CANTONEIRA SOLEIRA PORTA MALA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE 1º FIL DE BANCOS E FIXAR 3 (TRÊS) LANTERNAS PLACA CORTESIA NA 1º FIL DE BANCOS",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [
+      {
+        "atividade": "REMOVER DIVISÓRIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO NA COLUNA SUPERIOR DA PORTA DE CORRER",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR ISOLAMENTO TÉRMICO NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR GALVANIZADOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR SUPORTE ASSOALHO DEGRAU ESQUERDO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU DE PARABRISA NO ASSOALHO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR CHAPA DE COMPENSADO JÁ COM MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS PASSADEIRAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PARAFUSAR CHAPA DE COMPENSADO NAVAL NA PORTA LATERAL E TRASEIRA",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 1": [
+      {
+        "atividade": "INSTALAR TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR BORRACHA DE ACABAMENTO ARO JANELA ABS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAL LE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAL LD",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO SOLEIRA CABINE/SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA DA PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA TRASEIRA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR AROS DE JANELAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO DAS PORTAS",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 2": [
+      {
+        "atividade": "INSTALAR OS MARTELOS DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "BATER TAMPINHAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO FAIXA REFLETIVA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR MAÇANETA DA PORTA DE CORRER",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "INSTALAR ILUMINAÇÃO PRINCIPAL DO SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR FITA LED NA PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTOR FITA DE LED PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" E INSTALAR LUZ BALIZADORA NAS LATERAIS EM ABS L.E./L.D.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR APARELHO SOM ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR PORTA LUVAS ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR PARTE INFERIOR ORIGINAL VOLANTE PAINEL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR ACABAMENTO LATERAL PAINEL LE ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR MÁSCARA FRONTA PAINEL CABINE ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR PÇ PAINEL ORIGINAL CABINE LOCAL DE INSTALAÇÃO BOTOEIRA PLÁSTICA JI",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE PORTA FUSÍVEL ACESSÓRIOS INTERNOS E/S/J PARA BATERIA E FIXA-LO NA BATERIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE CENTRAL ELÉTRICA E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CHICOTE CENTRAL ELÉTRICA NO CHICOTE PORTA FUSÍVEL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE ALIMENTAÇÃO RELE PÓS IGNIÇÃO E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE RELE PÓS IGNIÇÃO NO PÓS CHAVE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE BOTÕES E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" TODOS OS CONECTORES NA MUNHA (ÁREA PASSAGEM CHICOTE)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR REGULADOR DE TENSÃO DENTRO DO PAINEL CABINE (ATRÁS DA BOTOEIRA PLÁSTICA JI)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE LUZ CORTESIA SOB PAINEL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE LUZ CORTESIA SOB PAINEL CABINE E/S/J NO POSITIVO E NEGATIVO DA ILUMINAÇÃO ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REMONTAR PAINEL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LUZ CORTESIA SOB PAINEL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR BOTOEIRA PLÁSTICA JI MONTADORA NO PAINEL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTORES DO CHICOTE RELE PÓS IGNIÇÃO NOS BOTÕES DE ACIONAMENTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTORES DO CHICOTE BOTÕES NOS BOTÕES DE ACIONAMENTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR BOTÕES DE ACIONAMENTO NA BOTOEIRA E CHICOTE PÓS IGNIÇÃO E CHICOTE DOS BOTÕES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR OS FUSÍVEIS NOS PORTA FUSÍVEIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR TODOS OS RELÊS NA BASE DE RELE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTOR SOLEIRA PORTA MALA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTOR 1º FILEIRA DE BANCOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR TETO ORIGINAL CABINE PINTADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR SUPORTE LUMINÁRIA ORIGINAL CABINE E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR LUMINÁRIA ORIGINAL CABINE E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR OS 2 (DOIS) QUEBRA SOL ORIGINAL DA CABINE E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR A ALÇA PQP CABINE ORIGINAL LD E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR COLUNAS \"A\" DO VEÍCULO FLOCADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR COLUNAS \"B\" DO VEÍCULO FLOCADO",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [
+      {
+        "atividade": "REALIZAR LAVAGEM EXTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR LIMPEZA INTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
+        "responsavel": ""
+      }
+    ],
+    "ACESSÃ“RIOS": []
+  },
+  "18 - JI URBAN ESJ TB VITRE TETO C VELUDO PRETO": {
+    "CORTE": [],
+    "AR CONDICIONADO": [
+      {
+        "atividade": "CONFERÊNCIA DA INSTALAÇÃO DO AR CONDICIONADO CONFORME OS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "TESTE DE FUNCIONAMENTO DO AR CONDICIONADO",
+        "responsavel": ""
+      }
+    ],
+    "PREPARAÇÃO DE PEÇAS": [
+      {
+        "atividade": "UTILIZAR O GABARITO DE CORTE MATERIAL ISOLAMENTO PARA PREPARAR MATERIAIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "USINAR CHAPA DE COMPENSADO NAVAL CONFORME DESENHO TÉCNICO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR CHAPA DE COMPENSADO NAVAL USINADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR PÓS LIXAMENTO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NA MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR MANTA VINÍLICA (PASSADEIRA) NO ASSOALHO DE COMPENSADO NAVAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS DA MANTA VINÍLICA (PASSADEIRA) E FAZER RODAPÉ PARA ESTANQUIEDADE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR TETO SALÃO ABS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR COLUNAS \"A\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR COLUNAS \"B\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR SELADORA GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR LUMINARIA ORIGINAL CABINE CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR SUPORTE QUEBRA SOL ORIGINAL CABINE CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR QUEBRA SOL CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR TETO CABINE ORIGINAL CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR ALCA PQP CABINE ORIGINAL LD E/S/J CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR ALETA AR TETO E/S/J PILAR CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR GANCHO CABIDEIRO MARCOPOLO ACRYLIS CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR TETO SALÃO ABS CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR COLUNAS \"A\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PINTAR COLUNAS \"B\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR PÓS PINTURA GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ LUMINARIA ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ SUPORTE QUEBRA SOL ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ QUEBRA SOL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ TETO CABINE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ ALCA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ ALETA AR TETO E/S/J PILAR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ ACABAMENTO PLASTICO ORIGINAL MICROFONE ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR VERNIZ GANCHO CABIDEIRO MARCOPOLO ACRYLIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA FLOCAGEM TETO SALÃO ABS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA FLOCAGEM COLUNAS \"A\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA FLOCAGEM COLUNAS \"B\"",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FLOCAGEM TETO SALÃO ABS CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FLOCAGEM COLUNAS \"A\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FLOCAGEM COLUNAS \"B\" CONFORME COR DESCRITA NA O.S.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR A LIMPEZA TETO SALÃO ABS FLOCADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR A LIMPEZA COLUNAS \"A\" FLOCADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR A LIMPEZA COLUNAS \"B\" FLOCADO",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "RETIRAR COLUNAS \"A\" DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR A ALÇA PQP CABINE ORIGINAL LD E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR OS 2 (DOIS) QUEBRA SOL ORIGINAL DA CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR LUMINÁRIA ORIGINAL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR SUPORTE LUMINÁRIA ORIGINAL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR TETO ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR COLUNAS \"B\" DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FURAÇÃO PARA INSTALAR INTERRPTOR DE PORTA NA COLUNA PORTA CORREDIÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FAZER FURAÇÃO SOLEIRA ORIGINAL PORTA LATERAL P/ ILUMINAÇÃO DEGRAU",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE INTERRUPTOR DE PORTA E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE ALIMENTAÇÃO 4 ARANDELAS E/S/J E FIXA-LOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE LUZES CORTESIA E/S/J - DEGRAU, SOLEIRA PM, SOB BCO 1º FIL E FIXA-LOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE LUZ BALIZADORA INFERIOR E/S/J E FIXA-LOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE ILUMINAÇÃO PRINCIPAL E FIXA-LO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DA ILUMINAÇÃO PRINCIPAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DAS ARANDELAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DO CHICOTE LUZ CORTESIA SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE INTERRUPTOR DE PORTA NO NEGATIVO DA LUZ BALIZADORA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR FITA LED NA CANTONEIRA SOLEIRA PORTA MALA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE 1º FIL DE BANCOS E FIXAR 3 (TRÊS) LANTERNAS PLACA CORTESIA NA 1º FIL DE BANCOS",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [
+      {
+        "atividade": "REMOVER DIVISÓRIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO NA COLUNA SUPERIOR DA PORTA DE CORRER",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR ISOLAMENTO TÉRMICO NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR GALVANIZADOR",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR SUPORTE ASSOALHO DEGRAU ESQUERDO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU DE PARABRISA NO ASSOALHO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR CHAPA DE COMPENSADO JÁ COM MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS PASSADEIRAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PARAFUSAR CHAPA DE COMPENSADO NAVAL NA PORTA LATERAL E TRASEIRA",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 1": [
+      {
+        "atividade": "INSTALAR TETO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR BORRACHA DE ACABAMENTO ARO JANELA ABS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAL LE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAL LD",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO SOLEIRA CABINE/SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA DA PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA TRASEIRA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR AROS DE JANELAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO DAS PORTAS",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 2": [
+      {
+        "atividade": "INSTALAR OS MARTELOS DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "BATER TAMPINHAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAÇÃO FAIXA REFLETIVA",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "INSTALAR ILUMINAÇÃO PRINCIPAL DO SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR FITA LED NA PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTOR FITA DE LED PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" E INSTALAR LUZ BALIZADORA NAS LATERAIS EM ABS L.E./L.D.",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR APARELHO SOM ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR PORTA LUVAS ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR PARTE INFERIOR ORIGINAL VOLANTE PAINEL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR ACABAMENTO LATERAL PAINEL LE ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR MÁSCARA FRONTA PAINEL CABINE ORIGINAL E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "DESMONTAR PÇ PAINEL ORIGINAL CABINE LOCAL DE INSTALAÇÃO BOTOEIRA PLÁSTICA JI",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE PORTA FUSÍVEL ACESSÓRIOS INTERNOS E/S/J PARA BATERIA E FIXA-LO NA BATERIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE CENTRAL ELÉTRICA E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CHICOTE CENTRAL ELÉTRICA NO CHICOTE PORTA FUSÍVEL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE ALIMENTAÇÃO RELE PÓS IGNIÇÃO E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE RELE PÓS IGNIÇÃO NO PÓS CHAVE ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE BOTÕES E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" TODOS OS CONECTORES NA MUNHA (ÁREA PASSAGEM CHICOTE)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR REGULADOR DE TENSÃO DENTRO DO PAINEL CABINE (ATRÁS DA BOTOEIRA PLÁSTICA JI)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PASSAR CHICOTE LUZ CORTESIA SOB PAINEL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" DERIVADOR DE FIO DO CHICOTE LUZ CORTESIA SOB PAINEL CABINE E/S/J NO POSITIVO E NEGATIVO DA ILUMINAÇÃO ORIGINAL CABINE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REMONTAR PAINEL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LUZ CORTESIA SOB PAINEL CABINE E/S/J",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR BOTOEIRA PLÁSTICA JI MONTADORA NO PAINEL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTORES DO CHICOTE RELE PÓS IGNIÇÃO NOS BOTÕES DE ACIONAMENTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTORES DO CHICOTE BOTÕES NOS BOTÕES DE ACIONAMENTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR BOTÕES DE ACIONAMENTO NA BOTOEIRA E CHICOTE PÓS IGNIÇÃO E CHICOTE DOS BOTÕES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR OS FUSÍVEIS NOS PORTA FUSÍVEIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR TODOS OS RELÊS NA BASE DE RELE",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTOR SOLEIRA PORTA MALA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "\"PLUGAR\" CONECTOR 1º FILEIRA DE BANCOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR TETO ORIGINAL CABINE PINTADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR SUPORTE LUMINÁRIA ORIGINAL CABINE E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR LUMINÁRIA ORIGINAL CABINE E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR OS 2 (DOIS) QUEBRA SOL ORIGINAL DA CABINE E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR A ALÇA PQP CABINE ORIGINAL LD E/S/J PINTADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REINSTALAR COLUNAS \"A\" DO VEÍCULO FLOCADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RETIRAR COLUNAS \"B\" DO VEÍCULO FLOCADO",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [
+      {
+        "atividade": "REALIZAR LAVAGEM EXTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR LIMPEZA INTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
+        "responsavel": ""
+      }
+    ],
+    "ACESSÃ“RIOS": []
+  },
+  "SPRINTER 417 14 - VITRE - PLUS": {
+    "CORTE": [],
+    "AR CONDICIONADO": [
+      {
+        "atividade": "CONFERÊNCIA DA INSTALAÇÃO DO AR CONDICIONADO CONFORME OS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "TESTE DE FUNCIONAMENTO DO AR CONDICIONADO",
+        "responsavel": ""
+      }
+    ],
+    "PREPARAÇÃO DE PEÇAS": [
+      {
+        "atividade": "UTILIZAR O GABARITO DE CORTE MATERIAL ISOLAMENTO PARA PREPARAR MATERIAIS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "USINAR CHAPA DE COMPENSADO NAVAL CONFORME DESENHO TÉCNICO",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 1": [
+      {
+        "atividade": "COLAR LED NO DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR DEFLETOR DE AR NO DUTO",
+        "responsavel": ""
+      }
+    ],
+    "ISOLAMENTO": [
+      {
+        "atividade": "REMOVER GANCHOS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REMOVER DIVISÓRIAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REMOVER LATERAIS ORIGINAIS INFERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REMOVER ASSOALHO ORIGINAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "CORTAR CONECTOR ORIGINAL ILUMINAÇÃO SALÃO PARA LIGAÇÃO LED DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR REFORÇO DO DUTO NO TETO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR ISOLAMENTO TÉRMICO NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR NIVELADOR DE PISO NO ASSOALHO DA VAN",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA PU DE PARABRISA NO ASSOALHO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR CHAPA DE COMPENSADO USINADA E LIXADA NO ASSOALHO DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PARAFUSAR CHAPA DE COMPENSADO NAVAL NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIXAR NAS EMENDAS DA CHAPA DE COMPENSADO NAVAL USINADA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "LIMPAR PÓS LIXAMENTO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NO ASSOALHO DE COMPENSADO NAVAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "APLICAR COLA SPRAY NA MANTA VINÍLICA (PASSADEIRA)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "COLAR MANTA VINÍLICA (PASSADEIRA) NO ASSOALHO DE COMPENSADO NAVAL DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "RECORTAR SOBRAS DA MANTA VINÍLICA (PASSADEIRA) E FAZER RODAPÉ PARA ESTANQUIEDADE",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 1": [
+      {
+        "atividade": "PREPARAR LATERAIS INFERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAIS INFERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PREPARAR PEÇAS DO TETO (MARCAR PONTOS DE FIXAÇÃO)",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR PEÇAS DO TETO NO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PREPARAR LATERAIS SUPERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR LATERAIS SUPERIORES",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR COLUNA TRASEIRA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR COLUNA CENTRAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PREPARAR CONSOLE DO AR CONDICIONADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR CONSOLE DO AR CONDICIONADO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "PREPARAR COLUNA CINTO DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR COLUNA CINTO DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA PORTA LATERAL",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR COLUNA TRASEIRA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR CANTONEIRA PORTA TRASEIRA",
+        "responsavel": ""
+      }
+    ],
+    "REVESTIMENTO 2": [
+      {
+        "atividade": "INSTALAR DIFUSORES DE AR CONDICIONADO NO DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR OS MARTELOS DE SEGURANÇA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR BATENTE DIVISÓRIA",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR SOLEIRA CABINE/SALÃO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "INSTALAR ACABAMENTO SUPERIOR DAS PORTAS",
+        "responsavel": ""
+      },
+      {
+        "atividade": "BATER TAMPINHAS DE ACABAMENTO",
+        "responsavel": ""
+      }
+    ],
+    "ELÉTRICA 2": [
+      {
+        "atividade": "FAZER LIGAÇÃO LED DUTO NO CHICOTE ORIGINAL ILUMINAÇÃO SALÃO PARA LIGAÇÃO LED DUTO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "FIXAR DUTO DE AR CONDICIONADO JÁ PREPARADO PELA ELÉTRICA",
+        "responsavel": ""
+      }
+    ],
+    "BANCO": [],
+    "LIMPEZA/LIBERAÇÃO": [
+      {
+        "atividade": "REALIZAR LAVAGEM EXTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "REALIZAR LIMPEZA INTERNA DO VEÍCULO",
+        "responsavel": ""
+      },
+      {
+        "atividade": "ARMAZENAR MANUAL, CHAVE RESERVA, MANUAIS DE ITENS INSTALADOS, CONTROLES, TERMO DE GARANTIA NO BANCO CARONA",
+        "responsavel": ""
+      }
+    ],
+    "ACESSÃ“RIOS": []
   }
 }
