@@ -20,6 +20,7 @@ REGRAS_TABLE = "suprimentos_regras_popup_item"
 RELACOES_TABLE = "suprimentos_relacoes_processo_item"
 BOM_COMPONENTS_TABLE = "cadastro_bom_componentes"
 USERS_TABLE = "users"
+DOCUMENTOS_TABLE = "suprimentos_documentos"
 
 _cache = {}
 
@@ -75,6 +76,7 @@ def status():
             REGRAS_TABLE,
             RELACOES_TABLE,
             BOM_COMPONENTS_TABLE,
+            DOCUMENTOS_TABLE,
             USERS_TABLE,
         ],
     }
@@ -452,6 +454,66 @@ def salvar_regras(regras):
         _request("POST", REGRAS_TABLE, payload=rows, prefer="return=minimal")
     clear_cache()
     return len(rows)
+
+
+def normalizar_documento(documento):
+    row = dict(documento or {})
+    row["tipo"] = _clean(row.get("tipo")).lower()
+    row["numero"] = _clean(row.get("numero"))
+    row["data_criacao"] = _date_or_none(row.get("data_criacao")) or datetime.now().date().isoformat()
+    for key in ("dados", "itens", "processos", "componentes", "composicao"):
+        value = row.get(key)
+        if value is None:
+            value = {} if key in {"dados", "processos", "componentes"} else []
+        row[key] = value
+    dados = row.get("dados") if isinstance(row.get("dados"), dict) else {}
+    itens = row.get("itens") if isinstance(row.get("itens"), list) else []
+    row["valor_total"] = _numeric(dados.get("total_pedido"))
+    row["itens_count"] = len(itens)
+    row["search_text"] = _search_text(
+        row.get("tipo"),
+        row.get("numero"),
+        dados.get("fornecedor"),
+        dados.get("cliente"),
+        dados.get("razao_social"),
+        dados.get("chassis"),
+        dados.get("mmv"),
+        dados.get("municipio"),
+    )
+    return row
+
+
+def documento_to_legacy(row):
+    return {
+        "tipo": _clean(row.get("tipo")),
+        "numero": _clean(row.get("numero")),
+        "data_criacao": _clean(row.get("data_criacao")),
+        "dados": row.get("dados") or {},
+        "itens": row.get("itens") or [],
+        "processos": row.get("processos") or {},
+        "componentes": row.get("componentes") or {},
+        "composicao": row.get("composicao") or [],
+    }
+
+
+def salvar_documento(documento):
+    row = normalizar_documento(documento)
+    if not row.get("tipo") or not row.get("numero"):
+        return False
+    _request("POST", DOCUMENTOS_TABLE, payload=row, prefer="return=minimal")
+    clear_cache()
+    return True
+
+
+def carregar_documentos(force=False, limit=1000):
+    rows = _all_rows(
+        DOCUMENTOS_TABLE,
+        select="tipo,numero,data_criacao,dados,itens,processos,componentes,composicao",
+        order="data_criacao.desc,created_at.desc",
+        cache_key="documentos",
+        force=force,
+    )
+    return [documento_to_legacy(row) for row in rows[:limit]]
 
 
 def verify_user(username, password):

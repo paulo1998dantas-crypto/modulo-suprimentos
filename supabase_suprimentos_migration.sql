@@ -77,6 +77,23 @@ create table if not exists public.suprimentos_relacoes_processo_item (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists public.suprimentos_documentos (
+    id bigserial primary key,
+    tipo text not null,
+    numero text not null,
+    data_criacao date not null default current_date,
+    dados jsonb not null default '{}'::jsonb,
+    itens jsonb not null default '[]'::jsonb,
+    processos jsonb not null default '{}'::jsonb,
+    componentes jsonb not null default '{}'::jsonb,
+    composicao jsonb not null default '[]'::jsonb,
+    valor_total numeric not null default 0,
+    itens_count integer not null default 0,
+    search_text text not null default '',
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 create index if not exists suprimentos_pessoas_nome_idx
     on public.suprimentos_pessoas (nome_fantasia);
 
@@ -100,6 +117,15 @@ create index if not exists suprimentos_regras_gatilho_idx
 
 create index if not exists suprimentos_relacoes_item_idx
     on public.suprimentos_relacoes_processo_item (item_codigo);
+
+create index if not exists suprimentos_documentos_tipo_data_idx
+    on public.suprimentos_documentos (tipo, data_criacao desc);
+
+create index if not exists suprimentos_documentos_numero_idx
+    on public.suprimentos_documentos (numero);
+
+create index if not exists suprimentos_documentos_search_idx
+    on public.suprimentos_documentos using gin (to_tsvector('simple', search_text));
 
 create or replace function public.suprimentos_touch_updated_at()
 returns trigger
@@ -131,7 +157,13 @@ create trigger suprimentos_relacoes_touch_updated_at
 before update on public.suprimentos_relacoes_processo_item
 for each row execute function public.suprimentos_touch_updated_at();
 
+drop trigger if exists suprimentos_documentos_touch_updated_at on public.suprimentos_documentos;
+create trigger suprimentos_documentos_touch_updated_at
+before update on public.suprimentos_documentos
+for each row execute function public.suprimentos_touch_updated_at();
+
 alter table public.suprimentos_pessoas enable row level security;
 alter table public.suprimentos_processos enable row level security;
 alter table public.suprimentos_regras_popup_item enable row level security;
 alter table public.suprimentos_relacoes_processo_item enable row level security;
+alter table public.suprimentos_documentos enable row level security;

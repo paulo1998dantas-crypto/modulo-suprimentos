@@ -185,6 +185,36 @@ grid-template-columns:repeat(2, minmax(0, 1fr));
 gap:22px;
 }
 
+.dashboard-metrics{
+display:grid;
+grid-template-columns:repeat(3, minmax(0, 1fr));
+gap:16px;
+margin-bottom:16px;
+}
+
+.metric-card{
+background:var(--card);
+border:1px solid #edf0f5;
+border-radius:12px;
+padding:16px;
+box-shadow:0 8px 20px rgba(15,23,42,0.06);
+}
+
+.metric-card span{
+display:block;
+color:#5b6b82;
+font-size:12px;
+font-weight:800;
+letter-spacing:0.03em;
+text-transform:uppercase;
+}
+
+.metric-card strong{
+display:block;
+font-size:26px;
+margin-top:8px;
+}
+
 .chart-card{
 background:var(--card);
 border:1px solid #edf0f5;
@@ -208,6 +238,52 @@ display:block;
 display:flex;
 justify-content:flex-end;
 margin-bottom:16px;
+}
+
+.dashboard-table{
+background:var(--card);
+border:1px solid #edf0f5;
+border-radius:14px;
+box-shadow:0 10px 24px rgba(15,23,42,0.08);
+margin-top:22px;
+overflow:auto;
+}
+
+.dashboard-table h3{
+font-size:15px;
+margin:0;
+padding:16px 18px 0 18px;
+}
+
+.dashboard-table table{
+border-collapse:collapse;
+min-width:760px;
+width:100%;
+}
+
+.dashboard-table th,
+.dashboard-table td{
+border-bottom:1px solid #edf0f5;
+padding:12px 18px;
+text-align:left;
+vertical-align:top;
+}
+
+.dashboard-table th{
+color:#5b6b82;
+font-size:12px;
+text-transform:uppercase;
+}
+
+.dashboard-table td{
+font-size:14px;
+}
+
+@media (max-width:900px){
+.dashboard-grid,
+.dashboard-metrics{
+grid-template-columns:1fr;
+}
 }
   .os-actions{
   gap:1cm;
@@ -3978,6 +4054,20 @@ renderDashboardCharts();
 <div class="dashboard-actions">
 <a class="btn" href="/exportar_dashboard">Exportar Excel</a>
 </div>
+<div class="dashboard-metrics">
+<div class="metric-card">
+<span>Ordens de compra</span>
+<strong>{{ dashboard.totais.qtd_oc }}</strong>
+</div>
+<div class="metric-card">
+<span>Ordens de servico</span>
+<strong>{{ dashboard.totais.qtd_os }}</strong>
+</div>
+<div class="metric-card">
+<span>Total em compras</span>
+<strong>R$ {{ "{:,.2f}".format(dashboard.totais.total_oc or 0).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong>
+</div>
+</div>
 <div class="dashboard-grid">
 <div class="chart-card">
 <h3>Compras - Valor Total Gasto x Data de Criacao</h3>
@@ -3987,6 +4077,42 @@ renderDashboardCharts();
 <h3>O.S - Quantidade x Data de Criacao</h3>
 <canvas id="chart-os" class="chart-canvas"></canvas>
 </div>
+</div>
+<div class="dashboard-table">
+<h3>Ultimas emissoes</h3>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Tipo</th>
+<th>Numero</th>
+<th>Cliente/Fornecedor</th>
+<th>Resumo</th>
+</tr>
+</thead>
+<tbody>
+{% for doc in dashboard.recentes %}
+{% set dados = doc.dados or {} %}
+<tr>
+<td>{{ doc.data_criacao or "-" }}</td>
+<td>{{ "O.C" if doc.tipo == "oc" else "O.S" }}</td>
+<td>{{ doc.numero or "-" }}</td>
+<td>{{ dados.fornecedor or dados.cliente or dados.razao_social or "-" }}</td>
+<td>
+{% if doc.tipo == "oc" %}
+{{ dados.total_pedido or "0" }}
+{% else %}
+{{ (doc.itens or [])|length }} item(ns)
+{% endif %}
+</td>
+</tr>
+{% else %}
+<tr>
+<td colspan="5">Nenhuma emissao registrada ainda.</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
 </div>
 </div>
 

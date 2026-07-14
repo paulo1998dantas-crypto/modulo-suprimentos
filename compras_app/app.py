@@ -453,7 +453,7 @@ def _reset_base_data():
     ensure_data_storage()
 
 
-def carregar_historico():
+def _carregar_historico_local():
     if not os.path.exists(HISTORICO_FILE):
         return []
     try:
@@ -472,6 +472,17 @@ def carregar_historico():
     return []
 
 
+def carregar_historico():
+    if supabase_data.enabled():
+        try:
+            documentos = supabase_data.carregar_documentos()
+            if documentos:
+                return documentos
+        except Exception:
+            app.logger.exception("Falha ao carregar historico de documentos do Supabase")
+    return _carregar_historico_local()
+
+
 def salvar_historico(entries):
     try:
         with open(HISTORICO_FILE, "w", encoding="utf-8") as f:
@@ -481,7 +492,6 @@ def salvar_historico(entries):
 
 
 def registrar_historico(tipo, numero, dados, itens=None, processos=None, componentes=None, composicao=None):
-    entries = carregar_historico()
     entry = {
         "tipo": tipo,
         "numero": str(numero),
@@ -492,6 +502,12 @@ def registrar_historico(tipo, numero, dados, itens=None, processos=None, compone
         "componentes": componentes or {},
         "composicao": composicao or [],
     }
+    if supabase_data.enabled():
+        try:
+            supabase_data.salvar_documento(entry)
+        except Exception:
+            app.logger.exception("Falha ao salvar historico de documento no Supabase")
+    entries = _carregar_historico_local()
     entries.append(entry)
     salvar_historico(entries)
 
@@ -515,6 +531,28 @@ def _agrupar_por_data(entries, tipo, campo_soma=None):
         else:
             resumo[data] += 1
     return [{"data": k, "valor": resumo[k]} for k in sorted(resumo.keys())]
+
+
+def _dashboard_totais(entries):
+    total_oc = 0.0
+    qtd_oc = 0
+    qtd_os = 0
+    for entry in entries:
+        if entry.get("tipo") == "oc":
+            qtd_oc += 1
+            total_oc += _parse_numero_form((entry.get("dados") or {}).get("total_pedido"), 0.0)
+        elif entry.get("tipo") == "os":
+            qtd_os += 1
+    return {"qtd_oc": qtd_oc, "qtd_os": qtd_os, "total_oc": total_oc}
+
+
+def _dashboard_recentes(entries, limit=20):
+    recentes = sorted(
+        entries,
+        key=lambda item: (str(item.get("data_criacao") or ""), str(item.get("numero") or "")),
+        reverse=True,
+    )
+    return recentes[:limit]
 
 
 def _get_free_port():
@@ -3095,6 +3133,9 @@ def index():
     dashboard = {
         "oc_totais": oc_totais,
         "os_quantidades": os_quantidades,
+        "totais": _dashboard_totais(historico),
+        "recentes": _dashboard_recentes(historico),
+        "persistencia": "supabase" if supabase_data.enabled() else "local",
     }
     pedidos_dir, os_dir = get_save_paths()
     bom_dir = get_bom_dir()
