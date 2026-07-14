@@ -141,18 +141,12 @@ def _first_value(values, keys):
     return ""
 
 
-def _compact_description(*parts):
-    return " ".join(_clean(part) for part in parts if _clean(part))
-
-
 def row_to_produto(row):
     sku = _clean(row.get("sku"))
     values = row.get("field_values") if isinstance(row.get("field_values"), dict) else {}
-    descricao = _compact_description(
-        row.get("descricao_primaria"),
-        row.get("descricao_secundaria"),
-        row.get("sufixo"),
-    )
+    descricao_primaria = _clean(row.get("descricao_primaria"))
+    descricao_secundaria = _clean(row.get("descricao_secundaria"))
+    sufixo = _clean(row.get("sufixo"))
     unidade = _first_value(
         values,
         [
@@ -168,13 +162,15 @@ def row_to_produto(row):
     fornecedor = _first_value(values, ["fornecedor", "cod_fornecedor"])
     status_value = _first_value(values, ["status"])
     produto = {
-        "descricao": descricao,
+        "descricao": descricao_primaria,
         "unidade": unidade,
         "grupo": _group_from_sku(sku),
         "categoria": _clean(row.get("category_label")),
         "processo_conjunto": _first_value(values, ["processo_conjunto", "processo", "processo_vinculado"]),
         "fornecedor": fornecedor,
         "campos_extras": {
+            "descricao_secundaria": descricao_secundaria,
+            "sufixo": sufixo,
             "status": status_value or "ATIVO",
             "origem": "supabase",
         },

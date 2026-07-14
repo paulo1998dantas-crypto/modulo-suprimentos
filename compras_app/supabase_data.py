@@ -8,6 +8,8 @@ from datetime import datetime
 
 from werkzeug.security import check_password_hash
 
+import supabase_catalog
+
 
 PAGE_SIZE = 1000
 CACHE_TTL_SECONDS = 10
@@ -301,16 +303,21 @@ def carregar_bom_componentes(force=False):
         cache_key="bom_componentes",
         force=force,
     )
+    try:
+        catalogo = supabase_catalog.carregar_produtos(force=force) if supabase_catalog.enabled() else {}
+    except Exception:
+        catalogo = {}
     componentes = {}
     for row in rows:
         parent = _clean(row.get("parent_sku"))
         component = _clean(row.get("component_sku"))
         if not parent or not component:
             continue
+        cadastro_item = catalogo.get(component) or {}
         componentes.setdefault(parent, []).append(
             {
                 "codigo": component,
-                "descricao": _clean(row.get("component_descricao")),
+                "descricao": _clean(cadastro_item.get("descricao")) or _clean(row.get("component_descricao")),
                 "unidade": _clean(row.get("unidade")),
                 "quantidade": _clean(row.get("quantidade")),
             }
