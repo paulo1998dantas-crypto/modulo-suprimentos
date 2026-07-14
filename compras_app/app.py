@@ -83,6 +83,7 @@ from processos_transformacao import (
     resolver_processo_transformacao,
     resolver_processos_transformacao,
 )
+import supabase_catalog
 
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.secret_key = "emissor_documentos"
@@ -489,6 +490,12 @@ def _abrir_navegador(port):
 
 
 def carregar_produtos():
+    if supabase_catalog.enabled():
+        try:
+            return supabase_catalog.carregar_produtos()
+        except Exception as exc:
+            app.logger.exception("Falha ao carregar SKUs do Supabase")
+            return {}
 
     if not os.path.exists(PRODUTOS_FILE):
         return {}
@@ -507,6 +514,8 @@ def carregar_fornecedores():
 
 
 def carregar_os_produtos():
+    if supabase_catalog.enabled():
+        return carregar_produtos()
 
     if not os.path.exists(OS_PRODUTOS_FILE):
         return {}
@@ -1953,6 +1962,27 @@ def importar_produtos(file_storage):
 
 
 def atualizar_skus_arquivo(skus_file=None, somente_se_mais_novo=False):
+    if supabase_catalog.enabled():
+        supabase_catalog.clear_cache()
+        try:
+            produtos = supabase_catalog.carregar_produtos(force=True)
+            return {
+                "arquivo": supabase_catalog.status().get("url", ""),
+                "linhas": len(produtos),
+                "atualizado": True,
+                "ignorado": False,
+                "erro": "",
+            }
+        except Exception as exc:
+            app.logger.exception("Falha ao atualizar SKUs do Supabase")
+            return {
+                "arquivo": supabase_catalog.status().get("url", ""),
+                "linhas": 0,
+                "atualizado": False,
+                "ignorado": False,
+                "erro": f"Falha ao buscar SKUs no Supabase: {exc}",
+            }
+
     skus_file = skus_file or get_skus_file()
     resultado = {
         "arquivo": skus_file,
@@ -2800,10 +2830,14 @@ def index():
         "skus_file": skus_file,
         "processos_dir": processos_dir,
     }
+    catalogo_status = supabase_catalog.status()
     bom_status = request.args.get("bom_status")
     skus_status = request.args.get("skus_status")
     if not skus_status and resultado_skus_auto.get("atualizado"):
-        skus_status = f"SKUs atualizados automaticamente ({resultado_skus_auto['linhas']} linhas)."
+        if catalogo_status.get("enabled"):
+            skus_status = f"Catalogo Supabase conectado ({resultado_skus_auto['linhas']} SKUs)."
+        else:
+            skus_status = f"SKUs atualizados automaticamente ({resultado_skus_auto['linhas']} linhas)."
     os_processos_status = request.args.get("os_processos_status")
     regras_popup_status = request.args.get("regras_popup_status")
     relacoes_processo_status = request.args.get("relacoes_processo_status")
@@ -2821,6 +2855,7 @@ def index():
         tab=tab,
         dashboard=dashboard,
         save_paths=save_paths,
+        catalogo_status=catalogo_status,
         bom_dir=bom_dir,
         skus_file=skus_file,
         processos_dir=processos_dir,
@@ -2835,6 +2870,26 @@ def index():
         relacoes_processo_item=relacoes_processo_item,
         regras_popup_item=regras_popup_item,
     )
+
+
+@app.route("/healthz")
+def healthz():
+    produtos_count = None
+    if supabase_catalog.enabled():
+        try:
+            produtos_count = len(supabase_catalog.carregar_produtos())
+        except Exception as exc:
+            app.logger.exception("Falha no healthz Supabase")
+            return {
+                "ok": False,
+                "catalog": supabase_catalog.status(),
+                "error": str(exc),
+            }, 500
+    return {
+        "ok": True,
+        "catalog": supabase_catalog.status(),
+        "produtos_count": produtos_count,
+    }
 
 
 @app.route("/gerar_oc", methods=["POST"])

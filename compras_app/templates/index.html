@@ -4475,7 +4475,11 @@ renderDashboardCharts();
 <div id="tab-cadastro" class="tab-content">
 <div class="card">
 <h3>Cadastros</h3>
+{% if catalogo_status.enabled %}
+<p>Catalogo de SKUs conectado ao Supabase: <strong>{{ catalogo_status.url }}</strong>.</p>
+{% else %}
 <p>Selecione um cadastro pelos botoes flutuantes.</p>
+{% endif %}
 </div>
 <div class="card">
 <h3>Caminhos de Salvamento</h3>
@@ -4493,10 +4497,12 @@ renderDashboardCharts();
 <label>Caminho B.O.M</label>
 <input name="bom_dir" value="{{ save_paths.bom_dir if save_paths else '' }}">
 </div>
-<div>
-<label>Arquivo Base SKUs</label>
-<input name="skus_file" value="{{ save_paths.skus_file if save_paths else '' }}">
-</div>
+{% if not catalogo_status.enabled %}
+  <div>
+  <label>Arquivo Base SKUs</label>
+  <input name="skus_file" value="{{ save_paths.skus_file if save_paths else '' }}">
+  </div>
+{% endif %}
 <div>
 <label>Caminho Processos</label>
 <input name="processos_dir" value="{{ save_paths.processos_dir if save_paths else '' }}">
@@ -4505,6 +4511,20 @@ renderDashboardCharts();
 <button type="submit">Salvar Caminhos</button>
 </form>
 </div>
+{% if catalogo_status.enabled %}
+<div class="card">
+  <h3>Catalogo Supabase</h3>
+  <p>Os SKUs sao lidos diretamente da base do ModuloCadastro. Ao cadastrar ou editar um SKU la, basta recarregar esta pagina para atualizar a visualizacao do suprimentos.</p>
+  <form method="POST" action="/atualizar_skus">
+    <button type="submit">Recarregar Catalogo</button>
+  </form>
+  {% if skus_status %}
+    <div class="total-box" style="margin-top:16px;">
+      {{ skus_status }}
+    </div>
+  {% endif %}
+</div>
+{% else %}
 <div class="card">
   <h3>Atualizar SKUs</h3>
   <p>Importa os SKUs direto de <strong>{{ skus_file }}</strong>, sem upload manual.</p>
@@ -4517,6 +4537,7 @@ renderDashboardCharts();
     </div>
   {% endif %}
 </div>
+{% endif %}
 <div class="card">
   <h3>Atualizar B.O.M</h3>
   <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ bom_dir }}</strong> e importa o conteudo para os cadastros.</p>
@@ -4607,6 +4628,7 @@ renderDashboardCharts();
 </form>
 </div>
 
+{% if not catalogo_status.enabled %}
 <div id="panel-item" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Item</div>
@@ -4655,6 +4677,7 @@ renderDashboardCharts();
 <button type="submit">Baixar Modelo (XLSX)</button>
 </form>
 </div>
+{% endif %}
 
 <div id="panel-os-fornecedor" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
@@ -4684,6 +4707,7 @@ renderDashboardCharts();
 </form>
 </div>
 
+{% if not catalogo_status.enabled %}
 <div id="panel-os-item" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Item (OS)</div>
@@ -4765,6 +4789,7 @@ renderDashboardCharts();
 <button type="submit">Baixar Modelo (XLSX)</button>
 </form>
 </div>
+{% endif %}
 
 <div id="panel-os-processos" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
@@ -4934,14 +4959,18 @@ renderDashboardCharts();
 <button id="cadastro-compras-toggle" class="fab fab-parent" type="button" title="Cadastro - Compras" onclick="return toggleCadastroMenu('cadastro-compras-menu', 'cadastro-producao-menu')">Cadastro - Compras</button>
 <div id="cadastro-compras-menu" class="fab-menu">
 <a id="abrir-fornecedor" class="fab fab-child" href="#panel-fornecedor" title="Cadastro Fornecedor">Cadastro Fornecedor</a>
+{% if not catalogo_status.enabled %}
 <a id="abrir-item" class="fab fab-child" href="#panel-item" title="Cadastro Produto">Cadastro Produto</a>
+{% endif %}
 </div>
 </div>
 <div class="fab-group">
 <button id="cadastro-producao-toggle" class="fab fab-parent" type="button" title="Cadastro - Producao" onclick="return toggleCadastroMenu('cadastro-producao-menu', 'cadastro-compras-menu')">Cadastro - Producao</button>
 <div id="cadastro-producao-menu" class="fab-menu">
 <a id="abrir-os-fornecedor" class="fab fab-child" href="#panel-os-fornecedor" title="Cadastro de Cliente">Cadastro de Cliente</a>
+{% if not catalogo_status.enabled %}
 <a id="abrir-os-item" class="fab fab-child" href="#panel-os-item" title="Cadastro de itens">Cadastro de itens</a>
+{% endif %}
 <a id="abrir-os-processos" class="fab fab-child" href="#panel-os-processos" title="Processos">Processos</a>
 </div>
 </div>

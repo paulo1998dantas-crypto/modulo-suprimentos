@@ -4,3 +4,4 @@ openpyxl==3.1.5
 docx2pdf==0.1.8
 pypdfium2==4.30.0
 PyPDF2==3.0.1
+gunicorn==22.0.0
