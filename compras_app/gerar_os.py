@@ -13,7 +13,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches
 
 from composicao import resolver_composicao_final
-from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO, pasta_os
+from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 
 logger = logging.getLogger(__name__)
@@ -467,7 +467,7 @@ def _salvar_documento_os(
     incluir_cliente_nome=True,
     cliente_nome_limite=None,
 ):
-    pasta = pasta_os(numero_os, dados)
+    pasta = tempfile.mkdtemp(prefix="modulo-suprimentos-os-")
     cliente = (dados.get("cliente", "") or "").strip()
     chassi = (dados.get("chassis", "") or "").strip()
     nome = _montar_nome_documento_os(

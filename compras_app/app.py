@@ -3067,6 +3067,8 @@ def index():
     oc_prefill = carregar_importacao(OC_IMPORT_FILE)
     os_prefill = carregar_importacao(OS_IMPORT_FILE)
     tab = request.args.get("tab", "oc")
+    if tab == "cadastro":
+        tab = "oc"
     historico = carregar_historico()
     oc_totais = _agrupar_por_data(historico, "oc", "total_pedido")
     os_quantidades = _agrupar_por_data(historico, "os", None)
@@ -3266,10 +3268,15 @@ def gerar_oc():
     dados_hist = dict(dados_pedido)
     dados_hist["fornecedor"] = fornecedor_nome
     registrar_historico("oc", numero_oc, dados_hist, itens=itens)
-    pedidos_dir, _ = get_save_paths()
-    salvo_onedrive = _is_in_dir(arquivo, pedidos_dir)
+    @after_this_request
+    def _cleanup_oc(response):
+        try:
+            shutil.rmtree(os.path.dirname(arquivo), ignore_errors=True)
+        except Exception:
+            pass
+        return response
+
     resp = send_file(arquivo, as_attachment=True, download_name=nome_docx)
-    resp.set_cookie("save_status", "onedrive" if salvo_onedrive else "fallback", max_age=20, path="/")
     return resp
 
 
@@ -3648,12 +3655,14 @@ def gerar_os():
             os.remove(zip_path)
         except Exception:
             pass
+        for path in arquivos_saida:
+            try:
+                shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+            except Exception:
+                pass
         return response
 
-    _, os_dir = get_save_paths()
-    salvo_onedrive = all(_is_in_dir(path, os_dir) for path in arquivos_saida if path)
     resp = send_file(zip_path, as_attachment=True, download_name=download_name)
-    resp.set_cookie("save_status", "onedrive" if salvo_onedrive else "fallback", max_age=20, path="/")
     return resp
 
 

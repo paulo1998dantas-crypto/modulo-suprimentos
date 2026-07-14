@@ -3649,13 +3649,6 @@ calcularVencimento();
 });
 }
 
-const formOc = document.querySelector('form[action="/gerar_oc"]');
-if (formOc){
-formOc.addEventListener("submit", () => {
-monitorSaveStatus();
-});
-}
-
 const formOs = document.getElementById("form-os");
 if (formOs){
 formOs.addEventListener("submit", (event) => {
@@ -3671,7 +3664,6 @@ if (!validarProcessoObrigatorioOS()){
 event.preventDefault();
 return;
 }
-monitorSaveStatus();
 setTimeout(limparOSForm, 500);
 });
 }
@@ -3765,7 +3757,6 @@ renderDashboardCharts();
 <div class="nav-tabs">
 <button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
 <button type="button" class="tab-btn" data-tab="tab-os">Producao</button>
-<button type="button" class="tab-btn" data-tab="tab-cadastro">Cadastro</button>
 <button type="button" class="tab-btn" data-tab="tab-dashboard">Dashboard</button>
 </div>
 {% if current_user %}
@@ -4505,36 +4496,6 @@ renderDashboardCharts();
 {% else %}
 <p>Selecione um cadastro pelos botoes flutuantes.</p>
 {% endif %}
-</div>
-<div class="card">
-<h3>Caminhos de Salvamento</h3>
-<form method="POST" action="/salvar_caminhos">
-<div class="grid">
-<div>
-<label>Caminho Compras (O.C)</label>
-<input name="pedidos_dir" value="{{ save_paths.pedidos_dir if save_paths else '' }}">
-</div>
-<div>
-<label>Caminho Producao (O.S)</label>
-<input name="os_dir" value="{{ save_paths.os_dir if save_paths else '' }}">
-</div>
-<div>
-<label>Caminho B.O.M</label>
-<input name="bom_dir" value="{{ save_paths.bom_dir if save_paths else '' }}">
-</div>
-{% if not catalogo_status.enabled %}
-  <div>
-  <label>Arquivo Base SKUs</label>
-  <input name="skus_file" value="{{ save_paths.skus_file if save_paths else '' }}">
-  </div>
-{% endif %}
-<div>
-<label>Caminho Processos</label>
-<input name="processos_dir" value="{{ save_paths.processos_dir if save_paths else '' }}">
-</div>
-</div>
-<button type="submit">Salvar Caminhos</button>
-</form>
 </div>
 {% if catalogo_status.enabled %}
 <div class="card">

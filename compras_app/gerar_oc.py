@@ -1,5 +1,6 @@
 import os
 import json
+import tempfile
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
@@ -7,7 +8,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from datetime import datetime
 from composicao import expandir_composicao_itens, normalizar_componentes
-from config import TEMPLATE_WORD, TEMPLATE_OS, pasta_ano, OS_COMPONENTES_FILE
+from config import TEMPLATE_WORD, TEMPLATE_OS, OS_COMPONENTES_FILE
 import logging
 
 
@@ -292,7 +293,7 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
         except Exception:
             pass
 
-    pasta = pasta_ano()
+    pasta = tempfile.mkdtemp(prefix="modulo-suprimentos-oc-")
 
     nome = construir_nome_oc(numero_oc, fornecedor, dados_pedido)
     path = os.path.join(pasta, nome)
