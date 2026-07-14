@@ -4481,10 +4481,7 @@ renderDashboardCharts();
 {% if catalogo_status.enabled %}
 <div class="card">
   <h3>Catalogo Supabase</h3>
-  <p>Os SKUs sao lidos diretamente da base do ModuloCadastro. Ao cadastrar ou editar um SKU la, basta recarregar esta pagina para atualizar a visualizacao do suprimentos.</p>
-  <form method="POST" action="/atualizar_skus">
-    <button type="submit">Recarregar Catalogo</button>
-  </form>
+  <p>Os SKUs sao lidos diretamente da base do ModuloCadastro e a visualizacao e renovada automaticamente pelo cache online do aplicativo.</p>
   {% if skus_status %}
     <div class="total-box" style="margin-top:16px;">
       {{ skus_status }}
@@ -4493,11 +4490,8 @@ renderDashboardCharts();
 </div>
 {% else %}
 <div class="card">
-  <h3>Atualizar SKUs</h3>
-  <p>Importa os SKUs direto de <strong>{{ skus_file }}</strong>, sem upload manual.</p>
-  <form method="POST" action="/atualizar_skus">
-    <button type="submit">Atualizar SKUs</button>
-  </form>
+  <h3>Catalogo de SKUs</h3>
+  <p>Configure o Supabase para que os SKUs sejam lidos diretamente da base do ModuloCadastro.</p>
   {% if skus_status %}
     <div class="total-box" style="margin-top:16px;">
       {{ skus_status }}
@@ -4508,7 +4502,7 @@ renderDashboardCharts();
 {% if dados_status.enabled %}
 <div class="card">
   <h3>B.O.M no Supabase</h3>
-  <p>A estrutura de B.O.M e lida da base do ModuloCadastro. Novos uploads feitos la ficam disponiveis aqui ao recarregar a pagina.</p>
+  <p>A estrutura de B.O.M e lida da base do ModuloCadastro. Novos uploads feitos la ficam disponiveis automaticamente conforme o cache online expira.</p>
   {% if bom_status %}
     <div class="total-box" style="margin-top:16px;">
       {{ bom_status }}
@@ -4517,7 +4511,7 @@ renderDashboardCharts();
 </div>
 <div class="card">
   <h3>Processos no Supabase</h3>
-  <p>A base de processos, parâmetros de item relacionado e relação processo x item ficam persistidos nas tabelas do ModuloSuprimentos.</p>
+  <p>A base de processos, parametros de item relacionado e relacao processo x item ficam persistidos nas tabelas do ModuloSuprimentos.</p>
   {% if os_processos_status %}
     <div class="total-box" style="margin-top:16px;">
       {{ os_processos_status }}
@@ -4526,11 +4520,8 @@ renderDashboardCharts();
 </div>
 {% else %}
 <div class="card">
-  <h3>Atualizar B.O.M</h3>
-  <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ bom_dir }}</strong> e importa o conteudo para os cadastros.</p>
-  <form method="POST" action="/atualizar_bom">
-    <button type="submit">Atualizar B.O.M</button>
-  </form>
+  <h3>B.O.M</h3>
+  <p>Configure o Supabase para que a B.O.M seja lida diretamente da base do ModuloCadastro.</p>
   {% if bom_status %}
     <div class="total-box" style="margin-top:16px;">
       {{ bom_status }}
@@ -4538,12 +4529,8 @@ renderDashboardCharts();
   {% endif %}
 </div>
 <div class="card">
-  <h3>Atualizar Base de Processos</h3>
-  <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ processos_dir }}</strong> e atualiza a base de processos para relacionamento com as transformacoes.</p>
-  <form method="POST" action="/atualizar_processos">
-    <input type="hidden" name="next_tab" value="cadastro">
-    <button type="submit">Atualizar Processos</button>
-  </form>
+  <h3>Base de Processos</h3>
+  <p>Configure o Supabase para manter processos, parametros e relacoes persistidos online.</p>
   {% if os_processos_status %}
     <div class="total-box" style="margin-top:16px;">
       {{ os_processos_status }}
