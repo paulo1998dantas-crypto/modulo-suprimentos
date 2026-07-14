@@ -81,7 +81,7 @@ def _request_rows(offset):
         [
             (
                 "select",
-                "sku,category_label,descricao_primaria,descricao_secundaria,sufixo,unidade,field_values,form_values,updated_at",
+                "sku,category_label,descricao_primaria,descricao_secundaria,sufixo,unidade,ativo,field_values,form_values,updated_at",
             ),
             ("order", "sku.asc"),
             ("limit", str(PAGE_SIZE)),
@@ -142,6 +142,8 @@ def _first_value(values, keys):
 
 
 def row_to_produto(row):
+    if row.get("ativo") is False:
+        return "", {}
     sku = _clean(row.get("sku"))
     values = row.get("field_values") if isinstance(row.get("field_values"), dict) else {}
     descricao_primaria = _clean(row.get("descricao_primaria"))
@@ -160,7 +162,7 @@ def row_to_produto(row):
         ],
     )
     fornecedor = _first_value(values, ["fornecedor", "cod_fornecedor"])
-    status_value = _first_value(values, ["status"])
+    status_value = "ATIVO" if row.get("ativo", True) else "INATIVO"
     produto = {
         "descricao": descricao_primaria,
         "unidade": unidade,
