@@ -8,6 +8,12 @@ services:
     envVars:
       - key: SUPRIMENTOS_CATALOG_MODE
         value: supabase
+      - key: SUPRIMENTOS_DATA_MODE
+        value: supabase
+      - key: SUPRIMENTOS_REQUIRE_LOGIN
+        value: "1"
+      - key: SUPRIMENTOS_SESSION_SECRET
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY

@@ -65,6 +65,23 @@ box-shadow:0 6px 14px rgba(15,23,42,0.12);
 filter:brightness(0.97);
 }
 
+.topbar-user{
+font-size:12px;
+font-weight:800;
+color:#475569;
+}
+
+.topbar-logout{
+font-size:12px;
+font-weight:900;
+color:#0f172a;
+text-decoration:none;
+padding:8px 10px;
+border:1px solid #dbe2ea;
+border-radius:10px;
+background:#fff;
+}
+
 .nav-tabs{
 display:flex;
 gap:10px;
@@ -3751,6 +3768,10 @@ renderDashboardCharts();
 <button type="button" class="tab-btn" data-tab="tab-cadastro">Cadastro</button>
 <button type="button" class="tab-btn" data-tab="tab-dashboard">Dashboard</button>
 </div>
+{% if current_user %}
+<span class="topbar-user">{{ current_user.username }}</span>
+<a class="topbar-logout" href="{{ url_for('logout') }}">Sair</a>
+{% endif %}
 </div>
 </div>
 
@@ -4542,6 +4563,26 @@ renderDashboardCharts();
   {% endif %}
 </div>
 {% endif %}
+{% if dados_status.enabled %}
+<div class="card">
+  <h3>B.O.M no Supabase</h3>
+  <p>A estrutura de B.O.M e lida da base do ModuloCadastro. Novos uploads feitos la ficam disponiveis aqui ao recarregar a pagina.</p>
+  {% if bom_status %}
+    <div class="total-box" style="margin-top:16px;">
+      {{ bom_status }}
+    </div>
+  {% endif %}
+</div>
+<div class="card">
+  <h3>Processos no Supabase</h3>
+  <p>A base de processos, parâmetros de item relacionado e relação processo x item ficam persistidos nas tabelas do ModuloSuprimentos.</p>
+  {% if os_processos_status %}
+    <div class="total-box" style="margin-top:16px;">
+      {{ os_processos_status }}
+    </div>
+  {% endif %}
+</div>
+{% else %}
 <div class="card">
   <h3>Atualizar B.O.M</h3>
   <p>Busca todas as planilhas XLS(X/M) dentro de <strong>{{ bom_dir }}</strong> e importa o conteudo para os cadastros.</p>
@@ -4567,25 +4608,38 @@ renderDashboardCharts();
     </div>
   {% endif %}
 </div>
+{% endif %}
 <div class="cadastro-sections">
 <div id="panel-fornecedor" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
-<div class="panel-title">Cadastro de Fornecedor</div>
+<div class="panel-title">Cadastro Geral de Pessoa</div>
 <button type="button" id="fechar-fornecedor" class="panel-close" onclick="return fecharCadastroPainel('panel-fornecedor')">X</button>
 </div>
-<form method="POST" action="/cadastrar_fornecedor">
+<form method="POST" action="/cadastrar_pessoa">
 <div class="grid">
 <div>
-<label>Fornecedor</label>
-<input name="fornecedor" required>
+<label>Nome Fantasia</label>
+<input name="nome_fantasia" required>
 </div>
 <div>
 <label>Razao Social</label>
 <input name="razao_social">
 </div>
 <div>
-<label>CNPJ</label>
-<input name="cnpj">
+<label>CNPJ/CPF</label>
+<input name="cnpj_cpf">
+</div>
+<div>
+<label>Identificador</label>
+<input name="identificador">
+</div>
+<div>
+<label>RG</label>
+<input name="rg">
+</div>
+<div>
+<label>IE</label>
+<input name="ie">
 </div>
 <div>
 <label>Email</label>
@@ -4596,8 +4650,24 @@ renderDashboardCharts();
 <input name="telefone">
 </div>
 <div>
-<label>Endereco</label>
-<input name="endereco">
+<label>Whatsapp</label>
+<input name="whatsapp">
+</div>
+<div>
+<label>Celular</label>
+<input name="celular">
+</div>
+<div>
+<label>Logradouro</label>
+<input name="logradouro">
+</div>
+<div>
+<label>Numero</label>
+<input name="logradouro_numero">
+</div>
+<div>
+<label>Complemento</label>
+<input name="complemento">
 </div>
 <div>
 <label>Bairro</label>
@@ -4615,21 +4685,43 @@ renderDashboardCharts();
 <label>CEP</label>
 <input name="cep">
 </div>
+<div>
+<label>Grupo</label>
+<input name="pessoa_grupo">
+</div>
+<div>
+<label>Categoria</label>
+<input name="categoria">
+</div>
+<div>
+<label>Site</label>
+<input name="site">
+</div>
+</div>
+<div class="grid" style="margin-top:12px;">
+<label><input type="checkbox" name="pessoa_fisica" value="1"> Pessoa fisica</label>
+<label><input type="checkbox" name="cliente" value="1"> Cliente</label>
+<label><input type="checkbox" name="fornecedor" value="1"> Fornecedor</label>
+<label><input type="checkbox" name="colaborador" value="1"> Colaborador</label>
+<label><input type="checkbox" name="transportadora" value="1"> Transportadora</label>
+</div>
+<div style="margin-top:12px;">
+<label>Observacoes</label>
+<textarea name="observacoes" rows="3"></textarea>
 </div>
 <br>
-<button type="submit">Cadastrar Fornecedor</button>
+<button type="submit">Cadastrar Pessoa</button>
 </form>
 <br>
-<form method="POST" action="/importar_fornecedores" enctype="multipart/form-data">
-<label>Importar Planilha (XLSX)</label>
-<input type="file" name="arquivo_fornecedores" accept=".xlsx">
+<form method="POST" action="/importar_pessoas" enctype="multipart/form-data">
+<label>Importar Planilha de Pessoas (XLSX)</label>
+<input type="file" name="arquivo_pessoas" accept=".xlsx">
 <br><br>
-<button type="submit">Importar Fornecedores</button>
+<button type="submit">Importar Pessoas</button>
 </form>
-<br>
-<form method="GET" action="/exportar_modelo_fornecedores">
-<button type="submit">Baixar Modelo (XLSX)</button>
-</form>
+{% if pessoas_status %}
+<div class="total-box" style="margin-top:16px;">{{ pessoas_status }}</div>
+{% endif %}
 </div>
 
 {% if not catalogo_status.enabled %}
@@ -4683,6 +4775,7 @@ renderDashboardCharts();
 </div>
 {% endif %}
 
+{% if not dados_status.enabled %}
 <div id="panel-os-fornecedor" class="card cadastro-section" aria-hidden="true">
 <div class="panel-header">
 <div class="panel-title">Cadastro de Cliente (OS)</div>
@@ -4710,6 +4803,7 @@ renderDashboardCharts();
 <button type="submit">Baixar Modelo (XLSX)</button>
 </form>
 </div>
+{% endif %}
 
 {% if not catalogo_status.enabled %}
 <div id="panel-os-item" class="card cadastro-section" aria-hidden="true">
@@ -4962,7 +5056,7 @@ renderDashboardCharts();
 <div class="fab-group">
 <button id="cadastro-compras-toggle" class="fab fab-parent" type="button" title="Cadastro - Compras" onclick="return toggleCadastroMenu('cadastro-compras-menu', 'cadastro-producao-menu')">Cadastro - Compras</button>
 <div id="cadastro-compras-menu" class="fab-menu">
-<a id="abrir-fornecedor" class="fab fab-child" href="#panel-fornecedor" title="Cadastro Fornecedor">Cadastro Fornecedor</a>
+<a id="abrir-fornecedor" class="fab fab-child" href="#panel-fornecedor" title="Cadastro Pessoa">Cadastro Pessoa</a>
 {% if not catalogo_status.enabled %}
 <a id="abrir-item" class="fab fab-child" href="#panel-item" title="Cadastro Produto">Cadastro Produto</a>
 {% endif %}
@@ -4971,7 +5065,6 @@ renderDashboardCharts();
 <div class="fab-group">
 <button id="cadastro-producao-toggle" class="fab fab-parent" type="button" title="Cadastro - Producao" onclick="return toggleCadastroMenu('cadastro-producao-menu', 'cadastro-compras-menu')">Cadastro - Producao</button>
 <div id="cadastro-producao-menu" class="fab-menu">
-<a id="abrir-os-fornecedor" class="fab fab-child" href="#panel-os-fornecedor" title="Cadastro de Cliente">Cadastro de Cliente</a>
 {% if not catalogo_status.enabled %}
 <a id="abrir-os-item" class="fab fab-child" href="#panel-os-item" title="Cadastro de itens">Cadastro de itens</a>
 {% endif %}

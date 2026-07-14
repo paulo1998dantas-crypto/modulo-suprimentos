@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request
+from functools import wraps
+
+from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session
 import re
 import json
 import io
@@ -84,9 +86,47 @@ from processos_transformacao import (
     resolver_processos_transformacao,
 )
 import supabase_catalog
+import supabase_data
 
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
-app.secret_key = "emissor_documentos"
+app.secret_key = os.environ.get("SUPRIMENTOS_SESSION_SECRET", "").strip() or "emissor_documentos"
+
+
+def _env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() not in {"0", "false", "nao", "não", "no", "n"}
+
+
+def login_enabled():
+    return _env_bool("SUPRIMENTOS_REQUIRE_LOGIN", default=supabase_data.enabled())
+
+
+def current_user():
+    return session.get("suprimentos_user")
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if login_enabled() and not current_user():
+            return redirect(url_for("login", next=request.path))
+        return view(*args, **kwargs)
+
+    return wrapped
+
+
+@app.before_request
+def require_login_global():
+    if not login_enabled():
+        return None
+    public_endpoints = {"login", "logout", "healthz", "static"}
+    if request.endpoint in public_endpoints:
+        return None
+    if current_user():
+        return None
+    return redirect(url_for("login", next=request.full_path if request.query_string else request.path))
 
 RELEASE_BUILD_NAME = "ModuloSuprimentos"
 RELEASE_ENVIO_DIR_NAME = "ModuloSuprimentos_envio"
@@ -505,6 +545,12 @@ def carregar_produtos():
 
 
 def carregar_fornecedores():
+    if supabase_data.enabled():
+        try:
+            return supabase_data.carregar_pessoas("fornecedor")
+        except Exception:
+            app.logger.exception("Falha ao carregar fornecedores do Supabase")
+            return {}
 
     if not os.path.exists(FORNECEDORES_FILE):
         return {}
@@ -525,6 +571,12 @@ def carregar_os_produtos():
 
 
 def carregar_os_fornecedores():
+    if supabase_data.enabled():
+        try:
+            return supabase_data.carregar_pessoas("cliente")
+        except Exception:
+            app.logger.exception("Falha ao carregar clientes do Supabase")
+            return {}
 
     if not os.path.exists(OS_FORNECEDORES_FILE):
         return {}
@@ -533,7 +585,27 @@ def carregar_os_fornecedores():
         return json.load(f)
 
 
+def salvar_fornecedores(fornecedores):
+    if supabase_data.enabled():
+        supabase_data.salvar_pessoas_legacy(fornecedores or {}, "fornecedor")
+        return
+    salvar_json(FORNECEDORES_FILE, fornecedores or {})
+
+
+def salvar_os_fornecedores(fornecedores):
+    if supabase_data.enabled():
+        supabase_data.salvar_pessoas_legacy(fornecedores or {}, "cliente")
+        return
+    salvar_json(OS_FORNECEDORES_FILE, fornecedores or {})
+
+
 def carregar_os_componentes():
+    if supabase_data.enabled():
+        try:
+            return supabase_data.carregar_bom_componentes()
+        except Exception:
+            app.logger.exception("Falha ao carregar B.O.M. do Supabase")
+            return {}
 
     if not os.path.exists(OS_COMPONENTES_FILE):
         return {}
@@ -543,6 +615,16 @@ def carregar_os_componentes():
 
 
 def carregar_os_processos():
+    if supabase_data.enabled():
+        try:
+            data = supabase_data.carregar_processos()
+        except Exception:
+            app.logger.exception("Falha ao carregar processos do Supabase")
+            data = {}
+        for conjunto in list(data):
+            for nome in PROCESSOS_ORDEM:
+                data[conjunto].setdefault(nome, [])
+        return data
 
     if not os.path.exists(OS_PROCESSOS_FILE):
         return {}
@@ -593,6 +675,13 @@ def carregar_os_processos():
 
 
 def carregar_relacoes_processo_item():
+    if supabase_data.enabled():
+        try:
+            return supabase_data.carregar_relacoes()
+        except Exception:
+            app.logger.exception("Falha ao carregar relacoes processo x item do Supabase")
+            return {}
+
     if not os.path.exists(OS_PROCESSO_RELACOES_FILE):
         return {}
     try:
@@ -641,10 +730,20 @@ def carregar_relacoes_processo_item():
 
 
 def salvar_relacoes_processo_item(relacoes):
+    if supabase_data.enabled():
+        supabase_data.salvar_relacoes(relacoes or {})
+        return
     salvar_json(OS_PROCESSO_RELACOES_FILE, relacoes or {})
 
 
 def carregar_regras_popup_item():
+    if supabase_data.enabled():
+        try:
+            return supabase_data.carregar_regras()
+        except Exception:
+            app.logger.exception("Falha ao carregar parametros de item relacionado do Supabase")
+            return []
+
     if not os.path.exists(OS_ITEM_POPUP_REGRAS_FILE):
         return []
     try:
@@ -685,10 +784,23 @@ def carregar_regras_popup_item():
 
 
 def salvar_regras_popup_item(regras):
+    if supabase_data.enabled():
+        supabase_data.salvar_regras(regras or [])
+        return
     salvar_json(OS_ITEM_POPUP_REGRAS_FILE, regras or [])
 
 
 def carregar_os_processos():
+    if supabase_data.enabled():
+        try:
+            data = supabase_data.carregar_processos()
+        except Exception:
+            app.logger.exception("Falha ao carregar processos do Supabase")
+            data = {}
+        for conjunto in list(data):
+            for nome in PROCESSOS_ORDEM:
+                data[conjunto].setdefault(nome, [])
+        return data
 
     if not os.path.exists(OS_PROCESSOS_FILE):
         return {}
@@ -710,6 +822,13 @@ def carregar_os_processos():
             normalizado[conjunto].setdefault(nome, [])
 
     return normalizado
+
+
+def salvar_os_processos(processos):
+    if supabase_data.enabled():
+        supabase_data.salvar_processos(processos or {})
+        return
+    salvar_json(OS_PROCESSOS_FILE, processos or {})
 
 
 def salvar_json(path, data):
@@ -2060,7 +2179,7 @@ def importar_fornecedores(file_storage):
         }
         count += 1
 
-    salvar_json(FORNECEDORES_FILE, fornecedores)
+    salvar_fornecedores(fornecedores)
     return count
 
 
@@ -2130,8 +2249,107 @@ def importar_os_fornecedores(file_storage):
         }
         count += 1
 
-    salvar_json(OS_FORNECEDORES_FILE, fornecedores)
+    salvar_os_fornecedores(fornecedores)
     return count
+
+
+PESSOA_IMPORT_FIELDS = {
+    "data_registro": ("data_de_registro", "data_registro"),
+    "pessoa_fisica": ("pessoafisica", "pessoa_fisica"),
+    "nome_fantasia": ("nomefantasia", "nome_fantasia", "fornecedor", "cliente"),
+    "razao_social": ("razaosocial", "razao_social"),
+    "cnpj_cpf": ("cnpj_cpf", "cnpj", "cpf"),
+    "codigo_identificador_unico": ("codigo_identificador_unico",),
+    "rg": ("rg",),
+    "ie": ("ie",),
+    "logradouro": ("logradouro", "endereco"),
+    "logradouro_numero": ("logradouronumero", "logradouro_numero", "numero"),
+    "complemento": ("complemento",),
+    "bairro": ("bairro",),
+    "cidade": ("cidade",),
+    "codigo_municipio": ("codigomunicipio", "codigo_municipio"),
+    "pais": ("pais",),
+    "codigo_pais": ("codigopais", "codigo_pais"),
+    "cep": ("cep",),
+    "uf": ("uf",),
+    "codigo_uf": ("codigouf", "codigo_uf"),
+    "telefone": ("telefone",),
+    "whatsapp": ("whatsapp",),
+    "celular": ("celular",),
+    "email": ("email",),
+    "site": ("site",),
+    "cliente": ("cliente",),
+    "fornecedor": ("fornecedor",),
+    "colaborador": ("colaborador",),
+    "transportadora": ("transportadora",),
+    "pessoa_grupo": ("pessoagrupo", "pessoa_grupo"),
+    "identificador": ("identificador",),
+    "vendedor_padrao": ("vendedorpadrao", "vendedor_padrao"),
+    "categoria": ("categoria",),
+    "tabela_preco": ("tabelapreco", "tabela_preco"),
+    "observacoes": ("observacoes", "observacao"),
+    "limite_credito": ("limite_de_credito", "limite_credito"),
+    "periodicidade_venda_compra_dias": (
+        "periodicidade_venda_compra_dias",
+        "periodicidade_venda_compra",
+    ),
+    "validation": ("validation",),
+    "valor_minimo_compra": ("valorminimocompra", "valor_minimo_compra"),
+    "data_nascimento_fundacao": (
+        "datanascimentofundacao",
+        "data_nascimento_fundacao",
+    ),
+}
+
+
+def importar_pessoas(file_storage):
+    linhas = ler_linhas_arquivo(file_storage)
+    if not linhas:
+        return 0
+
+    header_raw, header, mapa, rows = _resolver_header_importacao(
+        linhas,
+        campos_esperados={"nomefantasia", "razaosocial", "cnpj_cpf", "identificador"},
+    )
+    pessoas = []
+    for row in rows:
+        pessoa = {}
+        for campo, aliases in PESSOA_IMPORT_FIELDS.items():
+            pessoa[campo] = _valor_coluna(row, mapa, *aliases)
+        if not any(pessoa.get(campo) for campo in ("nome_fantasia", "razao_social", "cnpj_cpf", "identificador")):
+            continue
+        pessoa["payload"] = _coletar_campos_extras(row, header_raw, header, set())
+        pessoas.append(pessoa)
+
+    if not supabase_data.enabled():
+        fornecedores = carregar_fornecedores()
+        clientes = carregar_os_fornecedores()
+        for pessoa in pessoas:
+            nome = pessoa.get("nome_fantasia") or pessoa.get("razao_social") or pessoa.get("cnpj_cpf")
+            if not nome:
+                continue
+            legacy = {
+                "fornecedor": nome,
+                "cliente": nome,
+                "razao_social": pessoa.get("razao_social", ""),
+                "cnpj": pessoa.get("cnpj_cpf", ""),
+                "email": pessoa.get("email", ""),
+                "telefone": pessoa.get("telefone", ""),
+                "endereco": pessoa.get("logradouro", ""),
+                "bairro": pessoa.get("bairro", ""),
+                "cidade": pessoa.get("cidade", ""),
+                "uf": pessoa.get("uf", ""),
+                "cep": pessoa.get("cep", ""),
+            }
+            if str(pessoa.get("fornecedor", "")).strip().upper() in {"SIM", "S", "1", "TRUE"}:
+                fornecedores[pessoa.get("cnpj_cpf") or nome] = legacy
+            if str(pessoa.get("cliente", "")).strip().upper() in {"SIM", "S", "1", "TRUE"}:
+                clientes[nome] = {"cliente": nome}
+        salvar_fornecedores(fornecedores)
+        salvar_os_fornecedores(clientes)
+        return len(pessoas)
+
+    return supabase_data.salvar_pessoas(pessoas)
 
 
 def _normalizar_codigo_planilha(valor):
@@ -2565,7 +2783,7 @@ def importar_os_processos(file_storage):
             })
             count += 1
 
-        salvar_json(OS_PROCESSOS_FILE, processos)
+        salvar_os_processos(processos)
         return count
 
     # formato "largo": cada coluna = processo, cada linha = atividade
@@ -2607,7 +2825,7 @@ def importar_os_processos(file_storage):
             })
             count += 1
 
-    salvar_json(OS_PROCESSOS_FILE, processos)
+    salvar_os_processos(processos)
     return count
 
 
@@ -2687,7 +2905,7 @@ def importar_os_processos_atualizado(file_storage):
             for processo, linhas_processo in staged.items():
                 processos[conjunto][processo] = linhas_processo
 
-        salvar_json(OS_PROCESSOS_FILE, processos)
+        salvar_os_processos(processos)
         return count
 
     conjunto = conjunto_arquivo or "PADRAO"
@@ -2731,7 +2949,7 @@ def importar_os_processos_atualizado(file_storage):
     for processo_nome, linhas_processo in staged.items():
         processos[conjunto][processo_nome] = linhas_processo
 
-    salvar_json(OS_PROCESSOS_FILE, processos)
+    salvar_os_processos(processos)
     return count
 
 
@@ -2793,6 +3011,40 @@ def proximo_numero_os():
     return numero
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        try:
+            user = supabase_data.verify_user(username, password)
+        except Exception:
+            app.logger.exception("Falha ao validar login no Supabase")
+            user = None
+        if user:
+            session.clear()
+            session["suprimentos_user"] = user
+            return redirect(request.args.get("next") or url_for("index"))
+        return render_template(
+            "login.html",
+            erro="Usuario ou senha invalidos.",
+            next_url=request.args.get("next") or url_for("index"),
+        )
+    if current_user():
+        return redirect(url_for("index"))
+    return render_template(
+        "login.html",
+        erro="",
+        next_url=request.args.get("next") or url_for("index"),
+    )
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
 @app.route("/")
 def index():
     if request.method == "HEAD":
@@ -2834,6 +3086,7 @@ def index():
         "processos_dir": processos_dir,
     }
     catalogo_status = supabase_catalog.status()
+    dados_status = supabase_data.status()
     bom_status = request.args.get("bom_status")
     skus_status = request.args.get("skus_status")
     if not skus_status and resultado_skus_auto.get("atualizado"):
@@ -2842,6 +3095,7 @@ def index():
         else:
             skus_status = f"SKUs atualizados automaticamente ({resultado_skus_auto['linhas']} linhas)."
     os_processos_status = request.args.get("os_processos_status")
+    pessoas_status = request.args.get("pessoas_status")
     regras_popup_status = request.args.get("regras_popup_status")
     relacoes_processo_status = request.args.get("relacoes_processo_status")
 
@@ -2859,12 +3113,15 @@ def index():
         dashboard=dashboard,
         save_paths=save_paths,
         catalogo_status=catalogo_status,
+        dados_status=dados_status,
+        current_user=current_user(),
         bom_dir=bom_dir,
         skus_file=skus_file,
         processos_dir=processos_dir,
         bom_status=bom_status,
         skus_status=skus_status,
         os_processos_status=os_processos_status,
+        pessoas_status=pessoas_status,
         regras_popup_status=regras_popup_status,
         relacoes_processo_status=relacoes_processo_status,
         processos_os=PROCESSOS_OS,
@@ -2891,6 +3148,7 @@ def healthz():
     return {
         "ok": True,
         "catalog": supabase_catalog.status(),
+        "data": supabase_data.status(),
         "produtos_count": produtos_count,
     }
 
@@ -3439,9 +3697,66 @@ def cadastrar_fornecedor():
             "cep": _pick("cep", request.form.get("cep", "").strip()),
         }
 
-        salvar_json(FORNECEDORES_FILE, fornecedores)
+        salvar_fornecedores(fornecedores)
 
     return index()
+
+
+@app.route("/cadastrar_pessoa", methods=["POST"])
+def cadastrar_pessoa():
+    pessoa = {
+        "identificador": request.form.get("identificador", "").strip(),
+        "pessoa_fisica": request.form.get("pessoa_fisica") == "1",
+        "nome_fantasia": request.form.get("nome_fantasia", "").strip(),
+        "razao_social": request.form.get("razao_social", "").strip(),
+        "cnpj_cpf": request.form.get("cnpj_cpf", "").strip(),
+        "rg": request.form.get("rg", "").strip(),
+        "ie": request.form.get("ie", "").strip(),
+        "logradouro": request.form.get("logradouro", "").strip(),
+        "logradouro_numero": request.form.get("logradouro_numero", "").strip(),
+        "complemento": request.form.get("complemento", "").strip(),
+        "bairro": request.form.get("bairro", "").strip(),
+        "cidade": request.form.get("cidade", "").strip(),
+        "uf": request.form.get("uf", "").strip(),
+        "cep": request.form.get("cep", "").strip(),
+        "telefone": request.form.get("telefone", "").strip(),
+        "whatsapp": request.form.get("whatsapp", "").strip(),
+        "celular": request.form.get("celular", "").strip(),
+        "email": request.form.get("email", "").strip(),
+        "site": request.form.get("site", "").strip(),
+        "cliente": request.form.get("cliente") == "1",
+        "fornecedor": request.form.get("fornecedor") == "1",
+        "colaborador": request.form.get("colaborador") == "1",
+        "transportadora": request.form.get("transportadora") == "1",
+        "pessoa_grupo": request.form.get("pessoa_grupo", "").strip(),
+        "categoria": request.form.get("categoria", "").strip(),
+        "observacoes": request.form.get("observacoes", "").strip(),
+    }
+    if any(pessoa.get(campo) for campo in ("nome_fantasia", "razao_social", "cnpj_cpf", "identificador")):
+        if supabase_data.enabled():
+            supabase_data.salvar_pessoas([pessoa])
+        else:
+            nome = pessoa.get("nome_fantasia") or pessoa.get("razao_social") or pessoa.get("cnpj_cpf")
+            if pessoa.get("fornecedor"):
+                fornecedores = carregar_fornecedores()
+                fornecedores[pessoa.get("cnpj_cpf") or nome] = {
+                    "fornecedor": nome,
+                    "razao_social": pessoa.get("razao_social", ""),
+                    "cnpj": pessoa.get("cnpj_cpf", ""),
+                    "email": pessoa.get("email", ""),
+                    "telefone": pessoa.get("telefone", ""),
+                    "endereco": pessoa.get("logradouro", ""),
+                    "bairro": pessoa.get("bairro", ""),
+                    "cidade": pessoa.get("cidade", ""),
+                    "uf": pessoa.get("uf", ""),
+                    "cep": pessoa.get("cep", ""),
+                }
+                salvar_fornecedores(fornecedores)
+            if pessoa.get("cliente"):
+                clientes = carregar_os_fornecedores()
+                clientes[nome] = {"cliente": nome}
+                salvar_os_fornecedores(clientes)
+    return redirect(url_for("index", tab="cadastro"))
 
 
 @app.route("/cadastrar_item", methods=["POST"])
@@ -3476,7 +3791,7 @@ def cadastrar_os_fornecedor():
         atual = fornecedores.get(cliente, {})
         fornecedores[cliente] = {"cliente": cliente if cliente != "" else atual.get("cliente", "")}
 
-        salvar_json(OS_FORNECEDORES_FILE, fornecedores)
+        salvar_os_fornecedores(fornecedores)
 
     return index()
 
@@ -3694,6 +4009,20 @@ def importar_fornecedores_route():
     return redirect(url_for("index", tab="oc"))
 
 
+@app.route("/importar_pessoas", methods=["POST"])
+def importar_pessoas_route():
+    arquivo = request.files.get("arquivo_pessoas")
+    status = ""
+    if arquivo and arquivo.filename:
+        try:
+            count = importar_pessoas(arquivo)
+            status = f"Pessoas importadas: {count} registro(s)."
+        except Exception:
+            app.logger.exception("Falha ao importar cadastro geral de pessoas")
+            status = "Falha ao importar cadastro geral de pessoas. Consulte o log."
+    return redirect(url_for("index", tab="cadastro", pessoas_status=status))
+
+
 @app.route("/importar_os_produtos", methods=["POST"])
 def importar_os_produtos_route():
 
@@ -3716,6 +4045,9 @@ def importar_os_fornecedores_route():
 
 @app.route("/importar_os_componentes", methods=["POST"])
 def importar_os_componentes_route():
+    if supabase_data.enabled():
+        status = "B.O.M. deve ser importada no ModuloCadastro; o suprimentos apenas consome a base Supabase."
+        return redirect(url_for("index", tab="cadastro", bom_status=status))
 
     arquivo = request.files.get("arquivo_os_componentes")
     if arquivo and arquivo.filename:
@@ -3726,6 +4058,9 @@ def importar_os_componentes_route():
 
 @app.route("/atualizar_bom", methods=["POST"])
 def atualizar_bom():
+    if supabase_data.enabled():
+        status = "B.O.M. lida diretamente do Supabase pelo ModuloCadastro."
+        return redirect(url_for("index", tab="cadastro", bom_status=status))
     bom_dir = get_bom_dir()
     if not bom_dir:
         status = "Caminho da B.O.M. não foi configurado."
@@ -3768,6 +4103,16 @@ def atualizar_bom():
 
 @app.route("/atualizar_skus", methods=["POST"])
 def atualizar_skus():
+    if supabase_catalog.enabled():
+        try:
+            supabase_catalog.clear_cache()
+            produtos = supabase_catalog.carregar_produtos(force=True)
+            status = f"Catalogo Supabase recarregado: {len(produtos)} SKU(s)."
+        except Exception as exc:
+            app.logger.exception("Falha ao recarregar catalogo Supabase")
+            status = f"Falha ao recarregar catalogo Supabase: {exc}"
+        return redirect(url_for("index", tab="cadastro", skus_status=status))
+
     skus_file = get_skus_file()
     resultado = atualizar_skus_arquivo(skus_file, somente_se_mais_novo=False)
     if resultado.get("erro"):
@@ -3782,6 +4127,9 @@ def atualizar_skus():
 @app.route("/atualizar_processos", methods=["POST"])
 def atualizar_processos():
     tab_destino = (request.form.get("next_tab", "") or "").strip() or "cadastro"
+    if supabase_data.enabled():
+        status = "Processos persistidos no Supabase. Use importacao/cadastro de processos para alterar a base."
+        return redirect(url_for("index", tab=tab_destino, os_processos_status=status))
     processos_dir = get_processos_dir()
     if not processos_dir:
         status = "Caminho da base de processos não foi configurado."
