@@ -320,7 +320,7 @@ def carregar_bom_componentes(force=False):
             {
                 "codigo": component,
                 "descricao": _clean(cadastro_item.get("descricao")) or _clean(row.get("component_descricao")),
-                "unidade": _clean(row.get("unidade")),
+                "unidade": _clean(cadastro_item.get("unidade")) or _clean(row.get("unidade")),
                 "quantidade": _clean(row.get("quantidade")),
             }
         )
