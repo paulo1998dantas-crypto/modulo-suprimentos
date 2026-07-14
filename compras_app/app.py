@@ -891,6 +891,19 @@ def _formatar_qtd_saida(valor):
     return texto.replace(".", ",")
 
 
+def _parse_numero_form(valor, default=0.0):
+    texto = str(valor or "").strip()
+    if not texto:
+        return default
+    texto = texto.replace("R$", "").replace("%", "").strip()
+    if "," in texto:
+        texto = texto.replace(".", "").replace(",", ".")
+    try:
+        return float(texto)
+    except Exception:
+        return default
+
+
 def _eh_faturamento_direto(descricao):
     texto = _corrigir_mojibake(descricao)
     texto = unicodedata.normalize("NFKD", str(texto or "").strip().upper())
@@ -3184,9 +3197,9 @@ def gerar_oc():
         icms = icmss[i] if i < len(icmss) else ""
         cofins = cofins_list[i] if i < len(cofins_list) else ""
 
-        qtd = float(qtds[i]) if qtds[i] else 0
-        valor = float(valores[i]) if valores[i] else 0
-        desconto = float(descontos[i]) if descontos[i] else 0
+        qtd = _parse_numero_form(qtds[i] if i < len(qtds) else "", 0.0)
+        valor = _parse_numero_form(valores[i] if i < len(valores) else "", 0.0)
+        desconto = _parse_numero_form(descontos[i] if i < len(descontos) else "", 0.0)
 
         produto_info = produtos.get(codigo_item, {})
         desc_form = descricoes[i] if i < len(descricoes) else ""
@@ -3218,10 +3231,7 @@ def gerar_oc():
     frete_raw = request.form.get("frete", "")
     frete_val = 0
     if frete_raw != "":
-        try:
-            frete_val = float(frete_raw)
-        except ValueError:
-            frete_val = 0
+        frete_val = _parse_numero_form(frete_raw, 0.0)
 
     prazo_raw = request.form.get("prazo", "")
     prazo_int = None
@@ -3290,7 +3300,7 @@ def gerar_os():
     os_produtos = carregar_os_produtos()
     produtos_catalogo = carregar_produtos()
     bom_dir = get_bom_dir()
-    if bom_dir and os.path.isdir(bom_dir):
+    if not supabase_data.enabled() and bom_dir and os.path.isdir(bom_dir):
         resultado_bom = importar_bom_diretorio(bom_dir, somente_se_mais_novo=True)
         if resultado_bom.get("falhas"):
             detalhes = []
@@ -3321,10 +3331,7 @@ def gerar_os():
         if not codigo_item:
             continue
         qtd_raw = str(qtds[idx]).strip() if idx < len(qtds) else ""
-        try:
-            qtd = float(qtd_raw) if qtd_raw else 1.0
-        except Exception:
-            qtd = 1.0
+        qtd = _parse_numero_form(qtd_raw, 1.0)
         if qtd <= 0:
             qtd = 1.0
 
@@ -3360,10 +3367,7 @@ def gerar_os():
         if luminaria_codigo:
             luminaria_info = produtos_catalogo.get(luminaria_codigo, {}) or os_produtos.get(luminaria_codigo, {})
             luminaria_qtd_raw = str(luminarias_qtd_linha[idx]).strip() if idx < len(luminarias_qtd_linha) else ""
-            try:
-                luminaria_qtd = float(luminaria_qtd_raw) if luminaria_qtd_raw else 1.0
-            except Exception:
-                luminaria_qtd = 1.0
+            luminaria_qtd = _parse_numero_form(luminaria_qtd_raw, 1.0)
             if luminaria_qtd <= 0:
                 luminaria_qtd = 1.0
             luminarias_extra.append(
@@ -3405,10 +3409,7 @@ def gerar_os():
             relacionado_codigo = normalizar_codigo(selecao.get("codigo", ""))
             if not relacionado_codigo:
                 continue
-            try:
-                relacionado_qtd = float(selecao.get("qtd", 1) or 1)
-            except Exception:
-                relacionado_qtd = 1
+            relacionado_qtd = _parse_numero_form(selecao.get("qtd", 1), 1.0)
             if relacionado_qtd <= 0:
                 relacionado_qtd = 1
             relacionado_info = produtos_catalogo.get(relacionado_codigo, {}) or os_produtos.get(relacionado_codigo, {})
