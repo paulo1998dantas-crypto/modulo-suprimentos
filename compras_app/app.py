@@ -3250,9 +3250,11 @@ def gerar_oc():
         desconto = _parse_numero_form(descontos[i] if i < len(descontos) else "", 0.0)
 
         produto_info = produtos.get(codigo_item, {})
+        campos_extras = produto_info.get("campos_extras") if isinstance(produto_info.get("campos_extras"), dict) else {}
         desc_form = descricoes[i] if i < len(descricoes) else ""
         unidade_form = unidades[i] if i < len(unidades) else ""
         descricao_final = produto_info.get("descricao") or desc_form
+        descricao_secundaria = campos_extras.get("descricao_secundaria") or produto_info.get("descricao_secundaria") or ""
         unidade_final = produto_info.get("unidade") or unidade_form
         ipi_val = ipi if ipi != "" else produto_info.get("ipi")
         icms_val = icms if icms != "" else produto_info.get("icms")
@@ -3262,6 +3264,8 @@ def gerar_oc():
         itens.append({
             "codigo": codigo_item,
             "descricao": descricao_final,
+            "descricao_primaria": descricao_final,
+            "descricao_secundaria": descricao_secundaria,
             "unidade": unidade_final,
             "qtd": qtd,
             "valor": valor,
@@ -3319,7 +3323,15 @@ def gerar_oc():
     fornecedor_nome = fornecedor_info.get("fornecedor") or fornecedor_info.get("razao_social") or fornecedor
     oc_mode = request.form.get("oc_mode", "completo")
     incluir_composicao = oc_mode != "resumido"
-    arquivo = gerar_word(numero_oc, fornecedor_nome, dados_pedido, itens, incluir_composicao=incluir_composicao)
+    componentes = carregar_os_componentes()
+    arquivo = gerar_word(
+        numero_oc,
+        fornecedor_nome,
+        dados_pedido,
+        itens,
+        incluir_composicao=incluir_composicao,
+        componentes=componentes,
+    )
     limpar_importacao(OC_IMPORT_FILE)
 
     nome_docx = construir_nome_oc(numero_oc, fornecedor_nome, dados_pedido)

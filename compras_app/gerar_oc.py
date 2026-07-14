@@ -6,6 +6,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.shared import Pt
 from datetime import datetime
 from composicao import expandir_composicao_itens, normalizar_componentes
 from config import TEMPLATE_WORD, TEMPLATE_OS, OS_COMPONENTES_FILE
@@ -120,7 +121,65 @@ def substituir(doc, chave, valor):
         _processar_container(section.even_page_footer)
 
 
-def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=True):
+def _clean(value):
+    return "" if value is None else str(value).strip()
+
+
+def _descricao_primaria_item(item):
+    return _clean(item.get("descricao_primaria")) or _clean(item.get("descricao"))
+
+
+def _descricao_secundaria_item(item):
+    extras = item.get("campos_extras") if isinstance(item.get("campos_extras"), dict) else {}
+    return (
+        _clean(item.get("descricao_secundaria"))
+        or _clean(extras.get("descricao_secundaria"))
+        or _clean(item.get("descricao"))
+    )
+
+
+def _add_descricao_paragraph(doc, label, value, bold_label=True):
+    paragraph = doc.add_paragraph()
+    paragraph.paragraph_format.space_after = Pt(2)
+    paragraph.paragraph_format.line_spacing = 1
+    label_run = paragraph.add_run(label)
+    label_run.bold = bold_label
+    label_run.font.size = Pt(8)
+    value_run = paragraph.add_run(value)
+    value_run.font.size = Pt(8)
+    return paragraph
+
+
+def _adicionar_descritivo_itens(doc, itens):
+    itens_validos = [item for item in itens or [] if _clean(item.get("codigo"))]
+    if not itens_validos:
+        return
+
+    doc.add_page_break()
+    for idx, item in enumerate(itens_validos):
+        codigo = _clean(item.get("codigo"))
+        _add_descricao_paragraph(doc, "PN: ", codigo)
+        _add_descricao_paragraph(doc, "DESCRIÇÃO PRIMÁRIA: ", _descricao_primaria_item(item))
+        _add_descricao_paragraph(doc, "DESCRIÇÃO SECUNDÁRIA: ", _descricao_secundaria_item(item))
+        if idx < len(itens_validos) - 1:
+            separator = doc.add_paragraph("-" * 160)
+            separator.paragraph_format.space_after = Pt(4)
+            for run in separator.runs:
+                run.font.size = Pt(6)
+
+
+def _carregar_componentes_local():
+    componentes = {}
+    if os.path.exists(OS_COMPONENTES_FILE):
+        try:
+            with open(OS_COMPONENTES_FILE, "r", encoding="utf-8") as f:
+                componentes = json.load(f) or {}
+        except Exception:
+            componentes = {}
+    return normalizar_componentes(componentes)
+
+
+def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=True, componentes=None):
 
     doc = Document(TEMPLATE_WORD)
 
@@ -209,18 +268,11 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
         _set_cell_text(row_cells[6], _format_brl(item["total"]), template_row.cells[6])
 
     # Composicao de materiais (B.O.M) usando a tabela do template, se existir
-    componentes = {}
-    if os.path.exists(OS_COMPONENTES_FILE):
-        try:
-            with open(OS_COMPONENTES_FILE, "r", encoding="utf-8") as f:
-                componentes = json.load(f) or {}
-        except Exception:
-            componentes = {}
-    componentes = normalizar_componentes(componentes)
+    componentes = normalizar_componentes(componentes) if componentes is not None else _carregar_componentes_local()
 
     composicao_rows = []
     if incluir_composicao:
-        composicao_rows = expandir_composicao_itens(itens, componentes)
+        composicao_rows = expandir_composicao_itens(itens, componentes, incluir_itens_sem_bom=False)
 
     tabela_comp = None
     template_row_comp = None
@@ -364,6 +416,8 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
                 for cell in row.cells:
                     for p in cell.paragraphs:
                         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+    _adicionar_descritivo_itens(doc, itens)
 
     path = _safe_save_doc(doc, path)
 

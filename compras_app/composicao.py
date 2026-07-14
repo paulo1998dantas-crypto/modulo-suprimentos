@@ -94,7 +94,7 @@ def expandir_composicao_item(codigo_item, quantidade, componentes, start_level=0
     return linhas
 
 
-def expandir_composicao_itens(itens, componentes):
+def expandir_composicao_itens(itens, componentes, incluir_itens_sem_bom=True):
     linhas = []
     for item in itens:
         codigo_item = normalizar_codigo(item.get("codigo", ""))
@@ -115,7 +115,7 @@ def expandir_composicao_itens(itens, componentes):
                     start_level=1 if _descricao_contem_cj_trilho(item) else 0,
                 )
             )
-        elif codigo_item:
+        elif codigo_item and incluir_itens_sem_bom:
             linhas.append(_linha_item_sem_bom(item))
     return linhas
 
