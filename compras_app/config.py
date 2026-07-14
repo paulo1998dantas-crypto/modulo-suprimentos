@@ -65,6 +65,10 @@ ENDERECO_ENTREGA = {
 
 def pasta_ano():
     ano = str(datetime.now().year)
+    if os.name != "nt":
+        path = os.path.join(DATA_DIR, "generated", "oc", ano)
+        os.makedirs(path, exist_ok=True)
+        return path
     pedidos_dir, _ = get_save_paths()
     path = _dir_com_ano(pedidos_dir, ano)
     try:
@@ -231,14 +235,18 @@ def set_processos_dir(processos_dir):
 
 def pasta_os(numero_os, dados):
     ano = str(datetime.now().year)
-    _, os_dir = get_save_paths()
-    base_ano = _dir_com_ano(os_dir, ano)
-    try:
+    if os.name != "nt":
+        base_ano = os.path.join(DATA_DIR, "generated", "os", ano)
         os.makedirs(base_ano, exist_ok=True)
-    except PermissionError:
-        base_ano = os.path.join(os.path.expanduser("~"), "Emissor documentos", "OS", ano)
-        os.makedirs(base_ano, exist_ok=True)
-        logging.getLogger(__name__).warning("Sem acesso ao diretorio OS. Usando %s", base_ano)
+    else:
+        _, os_dir = get_save_paths()
+        base_ano = _dir_com_ano(os_dir, ano)
+        try:
+            os.makedirs(base_ano, exist_ok=True)
+        except PermissionError:
+            base_ano = os.path.join(os.path.expanduser("~"), "Emissor documentos", "OS", ano)
+            os.makedirs(base_ano, exist_ok=True)
+            logging.getLogger(__name__).warning("Sem acesso ao diretorio OS. Usando %s", base_ano)
 
     mes_num = datetime.now().strftime("%m")
     mes_dir = None

@@ -299,6 +299,13 @@ def handle_exception(e):
     if isinstance(e, PermissionError):
         return str(e), 500
     app.logger.exception("Erro nao tratado")
+    if request.path in {"/gerar_os", "/gerar_oc"}:
+        erro_id = datetime.now().strftime("%Y%m%d%H%M%S")
+        return (
+            "Erro ao emitir documento. "
+            f"Informe este codigo ao suporte: {erro_id}. "
+            f"{type(e).__name__}: {str(e)}"
+        ), 500
     return "Internal Server Error", 500
 
 
