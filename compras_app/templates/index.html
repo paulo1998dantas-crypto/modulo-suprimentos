@@ -49,22 +49,6 @@ gap:12px;
 margin-left:auto;
 }
 
-.topbar-reset{
-width:36px;
-height:36px;
-border-radius:10px;
-border:none;
-background:#eef2f7;
-color:#0f172a;
-font-size:18px;
-cursor:pointer;
-box-shadow:0 6px 14px rgba(15,23,42,0.12);
-}
-
-.topbar-reset:hover{
-filter:brightness(0.97);
-}
-
 .topbar-user{
 font-size:12px;
 font-weight:800;
@@ -3751,9 +3735,6 @@ renderDashboardCharts();
 <div class="topbar">
 <img class="logo" src="/static/logo.png" alt="Logo">
 <div class="topbar-actions">
-<form method="POST" action="/resetar_base" onsubmit="return confirm('Tem certeza que deseja resetar a base de dados? Isso apaga cadastros locais.');">
-<button type="submit" class="topbar-reset" title="Resetar base de dados">&#8635;</button>
-</form>
 <div class="nav-tabs">
 <button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
 <button type="button" class="tab-btn" data-tab="tab-os">Producao</button>

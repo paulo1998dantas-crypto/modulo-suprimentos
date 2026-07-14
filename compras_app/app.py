@@ -4353,8 +4353,7 @@ def gerar_zip_release():
 
 @app.route("/resetar_base", methods=["POST"])
 def resetar_base():
-    _reset_base_data()
-    return redirect(url_for("index"))
+    return "Reset da base de dados desativado.", 403
 
 
 @app.route("/exportar_dashboard", methods=["GET"])
