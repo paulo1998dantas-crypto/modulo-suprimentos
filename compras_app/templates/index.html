@@ -1067,7 +1067,11 @@ border-radius:10px;
 <script>
 const produtos = {{ produtos|tojson }};
 const fornecedores = {{ fornecedores|tojson }};
+{% if catalogo_status.enabled %}
+const osProdutos = produtos;
+{% else %}
 const osProdutos = {{ os_produtos|tojson }};
+{% endif %}
 const osFornecedores = {{ os_fornecedores|tojson }};
 const osComponentes = {{ os_componentes|tojson }};
 const osProcessos = {{ os_processos|tojson }};

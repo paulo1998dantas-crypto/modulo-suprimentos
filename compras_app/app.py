@@ -1963,9 +1963,10 @@ def importar_produtos(file_storage):
 
 def atualizar_skus_arquivo(skus_file=None, somente_se_mais_novo=False):
     if supabase_catalog.enabled():
-        supabase_catalog.clear_cache()
+        if not somente_se_mais_novo:
+            supabase_catalog.clear_cache()
         try:
-            produtos = supabase_catalog.carregar_produtos(force=True)
+            produtos = supabase_catalog.carregar_produtos(force=not somente_se_mais_novo)
             return {
                 "arquivo": supabase_catalog.status().get("url", ""),
                 "linhas": len(produtos),
@@ -2794,6 +2795,8 @@ def proximo_numero_os():
 
 @app.route("/")
 def index():
+    if request.method == "HEAD":
+        return "", 200
 
     resultado_skus_auto = atualizar_skus_automatico()
     produtos = carregar_produtos()
