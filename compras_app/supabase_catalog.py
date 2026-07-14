@@ -81,7 +81,7 @@ def _request_rows(offset):
         [
             (
                 "select",
-                "sku,category_label,descricao_primaria,descricao_secundaria,sufixo,field_values,form_values,updated_at",
+                "sku,category_label,descricao_primaria,descricao_secundaria,sufixo,unidade,field_values,form_values,updated_at",
             ),
             ("order", "sku.asc"),
             ("limit", str(PAGE_SIZE)),
@@ -147,7 +147,7 @@ def row_to_produto(row):
     descricao_primaria = _clean(row.get("descricao_primaria"))
     descricao_secundaria = _clean(row.get("descricao_secundaria"))
     sufixo = _clean(row.get("sufixo"))
-    unidade = _first_value(
+    unidade = _clean(row.get("unidade")) or _first_value(
         values,
         [
             "unidade",
