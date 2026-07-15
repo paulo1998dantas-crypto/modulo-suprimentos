@@ -2886,11 +2886,11 @@ tbody.innerHTML = "";
 rows.forEach((comp) => {
 const row = document.createElement("tr");
 row.innerHTML = `
-<td>${comp.item || ""}<input type="hidden" name="os_comp_item[]" value="${comp.item || ""}"></td>
-<td>${comp.codigo || ""}<input type="hidden" name="os_comp_codigo[]" value="${comp.codigo || ""}"></td>
-<td style="padding-left:${(comp.level || 0) * 16}px">${comp.descricao || ""}<input type="hidden" name="os_comp_descricao[]" value="${comp.descricao || ""}"></td>
-<td>${comp.unidade || ""}<input type="hidden" name="os_comp_unidade[]" value="${comp.unidade || ""}"></td>
-<td>${comp.qtd || ""}<input type="hidden" name="os_comp_qtd[]" value="${comp.qtd || ""}"><input type="hidden" name="os_comp_level[]" value="${comp.level || 0}"></td>
+<td>${comp.item || ""}</td>
+<td>${comp.codigo || ""}</td>
+<td style="padding-left:${(comp.level || 0) * 16}px">${comp.descricao || ""}</td>
+<td>${comp.unidade || ""}</td>
+<td>${comp.qtd || ""}</td>
 `;
 tbody.appendChild(row);
 });
