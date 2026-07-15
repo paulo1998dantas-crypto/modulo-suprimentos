@@ -2902,11 +2902,6 @@ renderComposicaoRows(rowsBom);
 return;
 }
 
-if (osComposicaoSource === "prefill" && osPrefill && osPrefill.composicao && osPrefill.composicao.length){
-renderComposicaoRows(expandirComposicaoImportada(osPrefill.composicao));
-return;
-}
-
 renderComposicaoRows([]);
 }
 
@@ -3318,11 +3313,7 @@ atualizarHintProcessoAutomatico(resolverProcessoAutomaticoOS());
 } else {
 aplicarProcessoAutomaticoOS({ forcar: true });
 }
-if (osPrefill.composicao && osPrefill.composicao.length){
-osComposicaoSource = "prefill";
-} else {
 osComposicaoSource = "bom";
-}
 renderComponentes();
 aplicarProcessoAutomaticoOS();
 }

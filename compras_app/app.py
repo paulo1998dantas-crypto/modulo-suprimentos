@@ -4307,6 +4307,10 @@ def importar_os_documento():
         else:
             data = {}
         if data:
+            # A importacao de O.S serve como base de preenchimento. A composicao
+            # deve ser recalculada pela B.O.M atual no Supabase para evitar
+            # duplicidade, dados antigos e payloads grandes demais.
+            data["composicao"] = []
             salvar_json(OS_IMPORT_FILE, data)
     return redirect(url_for("index", tab="os"))
 
