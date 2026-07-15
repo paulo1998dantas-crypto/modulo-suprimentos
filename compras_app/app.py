@@ -75,6 +75,7 @@ from os_setores import (
     construir_itens_os_setor,
     enriquecer_composicao,
     filtrar_linhas_faturamento_direto,
+    filtrar_linhas_preparacao,
     filtrar_linhas_setor,
     propagar_setor_preparacao,
 )
@@ -3608,7 +3609,7 @@ def gerar_os():
     )
     pendencias_faturamento_direto = filtrar_linhas_faturamento_direto(composicao_enriquecida)
     pendencias_expedicao = filtrar_linhas_setor(composicao_enriquecida, SETOR_EXPEDICAO)
-    pendencias_preparacao = filtrar_linhas_setor(composicao_enriquecida, SETOR_PREPARACAO)
+    pendencias_preparacao = filtrar_linhas_preparacao(composicao_enriquecida)
     requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
 
     itens_expedicao = construir_itens_os_expedicao(pendencias_expedicao)

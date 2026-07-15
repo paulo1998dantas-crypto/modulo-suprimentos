@@ -115,6 +115,7 @@ def enriquecer_composicao(composicao, catalogo):
                 "categoria": categoria,
                 "fornecedor": fornecedor,
                 "setor": setor,
+                "setor_origem": setor,
                 "tipo_requisicao": tipo_requisicao,
             }
         )
@@ -128,6 +129,34 @@ def filtrar_linhas_setor(linhas, setor):
         if linha.get("setor") == setor
         and linha.get("tipo_requisicao") != TIPO_REQUISICAO_FATURAMENTO_DIRETO
     ]
+
+
+def _nivel_linha(linha):
+    try:
+        return int(linha.get("level", 0) or 0)
+    except Exception:
+        return 0
+
+
+def _codigo_pp_ou_cj(linha):
+    codigo = normalizar_codigo(linha.get("codigo", ""))
+    if len(codigo) >= 2 and codigo[:2] in {"20", "30"}:
+        return True
+    referencia = normalizar_texto(f"{linha.get('grupo', '')} {linha.get('categoria', '')}")
+    return "PRODUTO EM PROCESSO" in referencia or "CONJUNTO" in referencia or "KIT" in referencia
+
+
+def filtrar_linhas_preparacao(linhas):
+    resultado = []
+    for linha in linhas or []:
+        if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
+            continue
+        setor_original = linha.get("setor_origem") or linha.get("setor")
+        if setor_original != SETOR_PREPARACAO:
+            continue
+        if _nivel_linha(linha) <= 0 or _codigo_pp_ou_cj(linha):
+            resultado.append(linha)
+    return resultado
 
 
 def filtrar_linhas_faturamento_direto(linhas):
