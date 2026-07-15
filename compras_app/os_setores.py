@@ -8,6 +8,7 @@ SETOR_PREPARACAO = "PREPARACAO"
 SETOR_FATURAMENTO_DIRETO = "F.D"
 TIPO_REQUISICAO_MATERIAL = "MATERIAL"
 TIPO_REQUISICAO_FATURAMENTO_DIRETO = "FATURAMENTO DIRETO"
+PREFIXO_LAYOUT_PREPARACAO = "3024"
 
 _MARCADORES_PREPARACAO = (
     "ISOLAMENTO",
@@ -146,15 +147,72 @@ def _codigo_pp_ou_cj(linha):
     return "PRODUTO EM PROCESSO" in referencia or "CONJUNTO" in referencia or "KIT" in referencia
 
 
+def _codigo_layout_preparacao(linha):
+    return normalizar_codigo(linha.get("codigo", "")).startswith(PREFIXO_LAYOUT_PREPARACAO)
+
+
+def _forcar_linha_layout_preparacao(linha):
+    linha = dict(linha or {})
+    linha["setor"] = SETOR_PREPARACAO
+    linha["tipo_requisicao"] = TIPO_REQUISICAO_MATERIAL
+    linha["layout_preparacao"] = True
+    return linha
+
+
+def linhas_layout_preparacao(itens, catalogo=None):
+    linhas = []
+    for item in itens or []:
+        codigo = normalizar_codigo(item.get("codigo", ""))
+        if not codigo.startswith(PREFIXO_LAYOUT_PREPARACAO):
+            continue
+        info = (catalogo or {}).get(codigo, {}) if catalogo else {}
+        qtd = item.get("qtd", item.get("quantidade", ""))
+        linhas.append(
+            _forcar_linha_layout_preparacao(
+                {
+                    "item": codigo,
+                    "codigo": codigo,
+                    "descricao": item.get("descricao", "") or info.get("descricao", "") or "",
+                    "unidade": info.get("unidade", "") or item.get("unidade", "") or "",
+                    "qtd": qtd,
+                    "level": 0,
+                    "grupo": info.get("grupo", "") or "",
+                    "categoria": info.get("categoria", "") or "",
+                    "fornecedor": info.get("fornecedor", "") or "",
+                    "setor_origem": SETOR_PREPARACAO,
+                }
+            )
+        )
+    return linhas
+
+
 def filtrar_linhas_preparacao(linhas):
     resultado = []
+    ancestrais_layout_por_nivel = {}
     for linha in linhas or []:
+        nivel = _nivel_linha(linha)
+        ancestrais_layout_por_nivel = {
+            nivel_ancestral: ativo
+            for nivel_ancestral, ativo in ancestrais_layout_por_nivel.items()
+            if nivel_ancestral < nivel
+        }
+        dentro_de_layout_3024 = any(ancestrais_layout_por_nivel.values())
+        eh_layout_3024 = _codigo_layout_preparacao(linha)
+
         if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
+            continue
+        if dentro_de_layout_3024:
+            if eh_layout_3024:
+                ancestrais_layout_por_nivel[nivel] = True
+            continue
+        if eh_layout_3024:
+            resultado.append(_forcar_linha_layout_preparacao(linha))
+            ancestrais_layout_por_nivel[nivel] = True
             continue
         setor_original = linha.get("setor_origem") or linha.get("setor")
         if setor_original != SETOR_PREPARACAO:
             continue
-        if _nivel_linha(linha) <= 0 or _codigo_pp_ou_cj(linha):
+        if nivel <= 0 or _codigo_pp_ou_cj(linha):
             resultado.append(linha)
     return resultado
 

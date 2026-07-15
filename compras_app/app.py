@@ -77,6 +77,7 @@ from os_setores import (
     filtrar_linhas_faturamento_direto,
     filtrar_linhas_preparacao,
     filtrar_linhas_setor,
+    linhas_layout_preparacao,
     propagar_setor_preparacao,
 )
 from processos_transformacao import (
@@ -3610,6 +3611,23 @@ def gerar_os():
     pendencias_faturamento_direto = filtrar_linhas_faturamento_direto(composicao_enriquecida)
     pendencias_expedicao = filtrar_linhas_setor(composicao_enriquecida, SETOR_EXPEDICAO)
     pendencias_preparacao = filtrar_linhas_preparacao(composicao_enriquecida)
+    chaves_preparacao = {
+        (
+            normalizar_codigo(linha.get("codigo", "")),
+            normalizar_codigo(linha.get("item", "")),
+            str(linha.get("qtd", "")),
+        )
+        for linha in pendencias_preparacao
+    }
+    for linha in linhas_layout_preparacao(itens, os_produtos):
+        chave = (
+            normalizar_codigo(linha.get("codigo", "")),
+            normalizar_codigo(linha.get("item", "")),
+            str(linha.get("qtd", "")),
+        )
+        if chave not in chaves_preparacao:
+            pendencias_preparacao.append(linha)
+            chaves_preparacao.add(chave)
     requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
 
     itens_expedicao = construir_itens_os_expedicao(pendencias_expedicao)
