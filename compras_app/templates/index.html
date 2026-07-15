@@ -1165,6 +1165,9 @@ let osTabInitialized = false;
 let osPopupRegraFila = [];
 const osProcessoMap = Object.fromEntries(osProcessoDefs.map((processo) => [processo.nome, processo.key]));
 const osProcessoTableIds = osProcessoDefs.map((processo) => `processo_${processo.key}`);
+const osDraftStorageKey = "modulo_suprimentos_os_draft_v1";
+let osDraftRestoring = false;
+let osDraftSaveTimer = null;
 
 function initOsTab(){
 if (osTabInitialized){
@@ -1172,6 +1175,8 @@ return;
 }
 if (hasOsPrefill){
 aplicarPrefillOS();
+} else if (restaurarRascunhoOS()){
+// rascunho local restaurado
 } else {
 preencherProcessosPadrao(conjuntoProcessoAtual());
 }
@@ -2717,6 +2722,7 @@ linha.innerHTML = `
 `;
 
 inicializarLookupsEscopo(linha);
+agendarSalvarRascunhoOS();
 }
 
 function removerLinhaItemOS(btn){
@@ -2746,11 +2752,13 @@ salvarSelecoesPopupItem(row, []);
 atualizarFornecedorDiretoLinha(row);
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
+agendarSalvarRascunhoOS();
 return;
 }
 tabela.deleteRow(row.rowIndex);
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
+agendarSalvarRascunhoOS();
 }
 
 function aplicarProdutoLinhaOS(row, codigo, options){
@@ -2802,6 +2810,7 @@ iniciarPopupsItemOS(row, codigo, { semPopup });
 osComposicaoSource = "bom";
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
+agendarSalvarRascunhoOS();
 }
 
 function preencherOSItem(input){
@@ -3015,7 +3024,7 @@ data[processo.nome] = linhas;
 return data;
 }
 
-function limparOSForm(){
+function limparOSForm(options){
 const form = document.getElementById("form-os");
 if (!form){
 return;
@@ -3075,6 +3084,9 @@ tbody.innerHTML = "";
 definirProcessoConjuntoUI("");
 atualizarHintProcessoAutomatico({ conjunto: "", conflito: false });
 preencherProcessosPadrao(conjuntoProcessoAtual(), { forcar: true });
+if (!(options && options.preservarRascunho)){
+limparRascunhoOS({ silencioso: true });
+}
 }
 
 function limparOCForm(){
@@ -3314,6 +3326,208 @@ osComposicaoSource = "bom";
 renderComponentes();
 aplicarProcessoAutomaticoOS();
 }
+
+function osDraftStatus(texto, tipo){
+const el = document.getElementById("os_draft_status");
+if (!el){
+return;
+}
+el.textContent = texto || "";
+el.classList.toggle("is-warning", tipo === "warning");
+}
+
+function osDraftTemConteudo(data){
+if (!data){
+return false;
+}
+const campos = data.campos || {};
+const temCampo = Object.keys(campos).some((key) => String(campos[key] || "").trim());
+const temItem = (data.itens || []).some((item) => {
+return ["codigo", "descricao", "qtd", "serie", "unidade", "fornecedor", "luminaria", "luminaria_qtd", "popup"].some((key) => {
+return String(item[key] || "").trim() && !(key === "qtd" && String(item[key]).trim() === "1");
+});
+});
+const temProcesso = Object.values(data.processos || {}).some((linhas) => Array.isArray(linhas) && linhas.length);
+return temCampo || temItem || temProcesso;
+}
+
+function coletarRascunhoOS(){
+const form = document.getElementById("form-os");
+if (!form){
+return null;
+}
+const campos = {};
+[
+"os_cliente",
+"os_cliente_busca",
+"os_numero",
+"os_chassis",
+"os_municipio",
+"os_mmv",
+"os_previsao_inicio",
+"os_previsao_termino",
+"os_processo_conjunto",
+"os_descricao_servico",
+"os_obs_materiais",
+"os_obs",
+].forEach((name) => {
+const input = form.querySelector(`[name="${name}"]`);
+campos[name] = input ? input.value : "";
+});
+const itens = Array.from(document.querySelectorAll("#tabela_os tr")).slice(1).map((row) => {
+const valor = (selector) => {
+const input = row.querySelector(selector);
+return input ? input.value : "";
+};
+return {
+codigo: valor('input[name="os_codigo[]"]'),
+descricao: valor('input[name="os_descricao[]"]'),
+qtd: valor('input[name="os_qtd[]"]'),
+serie: valor('input[name="os_serie[]"]'),
+unidade: valor('input[name="os_unidade[]"]'),
+fornecedor: valor('input[name="os_fornecedor_item[]"]'),
+luminaria: valor('input[name="os_luminaria[]"]'),
+luminaria_qtd: valor('input[name="os_luminaria_qtd[]"]'),
+popup: valor('input[name="os_popup_itens[]"]') || "[]",
+};
+});
+return {
+version: 1,
+savedAt: new Date().toISOString(),
+campos,
+itens,
+processos: coletarProcessosUI(),
+composicaoSource: osComposicaoSource,
+};
+}
+
+function salvarRascunhoOS(){
+if (osDraftRestoring){
+return;
+}
+try {
+const data = coletarRascunhoOS();
+if (!osDraftTemConteudo(data)){
+localStorage.removeItem(osDraftStorageKey);
+osDraftStatus("");
+return;
+}
+localStorage.setItem(osDraftStorageKey, JSON.stringify(data));
+const hora = new Date(data.savedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+osDraftStatus(`Rascunho salvo automaticamente as ${hora}.`);
+} catch (error) {
+osDraftStatus("Nao foi possivel salvar o rascunho neste navegador.", "warning");
+}
+}
+
+function agendarSalvarRascunhoOS(){
+if (osDraftRestoring){
+return;
+}
+if (osDraftSaveTimer){
+clearTimeout(osDraftSaveTimer);
+}
+osDraftSaveTimer = setTimeout(salvarRascunhoOS, 400);
+}
+
+function limparRascunhoOS(options){
+try {
+localStorage.removeItem(osDraftStorageKey);
+} catch (error) {
+// ignora navegadores sem storage disponivel
+}
+if (!(options && options.silencioso)){
+osDraftStatus("Rascunho apagado.");
+}
+}
+
+function aplicarRascunhoOS(data){
+if (!data || !data.campos){
+return false;
+}
+osDraftRestoring = true;
+try {
+limparOSForm({ preservarRascunho: true });
+Object.entries(data.campos || {}).forEach(([name, value]) => {
+const input = document.querySelector(`#form-os [name="${name}"]`);
+if (input){
+input.value = value || "";
+}
+});
+const tabela = document.getElementById("tabela_os");
+const items = Array.isArray(data.itens) && data.itens.length ? data.itens : [];
+if (tabela && items.length){
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+items.forEach((item, idx) => {
+if (idx > 0){
+adicionarLinhaOS();
+}
+const row = tabela.rows[idx + 1];
+if (!row){
+return;
+}
+const set = (selector, value) => {
+const input = row.querySelector(selector);
+if (input){
+input.value = value || "";
+}
+};
+set('input[name="os_codigo[]"]', item.codigo);
+set('input[name="os_descricao[]"]', item.descricao);
+set('input[name="os_qtd[]"]', item.qtd || "1");
+set('input[name="os_serie[]"]', item.serie);
+set('input[name="os_unidade[]"]', item.unidade);
+set('input[name="os_fornecedor_item[]"]', item.fornecedor);
+set('input[name="os_luminaria[]"]', item.luminaria);
+set('input[name="os_luminaria_qtd[]"]', item.luminaria_qtd);
+set('input[name="os_popup_itens[]"]', item.popup || "[]");
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup: true });
+});
+}
+if (data.processos){
+osProcessoDefs.forEach((processo) => {
+aplicarProcessoTabela(processo.key, data.processos[processo.nome] || []);
+});
+}
+osComposicaoSource = data.composicaoSource || "bom";
+definirProcessoConjuntoUI((data.campos || {}).os_processo_conjunto || "");
+renderComponentes();
+atualizarHintProcessoAutomatico(resolverProcessoAutomaticoOS());
+const hora = data.savedAt ? new Date(data.savedAt).toLocaleString("pt-BR") : "";
+osDraftStatus(hora ? `Rascunho restaurado de ${hora}.` : "Rascunho restaurado.");
+return true;
+} finally {
+osDraftRestoring = false;
+}
+}
+
+function restaurarRascunhoOS(){
+let data = null;
+try {
+const raw = localStorage.getItem(osDraftStorageKey);
+if (!raw){
+return false;
+}
+data = JSON.parse(raw);
+} catch (error) {
+limparRascunhoOS({ silencioso: true });
+return false;
+}
+if (!osDraftTemConteudo(data)){
+limparRascunhoOS({ silencioso: true });
+return false;
+}
+return aplicarRascunhoOS(data);
+}
+
+function descartarRascunhoOS(){
+limparRascunhoOS();
+limparOSForm({ preservarRascunho: true });
+}
+
 function adicionarProcessoLinha(key){
 const tabela = document.getElementById(`processo_${key}`);
 if (!tabela){
@@ -3327,6 +3541,7 @@ row.innerHTML = `
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
 </td>
 `;
+agendarSalvarRascunhoOS();
 }
 
 function removerLinhaProcesso(btn){
@@ -3340,9 +3555,11 @@ const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
 const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
 if (atv) atv.value = "";
 if (resp) resp.value = "";
+agendarSalvarRascunhoOS();
 return;
 }
 tabela.deleteRow(row.rowIndex);
+agendarSalvarRascunhoOS();
 }
 
 function limparProcessosUI(){
@@ -3363,6 +3580,7 @@ if (atv) atv.value = "";
 if (resp) resp.value = "";
 }
 });
+agendarSalvarRascunhoOS();
 }
 
 function renderBarChart(canvasId, labels, values, color, valuePrefix){
@@ -3711,6 +3929,8 @@ calcularVencimento();
 
 const formOs = document.getElementById("form-os");
 if (formOs){
+formOs.addEventListener("input", agendarSalvarRascunhoOS);
+formOs.addEventListener("change", agendarSalvarRascunhoOS);
 formOs.addEventListener("submit", (event) => {
 if (!validarLuminariasObrigatoriasOS()){
 event.preventDefault();
@@ -3724,7 +3944,7 @@ if (!validarProcessoObrigatorioOS()){
 event.preventDefault();
 return;
 }
-setTimeout(limparOSForm, 500);
+salvarRascunhoOS();
 });
 }
 
@@ -3753,9 +3973,6 @@ btn.addEventListener("click", () => {
 const current = document.querySelector(".tab-content.active");
 if (current && current.id === "tab-oc"){
 limparOCForm();
-}
-if (current && current.id === "tab-os"){
-limparOSForm();
 }
 tabButtons.forEach((b) => b.classList.remove("active"));
 btn.classList.add("active");
@@ -3799,6 +4016,10 @@ const dash = document.getElementById("tab-dashboard");
 if (dash && dash.classList.contains("active")){
 renderDashboardCharts();
 }
+});
+
+window.addEventListener("beforeunload", () => {
+salvarRascunhoOS();
 });
 });
 
@@ -4147,6 +4368,16 @@ renderDashboardCharts();
 {% endif %}
 </div>
 <form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data">
+
+<div class="card">
+<h3>Rascunho da O.S</h3>
+<div class="dashboard-actions os-actions">
+<button type="button" onclick="salvarRascunhoOS()">Salvar rascunho agora</button>
+<button type="button" onclick="descartarRascunhoOS()">Limpar rascunho</button>
+</div>
+<p id="os_draft_status" style="margin:10px 0 0;font-size:12px;color:#64748b;"></p>
+<p style="margin:6px 0 0;font-size:12px;color:#64748b;">O rascunho fica salvo neste navegador. Arquivos PDF anexados precisam ser selecionados novamente ao reabrir.</p>
+</div>
 
 <div class="card">
 <h3>Dados do Cliente</h3>
