@@ -917,6 +917,70 @@ def salvar_regras_popup_item(regras):
     salvar_json(OS_ITEM_POPUP_REGRAS_FILE, regras or [])
 
 
+def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho):
+    codigo_raiz = normalizar_codigo(codigo_raiz)
+    selecoes = [selecao for selecao in (selecoes or []) if isinstance(selecao, dict)]
+    por_chave = {
+        str(selecao.get("chave", "") or ""): selecao
+        for selecao in selecoes
+        if str(selecao.get("chave", "") or "")
+    }
+    resolvidas = []
+
+    def resolver(gatilho, contexto, ancestrais, caminho):
+        for regra in regras_por_gatilho.get(gatilho, []):
+            regra_id = str(regra.get("id", "") or "")
+            chave = f"{contexto}|{regra_id}"
+            selecao = por_chave.get(chave)
+            if selecao is None and not ancestrais:
+                selecao = next(
+                    (
+                        candidata
+                        for candidata in selecoes
+                        if not str(candidata.get("chave", "") or "")
+                        and str(candidata.get("regra_id", "") or "") == regra_id
+                    ),
+                    None,
+                )
+            selecionado = normalizar_codigo((selecao or {}).get("codigo", ""))
+            opcoes = {
+                normalizar_codigo(codigo)
+                for codigo in (regra.get("opcoes") or [])
+                if normalizar_codigo(codigo)
+            }
+            quantidade = _parse_numero_form((selecao or {}).get("qtd", 0), 0)
+            if not selecao or selecionado not in opcoes or quantidade <= 0:
+                return f"Selecione o item relacionado obrigatorio para {gatilho}."
+            if selecionado in caminho:
+                trilha = " -> ".join([*caminho, selecionado])
+                return f"Ciclo nos parametros de item relacionado: {trilha}."
+
+            normalizada = dict(selecao)
+            normalizada.update(
+                {
+                    "regra_id": regra_id,
+                    "gatilho": gatilho,
+                    "codigo": selecionado,
+                    "qtd": quantidade,
+                    "chave": chave,
+                    "ancestrais": list(ancestrais),
+                }
+            )
+            resolvidas.append(normalizada)
+            erro = resolver(
+                selecionado,
+                f"{chave}>{selecionado}",
+                [*ancestrais, chave],
+                [*caminho, selecionado],
+            )
+            if erro:
+                return erro
+        return ""
+
+    erro = resolver(codigo_raiz, f"root:{codigo_raiz}", [], [codigo_raiz])
+    return resolvidas, erro
+
+
 def carregar_os_processos():
     if supabase_data.enabled():
         try:
@@ -3625,18 +3689,17 @@ def gerar_os():
             popup_selecoes = json.loads(popup_json or "[]")
         except Exception:
             popup_selecoes = []
-        selecoes_por_regra = {
-            str(selecao.get("regra_id", "") or ""): selecao
-            for selecao in popup_selecoes
-            if isinstance(selecao, dict) and str(selecao.get("regra_id", "") or "")
-        } if isinstance(popup_selecoes, list) else {}
-        for regra in regras_popup_por_gatilho.get(codigo_item, []):
-            regra_id = str(regra.get("id", "") or "")
-            selecao = selecoes_por_regra.get(regra_id, {})
-            selecionado = normalizar_codigo(selecao.get("codigo", ""))
-            if not usando_composicao_historica and selecionado not in (regra.get("opcoes") or []):
-                return f"Selecione o item relacionado obrigatorio para {codigo_item}.", 400
-        for selecao in popup_selecoes if isinstance(popup_selecoes, list) else []:
+        if usando_composicao_historica:
+            popup_selecoes_validas = popup_selecoes if isinstance(popup_selecoes, list) else []
+        else:
+            popup_selecoes_validas, popup_erro = _resolver_selecoes_popup_item(
+                codigo_item,
+                popup_selecoes,
+                regras_popup_por_gatilho,
+            )
+            if popup_erro:
+                return popup_erro, 400
+        for selecao in popup_selecoes_validas:
             if not isinstance(selecao, dict):
                 continue
             relacionado_codigo = normalizar_codigo(selecao.get("codigo", ""))

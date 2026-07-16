@@ -1463,6 +1463,69 @@ input.value = JSON.stringify(selecoes || []);
 }
 }
 
+function contextoRaizPopupItem(codigo){
+return `root:${normalizarCodigoOS(codigo)}`;
+}
+
+function chaveSelecaoPopupItem(contexto, regra){
+return `${contexto}|${String((regra && regra.id) || "")}`;
+}
+
+function encontrarSelecaoPopupItem(selecoes, tarefa){
+const porChave = (selecoes || []).find((selecao) => selecao && selecao.chave === tarefa.chaveSelecao);
+if (porChave){
+return porChave;
+}
+if (tarefa.ancestrais.length){
+return null;
+}
+return (selecoes || []).find((selecao) => (
+selecao
+&& !selecao.chave
+&& String(selecao.regra_id || "") === String(tarefa.regra.id || "")
+)) || null;
+}
+
+function construirFilaPopupItem(row, codigoGatilho, selecoes, contexto, ancestrais, caminhoCodigos){
+const gatilho = normalizarCodigoOS(codigoGatilho);
+const contextoAtual = contexto || contextoRaizPopupItem(gatilho);
+const ancestraisAtuais = Array.isArray(ancestrais) ? ancestrais : [];
+const caminhoAtual = Array.isArray(caminhoCodigos) && caminhoCodigos.length ? caminhoCodigos : [gatilho];
+const fila = [];
+regrasPopupItemParaCodigo(gatilho).forEach((regra) => {
+const tarefa = {
+row,
+regra,
+codigoGatilho: gatilho,
+contexto: contextoAtual,
+chaveSelecao: chaveSelecaoPopupItem(contextoAtual, regra),
+ancestrais: [...ancestraisAtuais],
+caminhoCodigos: [...caminhoAtual],
+};
+const selecao = encontrarSelecaoPopupItem(selecoes, tarefa);
+const selecionado = normalizarCodigoOS(selecao && selecao.codigo);
+const opcoes = (regra.opcoes || []).map((codigo) => normalizarCodigoOS(codigo));
+if (!selecao || !selecionado || !opcoes.includes(selecionado) || parseNumber(selecao.qtd) <= 0){
+fila.push(tarefa);
+return;
+}
+if (caminhoAtual.includes(selecionado)){
+fila.push(tarefa);
+return;
+}
+const contextoFilho = `${tarefa.chaveSelecao}>${selecionado}`;
+fila.push(...construirFilaPopupItem(
+row,
+selecionado,
+selecoes,
+contextoFilho,
+[...ancestraisAtuais, tarefa.chaveSelecao],
+[...caminhoAtual, selecionado],
+));
+});
+return fila;
+}
+
 function abrirProximoPopupItemOS(){
 if (!osPopupRegraFila.length){
 return;
@@ -1482,11 +1545,15 @@ select.innerHTML = '<option value="" selected disabled>Selecione</option>';
 (atual.regra.opcoes || []).forEach((codigo) => {
 const item = getProdutoInfo(produtos, codigo) || getProdutoInfo(osProdutos, codigo) || {};
 const option = document.createElement("option");
-option.value = codigo;
-option.textContent = `${codigo} - ${item.descricao || item.nome || "Item"}`;
+const codigoNorm = normalizarCodigoOS(codigo);
+const ciclo = atual.caminhoCodigos.includes(codigoNorm);
+option.value = codigoNorm;
+option.disabled = ciclo;
+option.textContent = `${codigoNorm} - ${item.descricao || item.nome || "Item"}${ciclo ? " (ciclo bloqueado)" : ""}`;
 select.appendChild(option);
 });
-display.textContent = `Item obrigatório relacionado a ${atual.codigoGatilho}`;
+const origem = atual.ancestrais.length ? "selecionado no popup anterior" : "informado na O.S.";
+display.textContent = `Item obrigatório relacionado a ${atual.codigoGatilho}, ${origem}`;
 qtdInput.value = String(atual.regra.quantidade || 1);
 qtdInput.readOnly = !atual.regra.quantidade_editavel;
 qtdWrap.style.display = atual.regra.quantidade_editavel ? "block" : "none";
@@ -1508,12 +1575,40 @@ if (!qtd || qtd <= 0){
 qtdInput.focus();
 return;
 }
-const selecoes = lerSelecoesPopupItem(atual.row).filter((selecao) => selecao.regra_id !== atual.regra.id);
-selecoes.push({ regra_id: atual.regra.id, codigo, qtd });
+let selecoes = lerSelecoesPopupItem(atual.row).filter((selecao) => {
+if (!selecao){
+return false;
+}
+if (selecao.chave === atual.chaveSelecao){
+return false;
+}
+if (!atual.ancestrais.length && !selecao.chave && String(selecao.regra_id || "") === String(atual.regra.id || "")){
+return false;
+}
+return !(Array.isArray(selecao.ancestrais) && selecao.ancestrais.includes(atual.chaveSelecao));
+});
+const codigoNorm = normalizarCodigoOS(codigo);
+selecoes.push({
+regra_id: atual.regra.id,
+gatilho: atual.codigoGatilho,
+codigo: codigoNorm,
+qtd,
+chave: atual.chaveSelecao,
+ancestrais: [...atual.ancestrais],
+});
 salvarSelecoesPopupItem(atual.row, selecoes);
 modal.classList.remove("is-open");
 limparEventos();
 osPopupRegraFila.shift();
+const filaFilha = construirFilaPopupItem(
+atual.row,
+codigoNorm,
+selecoes,
+`${atual.chaveSelecao}>${codigoNorm}`,
+[...atual.ancestrais, atual.chaveSelecao],
+[...atual.caminhoCodigos, codigoNorm],
+);
+osPopupRegraFila.unshift(...filaFilha);
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
 abrirProximoPopupItemOS();
@@ -1543,19 +1638,15 @@ salvarSelecoesPopupItem(row, []);
 return;
 }
 const selecoes = lerSelecoesPopupItem(row);
-const regrasPendentes = regras.filter((regra) => !selecoes.some((selecao) => (
-selecao.regra_id === regra.id
-&& selecao.codigo
-&& parseNumber(selecao.qtd) > 0
-)));
-if (!regrasPendentes.length){
+const filaPendente = construirFilaPopupItem(row, codigo, selecoes);
+if (!filaPendente.length){
 return;
 }
 const modal = document.getElementById("modal-regra-item-os");
 if (osPopupRegraFila.length && modal && modal.classList.contains("is-open")){
 return;
 }
-osPopupRegraFila = regrasPendentes.map((regra) => ({ row, regra, codigoGatilho: codigo }));
+osPopupRegraFila = filaPendente;
 abrirProximoPopupItemOS();
 }
 
@@ -1565,12 +1656,13 @@ for (let index = 1; index < linhas.length; index += 1){
 const row = linhas[index];
 const codigoInput = row.querySelector('input[name="os_codigo[]"]');
 const codigo = codigoInput ? normalizarCodigoOS(codigoInput.value) : "";
-const regras = regrasPopupItemParaCodigo(codigo);
 const selecoes = lerSelecoesPopupItem(row);
-if (regras.every((regra) => selecoes.some((selecao) => selecao.regra_id === regra.id && selecao.codigo && parseNumber(selecao.qtd) > 0))){
+const filaPendente = construirFilaPopupItem(row, codigo, selecoes);
+if (!filaPendente.length){
 continue;
 }
-iniciarPopupsItemOS(row, codigo);
+osPopupRegraFila = filaPendente;
+abrirProximoPopupItemOS();
 return false;
 }
 return true;
