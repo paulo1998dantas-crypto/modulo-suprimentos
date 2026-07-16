@@ -189,7 +189,7 @@ class PreparacaoFilterTests(unittest.TestCase):
         self.assertEqual([linha["codigo"] for linha in linhas], ["30140027"])
         self.assertEqual(linhas[0]["regra_preparacao"], "PISO")
 
-    def test_isolamento_e_acabamento_nao_sao_preparacao(self):
+    def test_isolamento_e_acabamento_pp_cj_sao_preparacao(self):
         catalogo = {
             "30160002": {
                 "descricao": "CJ ISOLAMENTO TERMICO E/S/J",
@@ -201,6 +201,12 @@ class PreparacaoFilterTests(unittest.TestCase):
                 "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO",
                 "unidade": "pc",
                 "grupo": "10 - INSUMO",
+                "categoria": "52 - ACABAMENTOS",
+            },
+            "30520001": {
+                "descricao": "CJ ACABAMENTO INTERNO E/S/J",
+                "unidade": "cj",
+                "grupo": "30 - CONJUNTO / KIT",
                 "categoria": "52 - ACABAMENTOS",
             },
         }
@@ -218,12 +224,42 @@ class PreparacaoFilterTests(unittest.TestCase):
                     "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO",
                     "qtd": 4,
                 },
+                {
+                    "item": "40340049",
+                    "codigo": "30520001",
+                    "descricao": "CJ ACABAMENTO INTERNO E/S/J",
+                    "qtd": 1,
+                },
             ],
             catalogo,
         )
 
         preparacao = filtrar_linhas_preparacao(propagar_setor_preparacao(linhas, catalogo, {}))
-        self.assertEqual(preparacao, [])
+        codigos = [linha["codigo"] for linha in preparacao]
+        self.assertIn("30160002", codigos)
+        self.assertIn("30520001", codigos)
+        self.assertNotIn("10520005", codigos)
+
+    def test_destino_manual_pode_incluir_ou_retirar_linha_da_preparacao(self):
+        linhas = [
+            {
+                "item": "40340049",
+                "codigo": "10240001",
+                "descricao": "ACESSORIO ADESIVO IDENTIFICACAO",
+                "setor": "PREPARACAO",
+                "setor_manual": True,
+            },
+            {
+                "item": "40340049",
+                "codigo": "30160002",
+                "descricao": "CJ ISOLAMENTO TERMICO",
+                "setor": "EXPEDICAO",
+                "setor_manual": True,
+            },
+        ]
+
+        preparacao = filtrar_linhas_preparacao(propagar_setor_preparacao(linhas, {}, {}))
+        self.assertEqual([linha["codigo"] for linha in preparacao], ["10240001"])
 
 
 if __name__ == "__main__":

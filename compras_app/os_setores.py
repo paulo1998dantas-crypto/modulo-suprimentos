@@ -28,11 +28,13 @@ def classificar_item(item_info):
     descricao = normalizar_texto((item_info or {}).get("descricao", ""))
     codigo = normalizar_codigo((item_info or {}).get("codigo", ""))
     referencia = f"{categoria} {grupo} {descricao}"
-    if "TRILHO" in referencia or "REFORCO" in referencia:
+    if "TRILHO" in referencia or "REFORCO" in referencia or "ISOLAMENTO" in referencia:
         return SETOR_PREPARACAO
     if any(marcador in descricao for marcador in _MARCADORES_EXPEDICAO_DESCRICAO):
         return SETOR_EXPEDICAO
     if "PISO" in categoria and codigo[:2] in {"20", "30"}:
+        return SETOR_PREPARACAO
+    if "ACABAMENTO" in categoria and codigo[:2] in {"20", "30"}:
         return SETOR_PREPARACAO
     if codigo.startswith("3020") and "BANCO" in referencia:
         return SETOR_PREPARACAO
@@ -108,6 +110,7 @@ def enriquecer_composicao(composicao, catalogo):
                 "fornecedor": fornecedor,
                 "setor": setor,
                 "setor_origem": setor,
+                "setor_manual": bool(comp.get("setor_manual", False)),
                 "tipo_requisicao": tipo_requisicao,
             }
         )
@@ -154,8 +157,12 @@ def _regra_preparacao(linha, catalogo=None):
         return "TRILHO"
     if "REFORCO" in referencia:
         return "REFORCO"
+    if "ISOLAMENTO" in referencia:
+        return "ISOLAMENTO"
     if "PISO" in categoria and _codigo_pp_ou_cj(info):
         return "PISO"
+    if "ACABAMENTO" in categoria and _codigo_pp_ou_cj(info):
+        return "ACABAMENTO"
     return ""
 
 
@@ -225,6 +232,10 @@ def filtrar_linhas_preparacao(linhas):
     for linha in linhas or []:
         if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
             continue
+        if linha.get("setor_manual"):
+            if linha.get("setor") == SETOR_PREPARACAO:
+                resultado.append(_forcar_linha_layout_preparacao(linha))
+            continue
         if _descendente_cj_bancos(linha, pai_por_codigo):
             continue
         regra = _regra_preparacao(linha)
@@ -255,6 +266,9 @@ def propagar_setor_preparacao(linhas, catalogo=None, componentes=None):
     }
     for linha in linhas:
         if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
+            continue
+        if linha.get("setor_manual"):
+            linha["setor_origem"] = linha.get("setor", SETOR_EXPEDICAO)
             continue
         if _descendente_cj_bancos(linha, pai_por_codigo):
             setor = SETOR_EXPEDICAO

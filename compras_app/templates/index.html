@@ -1139,6 +1139,82 @@ background:linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
 border-radius:10px;
 }
 
+/* Operational layout: compact, tabular and aligned with ModuloEstoque. */
+body{background:#f3f6fa;}
+.topbar{padding:9px 16px;box-shadow:none;background:#fff;border-bottom:1px solid #cfd8e3;}
+.logo{height:34px;filter:none;}
+.container{max-width:1680px;padding:14px 16px 28px;}
+.nav-tabs{gap:4px;}
+.tab-btn,.topbar-logout{border-radius:4px;padding:7px 11px;box-shadow:none;}
+.tab-btn.active{background:#0b1c3a;box-shadow:none;}
+.tab-content.active{animation:none;}
+.card,.dashboard-table,.chart-card,.metric-card{border-radius:5px;box-shadow:none;border:1px solid #d8e0ea;background:#fff;}
+.card{padding:13px 14px;margin-bottom:10px;}
+.card:hover{transform:none;box-shadow:none;}
+.card h3{font-size:14px;margin:0 0 9px;padding:0;letter-spacing:0;}
+.card h3::after{display:none;}
+.grid,.grid-2,.grid-4{gap:8px 10px;}
+label{font-size:11px;margin-bottom:3px;color:#526174;}
+input,textarea,select{border-radius:3px;box-shadow:none;min-height:32px;padding:6px 8px;}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(14,165,163,.14);}
+button,.btn{border-radius:3px;box-shadow:none;background:#087f78;padding:7px 11px;font-size:12px;}
+button:hover{transform:none;box-shadow:none;background:#066e68;}
+.btn-secondary{background:#fff!important;color:#243247!important;border:1px solid #b9c5d3!important;}
+.btn-danger{background:#fff!important;color:#b42318!important;border:1px solid #e2aaa5!important;}
+.btn-row-remove{width:28px;min-width:28px;height:28px;padding:0;background:#fff!important;color:#b42318!important;border:1px solid #e3b2ae!important;font-size:17px;}
+table{border-collapse:collapse;}
+th{background:#e9eef5!important;color:#334155;font-size:10px;padding:7px 8px;letter-spacing:0;text-transform:uppercase;}
+td{padding:5px 7px;font-size:12px;border-color:#dbe3ec;}
+td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
+.tabela-os,.tabela-componentes{min-width:920px;}
+.table-scroll{width:100%;overflow:auto;border:1px solid #d8e0ea;}
+.table-scroll table{width:100%;}
+.card-heading-row,.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.compact-actions,.history-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.composition-status,.table-toolbar span{font-size:11px;color:#607085;}
+.composition-status.is-custom{color:#9a6700;font-weight:700;}
+.composicao-editor input,.composicao-editor select{width:100%;}
+.composicao-editor .comp-parent-cell{min-width:105px;max-width:150px;word-break:break-word;color:#526174;}
+.composicao-editor th:nth-child(3){min-width:360px;}
+.dashboard-actions{margin-bottom:8px;}
+.dashboard-metrics{gap:8px;margin-bottom:8px;}
+.dashboard-grid{gap:8px;}
+.metric-card{padding:10px 12px;}
+.metric-card strong{font-size:22px;}
+.chart-card{padding:10px;}
+.chart-canvas{height:210px;}
+.dashboard-table{margin-top:10px;}
+.dashboard-table h3{padding:10px 12px 0;font-size:13px;}
+.dashboard-table th,.dashboard-table td{padding:7px 9px;}
+.table-toolbar{padding:10px 12px;border-bottom:1px solid #d8e0ea;}
+.table-toolbar h3{padding:0;margin:0 0 2px;}
+.table-toolbar input{width:min(480px,45vw);}
+.history-actions{white-space:nowrap;}
+.history-actions button{padding:5px 7px;}
+.history-modal{display:none;position:fixed;inset:0;z-index:120;background:rgba(15,23,42,.5);padding:22px;align-items:center;justify-content:center;}
+.history-modal.open{display:flex;}
+.history-modal-box{width:min(1380px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:5px;border:1px solid #b9c5d3;padding:14px;box-shadow:0 20px 50px rgba(15,23,42,.25);}
+.history-modal-box h3,.history-modal-box h4{margin:0 0 8px;}
+.history-modal-box h4{margin-top:14px;font-size:12px;}
+.icon-close{width:32px;height:32px;padding:0;background:#fff!important;color:#334155!important;border:1px solid #b9c5d3!important;font-size:20px;}
+.history-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:#d8e0ea;border:1px solid #d8e0ea;margin-top:10px;}
+.history-summary>div{background:#f8fafc;padding:8px;display:flex;flex-direction:column;gap:2px;}
+.history-summary span{font-size:10px;text-transform:uppercase;color:#64748b;}
+.history-summary strong{font-size:12px;}
+.sector-badge{display:inline-block;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:700;background:#e7eef8;color:#29466f;}
+.sector-badge.prep{background:#fff1cc;color:#795500;}
+.sector-badge.fd{background:#e6f5ef;color:#006b4f;}
+.history-footer{justify-content:flex-end;margin-top:12px;}
+@media(max-width:800px){
+.container{padding:8px;}
+.topbar{align-items:stretch;}
+.topbar-actions{width:100%;margin-left:0;justify-content:space-between;overflow:auto;}
+.dashboard-metrics,.dashboard-grid,.history-summary{grid-template-columns:1fr 1fr;}
+.card-heading-row,.table-toolbar{align-items:stretch;flex-direction:column;}
+.table-toolbar input{width:100%;}
+}
+@media(max-width:520px){.dashboard-metrics,.dashboard-grid,.history-summary{grid-template-columns:1fr;}}
+
 </style>
 
 <script>
@@ -2879,44 +2955,126 @@ const tbody = document.getElementById("tabela_componentes_body");
 if (!tbody){
 return;
 }
-tbody.innerHTML = "";
+const rowsBom = coletarComposicaoBom();
+renderComposicaoRows(rowsBom);
+}
+
+function escapeHtmlOS(valor){
+return String(valor === null || valor === undefined ? "" : valor)
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;");
+}
+
+function destinoAutomaticoComposicao(comp){
+const codigo = normalizarCodigoOS(comp.codigo || "");
+const produto = getProdutoInfo(osProdutos, codigo) || {};
+const descricao = normalizarBusca(comp.descricao || produto.descricao || produto.nome || "");
+const categoria = normalizarBusca(comp.categoria || produto.categoria || "");
+const grupo = normalizarBusca(comp.grupo || produto.grupo || "");
+const referencia = `${categoria} ${grupo} ${descricao}`;
+const ppOuCj = ["20", "30"].includes(codigo.slice(0, 2)) || grupo.includes("produto em processo") || grupo.includes("conjunto") || grupo.includes("kit");
+if (referencia.includes("faturamento direto")){
+return "F.D";
+}
+if (referencia.includes("trilho") || referencia.includes("reforco") || referencia.includes("isolamento")){
+return "PREPARACAO";
+}
+if (categoria.includes("piso") && ppOuCj){
+return "PREPARACAO";
+}
+if (categoria.includes("acabamento") && ppOuCj){
+return "PREPARACAO";
+}
+if (codigo.startsWith("3020") && referencia.includes("banco")){
+return "PREPARACAO";
+}
+return "EXPEDICAO";
+}
+
+function sincronizarFonteComposicao(){
+const input = document.getElementById("os_composicao_source");
+if (input){
+input.value = osComposicaoSource;
+}
+const status = document.getElementById("os_composicao_status");
+if (status){
+status.textContent = osComposicaoSource === "custom" ? "Composição personalizada" : "Sincronizada com a B.O.M.";
+status.classList.toggle("is-custom", osComposicaoSource === "custom");
+}
+}
+
+function marcarComposicaoCustom(){
+osComposicaoSource = "custom";
+sincronizarFonteComposicao();
+agendarSalvarRascunhoOS();
+}
 
 function renderComposicaoRows(rows){
+const tbody = document.getElementById("tabela_componentes_body");
+if (!tbody){
+return;
+}
 tbody.innerHTML = "";
-rows.forEach((comp) => {
+(rows || []).forEach((comp) => {
 const row = document.createElement("tr");
+const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.setor : destinoAutomaticoComposicao(comp);
+const setorManual = comp.setor_manual ? "1" : "0";
 row.innerHTML = `
-<td>${comp.item || ""}</td>
-<td>${comp.codigo || ""}</td>
-<td style="padding-left:${(comp.level || 0) * 16}px">${comp.descricao || ""}</td>
-<td>${comp.unidade || ""}</td>
-<td>${comp.qtd || ""}</td>
+<td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"></td>
+<td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código"></td>
+<td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição"></td>
+<td><input name="os_comp_unidade[]" value="${escapeHtmlOS(comp.unidade || "")}" placeholder="Un."></td>
+<td><input name="os_comp_qtd[]" value="${escapeHtmlOS(comp.qtd || "")}" inputmode="decimal"></td>
+<td><select name="os_comp_setor[]"><option value="EXPEDICAO"${setor === "EXPEDICAO" ? " selected" : ""}>Expedição</option><option value="PREPARACAO"${setor === "PREPARACAO" ? " selected" : ""}>Preparação</option><option value="F.D"${setor === "F.D" ? " selected" : ""}>Faturamento direto</option></select><input type="hidden" name="os_comp_setor_manual[]" value="${setorManual}"></td>
+<td><button type="button" class="btn-row-remove" title="Excluir da composição" onclick="removerLinhaComposicao(this)">×</button></td>
 `;
 tbody.appendChild(row);
 });
+sincronizarFonteComposicao();
 }
 
-const rowsBom = coletarComposicaoBom();
-if (rowsBom.length){
-renderComposicaoRows(rowsBom);
-return;
+function coletarComposicaoTabela(){
+return Array.from(document.querySelectorAll("#tabela_componentes_body tr")).map((row) => ({
+item: (row.querySelector('[name="os_comp_item[]"]') || {}).value || "",
+codigo: (row.querySelector('[name="os_comp_codigo[]"]') || {}).value || "",
+descricao: (row.querySelector('[name="os_comp_descricao[]"]') || {}).value || "",
+unidade: (row.querySelector('[name="os_comp_unidade[]"]') || {}).value || "",
+qtd: (row.querySelector('[name="os_comp_qtd[]"]') || {}).value || "",
+level: Number((row.querySelector('[name="os_comp_level[]"]') || {}).value || 0),
+setor: (row.querySelector('[name="os_comp_setor[]"]') || {}).value || "EXPEDICAO",
+setor_manual: ((row.querySelector('[name="os_comp_setor_manual[]"]') || {}).value || "0") === "1",
+}));
 }
 
-renderComposicaoRows([]);
+function adicionarLinhaComposicao(){
+const rows = coletarComposicaoTabela();
+osComposicaoSource = "custom";
+rows.push({ item: "", codigo: "", descricao: "", unidade: "", qtd: 1, level: 0, setor: "EXPEDICAO", setor_manual: false });
+renderComposicaoRows(rows);
+const ultima = document.querySelector("#tabela_componentes_body tr:last-child input[name='os_comp_codigo[]']");
+if (ultima) ultima.focus();
+agendarSalvarRascunhoOS();
+}
+
+function removerLinhaComposicao(botao){
+const row = botao.closest("tr");
+if (row) row.remove();
+marcarComposicaoCustom();
+}
+
+function restaurarComposicaoBom(){
+osComposicaoSource = "bom";
+renderComponentes();
+agendarSalvarRascunhoOS();
 }
 
 function adicionarComponenteOS(){
 const tabela = document.querySelector("#panel-os-item table.tabela-componentes");
-if (!tabela){
-return;
-}
+if (!tabela) return;
 const row = tabela.insertRow();
-row.innerHTML = `
-<td><input name="os_comp_codigo[]"></td>
-<td><input name="os_comp_descricao[]"></td>
-<td><input name="os_comp_unidade[]" value="UN"></td>
-<td><input name="os_comp_qtd[]" type="number" step="0.01" min="0"></td>
-`;
+row.innerHTML = '<td><input name="os_comp_codigo[]"></td><td><input name="os_comp_descricao[]"></td><td><input name="os_comp_unidade[]" value="UN"></td><td><input name="os_comp_qtd[]" type="number" step="0.01" min="0"></td>';
 }
 
 function mesclarProcessosPadrao(conjuntos){
@@ -3076,6 +3234,10 @@ const tbody = document.getElementById("tabela_componentes_body");
 if (tbody){
 tbody.innerHTML = "";
 }
+osComposicaoSource = "bom";
+const historicoId = document.getElementById("os_historico_id");
+if (historicoId) historicoId.value = "";
+sincronizarFonteComposicao();
 definirProcessoConjuntoUI("");
 atualizarHintProcessoAutomatico({ conjunto: "", conflito: false });
 preencherProcessosPadrao(conjuntoProcessoAtual(), { forcar: true });
@@ -3339,7 +3501,8 @@ return String(item[key] || "").trim() && !(key === "qtd" && String(item[key]).tr
 });
 });
 const temProcesso = Object.values(data.processos || {}).some((linhas) => Array.isArray(linhas) && linhas.length);
-return temCampo || temItem || temProcesso;
+const temComposicaoCustom = data.composicaoSource === "custom" && Array.isArray(data.composicao);
+return temCampo || temItem || temProcesso || temComposicaoCustom;
 }
 
 function coletarRascunhoOS(){
@@ -3361,6 +3524,7 @@ const campos = {};
 "os_descricao_servico",
 "os_obs_materiais",
 "os_obs",
+"os_historico_id",
 ].forEach((name) => {
 const input = form.querySelector(`[name="${name}"]`);
 campos[name] = input ? input.value : "";
@@ -3389,6 +3553,7 @@ campos,
 itens,
 processos: coletarProcessosUI(),
 composicaoSource: osComposicaoSource,
+composicao: coletarComposicaoTabela(),
 };
 }
 
@@ -3485,7 +3650,11 @@ aplicarProcessoTabela(processo.key, data.processos[processo.nome] || []);
 }
 osComposicaoSource = data.composicaoSource || "bom";
 definirProcessoConjuntoUI((data.campos || {}).os_processo_conjunto || "");
+if (osComposicaoSource === "custom"){
+renderComposicaoRows(data.composicao || []);
+} else {
 renderComponentes();
+}
 atualizarHintProcessoAutomatico(resolverProcessoAutomaticoOS());
 const hora = data.savedAt ? new Date(data.savedAt).toLocaleString("pt-BR") : "";
 osDraftStatus(hora ? `Rascunho restaurado de ${hora}.` : "Rascunho restaurado.");
@@ -3728,11 +3897,118 @@ atualizarMetaArquivo(input);
 });
 }
 
+let historicoOSAtual = null;
+
+async function carregarHistoricoOS(id){
+const response = await fetch(`/api/historico/os/${encodeURIComponent(id)}`, { headers: { "Accept": "application/json" } });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok){
+throw new Error(payload.erro || "Não foi possível carregar a O.S.");
+}
+return payload.documento;
+}
+
+async function visualizarHistoricoOS(id){
+try {
+const doc = await carregarHistoricoOS(id);
+historicoOSAtual = doc;
+const dados = doc.dados || {};
+document.getElementById("historico_os_title").textContent = `O.S. ${doc.numero || ""}`;
+document.getElementById("historico_os_meta").textContent = `${doc.data_criacao || "-"} · ${dados.chassis || "Sem chassi"}`;
+document.getElementById("historico_os_dados").innerHTML = [
+["Cliente", dados.cliente], ["Município", dados.municipio], ["MMV", dados.mmv], ["Processo", dados.processo_conjunto]
+].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
+document.getElementById("historico_os_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td></tr>`).join("") || '<tr><td colspan="4">Sem itens.</td></tr>';
+document.getElementById("historico_os_composicao").innerHTML = (doc.composicao || []).map((item) => {
+const setor = item.setor === "PREPARACAO" ? { classe: "prep", label: "Preparação" } : item.setor === "F.D" ? { classe: "fd", label: "Faturamento direto" } : { classe: "exp", label: "Expedição" };
+return `<tr><td>${escapeHtmlOS(item.item || "")}</td><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td><span class="sector-badge ${setor.classe}">${setor.label}</span></td></tr>`;
+}).join("") || '<tr><td colspan="6">Sem composição.</td></tr>';
+document.getElementById("historico_os_editar").onclick = () => editarDocumentoHistoricoOS(doc);
+const modal = document.getElementById("historico_os_modal");
+modal.classList.add("open");
+modal.setAttribute("aria-hidden", "false");
+} catch (error) {
+alert(error.message);
+}
+}
+
+function fecharHistoricoOS(){
+const modal = document.getElementById("historico_os_modal");
+if (!modal) return;
+modal.classList.remove("open");
+modal.setAttribute("aria-hidden", "true");
+}
+
+function editarDocumentoHistoricoOS(doc){
+const dados = doc.dados || {};
+const draft = {
+version: 2,
+campos: {
+os_cliente: dados.cliente || "",
+os_cliente_busca: dados.cliente || "",
+os_numero: doc.numero || "",
+os_chassis: dados.chassis || "",
+os_municipio: dados.municipio || "",
+os_mmv: dados.mmv || "",
+os_previsao_inicio: dados.previsao_inicio || "",
+os_previsao_termino: dados.previsao_termino || "",
+os_processo_conjunto: dados.processo_conjunto || "",
+os_descricao_servico: dados.descricao_servico || "",
+os_obs_materiais: dados.obs_materiais || "",
+os_obs: dados.obs || "",
+os_historico_id: doc.id || "",
+},
+itens: doc.itens || [],
+processos: doc.processos || {},
+composicaoSource: "custom",
+composicao: doc.composicao || [],
+};
+aplicarRascunhoOS(draft);
+const historicoId = document.getElementById("os_historico_id");
+if (historicoId) historicoId.value = doc.id || "";
+fecharHistoricoOS();
+const tabButton = document.querySelector('[data-tab="tab-os"]');
+if (tabButton) tabButton.click();
+osDraftStatus(`Editando a O.S. ${doc.numero}. Ao gerar, este mesmo registro será atualizado.`);
+document.getElementById("form-os").scrollIntoView({ behavior: "smooth", block: "start" });
+salvarRascunhoOS();
+}
+
+async function editarHistoricoOS(id){
+try {
+editarDocumentoHistoricoOS(await carregarHistoricoOS(id));
+} catch (error) {
+alert(error.message);
+}
+}
+
+async function excluirHistoricoOS(id, numero){
+if (!confirm(`Excluir definitivamente a O.S. ${numero} do histórico?`)) return;
+try {
+const response = await fetch(`/api/historico/os/${encodeURIComponent(id)}/excluir`, { method: "POST", headers: { "Accept": "application/json" } });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível excluir a O.S.");
+window.location.href = "/?tab=dashboard";
+} catch (error) {
+alert(error.message);
+}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 inicializarLookupsEscopo(document);
 inicializarFileInputs(document);
 definirProcessoConjuntoUI(conjuntoProcessoAtual());
 inicializarOrdenacaoItensOS();
+
+const historySearch = document.getElementById("os_history_search");
+if (historySearch){
+historySearch.addEventListener("input", () => {
+const termo = normalizarBusca(historySearch.value || "");
+document.querySelectorAll("#os_history_table tbody tr[data-history-search]").forEach((row) => {
+row.hidden = termo && !normalizarBusca(row.dataset.historySearch || "").includes(termo);
+});
+});
+}
 
 const tabela = document.getElementById("tabela_itens");
 if (tabela){
@@ -3923,11 +4199,12 @@ if (formOs){
 formOs.addEventListener("input", agendarSalvarRascunhoOS);
 formOs.addEventListener("change", agendarSalvarRascunhoOS);
 formOs.addEventListener("submit", (event) => {
-if (!validarLuminariasObrigatoriasOS()){
+const reemissaoHistorica = Boolean((document.getElementById("os_historico_id") || {}).value) && osComposicaoSource === "custom";
+if (!reemissaoHistorica && !validarLuminariasObrigatoriasOS()){
 event.preventDefault();
 return;
 }
-if (!validarPopupsItensObrigatoriosOS()){
+if (!reemissaoHistorica && !validarPopupsItensObrigatoriosOS()){
 event.preventDefault();
 return;
 }
@@ -3939,11 +4216,30 @@ salvarRascunhoOS();
 });
 }
 
+const composicaoBody = document.getElementById("tabela_componentes_body");
+if (composicaoBody){
+composicaoBody.addEventListener("input", (event) => {
+if (event.target && String(event.target.name || "").startsWith("os_comp_")){
+marcarComposicaoCustom();
+}
+});
+composicaoBody.addEventListener("change", (event) => {
+if (event.target && event.target.name === "os_comp_setor[]"){
+const manual = event.target.closest("tr").querySelector('[name="os_comp_setor_manual[]"]');
+if (manual) manual.value = "1";
+marcarComposicaoCustom();
+}
+});
+}
+
 const tabButtons = document.querySelectorAll(".tab-btn");
 const cadastroActions = document.getElementById("cadastro-actions");
 const defaultTab = document.body.getAttribute("data-default-tab") || "oc";
 let initialTarget = "tab-oc";
-const dashboardData = {{ dashboard|tojson }};
+const dashboardData = {
+oc_totais: {{ dashboard.oc_totais|tojson }},
+os_quantidades: {{ dashboard.os_quantidades|tojson }},
+};
 let dashboardRendered = false;
 function renderDashboardCharts(){
 if (!dashboardData){
@@ -4326,6 +4622,42 @@ salvarRascunhoOS();
 </tbody>
 </table>
 </div>
+
+<div class="dashboard-table os-history-panel">
+<div class="table-toolbar">
+<div>
+<h3>Gestão de ordens de serviço</h3>
+<span>{{ (dashboard.ordens_servico or [])|length }} O.S. registrada(s) em {{ dashboard.persistencia }}</span>
+</div>
+<input id="os_history_search" type="search" placeholder="Buscar número, chassi, cliente, município ou MMV">
+</div>
+<table id="os_history_table">
+<thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Ações</th></tr></thead>
+<tbody>
+{% for doc in dashboard.ordens_servico %}
+{% set dados = doc.dados or {} %}
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or ''))|lower }}">
+<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar / reemitir</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
+</tr>
+{% else %}
+<tr><td colspan="7">Nenhuma O.S. registrada ainda.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div id="historico_os_modal" class="history-modal" aria-hidden="true">
+<div class="history-modal-box" role="dialog" aria-modal="true" aria-labelledby="historico_os_title">
+<div class="card-heading-row"><div><h3 id="historico_os_title">O.S.</h3><span id="historico_os_meta"></span></div><button type="button" class="icon-close" title="Fechar" onclick="fecharHistoricoOS()">×</button></div>
+<div id="historico_os_dados" class="history-summary"></div>
+<h4>Itens da O.S.</h4>
+<div class="table-scroll"><table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th></tr></thead><tbody id="historico_os_itens"></tbody></table></div>
+<h4>Composição e destino</h4>
+<div class="table-scroll"><table><thead><tr><th>Item pai</th><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th><th>Destino</th></tr></thead><tbody id="historico_os_composicao"></tbody></table></div>
+<div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOS()">Fechar</button><button id="historico_os_editar" type="button">Editar / reemitir</button></div>
+</div>
+</div>
 </div>
 
 <div id="tab-os" class="tab-content">
@@ -4359,6 +4691,8 @@ salvarRascunhoOS();
 {% endif %}
 </div>
 <form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data">
+<input type="hidden" id="os_historico_id" name="os_historico_id" value="">
+<input type="hidden" id="os_composicao_source" name="os_composicao_source" value="bom">
 
 <div class="card">
 <h3>Rascunho da O.S</h3>
@@ -4563,17 +4897,30 @@ salvarRascunhoOS();
 </div>
 
 <div class="card">
-<h3>Componentes</h3>
-<table class="tabela-componentes">
+<div class="card-heading-row">
+<div>
+<h3>Composição da O.S.</h3>
+<span id="os_composicao_status" class="composition-status">Sincronizada com a B.O.M.</span>
+</div>
+<div class="compact-actions">
+<button type="button" class="btn-secondary" onclick="restaurarComposicaoBom()">Recarregar B.O.M.</button>
+<button type="button" onclick="adicionarLinhaComposicao()">Adicionar só na composição</button>
+</div>
+</div>
+<div class="table-scroll">
+<table class="tabela-componentes composicao-editor">
 <tr>
 <th>Item</th>
 <th>Componente</th>
 <th>Descricao</th>
 <th>Unidade</th>
 <th>Qtd</th>
+<th>Destino</th>
+<th></th>
 </tr>
 <tbody id="tabela_componentes_body"></tbody>
 </table>
+</div>
 </div>
 
 <div class="card">

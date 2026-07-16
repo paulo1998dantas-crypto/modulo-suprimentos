@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session
+from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session, jsonify
 import re
 import json
 import io
@@ -66,6 +66,7 @@ from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, identificar_nome_processo, normalizar_nome_processo
 from os_setores import (
     SETOR_EXPEDICAO,
+    SETOR_FATURAMENTO_DIRETO,
     SETOR_PREPARACAO,
     TIPO_REQUISICAO_FATURAMENTO_DIRETO,
     agrupar_linhas_setor,
@@ -462,13 +463,13 @@ def _carregar_historico_local():
         with open(HISTORICO_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, list):
-            return data
+            return [dict(item, id=item.get("id") or f"local-{idx}") for idx, item in enumerate(data)]
         if isinstance(data, dict):
             merged = []
             for _, items in data.items():
                 if isinstance(items, list):
                     merged.extend(items)
-            return merged
+            return [dict(item, id=item.get("id") or f"local-{idx}") for idx, item in enumerate(merged)]
     except Exception:
         return []
     return []
@@ -493,7 +494,16 @@ def salvar_historico(entries):
         pass
 
 
-def registrar_historico(tipo, numero, dados, itens=None, processos=None, componentes=None, composicao=None):
+def registrar_historico(
+    tipo,
+    numero,
+    dados,
+    itens=None,
+    processos=None,
+    componentes=None,
+    composicao=None,
+    documento_id=None,
+):
     entry = {
         "tipo": tipo,
         "numero": str(numero),
@@ -504,13 +514,50 @@ def registrar_historico(tipo, numero, dados, itens=None, processos=None, compone
         "componentes": componentes or {},
         "composicao": composicao or [],
     }
+    if documento_id:
+        entry["id"] = documento_id
     if supabase_data.enabled():
         try:
-            supabase_data.salvar_documento(entry)
+            if documento_id:
+                supabase_data.atualizar_documento(documento_id, entry)
+            else:
+                supabase_data.salvar_documento(entry)
         except Exception:
             app.logger.exception("Falha ao salvar historico de documento no Supabase")
     entries = _carregar_historico_local()
-    entries.append(entry)
+    atualizado = False
+    if documento_id:
+        for idx, existente in enumerate(entries):
+            if str(existente.get("id")) == str(documento_id):
+                entries[idx] = entry
+                atualizado = True
+                break
+    if not atualizado:
+        entry.setdefault("id", f"local-{len(entries)}")
+        entries.append(entry)
+    salvar_historico(entries)
+
+
+def obter_historico_documento(documento_id):
+    if supabase_data.enabled():
+        try:
+            return supabase_data.obter_documento(documento_id)
+        except Exception:
+            app.logger.exception("Falha ao consultar documento no Supabase")
+    for entry in _carregar_historico_local():
+        if str(entry.get("id")) == str(documento_id):
+            return entry
+    return None
+
+
+def excluir_historico_documento(documento_id):
+    if supabase_data.enabled():
+        supabase_data.excluir_documento(documento_id)
+    entries = [
+        entry
+        for entry in _carregar_historico_local()
+        if str(entry.get("id")) != str(documento_id)
+    ]
     salvar_historico(entries)
 
 
@@ -3137,6 +3184,7 @@ def index():
         "os_quantidades": os_quantidades,
         "totais": _dashboard_totais(historico),
         "recentes": _dashboard_recentes(historico),
+        "ordens_servico": [entry for entry in historico if entry.get("tipo") == "os"],
         "persistencia": "supabase" if supabase_data.enabled() else "local",
     }
     pedidos_dir, os_dir = get_save_paths()
@@ -3195,6 +3243,27 @@ def index():
         relacoes_processo_item=relacoes_processo_item,
         regras_popup_item=regras_popup_item,
     )
+
+
+@app.route("/api/historico/os/<documento_id>")
+def api_historico_os(documento_id):
+    documento = obter_historico_documento(documento_id)
+    if not documento or documento.get("tipo") != "os":
+        return jsonify({"ok": False, "erro": "O.S nao encontrada."}), 404
+    return jsonify({"ok": True, "documento": documento})
+
+
+@app.route("/api/historico/os/<documento_id>/excluir", methods=["POST"])
+def api_excluir_historico_os(documento_id):
+    documento = obter_historico_documento(documento_id)
+    if not documento or documento.get("tipo") != "os":
+        return jsonify({"ok": False, "erro": "O.S nao encontrada."}), 404
+    try:
+        excluir_historico_documento(documento_id)
+    except Exception:
+        app.logger.exception("Falha ao excluir historico da O.S %s", documento_id)
+        return jsonify({"ok": False, "erro": "Nao foi possivel excluir a O.S."}), 500
+    return jsonify({"ok": True})
 
 
 @app.route("/healthz")
@@ -3356,6 +3425,9 @@ def gerar_oc():
 @app.route("/gerar_os", methods=["POST"])
 def gerar_os():
     atualizar_skus_automatico()
+    composicao_source = (request.form.get("os_composicao_source", "bom") or "bom").strip().lower()
+    historico_form_id = (request.form.get("os_historico_id", "") or "").strip()
+    usando_composicao_historica = composicao_source == "custom" and bool(historico_form_id)
     cliente = _limpar_valor_busca(
         request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
     )
@@ -3463,7 +3535,7 @@ def gerar_os():
             regra_id = str(regra.get("id", "") or "")
             selecao = selecoes_por_regra.get(regra_id, {})
             selecionado = normalizar_codigo(selecao.get("codigo", ""))
-            if selecionado not in (regra.get("opcoes") or []):
+            if not usando_composicao_historica and selecionado not in (regra.get("opcoes") or []):
                 return f"Selecione o item relacionado obrigatorio para {codigo_item}.", 400
         for selecao in popup_selecoes if isinstance(popup_selecoes, list) else []:
             if not isinstance(selecao, dict):
@@ -3563,6 +3635,8 @@ def gerar_os():
     comp_unidades = request.form.getlist("os_comp_unidade[]")
     comp_qtds = request.form.getlist("os_comp_qtd[]")
     comp_levels = request.form.getlist("os_comp_level[]")
+    comp_setores = request.form.getlist("os_comp_setor[]")
+    comp_setores_manuais = request.form.getlist("os_comp_setor_manual[]")
     composicao_importada = []
     for idx in range(len(comp_codigos)):
         item_pai = normalizar_codigo(comp_itens[idx]) if idx < len(comp_itens) else ""
@@ -3576,21 +3650,36 @@ def gerar_os():
             level = 0
         if not (codigo or descricao or qtd or unidade):
             continue
-        composicao_importada.append(
-            {
-                "item": item_pai,
-                "codigo": codigo,
-                "descricao": descricao,
-                "unidade": unidade,
-                "qtd": qtd,
-                "level": level,
-            }
+        linha_composicao = {
+            "item": item_pai,
+            "codigo": codigo,
+            "descricao": descricao,
+            "unidade": unidade,
+            "qtd": qtd,
+            "level": level,
+        }
+        setor = comp_setores[idx].strip().upper() if idx < len(comp_setores) else ""
+        setor_manual = (
+            str(comp_setores_manuais[idx]).strip().lower() in {"1", "true", "sim"}
+            if idx < len(comp_setores_manuais)
+            else False
         )
+        if setor in {SETOR_EXPEDICAO, SETOR_PREPARACAO, SETOR_FATURAMENTO_DIRETO}:
+            linha_composicao["setor"] = setor
+            linha_composicao["setor_manual"] = setor_manual
+        composicao_importada.append(linha_composicao)
 
-    composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
-    extras_composicao = expandir_composicao_referenciada(
-        [*luminarias_extra, *popup_itens_extra],
-        componentes,
+    if composicao_source == "custom":
+        composicao_final = composicao_importada
+    else:
+        composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
+    extras_composicao = (
+        []
+        if composicao_source == "custom"
+        else expandir_composicao_referenciada(
+            [*luminarias_extra, *popup_itens_extra],
+            componentes,
+        )
     )
     if extras_composicao:
         existentes = {
@@ -3712,6 +3801,11 @@ def gerar_os():
     chassi_nome = (dados.get("chassis", "") or "").strip()
     dados_historico = dict(dados)
     dados_historico["modo_os"] = "pacote_os"
+    historico_id = (request.form.get("os_historico_id", "") or "").strip()
+    if historico_id:
+        historico_existente = obter_historico_documento(historico_id)
+        if not historico_existente or historico_existente.get("tipo") != "os":
+            historico_id = ""
     registrar_historico(
         "os",
         numero_os,
@@ -3720,6 +3814,7 @@ def gerar_os():
         processos=processos_final,
         componentes=componentes,
         composicao=composicao_enriquecida,
+        documento_id=historico_id or None,
     )
 
     arquivos_saida = [

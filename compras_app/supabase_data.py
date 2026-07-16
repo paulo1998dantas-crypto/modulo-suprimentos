@@ -485,6 +485,8 @@ def normalizar_documento(documento):
 
 def documento_to_legacy(row):
     return {
+        "id": row.get("id"),
+        "created_at": _clean(row.get("created_at")),
         "tipo": _clean(row.get("tipo")),
         "numero": _clean(row.get("numero")),
         "data_criacao": _clean(row.get("data_criacao")),
@@ -505,10 +507,49 @@ def salvar_documento(documento):
     return True
 
 
+def obter_documento(documento_id):
+    rows = _request(
+        "GET",
+        DOCUMENTOS_TABLE,
+        query=[
+            ("select", "id,created_at,tipo,numero,data_criacao,dados,itens,processos,componentes,composicao"),
+            ("id", f"eq.{documento_id}"),
+            ("limit", "1"),
+        ],
+    ) or []
+    return documento_to_legacy(rows[0]) if rows else None
+
+
+def atualizar_documento(documento_id, documento):
+    row = normalizar_documento(documento)
+    if not row.get("tipo") or not row.get("numero"):
+        return False
+    _request(
+        "PATCH",
+        DOCUMENTOS_TABLE,
+        query=[("id", f"eq.{documento_id}")],
+        payload=row,
+        prefer="return=minimal",
+    )
+    clear_cache()
+    return True
+
+
+def excluir_documento(documento_id):
+    _request(
+        "DELETE",
+        DOCUMENTOS_TABLE,
+        query=[("id", f"eq.{documento_id}")],
+        prefer="return=minimal",
+    )
+    clear_cache()
+    return True
+
+
 def carregar_documentos(force=False, limit=1000):
     rows = _all_rows(
         DOCUMENTOS_TABLE,
-        select="tipo,numero,data_criacao,dados,itens,processos,componentes,composicao",
+        select="id,created_at,tipo,numero,data_criacao,dados,itens,processos,componentes,composicao",
         order="data_criacao.desc,created_at.desc",
         cache_key="documentos",
         force=force,

@@ -38,7 +38,7 @@ def normalizar_linha_composicao(comp, item="", level=0):
         "qtd": comp.get("qtd", comp.get("quantidade", "")),
         "level": level or 0,
     }
-    for campo in ("grupo", "categoria", "fornecedor", "setor", "tipo_requisicao"):
+    for campo in ("grupo", "categoria", "fornecedor", "setor", "tipo_requisicao", "setor_manual"):
         if comp.get(campo, "") != "":
             linha[campo] = comp.get(campo, "")
     return linha
