@@ -1,6 +1,7 @@
 from functools import wraps
 
 from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session, jsonify
+from flask.wrappers import Request as FlaskRequest
 import re
 import json
 import io
@@ -91,8 +92,26 @@ from processos_transformacao import (
 import supabase_catalog
 import supabase_data
 
+
+def _positive_env_int(name, default):
+    try:
+        value = int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return default
+    return value if value > 0 else default
+
+
+class SuprimentosRequest(FlaskRequest):
+    max_form_memory_size = _positive_env_int("SUPRIMENTOS_MAX_FORM_MEMORY_BYTES", 32 * 1024 * 1024)
+    max_form_parts = _positive_env_int("SUPRIMENTOS_MAX_FORM_PARTS", 20_000)
+
+
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.secret_key = os.environ.get("SUPRIMENTOS_SESSION_SECRET", "").strip() or "emissor_documentos"
+app.request_class = SuprimentosRequest
+app.config["MAX_CONTENT_LENGTH"] = _positive_env_int("SUPRIMENTOS_MAX_REQUEST_BYTES", 64 * 1024 * 1024)
+app.config["MAX_FORM_MEMORY_SIZE"] = SuprimentosRequest.max_form_memory_size
+app.config["MAX_FORM_PARTS"] = SuprimentosRequest.max_form_parts
 
 
 def _env_bool(name, default=False):
@@ -293,6 +312,20 @@ def _setup_logging():
 
 
 _setup_logging()
+
+
+@app.errorhandler(413)
+def handle_request_too_large(_error):
+    app.logger.warning(
+        "Requisicao excedeu o limite em %s: content_length=%s",
+        request.path,
+        request.content_length,
+    )
+    return (
+        "A O.S. ultrapassou o limite de envio do servidor. "
+        "O rascunho continua salvo neste navegador. Atualize a pagina e tente novamente.",
+        413,
+    )
 
 
 @app.errorhandler(Exception)
@@ -3422,6 +3455,72 @@ def gerar_oc():
 
 
 
+def _parse_os_composition_form(form):
+    raw_json = (form.get("os_composicao_json", "") or "").strip()
+    if raw_json:
+        try:
+            source_rows = json.loads(raw_json)
+        except json.JSONDecodeError as exc:
+            raise ValueError("A composicao da O.S. foi enviada em formato invalido.") from exc
+        if not isinstance(source_rows, list):
+            raise ValueError("A composicao da O.S. deve ser uma lista de itens.")
+    else:
+        comp_itens = form.getlist("os_comp_item[]")
+        comp_codigos = form.getlist("os_comp_codigo[]")
+        comp_descricoes = form.getlist("os_comp_descricao[]")
+        comp_unidades = form.getlist("os_comp_unidade[]")
+        comp_qtds = form.getlist("os_comp_qtd[]")
+        comp_levels = form.getlist("os_comp_level[]")
+        comp_setores = form.getlist("os_comp_setor[]")
+        comp_setores_manuais = form.getlist("os_comp_setor_manual[]")
+        source_rows = []
+        for idx in range(len(comp_codigos)):
+            source_rows.append(
+                {
+                    "item": comp_itens[idx] if idx < len(comp_itens) else "",
+                    "codigo": comp_codigos[idx],
+                    "descricao": comp_descricoes[idx] if idx < len(comp_descricoes) else "",
+                    "unidade": comp_unidades[idx] if idx < len(comp_unidades) else "",
+                    "qtd": comp_qtds[idx] if idx < len(comp_qtds) else "",
+                    "level": comp_levels[idx] if idx < len(comp_levels) else 0,
+                    "setor": comp_setores[idx] if idx < len(comp_setores) else "",
+                    "setor_manual": comp_setores_manuais[idx] if idx < len(comp_setores_manuais) else False,
+                }
+            )
+
+    composicao = []
+    for raw_row in source_rows:
+        if not isinstance(raw_row, dict):
+            continue
+        item_pai = normalizar_codigo(raw_row.get("item", ""))
+        codigo = normalizar_codigo(raw_row.get("codigo", ""))
+        descricao = str(raw_row.get("descricao", "") or "").strip()
+        unidade = str(raw_row.get("unidade", "") or "").strip()
+        qtd = str(raw_row.get("qtd", "") or "").strip()
+        try:
+            level = int(raw_row.get("level", 0) or 0)
+        except (TypeError, ValueError):
+            level = 0
+        if not (codigo or descricao or qtd or unidade):
+            continue
+        linha = {
+            "item": item_pai,
+            "codigo": codigo,
+            "descricao": descricao,
+            "unidade": unidade,
+            "qtd": qtd,
+            "level": level,
+        }
+        setor = str(raw_row.get("setor", "") or "").strip().upper()
+        setor_manual_raw = raw_row.get("setor_manual", False)
+        setor_manual = setor_manual_raw is True or str(setor_manual_raw).strip().lower() in {"1", "true", "sim"}
+        if setor in {SETOR_EXPEDICAO, SETOR_PREPARACAO, SETOR_FATURAMENTO_DIRETO}:
+            linha["setor"] = setor
+            linha["setor_manual"] = setor_manual
+        composicao.append(linha)
+    return composicao
+
+
 @app.route("/gerar_os", methods=["POST"])
 def gerar_os():
     atualizar_skus_automatico()
@@ -3629,45 +3728,7 @@ def gerar_os():
 
     componentes = carregar_os_componentes()
     layout_pdf = request.files.get("os_layout_pdf")
-    comp_itens = request.form.getlist("os_comp_item[]")
-    comp_codigos = request.form.getlist("os_comp_codigo[]")
-    comp_descricoes = request.form.getlist("os_comp_descricao[]")
-    comp_unidades = request.form.getlist("os_comp_unidade[]")
-    comp_qtds = request.form.getlist("os_comp_qtd[]")
-    comp_levels = request.form.getlist("os_comp_level[]")
-    comp_setores = request.form.getlist("os_comp_setor[]")
-    comp_setores_manuais = request.form.getlist("os_comp_setor_manual[]")
-    composicao_importada = []
-    for idx in range(len(comp_codigos)):
-        item_pai = normalizar_codigo(comp_itens[idx]) if idx < len(comp_itens) else ""
-        codigo = normalizar_codigo(comp_codigos[idx]) if idx < len(comp_codigos) else ""
-        descricao = comp_descricoes[idx].strip() if idx < len(comp_descricoes) else ""
-        unidade = comp_unidades[idx].strip() if idx < len(comp_unidades) else ""
-        qtd = comp_qtds[idx].strip() if idx < len(comp_qtds) else ""
-        try:
-            level = int((comp_levels[idx] if idx < len(comp_levels) else "0") or 0)
-        except Exception:
-            level = 0
-        if not (codigo or descricao or qtd or unidade):
-            continue
-        linha_composicao = {
-            "item": item_pai,
-            "codigo": codigo,
-            "descricao": descricao,
-            "unidade": unidade,
-            "qtd": qtd,
-            "level": level,
-        }
-        setor = comp_setores[idx].strip().upper() if idx < len(comp_setores) else ""
-        setor_manual = (
-            str(comp_setores_manuais[idx]).strip().lower() in {"1", "true", "sim"}
-            if idx < len(comp_setores_manuais)
-            else False
-        )
-        if setor in {SETOR_EXPEDICAO, SETOR_PREPARACAO, SETOR_FATURAMENTO_DIRETO}:
-            linha_composicao["setor"] = setor
-            linha_composicao["setor_manual"] = setor_manual
-        composicao_importada.append(linha_composicao)
+    composicao_importada = _parse_os_composition_form(request.form)
 
     if composicao_source == "custom":
         composicao_final = composicao_importada

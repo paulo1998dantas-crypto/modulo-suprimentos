@@ -3048,6 +3048,22 @@ setor_manual: ((row.querySelector('[name="os_comp_setor_manual[]"]') || {}).valu
 }));
 }
 
+function prepararComposicaoEnvioOS(){
+const jsonInput = document.getElementById("os_composicao_json");
+if (jsonInput){
+jsonInput.value = osComposicaoSource === "custom" ? JSON.stringify(coletarComposicaoTabela()) : "";
+}
+document.querySelectorAll('#tabela_componentes_body [name^="os_comp_"]').forEach((control) => {
+control.disabled = true;
+});
+}
+
+function reativarCamposComposicaoOS(){
+document.querySelectorAll('#tabela_componentes_body [name^="os_comp_"]').forEach((control) => {
+control.disabled = false;
+});
+}
+
 function adicionarLinhaComposicao(){
 const rows = coletarComposicaoTabela();
 osComposicaoSource = "custom";
@@ -4213,8 +4229,11 @@ event.preventDefault();
 return;
 }
 salvarRascunhoOS();
+prepararComposicaoEnvioOS();
 });
 }
+
+window.addEventListener("pageshow", reativarCamposComposicaoOS);
 
 const composicaoBody = document.getElementById("tabela_componentes_body");
 if (composicaoBody){
@@ -4693,6 +4712,7 @@ salvarRascunhoOS();
 <form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data">
 <input type="hidden" id="os_historico_id" name="os_historico_id" value="">
 <input type="hidden" id="os_composicao_source" name="os_composicao_source" value="bom">
+<input type="hidden" id="os_composicao_json" name="os_composicao_json" value="">
 
 <div class="card">
 <h3>Rascunho da O.S</h3>
