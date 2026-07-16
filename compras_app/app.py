@@ -917,6 +917,9 @@ def salvar_regras_popup_item(regras):
     salvar_json(OS_ITEM_POPUP_REGRAS_FILE, regras or [])
 
 
+POPUP_ITEM_NAO_APLICAVEL = "__NAO_APLICAVEL__"
+
+
 def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho):
     codigo_raiz = normalizar_codigo(codigo_raiz)
     selecoes = [selecao for selecao in (selecoes or []) if isinstance(selecao, dict)]
@@ -949,6 +952,20 @@ def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho):
                 if normalizar_codigo(codigo)
             }
             quantidade = _parse_numero_form((selecao or {}).get("qtd", 0), 0)
+            if selecao and selecionado == POPUP_ITEM_NAO_APLICAVEL:
+                normalizada = dict(selecao)
+                normalizada.update(
+                    {
+                        "regra_id": regra_id,
+                        "gatilho": gatilho,
+                        "codigo": POPUP_ITEM_NAO_APLICAVEL,
+                        "qtd": 0,
+                        "chave": chave,
+                        "ancestrais": list(ancestrais),
+                    }
+                )
+                resolvidas.append(normalizada)
+                continue
             if not selecao or selecionado not in opcoes or quantidade <= 0:
                 return f"Selecione o item relacionado obrigatorio para {gatilho}."
             if selecionado in caminho:
@@ -3703,7 +3720,7 @@ def gerar_os():
             if not isinstance(selecao, dict):
                 continue
             relacionado_codigo = normalizar_codigo(selecao.get("codigo", ""))
-            if not relacionado_codigo:
+            if not relacionado_codigo or relacionado_codigo == POPUP_ITEM_NAO_APLICAVEL:
                 continue
             relacionado_qtd = _parse_numero_form(selecao.get("qtd", 1), 1.0)
             if relacionado_qtd <= 0:

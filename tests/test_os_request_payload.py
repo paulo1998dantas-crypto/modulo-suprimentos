@@ -12,6 +12,7 @@ sys.path.insert(0, str(APP_DIR))
 os.environ["SUPRIMENTOS_REQUIRE_LOGIN"] = "0"
 
 from app import (  # noqa: E402
+    POPUP_ITEM_NAO_APLICAVEL,
     SuprimentosRequest,
     _parse_os_composition_form,
     _resolver_selecoes_popup_item,
@@ -145,6 +146,34 @@ class OsPopupChainTests(unittest.TestCase):
 
         self.assertEqual(erro, "")
         self.assertEqual([item["codigo"] for item in resolvidas], ["B", "C"])
+
+    def test_non_applicable_completes_root_popup_without_creating_item(self):
+        resolvidas, erro = _resolver_selecoes_popup_item(
+            "A",
+            [{"regra_id": "regra-a", "codigo": POPUP_ITEM_NAO_APLICAVEL, "qtd": 0}],
+            self.regras,
+        )
+
+        self.assertEqual(erro, "")
+        self.assertEqual(len(resolvidas), 1)
+        self.assertEqual(resolvidas[0]["codigo"], POPUP_ITEM_NAO_APLICAVEL)
+        self.assertEqual(resolvidas[0]["qtd"], 0)
+
+    def test_non_applicable_stops_only_nested_branch(self):
+        selecoes = [
+            {"regra_id": "regra-a", "codigo": "B", "qtd": 1},
+            {
+                "regra_id": "regra-b",
+                "codigo": POPUP_ITEM_NAO_APLICAVEL,
+                "qtd": 0,
+                "chave": "root:A|regra-a>B|regra-b",
+            },
+        ]
+
+        resolvidas, erro = _resolver_selecoes_popup_item("A", selecoes, self.regras)
+
+        self.assertEqual(erro, "")
+        self.assertEqual([item["codigo"] for item in resolvidas], ["B", POPUP_ITEM_NAO_APLICAVEL])
 
 
 if __name__ == "__main__":

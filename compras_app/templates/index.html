@@ -1239,6 +1239,7 @@ const hasOsPrefill = osPrefill && Object.keys(osPrefill).length > 0;
 let osComposicaoSource = "bom";
 let osTabInitialized = false;
 let osPopupRegraFila = [];
+const OS_POPUP_NAO_APLICAVEL = "__NAO_APLICAVEL__";
 const osProcessoMap = Object.fromEntries(osProcessoDefs.map((processo) => [processo.nome, processo.key]));
 const osProcessoTableIds = osProcessoDefs.map((processo) => `processo_${processo.key}`);
 const osDraftStorageKey = "modulo_suprimentos_os_draft_v1";
@@ -1505,6 +1506,9 @@ caminhoCodigos: [...caminhoAtual],
 const selecao = encontrarSelecaoPopupItem(selecoes, tarefa);
 const selecionado = normalizarCodigoOS(selecao && selecao.codigo);
 const opcoes = (regra.opcoes || []).map((codigo) => normalizarCodigoOS(codigo));
+if (selecao && selecionado === OS_POPUP_NAO_APLICAVEL){
+return;
+}
 if (!selecao || !selecionado || !opcoes.includes(selecionado) || parseNumber(selecao.qtd) <= 0){
 fila.push(tarefa);
 return;
@@ -1542,6 +1546,10 @@ if (!modal || !select || !qtdInput || !qtdWrap || !display || !okBtn || !cancelB
 return;
 }
 select.innerHTML = '<option value="" selected disabled>Selecione</option>';
+const opcaoNaoAplicavel = document.createElement("option");
+opcaoNaoAplicavel.value = OS_POPUP_NAO_APLICAVEL;
+opcaoNaoAplicavel.textContent = "Não aplicável";
+select.appendChild(opcaoNaoAplicavel);
 (atual.regra.opcoes || []).forEach((codigo) => {
 const item = getProdutoInfo(produtos, codigo) || getProdutoInfo(osProdutos, codigo) || {};
 const option = document.createElement("option");
@@ -1559,19 +1567,25 @@ qtdInput.readOnly = !atual.regra.quantidade_editavel;
 qtdWrap.style.display = atual.regra.quantidade_editavel ? "block" : "none";
 modal.classList.add("is-open");
 
+const onSelectChange = () => {
+const naoAplicavel = select.value === OS_POPUP_NAO_APLICAVEL;
+qtdWrap.style.display = !naoAplicavel && atual.regra.quantidade_editavel ? "block" : "none";
+};
 const limparEventos = () => {
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
 modal.removeEventListener("click", onBackdrop);
+select.removeEventListener("change", onSelectChange);
 };
 const onOk = () => {
 const codigo = select.value || "";
-const qtd = parseNumber(qtdInput.value);
+const naoAplicavel = codigo === OS_POPUP_NAO_APLICAVEL;
+const qtd = naoAplicavel ? 0 : parseNumber(qtdInput.value);
 if (!codigo){
 select.focus();
 return;
 }
-if (!qtd || qtd <= 0){
+if (!naoAplicavel && (!qtd || qtd <= 0)){
 qtdInput.focus();
 return;
 }
@@ -1600,7 +1614,7 @@ salvarSelecoesPopupItem(atual.row, selecoes);
 modal.classList.remove("is-open");
 limparEventos();
 osPopupRegraFila.shift();
-const filaFilha = construirFilaPopupItem(
+const filaFilha = naoAplicavel ? [] : construirFilaPopupItem(
 atual.row,
 codigoNorm,
 selecoes,
@@ -1626,6 +1640,7 @@ onCancel();
 okBtn.addEventListener("click", onOk);
 cancelBtn.addEventListener("click", onCancel);
 modal.addEventListener("click", onBackdrop);
+select.addEventListener("change", onSelectChange);
 }
 
 function iniciarPopupsItemOS(row, codigo, options){
@@ -1893,7 +1908,7 @@ if (luminariaInput){
 adicionarProcessosCodigo(luminariaInput.value);
 }
 lerSelecoesPopupItem(row).forEach((selecao) => {
-if (selecao && selecao.codigo){
+if (selecao && selecao.codigo && normalizarCodigoOS(selecao.codigo) !== OS_POPUP_NAO_APLICAVEL){
 adicionarProcessosCodigo(selecao.codigo);
 }
 });
@@ -2076,7 +2091,7 @@ level: 0,
 }
 lerSelecoesPopupItem(row).forEach((selecao) => {
 const codigoRelacionado = normalizarCodigoOS(selecao.codigo);
-if (!codigoRelacionado || rows.some((linha) => linha.item === codigoItem && linha.codigo === codigoRelacionado)){
+if (!codigoRelacionado || codigoRelacionado === OS_POPUP_NAO_APLICAVEL || rows.some((linha) => linha.item === codigoItem && linha.codigo === codigoRelacionado)){
 return;
 }
 const itemRelacionado = getProdutoInfo(produtos, codigoRelacionado) || getProdutoInfo(osProdutos, codigoRelacionado) || {};
