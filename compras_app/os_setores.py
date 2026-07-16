@@ -8,21 +8,9 @@ SETOR_PREPARACAO = "PREPARACAO"
 SETOR_FATURAMENTO_DIRETO = "F.D"
 TIPO_REQUISICAO_MATERIAL = "MATERIAL"
 TIPO_REQUISICAO_FATURAMENTO_DIRETO = "FATURAMENTO DIRETO"
-PREFIXO_LAYOUT_PREPARACAO = "3024"
-
-_MARCADORES_PREPARACAO = (
-    "ISOLAMENTO",
-    "PISO",
-    "REFORCO",
-    "ACABAMENTO",
-)
-_MARCADORES_PREPARACAO_DESCRICAO = (
-    "CJ TRILHO",
-)
 _MARCADORES_EXPEDICAO_DESCRICAO = (
     "ACESSORIO ACABAMENTO PLASTICO",
 )
-_MARCADOR_PRODUTO_PROCESSO = "PRODUTO EM PROCESSO"
 
 
 def normalizar_texto(valor):
@@ -38,14 +26,16 @@ def classificar_item(item_info):
     categoria = normalizar_texto((item_info or {}).get("categoria", ""))
     grupo = normalizar_texto((item_info or {}).get("grupo", ""))
     descricao = normalizar_texto((item_info or {}).get("descricao", ""))
-    if any(marcador in descricao for marcador in _MARCADORES_PREPARACAO_DESCRICAO):
+    codigo = normalizar_codigo((item_info or {}).get("codigo", ""))
+    referencia = f"{categoria} {grupo} {descricao}"
+    if "TRILHO" in referencia or "REFORCO" in referencia:
         return SETOR_PREPARACAO
     if any(marcador in descricao for marcador in _MARCADORES_EXPEDICAO_DESCRICAO):
         return SETOR_EXPEDICAO
-    referencia = categoria or grupo
-    for marcador in _MARCADORES_PREPARACAO:
-        if marcador and marcador in referencia:
-            return SETOR_PREPARACAO
+    if "PISO" in categoria and codigo[:2] in {"20", "30"}:
+        return SETOR_PREPARACAO
+    if codigo.startswith("3020") and "BANCO" in referencia:
+        return SETOR_PREPARACAO
     return SETOR_EXPEDICAO
 
 
@@ -97,6 +87,7 @@ def enriquecer_composicao(composicao, catalogo):
             info_classificacao["categoria"] = categoria
         if descricao:
             info_classificacao["descricao"] = descricao
+        info_classificacao["codigo"] = codigo
         setor = comp.get("setor", "") or classificar_item(info_classificacao)
         tipo_requisicao = comp.get("tipo_requisicao", "") or classificar_tipo_requisicao(info_classificacao, descricao)
         if tipo_requisicao == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
@@ -132,13 +123,6 @@ def filtrar_linhas_setor(linhas, setor):
     ]
 
 
-def _nivel_linha(linha):
-    try:
-        return int(linha.get("level", 0) or 0)
-    except Exception:
-        return 0
-
-
 def _codigo_pp_ou_cj(linha):
     codigo = normalizar_codigo(linha.get("codigo", ""))
     if len(codigo) >= 2 and codigo[:2] in {"20", "30"}:
@@ -147,8 +131,48 @@ def _codigo_pp_ou_cj(linha):
     return "PRODUTO EM PROCESSO" in referencia or "CONJUNTO" in referencia or "KIT" in referencia
 
 
-def _codigo_layout_preparacao(linha):
-    return normalizar_codigo(linha.get("codigo", "")).startswith(PREFIXO_LAYOUT_PREPARACAO)
+def _info_linha(linha, catalogo=None):
+    linha = dict(linha or {})
+    codigo = normalizar_codigo(linha.get("codigo", ""))
+    info = dict((catalogo or {}).get(codigo, {}) if catalogo else {})
+    info.update({chave: valor for chave, valor in linha.items() if valor not in (None, "")})
+    info["codigo"] = codigo
+    return info
+
+
+def _regra_preparacao(linha, catalogo=None):
+    info = _info_linha(linha, catalogo)
+    codigo = normalizar_codigo(info.get("codigo", ""))
+    categoria = normalizar_texto(info.get("categoria", ""))
+    grupo = normalizar_texto(info.get("grupo", ""))
+    descricao = normalizar_texto(info.get("descricao", ""))
+    referencia = f"{categoria} {grupo} {descricao}"
+
+    if codigo.startswith("3020") and "BANCO" in referencia:
+        return "CJ_BANCOS"
+    if "TRILHO" in referencia:
+        return "TRILHO"
+    if "REFORCO" in referencia:
+        return "REFORCO"
+    if "PISO" in categoria and _codigo_pp_ou_cj(info):
+        return "PISO"
+    return ""
+
+
+def _codigo_cj_bancos(codigo):
+    return normalizar_codigo(codigo).startswith("3020")
+
+
+def _descendente_cj_bancos(linha, pai_por_codigo=None):
+    codigo = normalizar_codigo(linha.get("codigo", ""))
+    pai = normalizar_codigo(linha.get("item", ""))
+    visitados = set()
+    while pai and pai != codigo and pai not in visitados:
+        if _codigo_cj_bancos(pai):
+            return True
+        visitados.add(pai)
+        pai = normalizar_codigo((pai_por_codigo or {}).get(pai, ""))
+    return False
 
 
 def _forcar_linha_layout_preparacao(linha):
@@ -161,59 +185,56 @@ def _forcar_linha_layout_preparacao(linha):
 
 def linhas_layout_preparacao(itens, catalogo=None):
     linhas = []
+    vistos = set()
     for item in itens or []:
         codigo = normalizar_codigo(item.get("codigo", ""))
-        if not codigo.startswith(PREFIXO_LAYOUT_PREPARACAO):
+        info = _info_linha(item, catalogo)
+        regra = _regra_preparacao(info, catalogo)
+        if not codigo or not regra or codigo in vistos:
             continue
-        info = (catalogo or {}).get(codigo, {}) if catalogo else {}
+        vistos.add(codigo)
         qtd = item.get("qtd", item.get("quantidade", ""))
-        linhas.append(
-            _forcar_linha_layout_preparacao(
-                {
-                    "item": codigo,
-                    "codigo": codigo,
-                    "descricao": item.get("descricao", "") or info.get("descricao", "") or "",
-                    "unidade": info.get("unidade", "") or item.get("unidade", "") or "",
-                    "qtd": qtd,
-                    "level": 0,
-                    "grupo": info.get("grupo", "") or "",
-                    "categoria": info.get("categoria", "") or "",
-                    "fornecedor": info.get("fornecedor", "") or "",
-                    "setor_origem": SETOR_PREPARACAO,
-                }
-            )
+        linha = _forcar_linha_layout_preparacao(
+            {
+                "item": codigo,
+                "codigo": codigo,
+                "descricao": info.get("descricao", "") or "",
+                "unidade": info.get("unidade", "") or "",
+                "qtd": qtd,
+                "level": 0,
+                "grupo": info.get("grupo", "") or "",
+                "categoria": info.get("categoria", "") or "",
+                "fornecedor": info.get("fornecedor", "") or "",
+                "setor_origem": SETOR_PREPARACAO,
+                "regra_preparacao": regra,
+            }
         )
+        if regra == "CJ_BANCOS":
+            linha["ocultar_composicao_preparacao"] = True
+        linhas.append(linha)
     return linhas
 
 
 def filtrar_linhas_preparacao(linhas):
     resultado = []
-    ancestrais_layout_por_nivel = {}
+    pai_por_codigo = {
+        normalizar_codigo(linha.get("codigo", "")): normalizar_codigo(linha.get("item", ""))
+        for linha in (linhas or [])
+        if normalizar_codigo(linha.get("codigo", ""))
+    }
     for linha in linhas or []:
-        nivel = _nivel_linha(linha)
-        ancestrais_layout_por_nivel = {
-            nivel_ancestral: ativo
-            for nivel_ancestral, ativo in ancestrais_layout_por_nivel.items()
-            if nivel_ancestral < nivel
-        }
-        dentro_de_layout_3024 = any(ancestrais_layout_por_nivel.values())
-        eh_layout_3024 = _codigo_layout_preparacao(linha)
-
         if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
             continue
-        if dentro_de_layout_3024:
-            if eh_layout_3024:
-                ancestrais_layout_por_nivel[nivel] = True
+        if _descendente_cj_bancos(linha, pai_por_codigo):
             continue
-        if eh_layout_3024:
-            resultado.append(_forcar_linha_layout_preparacao(linha))
-            ancestrais_layout_por_nivel[nivel] = True
+        regra = _regra_preparacao(linha)
+        if not regra:
             continue
-        setor_original = linha.get("setor_origem") or linha.get("setor")
-        if setor_original != SETOR_PREPARACAO:
-            continue
-        if nivel <= 0 or _codigo_pp_ou_cj(linha):
-            resultado.append(linha)
+        linha_preparacao = _forcar_linha_layout_preparacao(linha)
+        linha_preparacao["regra_preparacao"] = regra
+        if regra == "CJ_BANCOS":
+            linha_preparacao["ocultar_composicao_preparacao"] = True
+        resultado.append(linha_preparacao)
     return resultado
 
 
@@ -227,97 +248,20 @@ def filtrar_linhas_faturamento_direto(linhas):
 
 def propagar_setor_preparacao(linhas, catalogo=None, componentes=None):
     linhas = [dict(linha or {}) for linha in (linhas or [])]
-    codigos_com_bom = {
-        normalizar_codigo(codigo)
-        for codigo, filhos in (componentes or {}).items()
-        if normalizar_codigo(codigo) and filhos
-    }
-    setor_por_codigo = {
-        normalizar_codigo(linha.get("codigo", "")): linha.get("setor", "")
-        for linha in linhas
-        if normalizar_codigo(linha.get("codigo", ""))
-    }
     pai_por_codigo = {
         normalizar_codigo(linha.get("codigo", "")): normalizar_codigo(linha.get("item", ""))
         for linha in linhas
         if normalizar_codigo(linha.get("codigo", ""))
     }
-
-    def produto_processo_com_bom(codigo):
-        codigo = normalizar_codigo(codigo)
-        if not codigo or codigo not in codigos_com_bom:
-            return False
-        item_info = (catalogo or {}).get(codigo, {}) if catalogo else {}
-        grupo = normalizar_texto((item_info or {}).get("grupo", ""))
-        categoria = normalizar_texto((item_info or {}).get("categoria", ""))
-        return _MARCADOR_PRODUTO_PROCESSO in grupo or _MARCADOR_PRODUTO_PROCESSO in categoria
-
-    def setor_codigo(codigo):
-        codigo = normalizar_codigo(codigo)
-        if not codigo:
-            return ""
-        if produto_processo_com_bom(codigo):
-            return SETOR_PREPARACAO
-        if setor_por_codigo.get(codigo):
-            return setor_por_codigo[codigo]
-        item_info = (catalogo or {}).get(codigo, {}) if catalogo else {}
-        if item_info:
-            return classificar_item(item_info)
-        return ""
-
-    def tem_ancestral_preparacao(linha):
-        visitados = set()
-        pai = normalizar_codigo(linha.get("item", ""))
-        codigo = normalizar_codigo(linha.get("codigo", ""))
-        while pai and pai != codigo and pai not in visitados:
-            visitados.add(pai)
-            if setor_codigo(pai) == SETOR_PREPARACAO:
-                return True
-            pai = pai_por_codigo.get(pai, "")
-        return False
-
-    setores_por_level = {}
     for linha in linhas:
-        codigo = normalizar_codigo(linha.get("codigo", ""))
-        try:
-            level = int(linha.get("level", 0) or 0)
-        except Exception:
-            level = 0
-        tem_ancestral_por_nivel = any(
-            setor == SETOR_PREPARACAO
-            for nivel, setor in setores_por_level.items()
-            if nivel < level
-        )
-        if (
-            linha.get("setor") != SETOR_PREPARACAO
-            and linha.get("tipo_requisicao") != TIPO_REQUISICAO_FATURAMENTO_DIRETO
-            and (
-                setor_codigo(codigo) == SETOR_PREPARACAO
-                or tem_ancestral_preparacao(linha)
-                or tem_ancestral_por_nivel
-            )
-        ):
-            linha["setor"] = SETOR_PREPARACAO
-        setores_por_level = {
-            nivel: setor
-            for nivel, setor in setores_por_level.items()
-            if nivel < level
-        }
-        setores_por_level[level] = linha.get("setor", "")
-
-    codigos_preparacao = {
-        normalizar_codigo(linha.get("codigo", ""))
-        for linha in linhas
-        if linha.get("setor") == SETOR_PREPARACAO
-        and normalizar_codigo(linha.get("codigo", ""))
-    }
-    for linha in linhas:
-        codigo = normalizar_codigo(linha.get("codigo", ""))
-        if (
-            codigo in codigos_preparacao
-            and linha.get("tipo_requisicao") != TIPO_REQUISICAO_FATURAMENTO_DIRETO
-        ):
-            linha["setor"] = SETOR_PREPARACAO
+        if linha.get("tipo_requisicao") == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
+            continue
+        if _descendente_cj_bancos(linha, pai_por_codigo):
+            setor = SETOR_EXPEDICAO
+        else:
+            setor = SETOR_PREPARACAO if _regra_preparacao(linha, catalogo) else SETOR_EXPEDICAO
+        linha["setor"] = setor
+        linha["setor_origem"] = setor
     return linhas
 
 

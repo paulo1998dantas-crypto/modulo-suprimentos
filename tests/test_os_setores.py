@@ -13,12 +13,12 @@ from os_setores import (
 
 
 class PreparacaoFilterTests(unittest.TestCase):
-    def test_preparacao_nao_explode_insumo_de_conjunto_nao_preparacao(self):
+    def test_preparacao_restringe_a_trilho_piso_reforco_e_cj_bancos(self):
         catalogo = {
-            "30180004": {
-                "descricao": "CJ REVESTIMENTO E/S/J TB",
+            "30240032": {
+                "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
                 "grupo": "30 - CONJUNTO / KIT",
-                "categoria": "18 - REVESTIMENTO",
+                "categoria": "24 - ACESSORIOS",
                 "unidade": "cj",
             },
             "10440013": {
@@ -33,18 +33,24 @@ class PreparacaoFilterTests(unittest.TestCase):
                 "categoria": "14 - PISO",
                 "unidade": "cj",
             },
+            "10280050": {
+                "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI",
+                "grupo": "10 - INSUMO",
+                "categoria": "28 - MATERIA PRIMA",
+                "unidade": "br",
+            },
         }
         linhas = [
             {
                 "item": "40340049",
-                "codigo": "30180004",
-                "descricao": "CJ REVESTIMENTO E/S/J TB",
+                "codigo": "30240032",
+                "descricao": "ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG",
                 "unidade": "cj",
                 "qtd": 1,
                 "level": 0,
             },
             {
-                "item": "30180004",
+                "item": "40340049",
                 "codigo": "10440013",
                 "descricao": "REFORCO U ACO GALVANIZADO FIXACAO TETO E/S/J",
                 "unidade": "pc",
@@ -67,27 +73,36 @@ class PreparacaoFilterTests(unittest.TestCase):
                 "qtd": 1,
                 "level": 0,
             },
+            {
+                "item": "40340049",
+                "codigo": "10280050",
+                "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI",
+                "unidade": "br",
+                "qtd": 2,
+                "level": 0,
+            },
         ]
 
         preparacao = filtrar_linhas_preparacao(
             propagar_setor_preparacao(
                 enriquecer_composicao(linhas, catalogo),
                 catalogo,
-                {"30180004": [{}], "30140027": [{}]},
+                {"30240032": [{}], "30140027": [{}]},
             )
         )
 
         codigos = [linha["codigo"] for linha in preparacao]
-        self.assertNotIn("30180004", codigos)
+        self.assertNotIn("30240032", codigos)
         self.assertIn("30140027", codigos)
-        self.assertEqual(codigos.count("10440013"), 1)
+        self.assertIn("10440013", codigos)
+        self.assertIn("10280050", codigos)
 
-    def test_preparacao_mostra_conjunto_3024_sem_explodir_composicao(self):
+    def test_preparacao_mostra_cj_bancos_sem_explodir_composicao(self):
         catalogo = {
-            "30240062": {
-                "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 1 VAO LE",
+            "30200036": {
+                "descricao": "CJ BANCOS REC LE 3,3 EXECUTIVO",
                 "grupo": "30 - CONJUNTO / KIT",
-                "categoria": "24 - ACESSORIO",
+                "categoria": "20 - BANCOS",
                 "unidade": "cj",
             },
             "10440013": {
@@ -99,19 +114,19 @@ class PreparacaoFilterTests(unittest.TestCase):
         }
         linhas = [
             {
-                "item": "40340049",
-                "codigo": "30240062",
-                "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 1 VAO LE",
-                "unidade": "cj",
-                "qtd": 1,
-                "level": 0,
-            },
-            {
-                "item": "30240062",
+                "item": "30200036",
                 "codigo": "10440013",
                 "descricao": "REFORCO U ACO GALVANIZADO FIXACAO TETO E/S/J",
                 "unidade": "pc",
                 "qtd": 2,
+                "level": 1,
+            },
+            {
+                "item": "30200036",
+                "codigo": "10280050",
+                "descricao": "MP PERFIL ALUMINIO TRILHO BANCO JI",
+                "unidade": "br",
+                "qtd": 1,
                 "level": 1,
             },
         ]
@@ -120,17 +135,34 @@ class PreparacaoFilterTests(unittest.TestCase):
             propagar_setor_preparacao(
                 enriquecer_composicao(linhas, catalogo),
                 catalogo,
-                {"30240062": [{}]},
+                {"30200036": [{}]},
+            )
+        )
+        preparacao.extend(
+            linhas_layout_preparacao(
+                [
+                    {
+                        "codigo": "30200036",
+                        "descricao": "CJ BANCOS REC LE 3,3 EXECUTIVO",
+                        "qtd": 1,
+                    }
+                ],
+                catalogo,
             )
         )
 
         codigos = [linha["codigo"] for linha in preparacao]
-        self.assertEqual(codigos, ["30240062"])
-        self.assertTrue(preparacao[0].get("layout_preparacao"))
-        self.assertEqual(preparacao[0].get("setor"), "PREPARACAO")
+        self.assertEqual(codigos, ["30200036"])
+        self.assertTrue(preparacao[0].get("ocultar_composicao_preparacao"))
 
-    def test_preparacao_inclui_3024_da_lista_original(self):
+    def test_preparacao_referencia_cj_piso_e_nao_forca_3024(self):
         catalogo = {
+            "30140027": {
+                "descricao": "CJ PISO CN 12 MM E/S/J TB LG BRIGHT",
+                "grupo": "30 - CONJUNTO / KIT",
+                "categoria": "14 - PISO",
+                "unidade": "cj",
+            },
             "30240062": {
                 "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 1 VAO LE",
                 "grupo": "30 - CONJUNTO / KIT",
@@ -141,18 +173,57 @@ class PreparacaoFilterTests(unittest.TestCase):
         linhas = linhas_layout_preparacao(
             [
                 {
+                    "codigo": "30140027",
+                    "descricao": "CJ PISO CN 12 MM E/S/J TB LG BRIGHT",
+                    "qtd": 1,
+                },
+                {
                     "codigo": "30240062",
                     "descricao": "CJ MOVEL LATERAL PRETO E/S/J C-CLASS 1 VAO LE",
                     "qtd": 1,
                 },
-                {"codigo": "30180004", "descricao": "CJ REVESTIMENTO E/S/J TB", "qtd": 1},
             ],
             catalogo,
         )
 
-        self.assertEqual([linha["codigo"] for linha in linhas], ["30240062"])
-        self.assertEqual(linhas[0]["unidade"], "cj")
-        self.assertEqual(linhas[0]["setor"], "PREPARACAO")
+        self.assertEqual([linha["codigo"] for linha in linhas], ["30140027"])
+        self.assertEqual(linhas[0]["regra_preparacao"], "PISO")
+
+    def test_isolamento_e_acabamento_nao_sao_preparacao(self):
+        catalogo = {
+            "30160002": {
+                "descricao": "CJ ISOLAMENTO TERMICO E/S/J",
+                "unidade": "cj",
+                "grupo": "30 - CONJUNTO / KIT",
+                "categoria": "16 - ISOLAMENTO",
+            },
+            "10520005": {
+                "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO",
+                "unidade": "pc",
+                "grupo": "10 - INSUMO",
+                "categoria": "52 - ACABAMENTOS",
+            },
+        }
+        linhas = enriquecer_composicao(
+            [
+                {
+                    "item": "40340049",
+                    "codigo": "30160002",
+                    "descricao": "CJ ISOLAMENTO TERMICO E/S/J",
+                    "qtd": 1,
+                },
+                {
+                    "item": "40340049",
+                    "codigo": "10520005",
+                    "descricao": "ACESSORIO ACABAMENTO PLASTICO PARAFUSO",
+                    "qtd": 4,
+                },
+            ],
+            catalogo,
+        )
+
+        preparacao = filtrar_linhas_preparacao(propagar_setor_preparacao(linhas, catalogo, {}))
+        self.assertEqual(preparacao, [])
 
 
 if __name__ == "__main__":
