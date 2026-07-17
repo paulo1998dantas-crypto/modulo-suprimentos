@@ -712,6 +712,40 @@ def carregar_os_fornecedores():
         return json.load(f)
 
 
+def _resolver_nome_cliente_os(valor, clientes=None):
+    valor = _limpar_valor_busca(valor)
+    if not valor:
+        return ""
+
+    clientes = clientes if isinstance(clientes, dict) else carregar_os_fornecedores()
+    info = clientes.get(valor)
+    if not isinstance(info, dict):
+        valor_normalizado = valor.casefold()
+        for chave, candidato in clientes.items():
+            if str(chave).strip().casefold() == valor_normalizado:
+                info = candidato
+                break
+            if not isinstance(candidato, dict):
+                continue
+            nomes = (
+                candidato.get("cliente"),
+                candidato.get("nome_fantasia"),
+                candidato.get("razao_social"),
+            )
+            if any(str(nome or "").strip().casefold() == valor_normalizado for nome in nomes):
+                info = candidato
+                break
+
+    if not isinstance(info, dict):
+        return valor
+    return _limpar_valor_busca(
+        info.get("cliente")
+        or info.get("nome_fantasia")
+        or info.get("razao_social")
+        or valor
+    )
+
+
 def salvar_fornecedores(fornecedores):
     if supabase_data.enabled():
         supabase_data.salvar_pessoas_legacy(fornecedores or {}, "fornecedor")
@@ -3645,9 +3679,10 @@ def gerar_os():
     composicao_source = (request.form.get("os_composicao_source", "bom") or "bom").strip().lower()
     historico_form_id = (request.form.get("os_historico_id", "") or "").strip()
     usando_composicao_historica = composicao_source == "custom" and bool(historico_form_id)
-    cliente = _limpar_valor_busca(
+    cliente_selecionado = _limpar_valor_busca(
         request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
     )
+    cliente = _resolver_nome_cliente_os(cliente_selecionado)
     os_produtos = carregar_os_produtos()
     produtos_catalogo = carregar_produtos()
     bom_dir = get_bom_dir()

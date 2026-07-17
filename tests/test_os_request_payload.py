@@ -15,6 +15,7 @@ from app import (  # noqa: E402
     POPUP_ITEM_NAO_APLICAVEL,
     SuprimentosRequest,
     _parse_os_composition_form,
+    _resolver_nome_cliente_os,
     _resolver_selecoes_popup_item,
     app,
 )
@@ -22,6 +23,24 @@ from flask import request  # noqa: E402
 
 
 class OsRequestPayloadTests(unittest.TestCase):
+    def test_resolves_customer_key_to_name_before_generating_documents(self):
+        clientes = {
+            "12.345.678/0001-90": {
+                "cliente": "CLIENTE EXEMPLO LTDA",
+                "razao_social": "CLIENTE EXEMPLO LTDA",
+                "cnpj": "12.345.678/0001-90",
+            }
+        }
+
+        nome = _resolver_nome_cliente_os("12.345.678/0001-90", clientes)
+
+        self.assertEqual("CLIENTE EXEMPLO LTDA", nome)
+
+    def test_keeps_manually_entered_customer_name(self):
+        nome = _resolver_nome_cliente_os("CLIENTE SEM CADASTRO", {})
+
+        self.assertEqual("CLIENTE SEM CADASTRO", nome)
+
     def test_large_legacy_multipart_payload_is_accepted(self):
         pairs = []
         for index in range(1_500):
