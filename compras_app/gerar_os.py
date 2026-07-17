@@ -421,6 +421,56 @@ def _isolar_layout_na_ultima_pagina(doc, tabela):
         body.append(tabela_xml)
 
 
+def _inserir_vistos_qualidade_gestao(doc, refs):
+    titulo = "VISTOS DE QUALIDADE E GESTÃO"
+    for tabela in doc.tables:
+        texto = " ".join(
+            cell.text for row in tabela.rows for cell in row.cells
+        ).upper()
+        if titulo in texto:
+            return tabela
+
+    modelo = Document(TEMPLATE_REQUISICAO_EXPEDICAO)
+    tabela_modelo = next(
+        (
+            tabela
+            for tabela in modelo.tables
+            if "VISTOS DE EXPEDIÇÃO E CONFERÊNCIA"
+            in " ".join(cell.text for row in tabela.rows for cell in row.cells).upper()
+        ),
+        None,
+    )
+    if tabela_modelo is None:
+        raise RuntimeError("Tabela padrão de vistos não encontrada no template de requisição.")
+
+    tabela_xml = deepcopy(tabela_modelo._tbl)
+    substituicoes = {
+        "VISTOS DE EXPEDIÇÃO E CONFERÊNCIA": titulo,
+        "Assinatura da expedição": "Assinatura da QUALIDADE",
+        "Assinatura de conferência": "Assinatura de GESTÃO",
+    }
+    for texto_xml in tabela_xml.xpath(".//w:t"):
+        if texto_xml.text in substituicoes:
+            texto_xml.text = substituicoes[texto_xml.text]
+
+    body = doc._body._element
+    alvo = body.sectPr
+    layout_idx = refs.get("layout")
+    if layout_idx is not None and layout_idx < len(doc.tables):
+        layout_xml = doc.tables[layout_idx]._tbl
+        alvo = layout_xml
+        anterior = layout_xml.getprevious()
+        if anterior is not None and anterior.tag == qn("w:p"):
+            tem_quebra = anterior.xpath('.//w:pageBreakBefore | .//w:br[@w:type="page"]')
+            if tem_quebra:
+                alvo = anterior
+
+    indice = body.index(alvo) if alvo is not None else len(body)
+    body.insert(indice, OxmlElement("w:p"))
+    body.insert(indice + 1, tabela_xml)
+    return next(tabela for tabela in doc.tables if tabela._tbl is tabela_xml)
+
+
 def _remover_tabela(doc, tabela):
     try:
         tabela._tbl.getparent().remove(tabela._tbl)
@@ -637,6 +687,10 @@ def gerar_os_docx(
         _limpar_layout(tabela_layout)
         _inserir_layout_pdf(tabela_layout, layout_pdf)
         _isolar_layout_na_ultima_pagina(doc, tabela_layout)
+
+    if modo == "completa":
+        refs = mapear_tabelas_os(doc)
+        _inserir_vistos_qualidade_gestao(doc, refs)
 
     _alinhar_tudo_centro(doc)
     refs = mapear_tabelas_os(doc)
