@@ -1487,11 +1487,41 @@ selecao
 )) || null;
 }
 
-function construirFilaPopupItem(row, codigoGatilho, selecoes, contexto, ancestrais, caminhoCodigos){
+function gatilhosPopupItemNaBom(codigoRaiz){
+const raiz = normalizarCodigoOS(codigoRaiz);
+const encontrados = [];
+const gatilhosVistos = new Set();
+const paisVisitados = new Set();
+function visitar(codigoPai, caminho){
+if (paisVisitados.has(codigoPai)){
+return;
+}
+paisVisitados.add(codigoPai);
+(componentesItemOS(codigoPai) || []).forEach((componente) => {
+const codigoFilho = normalizarCodigoOS((componente && componente.codigo) || "");
+if (!codigoFilho || caminho.includes(codigoFilho)){
+return;
+}
+const caminhoFilho = [...caminho, codigoFilho];
+if (regrasPopupItemParaCodigo(codigoFilho).length && !gatilhosVistos.has(codigoFilho)){
+gatilhosVistos.add(codigoFilho);
+encontrados.push({ codigo: codigoFilho, caminho: caminhoFilho });
+}
+visitar(codigoFilho, caminhoFilho);
+});
+}
+if (raiz){
+visitar(raiz, [raiz]);
+}
+return encontrados;
+}
+
+function construirFilaPopupItem(row, codigoGatilho, selecoes, contexto, ancestrais, caminhoCodigos, incluirBom, origemBom){
 const gatilho = normalizarCodigoOS(codigoGatilho);
 const contextoAtual = contexto || contextoRaizPopupItem(gatilho);
 const ancestraisAtuais = Array.isArray(ancestrais) ? ancestrais : [];
 const caminhoAtual = Array.isArray(caminhoCodigos) && caminhoCodigos.length ? caminhoCodigos : [gatilho];
+const deveIncluirBom = incluirBom !== false;
 const fila = [];
 regrasPopupItemParaCodigo(gatilho).forEach((regra) => {
 const tarefa = {
@@ -1502,6 +1532,7 @@ contexto: contextoAtual,
 chaveSelecao: chaveSelecaoPopupItem(contextoAtual, regra),
 ancestrais: [...ancestraisAtuais],
 caminhoCodigos: [...caminhoAtual],
+origemBom: origemBom || "",
 };
 const selecao = encontrarSelecaoPopupItem(selecoes, tarefa);
 const selecionado = normalizarCodigoOS(selecao && selecao.codigo);
@@ -1527,6 +1558,21 @@ contextoFilho,
 [...caminhoAtual, selecionado],
 ));
 });
+if (deveIncluirBom){
+gatilhosPopupItemNaBom(gatilho).forEach((gatilhoBom) => {
+const caminhoBomTexto = gatilhoBom.caminho.join(">");
+fila.push(...construirFilaPopupItem(
+row,
+gatilhoBom.codigo,
+selecoes,
+`${contextoAtual}>bom:${caminhoBomTexto}`,
+ancestraisAtuais,
+[...caminhoAtual, ...gatilhoBom.caminho.slice(1)],
+false,
+gatilhoBom.caminho.join(" -> "),
+));
+});
+}
 return fila;
 }
 
@@ -1560,7 +1606,9 @@ option.disabled = ciclo;
 option.textContent = `${codigoNorm} - ${item.descricao || item.nome || "Item"}${ciclo ? " (ciclo bloqueado)" : ""}`;
 select.appendChild(option);
 });
-const origem = atual.ancestrais.length ? "selecionado no popup anterior" : "informado na O.S.";
+const origem = atual.origemBom
+? `componente da B.O.M. ${atual.origemBom}`
+: (atual.ancestrais.length ? "selecionado no popup anterior" : "informado na O.S.");
 display.textContent = `Item obrigatório relacionado a ${atual.codigoGatilho}, ${origem}`;
 qtdInput.value = String(atual.regra.quantidade || 1);
 qtdInput.readOnly = !atual.regra.quantidade_editavel;
@@ -1645,11 +1693,6 @@ select.addEventListener("change", onSelectChange);
 
 function iniciarPopupsItemOS(row, codigo, options){
 if (!row || (options && options.semPopup)){
-return;
-}
-const regras = regrasPopupItemParaCodigo(codigo);
-if (!regras.length){
-salvarSelecoesPopupItem(row, []);
 return;
 }
 const selecoes = lerSelecoesPopupItem(row);

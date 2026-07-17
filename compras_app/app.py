@@ -920,7 +920,32 @@ def salvar_regras_popup_item(regras):
 POPUP_ITEM_NAO_APLICAVEL = "__NAO_APLICAVEL__"
 
 
-def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho):
+def _gatilhos_popup_na_bom(codigo_raiz, regras_por_gatilho, componentes):
+    codigo_raiz = normalizar_codigo(codigo_raiz)
+    encontrados = []
+    gatilhos_vistos = set()
+    pais_visitados = set()
+
+    def visitar(codigo_pai, caminho):
+        if codigo_pai in pais_visitados:
+            return
+        pais_visitados.add(codigo_pai)
+        for componente in (componentes or {}).get(codigo_pai, []) or []:
+            codigo_filho = normalizar_codigo((componente or {}).get("codigo", ""))
+            if not codigo_filho or codigo_filho in caminho:
+                continue
+            caminho_filho = [*caminho, codigo_filho]
+            if regras_por_gatilho.get(codigo_filho) and codigo_filho not in gatilhos_vistos:
+                gatilhos_vistos.add(codigo_filho)
+                encontrados.append({"codigo": codigo_filho, "caminho": caminho_filho})
+            visitar(codigo_filho, caminho_filho)
+
+    if codigo_raiz:
+        visitar(codigo_raiz, [codigo_raiz])
+    return encontrados
+
+
+def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho, componentes=None):
     codigo_raiz = normalizar_codigo(codigo_raiz)
     selecoes = [selecao for selecao in (selecoes or []) if isinstance(selecao, dict)]
     por_chave = {
@@ -930,7 +955,7 @@ def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho):
     }
     resolvidas = []
 
-    def resolver(gatilho, contexto, ancestrais, caminho):
+    def resolver(gatilho, contexto, ancestrais, caminho, incluir_bom=True):
         for regra in regras_por_gatilho.get(gatilho, []):
             regra_id = str(regra.get("id", "") or "")
             chave = f"{contexto}|{regra_id}"
@@ -992,6 +1017,18 @@ def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho):
             )
             if erro:
                 return erro
+        if incluir_bom:
+            for gatilho_bom in _gatilhos_popup_na_bom(gatilho, regras_por_gatilho, componentes):
+                caminho_bom = gatilho_bom["caminho"]
+                erro = resolver(
+                    gatilho_bom["codigo"],
+                    f"{contexto}>bom:{'>'.join(caminho_bom)}",
+                    ancestrais,
+                    [*caminho, *caminho_bom[1:]],
+                    incluir_bom=False,
+                )
+                if erro:
+                    return erro
         return ""
 
     erro = resolver(codigo_raiz, f"root:{codigo_raiz}", [], [codigo_raiz])
@@ -3640,6 +3677,7 @@ def gerar_os():
     regras_popup_por_gatilho = {}
     for regra in carregar_regras_popup_item():
         regras_popup_por_gatilho.setdefault(regra.get("gatilho", ""), []).append(regra)
+    componentes = carregar_os_componentes()
     for idx in range(len(codigos)):
         codigo_item = normalizar_codigo(codigos[idx])
         if not codigo_item:
@@ -3713,6 +3751,7 @@ def gerar_os():
                 codigo_item,
                 popup_selecoes,
                 regras_popup_por_gatilho,
+                componentes,
             )
             if popup_erro:
                 return popup_erro, 400
@@ -3806,7 +3845,6 @@ def gerar_os():
     numero_manual = request.form.get("os_numero", "").strip()
     numero_os = numero_manual or proximo_numero_os()
 
-    componentes = carregar_os_componentes()
     layout_pdf = request.files.get("os_layout_pdf")
     composicao_importada = _parse_os_composition_form(request.form)
 

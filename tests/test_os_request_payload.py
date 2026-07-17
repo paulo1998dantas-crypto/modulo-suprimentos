@@ -175,6 +175,67 @@ class OsPopupChainTests(unittest.TestCase):
         self.assertEqual(erro, "")
         self.assertEqual([item["codigo"] for item in resolvidas], ["B", POPUP_ITEM_NAO_APLICAVEL])
 
+    def test_requires_selection_for_trigger_inside_bom(self):
+        regras = {
+            "30180024": [
+                {"id": "regra-110", "gatilho": "30180024", "opcoes": ["30180023", "30180031"]}
+            ]
+        }
+        componentes = {"40340055": [{"codigo": "30180024"}]}
+
+        resolvidas, erro = _resolver_selecoes_popup_item("40340055", [], regras, componentes)
+
+        self.assertEqual(resolvidas, [])
+        self.assertIn("30180024", erro)
+
+    def test_resolves_selection_for_trigger_inside_bom(self):
+        regras = {
+            "30180024": [
+                {"id": "regra-110", "gatilho": "30180024", "opcoes": ["30180023", "30180031"]}
+            ]
+        }
+        componentes = {"40340055": [{"codigo": "30180024"}]}
+        selecoes = [
+            {
+                "regra_id": "regra-110",
+                "codigo": "30180023",
+                "qtd": 1,
+                "chave": "root:40340055>bom:40340055>30180024|regra-110",
+            }
+        ]
+
+        resolvidas, erro = _resolver_selecoes_popup_item(
+            "40340055",
+            selecoes,
+            regras,
+            componentes,
+        )
+
+        self.assertEqual(erro, "")
+        self.assertEqual([item["codigo"] for item in resolvidas], ["30180023"])
+        self.assertEqual(resolvidas[0]["gatilho"], "30180024")
+
+    def test_finds_trigger_deep_inside_bom_and_handles_bom_cycle(self):
+        regras = {"C": [{"id": "regra-c", "gatilho": "C", "opcoes": ["D"]}]}
+        componentes = {
+            "A": [{"codigo": "B"}],
+            "B": [{"codigo": "C"}],
+            "C": [{"codigo": "A"}],
+        }
+        selecoes = [
+            {
+                "regra_id": "regra-c",
+                "codigo": "D",
+                "qtd": 1,
+                "chave": "root:A>bom:A>B>C|regra-c",
+            }
+        ]
+
+        resolvidas, erro = _resolver_selecoes_popup_item("A", selecoes, regras, componentes)
+
+        self.assertEqual(erro, "")
+        self.assertEqual([item["codigo"] for item in resolvidas], ["D"])
+
 
 if __name__ == "__main__":
     unittest.main()
