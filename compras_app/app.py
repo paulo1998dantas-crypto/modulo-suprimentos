@@ -570,9 +570,23 @@ def _ids_existentes_por_signature(linhas, campos):
     return por_signature
 
 
+def _linhas_existentes_por_line_id(linhas):
+    por_line_id = {}
+    for linha in linhas or []:
+        if not isinstance(linha, dict):
+            continue
+        line_id = _normalizar_line_id(
+            linha.get("line_id") or linha.get("linha_id") or linha.get("id_linha") or linha.get("lineId")
+        )
+        if line_id:
+            por_line_id[line_id] = linha
+    return por_line_id
+
+
 def _atribuir_line_ids(linhas, prefix, existentes=None, campos_chave=None):
     campos_chave = tuple(campos_chave or ())
     ids_por_signature = _ids_existentes_por_signature(existentes, campos_chave)
+    existentes_por_line_id = _linhas_existentes_por_line_id(existentes)
     resultado = []
     usados = set()
     for linha in linhas or []:
@@ -591,6 +605,11 @@ def _atribuir_line_ids(linhas, prefix, existentes=None, campos_chave=None):
         while not line_id or line_id in usados:
             line_id = _line_id(prefix)
         item["line_id"] = line_id
+        existente = existentes_por_line_id.get(line_id)
+        if existente:
+            for key in ("line_status", "line_status_atualizado_por", "line_status_atualizado_em"):
+                if not item.get(key) and existente.get(key):
+                    item[key] = existente.get(key)
         usados.add(line_id)
         resultado.append(item)
     return resultado
@@ -725,6 +744,26 @@ def atualizar_status_historico_documento(documento_id, status):
         if str(entry.get("id")) == str(documento_id):
             entries[idx] = documento
             break
+    salvar_historico(entries)
+    return documento
+
+
+def salvar_historico_documento_atualizado(documento_id, documento):
+    if not documento:
+        return None
+    documento["atualizado_por"] = current_username()
+    if supabase_data.enabled():
+        supabase_data.atualizar_documento(documento_id, documento)
+        return documento
+    entries = _carregar_historico_local()
+    atualizado = False
+    for idx, entry in enumerate(entries):
+        if str(entry.get("id")) == str(documento_id):
+            entries[idx] = documento
+            atualizado = True
+            break
+    if not atualizado:
+        return None
     salvar_historico(entries)
     return documento
 
@@ -2471,6 +2510,59 @@ def _line_ids_documento(documento):
                 yield line_id
 
 
+def _linha_status(linha):
+    return str((linha or {}).get("line_status") or "emitido").strip().lower() or "emitido"
+
+
+def _linha_tem_id(linha, line_id):
+    return _normalizar_line_id((linha or {}).get("line_id")) == line_id
+
+
+def _aplicar_acao_linha_lista(linhas, line_id, acao, usuario):
+    resultado = []
+    aplicado = False
+    for linha in linhas or []:
+        if not isinstance(linha, dict) or not _linha_tem_id(linha, line_id):
+            resultado.append(linha)
+            continue
+        aplicado = True
+        if acao == "excluir":
+            continue
+        atualizada = dict(linha)
+        atualizada["line_status"] = acao
+        atualizada["line_status_atualizado_por"] = usuario
+        atualizada["line_status_atualizado_em"] = datetime.now().isoformat(timespec="seconds")
+        resultado.append(atualizada)
+    return resultado, aplicado
+
+
+def aplicar_baixa_linha_documento(documento, line_id, acao):
+    line_id = _normalizar_line_id(line_id)
+    if not line_id:
+        return False, ""
+    usuario = current_username()
+
+    itens, aplicado = _aplicar_acao_linha_lista(documento.get("itens", []) or [], line_id, acao, usuario)
+    if aplicado:
+        documento["itens"] = itens
+        return True, "itens"
+
+    composicao, aplicado = _aplicar_acao_linha_lista(documento.get("composicao", []) or [], line_id, acao, usuario)
+    if aplicado:
+        documento["composicao"] = composicao
+        return True, "composicao"
+
+    processos = documento.get("processos", {}) or {}
+    for grupo, linhas in list(processos.items()):
+        linhas_atualizadas, aplicado = _aplicar_acao_linha_lista(linhas or [], line_id, acao, usuario)
+        if aplicado:
+            processos[grupo] = linhas_atualizadas
+            documento["processos"] = processos
+            return True, f"processos/{grupo}"
+
+    return False, ""
+
+
 def _indexar_historico_para_baixa(historico):
     por_id = {}
     por_linha = {}
@@ -2517,8 +2609,18 @@ def importar_baixas_documentos(file_storage, tipo_filtro=""):
 
     historico = carregar_historico()
     indices = _indexar_historico_para_baixa(historico)
-    pendentes = {}
-    resultado = {"linhas": 0, "atualizados": 0, "excluidos": 0, "ignorados": 0, "erros": []}
+    por_id, por_linha, _ = indices
+    pendentes_documentos = {}
+    pendentes_linhas = {}
+    resultado = {
+        "linhas": 0,
+        "atualizados": 0,
+        "excluidos": 0,
+        "linhas_atualizadas": 0,
+        "linhas_excluidas": 0,
+        "ignorados": 0,
+        "erros": [],
+    }
 
     for aba, linhas in _ler_abas_baixa(file_storage):
         if not linhas:
@@ -2532,6 +2634,33 @@ def importar_baixas_documentos(file_storage, tipo_filtro=""):
                 resultado["ignorados"] += 1
                 continue
             resultado["linhas"] += 1
+
+            line_id = _normalizar_line_id(_valor_baixa(row, mapa, "line_id"))
+            if line_id:
+                documento = por_linha.get(line_id)
+                if not documento:
+                    resultado["erros"].append(f"{aba} linha {row_idx}: ID Linha nao encontrado")
+                    continue
+                if tipo_filtro and documento.get("tipo") != tipo_filtro:
+                    resultado["ignorados"] += 1
+                    continue
+                documento_id = str(documento.get("id") or "").strip()
+                if not documento_id:
+                    resultado["erros"].append(f"{aba} linha {row_idx}: documento da linha sem ID")
+                    continue
+                if documento_id in pendentes_documentos:
+                    resultado["erros"].append(
+                        f"{aba} linha {row_idx}: documento {documento.get('numero') or documento_id} ja possui baixa de documento inteiro"
+                    )
+                    continue
+                key = (documento_id, line_id)
+                existente = pendentes_linhas.get(key)
+                if existente and existente["acao"] != acao:
+                    resultado["erros"].append(f"{aba} linha {row_idx}: acao conflitante para ID Linha {line_id}")
+                    continue
+                pendentes_linhas[key] = {"acao": acao, "documento": documento, "aba": aba}
+                continue
+
             documento, origem = _resolver_documento_baixa(row, mapa, indices)
             if not documento:
                 resultado["erros"].append(f"{aba} linha {row_idx}: documento nao encontrado")
@@ -2543,15 +2672,39 @@ def importar_baixas_documentos(file_storage, tipo_filtro=""):
             if not documento_id:
                 resultado["erros"].append(f"{aba} linha {row_idx}: documento sem ID")
                 continue
-            existente = pendentes.get(documento_id)
+            if any(key[0] == documento_id for key in pendentes_linhas):
+                resultado["erros"].append(
+                    f"{aba} linha {row_idx}: documento {documento.get('numero') or documento_id} ja possui baixa por linha"
+                )
+                continue
+            existente = pendentes_documentos.get(documento_id)
             if existente and existente["acao"] != acao:
                 resultado["erros"].append(
                     f"{aba} linha {row_idx}: acao conflitante para documento {documento.get('numero') or documento_id}"
                 )
                 continue
-            pendentes[documento_id] = {"acao": acao, "documento": documento, "origem": origem}
+            pendentes_documentos[documento_id] = {"acao": acao, "documento": documento, "origem": origem}
 
-    for documento_id, item in pendentes.items():
+    documentos_linhas = {}
+    for (documento_id, line_id), item in pendentes_linhas.items():
+        documento = documentos_linhas.get(documento_id)
+        if documento is None:
+            base_doc = obter_historico_documento(documento_id) or item["documento"]
+            documento = dict(base_doc)
+            documentos_linhas[documento_id] = documento
+        aplicado, _escopo = aplicar_baixa_linha_documento(documento, line_id, item["acao"])
+        if not aplicado:
+            resultado["erros"].append(f"ID Linha {line_id}: nao foi possivel aplicar baixa")
+            continue
+        if item["acao"] == "excluir":
+            resultado["linhas_excluidas"] += 1
+        else:
+            resultado["linhas_atualizadas"] += 1
+
+    for documento_id, documento in documentos_linhas.items():
+        salvar_historico_documento_atualizado(documento_id, documento)
+
+    for documento_id, item in pendentes_documentos.items():
         acao = item["acao"]
         if acao == "excluir":
             excluir_historico_documento(documento_id)
@@ -3870,7 +4023,10 @@ def importar_baixa_documentos_route():
         resultado = importar_baixas_documentos(arquivo, tipo)
         status = (
             f"Baixa em massa: {resultado['atualizados']} documento(s) atualizado(s), "
-            f"{resultado['excluidos']} excluido(s), {resultado['ignorados']} linha(s) ignorada(s)."
+            f"{resultado['excluidos']} excluido(s), "
+            f"{resultado.get('linhas_atualizadas', 0)} linha(s) atualizada(s), "
+            f"{resultado.get('linhas_excluidas', 0)} linha(s) excluida(s), "
+            f"{resultado['ignorados']} linha(s) ignorada(s)."
         )
         if resultado["erros"]:
             status += " " + "; ".join(resultado["erros"][:3])
@@ -5284,7 +5440,7 @@ def exportar_dashboard():
         ws_oc_itens = wb.create_sheet("Compras Itens")
         ws_oc_itens.append(base_headers + [
             "ID Linha", "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
-            "IPI", "ICMS", "COFINS", "Total", "ACAO"
+            "IPI", "ICMS", "COFINS", "Total", "Status Linha", "ACAO"
         ])
     if tipo_filtro in {"", "os"}:
         ws_os = wb.create_sheet("Ordens de Servico")
@@ -5295,14 +5451,14 @@ def exportar_dashboard():
         ws_os_itens = wb.create_sheet("OS Itens")
         ws_os_itens.append(base_headers + [
             "ID Linha", "Indice", "Codigo", "Descricao", "Quantidade", "Serie", "Unidade", "Grupo",
-            "Categoria", "Fornecedor", "ACAO"
+            "Categoria", "Fornecedor", "Status Linha", "ACAO"
         ])
         ws_os_proc = wb.create_sheet("OS Processos")
-        ws_os_proc.append(base_headers + ["ID Linha", "Grupo", "Indice", "Atividade", "Responsavel", "ACAO"])
+        ws_os_proc.append(base_headers + ["ID Linha", "Grupo", "Indice", "Atividade", "Responsavel", "Status Linha", "ACAO"])
         ws_os_comp = wb.create_sheet("OS Componentes")
         ws_os_comp.append(base_headers + [
             "ID Linha", "Indice", "Item Pai", "Codigo", "Descricao", "Unidade", "Quantidade", "Nivel",
-            "Destino", "Destino Manual", "ACAO"
+            "Destino", "Destino Manual", "Status Linha", "ACAO"
         ])
 
     for entry in historico:
@@ -5356,6 +5512,7 @@ def exportar_dashboard():
                     item.get("icms", ""),
                     item.get("cofins", ""),
                     item.get("total", ""),
+                    _linha_status(item),
                     "",
                 ])
         elif tipo == "os":
@@ -5384,6 +5541,7 @@ def exportar_dashboard():
                     item.get("grupo", ""),
                     item.get("categoria", ""),
                     item.get("fornecedor", ""),
+                    _linha_status(item),
                     "",
                 ])
             processos = entry.get("processos", {}) or {}
@@ -5395,6 +5553,7 @@ def exportar_dashboard():
                         idx,
                         linha.get("atividade", ""),
                         linha.get("responsavel", ""),
+                        _linha_status(linha),
                         "",
                     ])
             composicao = entry.get("composicao", []) or []
@@ -5410,6 +5569,7 @@ def exportar_dashboard():
                     comp.get("level", ""),
                     comp.get("setor", ""),
                     "Sim" if comp.get("setor_manual") else "Nao",
+                    _linha_status(comp),
                     "",
                 ])
 

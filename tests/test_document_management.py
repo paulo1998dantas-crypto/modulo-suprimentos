@@ -84,7 +84,7 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertTrue(entry["processos"]["CORTE"][0]["line_id"].startswith("os-proc-"))
         self.assertTrue(entry["composicao"][0]["line_id"].startswith("os-comp-"))
 
-    def test_bulk_status_upload_uses_document_or_line_id(self):
+    def test_bulk_status_upload_updates_line_or_document_by_scope(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             history_path = Path(tmpdir) / "historico.json"
             history_path.write_text(json.dumps([
@@ -131,7 +131,48 @@ class DocumentManagementTests(unittest.TestCase):
             rows = json.loads(history_path.read_text(encoding="utf-8"))
             self.assertEqual(302, response.status_code)
             self.assertEqual(["local-oc"], [row["id"] for row in rows])
-            self.assertEqual("concluido", rows[0]["status"])
+            self.assertEqual("emitido", rows[0]["status"])
+            self.assertEqual("concluido", rows[0]["itens"][0]["line_status"])
+
+    def test_bulk_status_upload_can_delete_specific_os_line(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            history_path = Path(tmpdir) / "historico.json"
+            history_path.write_text(json.dumps([{
+                "id": "local-os",
+                "tipo": "os",
+                "numero": "200",
+                "data_criacao": "2026-07-19",
+                "status": "emitido",
+                "dados": {"cliente": "Cliente"},
+                "itens": [
+                    {"line_id": "os-item-keep", "codigo": "SKU-1"},
+                    {"line_id": "os-item-drop", "codigo": "SKU-2"},
+                ],
+            }], ensure_ascii=False), encoding="utf-8")
+
+            wb = Workbook()
+            ws = wb.active
+            ws.append(["ID", "ID Linha", "ACAO"])
+            ws.append(["local-os", "os-item-drop", "excluir"])
+            upload = io.BytesIO()
+            wb.save(upload)
+            upload.seek(0)
+
+            with (
+                patch.object(app_module, "HISTORICO_FILE", str(history_path)),
+                patch.object(app_module, "login_enabled", return_value=False),
+                patch.object(app_module.supabase_data, "enabled", return_value=False),
+            ):
+                response = app_module.app.test_client().post(
+                    "/importar_baixa_documentos",
+                    data={"arquivo_baixa_documentos": (upload, "baixas.xlsx")},
+                    content_type="multipart/form-data",
+                )
+
+            rows = json.loads(history_path.read_text(encoding="utf-8"))
+            self.assertEqual(302, response.status_code)
+            self.assertEqual("emitido", rows[0]["status"])
+            self.assertEqual(["os-item-keep"], [item["line_id"] for item in rows[0]["itens"]])
 
     def test_transient_import_path_is_scoped_by_login(self):
         with app_module.app.test_request_context("/"):
@@ -187,6 +228,7 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertIn("Criado Por", main_rows[0])
         self.assertIn("ACAO", main_rows[0])
         self.assertIn("ID Linha", item_rows[0])
+        self.assertIn("Status Linha", item_rows[0])
         self.assertIn("ACAO", item_rows[0])
         self.assertEqual("rascunho", main_rows[1][1])
         self.assertEqual("SKU-1", item_rows[1][8])
@@ -213,6 +255,7 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual(["Ordens de Servico", "OS Itens", "OS Processos", "OS Componentes"], workbook.sheetnames)
         self.assertIn("ACAO", [cell.value for cell in workbook["Ordens de Servico"][1]])
         self.assertIn("ID Linha", [cell.value for cell in workbook["OS Itens"][1]])
+        self.assertIn("Status Linha", [cell.value for cell in workbook["OS Itens"][1]])
         self.assertIn("ACAO", [cell.value for cell in workbook["OS Itens"][1]])
         workbook.close()
         response.close()
