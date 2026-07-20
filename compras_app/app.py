@@ -12,6 +12,7 @@ import sys
 import shutil
 import zipfile
 import subprocess
+import threading
 import unicodedata
 from datetime import date, timedelta, datetime
 import tempfile
@@ -127,6 +128,18 @@ def login_enabled():
 
 def current_user():
     return session.get("suprimentos_user")
+
+
+def current_username():
+    user = current_user() or {}
+    return str(user.get("username") or user.get("id") or "local").strip() or "local"
+
+
+def _user_scoped_file(path):
+    """Keep transient import data isolated per application login."""
+    stem, ext = os.path.splitext(path)
+    username = secure_filename(current_username()) or "local"
+    return f"{stem}.{username}{ext}"
 
 
 def login_required(view):
@@ -511,9 +524,7 @@ def _carregar_historico_local():
 def carregar_historico():
     if supabase_data.enabled():
         try:
-            documentos = supabase_data.carregar_documentos()
-            if documentos:
-                return documentos
+            return supabase_data.carregar_documentos()
         except Exception:
             app.logger.exception("Falha ao carregar historico de documentos do Supabase")
     return _carregar_historico_local()
@@ -536,11 +547,19 @@ def registrar_historico(
     componentes=None,
     composicao=None,
     documento_id=None,
+    status="emitido",
+    submit_token="",
 ):
+    existente = obter_historico_documento(documento_id) if documento_id else None
+    usuario = current_username()
     entry = {
         "tipo": tipo,
         "numero": str(numero),
-        "data_criacao": datetime.now().strftime("%Y-%m-%d"),
+        "data_criacao": (existente or {}).get("data_criacao") or datetime.now().strftime("%Y-%m-%d"),
+        "status": status or (existente or {}).get("status") or "emitido",
+        "submit_token": submit_token or (existente or {}).get("submit_token") or "",
+        "criado_por": (existente or {}).get("criado_por") or usuario,
+        "atualizado_por": usuario,
         "dados": dados or {},
         "itens": itens or [],
         "processos": processos or {},
@@ -554,21 +573,31 @@ def registrar_historico(
             if documento_id:
                 supabase_data.atualizar_documento(documento_id, entry)
             else:
-                supabase_data.salvar_documento(entry)
+                salvo = supabase_data.salvar_documento(entry)
+                if isinstance(salvo, dict) and salvo.get("id") is not None:
+                    entry["id"] = salvo["id"]
         except Exception:
             app.logger.exception("Falha ao salvar historico de documento no Supabase")
+            raise
+        return entry
     entries = _carregar_historico_local()
     atualizado = False
-    if documento_id:
-        for idx, existente in enumerate(entries):
-            if str(existente.get("id")) == str(documento_id):
-                entries[idx] = entry
-                atualizado = True
-                break
+    for idx, registro_local in enumerate(entries):
+        mesmo_id = documento_id and str(registro_local.get("id")) == str(documento_id)
+        mesmo_token = submit_token and registro_local.get("submit_token") == submit_token
+        if mesmo_id or mesmo_token:
+            if not entry.get("id"):
+                entry["id"] = registro_local.get("id")
+            if not entry.get("criado_por"):
+                entry["criado_por"] = registro_local.get("criado_por", "")
+            entries[idx] = entry
+            atualizado = True
+            break
     if not atualizado:
-        entry.setdefault("id", f"local-{len(entries)}")
+        entry.setdefault("id", f"local-{submit_token or len(entries)}")
         entries.append(entry)
     salvar_historico(entries)
+    return entry
 
 
 def obter_historico_documento(documento_id):
@@ -586,6 +615,7 @@ def obter_historico_documento(documento_id):
 def excluir_historico_documento(documento_id):
     if supabase_data.enabled():
         supabase_data.excluir_documento(documento_id)
+        return
     entries = [
         entry
         for entry in _carregar_historico_local()
@@ -594,10 +624,33 @@ def excluir_historico_documento(documento_id):
     salvar_historico(entries)
 
 
+def atualizar_status_historico_documento(documento_id, status):
+    status = str(status or "").strip().lower()
+    if status not in {"rascunho", "emitido", "cancelado", "concluido"}:
+        raise ValueError("Status de documento invalido.")
+    documento = obter_historico_documento(documento_id)
+    if not documento:
+        return None
+    documento["status"] = status
+    documento["atualizado_por"] = current_username()
+    if supabase_data.enabled():
+        supabase_data.atualizar_documento(documento_id, documento)
+        return documento
+    entries = _carregar_historico_local()
+    for idx, entry in enumerate(entries):
+        if str(entry.get("id")) == str(documento_id):
+            entries[idx] = documento
+            break
+    salvar_historico(entries)
+    return documento
+
+
 def _agrupar_por_data(entries, tipo, campo_soma=None):
     resumo = {}
     for e in entries:
         if e.get("tipo") != tipo:
+            continue
+        if e.get("status") == "cancelado":
             continue
         data = (e.get("data_criacao") or "")[:10]
         if not data:
@@ -620,6 +673,8 @@ def _dashboard_totais(entries):
     qtd_oc = 0
     qtd_os = 0
     for entry in entries:
+        if entry.get("status") == "cancelado":
+            continue
         if entry.get("tipo") == "oc":
             qtd_oc += 1
             total_oc += _parse_numero_form((entry.get("dados") or {}).get("total_pedido"), 0.0)
@@ -3267,40 +3322,32 @@ def mesclar_processos_modelo(processos, conjuntos):
     return processos_final
 
 
+_document_number_lock = threading.Lock()
+
+
+def _proximo_numero_documento(tipo, counter_file):
+    if supabase_data.enabled():
+        return supabase_data.proximo_numero_documento(tipo)
+    with _document_number_lock:
+        numeros = []
+        for documento in _carregar_historico_local():
+            if documento.get("tipo") != tipo:
+                continue
+            numero = str(documento.get("numero") or "").strip()
+            if numero.isdigit():
+                numeros.append(int(numero))
+        numero = max(numeros, default=0) + 1
+        with open(counter_file, "w", encoding="utf-8") as f:
+            f.write(str(numero))
+        return numero
+
+
 def proximo_numero_oc():
-
-    if not os.path.exists(COUNTER_FILE):
-
-        with open(COUNTER_FILE, "w") as f:
-            f.write("1")
-
-    with open(COUNTER_FILE, "r") as f:
-        numero = int(f.read())
-
-    novo = numero + 1
-
-    with open(COUNTER_FILE, "w") as f:
-        f.write(str(novo))
-
-    return novo
+    return _proximo_numero_documento("oc", COUNTER_FILE)
 
 
 def proximo_numero_os():
-
-    if not os.path.exists(OS_COUNTER_FILE):
-
-        with open(OS_COUNTER_FILE, "w") as f:
-            f.write("1")
-
-    with open(OS_COUNTER_FILE, "r") as f:
-        numero = int(f.read())
-
-    novo = numero + 1
-
-    with open(OS_COUNTER_FILE, "w") as f:
-        f.write(str(novo))
-
-    return numero
+    return _proximo_numero_documento("os", OS_COUNTER_FILE)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -3356,8 +3403,8 @@ def index():
         os_processos.keys(),
         relacoes_processo_item,
     )
-    oc_prefill = carregar_importacao(OC_IMPORT_FILE)
-    os_prefill = carregar_importacao(OS_IMPORT_FILE)
+    oc_prefill = carregar_importacao(_user_scoped_file(OC_IMPORT_FILE))
+    os_prefill = carregar_importacao(_user_scoped_file(OS_IMPORT_FILE))
     tab = request.args.get("tab", "oc")
     if tab == "cadastro":
         tab = "oc"
@@ -3369,6 +3416,7 @@ def index():
         "os_quantidades": os_quantidades,
         "totais": _dashboard_totais(historico),
         "recentes": _dashboard_recentes(historico),
+        "ordens_compra": [entry for entry in historico if entry.get("tipo") == "oc"],
         "ordens_servico": [entry for entry in historico if entry.get("tipo") == "os"],
         "persistencia": "supabase" if supabase_data.enabled() else "local",
     }
@@ -3396,6 +3444,7 @@ def index():
     pessoas_status = request.args.get("pessoas_status")
     regras_popup_status = request.args.get("regras_popup_status")
     relacoes_processo_status = request.args.get("relacoes_processo_status")
+    documento_status = request.args.get("documento_status")
 
     return render_template(
         "index.html",
@@ -3422,6 +3471,7 @@ def index():
         pessoas_status=pessoas_status,
         regras_popup_status=regras_popup_status,
         relacoes_processo_status=relacoes_processo_status,
+        documento_status=documento_status,
         processos_os=PROCESSOS_OS,
         processo_transformacao_por_item=processo_por_item,
         relacoes_processo_transformacao=RELACOES_PROCESSO_TRANSFORMACAO,
@@ -3451,6 +3501,46 @@ def api_excluir_historico_os(documento_id):
     return jsonify({"ok": True})
 
 
+@app.route("/api/historico/oc/<documento_id>")
+def api_historico_oc(documento_id):
+    documento = obter_historico_documento(documento_id)
+    if not documento or documento.get("tipo") != "oc":
+        return jsonify({"ok": False, "erro": "O.C nao encontrada."}), 404
+    return jsonify({"ok": True, "documento": documento})
+
+
+@app.route("/api/historico/oc/<documento_id>/excluir", methods=["POST"])
+def api_excluir_historico_oc(documento_id):
+    documento = obter_historico_documento(documento_id)
+    if not documento or documento.get("tipo") != "oc":
+        return jsonify({"ok": False, "erro": "O.C nao encontrada."}), 404
+    try:
+        excluir_historico_documento(documento_id)
+    except Exception:
+        app.logger.exception("Falha ao excluir historico da O.C %s", documento_id)
+        return jsonify({"ok": False, "erro": "Nao foi possivel excluir a O.C."}), 500
+    return jsonify({"ok": True})
+
+
+@app.route("/api/historico/<tipo>/<documento_id>/status", methods=["POST"])
+def api_status_historico(tipo, documento_id):
+    tipo = str(tipo or "").strip().lower()
+    if tipo not in {"oc", "os"}:
+        return jsonify({"ok": False, "erro": "Tipo de documento invalido."}), 400
+    documento = obter_historico_documento(documento_id)
+    if not documento or documento.get("tipo") != tipo:
+        return jsonify({"ok": False, "erro": "Documento nao encontrado."}), 404
+    payload = request.get_json(silent=True) or request.form
+    try:
+        atualizado = atualizar_status_historico_documento(documento_id, payload.get("status"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "erro": str(exc)}), 400
+    except Exception:
+        app.logger.exception("Falha ao atualizar status do documento %s", documento_id)
+        return jsonify({"ok": False, "erro": "Nao foi possivel atualizar o status."}), 500
+    return jsonify({"ok": True, "documento": atualizado})
+
+
 @app.route("/healthz")
 def healthz():
     produtos_count = None
@@ -3476,6 +3566,13 @@ def healthz():
 def gerar_oc():
 
     atualizar_skus_automatico()
+    acao = (request.form.get("acao", "imprimir") or "imprimir").strip().lower()
+    historico_id = (request.form.get("oc_historico_id", "") or "").strip()
+    submit_token = (request.form.get("oc_submit_token", "") or "").strip()
+    historico_existente = obter_historico_documento(historico_id) if historico_id else None
+    if historico_id and (not historico_existente or historico_existente.get("tipo") != "oc"):
+        historico_id = ""
+        historico_existente = None
     fornecedor = request.form.get("fornecedor", "")
     fornecedores = carregar_fornecedores()
     fornecedor_info = fornecedores.get(fornecedor, {})
@@ -3574,12 +3671,35 @@ def gerar_oc():
         "obs": request.form.get("obs", ""),
     }
 
-    numero_oc = proximo_numero_oc()
+    numero_oc = (
+        (request.form.get("oc_numero", "") or "").strip()
+        or str((historico_existente or {}).get("numero") or "").strip()
+        or proximo_numero_oc()
+    )
 
     fornecedor_nome = fornecedor_info.get("fornecedor") or fornecedor_info.get("razao_social") or fornecedor
     oc_mode = request.form.get("oc_mode", "completo")
     incluir_composicao = oc_mode != "resumido"
     componentes = carregar_os_componentes()
+    dados_hist = dict(dados_pedido)
+    dados_hist["fornecedor"] = fornecedor_nome
+    status_documento = (
+        ((historico_existente or {}).get("status") or "emitido")
+        if historico_existente
+        else "rascunho"
+    )
+    if acao == "salvar":
+        registrar_historico(
+            "oc",
+            numero_oc,
+            dados_hist,
+            itens=itens,
+            documento_id=historico_id or None,
+            status=status_documento,
+            submit_token=submit_token,
+        )
+        limpar_importacao(_user_scoped_file(OC_IMPORT_FILE))
+        return redirect(url_for("index", tab="dashboard", documento_status="Compra salva sem impressao."))
     arquivo = gerar_word(
         numero_oc,
         fornecedor_nome,
@@ -3588,12 +3708,17 @@ def gerar_oc():
         incluir_composicao=incluir_composicao,
         componentes=componentes,
     )
-    limpar_importacao(OC_IMPORT_FILE)
-
     nome_docx = construir_nome_oc(numero_oc, fornecedor_nome, dados_pedido)
-    dados_hist = dict(dados_pedido)
-    dados_hist["fornecedor"] = fornecedor_nome
-    registrar_historico("oc", numero_oc, dados_hist, itens=itens)
+    registrar_historico(
+        "oc",
+        numero_oc,
+        dados_hist,
+        itens=itens,
+        documento_id=historico_id or None,
+        status="emitido",
+        submit_token=submit_token,
+    )
+    limpar_importacao(_user_scoped_file(OC_IMPORT_FILE))
     @after_this_request
     def _cleanup_oc(response):
         try:
@@ -3676,8 +3801,14 @@ def _parse_os_composition_form(form):
 @app.route("/gerar_os", methods=["POST"])
 def gerar_os():
     atualizar_skus_automatico()
+    acao = (request.form.get("acao", "imprimir") or "imprimir").strip().lower()
+    submit_token = (request.form.get("os_submit_token", "") or "").strip()
     composicao_source = (request.form.get("os_composicao_source", "bom") or "bom").strip().lower()
     historico_form_id = (request.form.get("os_historico_id", "") or "").strip()
+    historico_existente = obter_historico_documento(historico_form_id) if historico_form_id else None
+    if historico_form_id and (not historico_existente or historico_existente.get("tipo") != "os"):
+        historico_form_id = ""
+        historico_existente = None
     usando_composicao_historica = composicao_source == "custom" and bool(historico_form_id)
     cliente_selecionado = _limpar_valor_busca(
         request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
@@ -3878,7 +4009,7 @@ def gerar_os():
         processos_final = processos_modelo
 
     numero_manual = request.form.get("os_numero", "").strip()
-    numero_os = numero_manual or proximo_numero_os()
+    numero_os = numero_manual or str((historico_existente or {}).get("numero") or "").strip() or proximo_numero_os()
 
     layout_pdf = request.files.get("os_layout_pdf")
     composicao_importada = _parse_os_composition_form(request.form)
@@ -3961,6 +4092,27 @@ def gerar_os():
             content_type=layout_pdf.content_type,
         )
 
+    dados_historico = dict(dados)
+    dados_historico["modo_os"] = "pacote_os"
+    status_documento = (historico_existente or {}).get("status") or "emitido"
+    if acao == "salvar" and not historico_existente:
+        status_documento = "rascunho"
+    if acao == "salvar":
+        registrar_historico(
+            "os",
+            numero_os,
+            dados_historico,
+            itens=itens,
+            processos=processos_final,
+            componentes=componentes,
+            composicao=composicao_enriquecida,
+            documento_id=historico_form_id or None,
+            status=status_documento,
+            submit_token=submit_token,
+        )
+        limpar_importacao(_user_scoped_file(OS_IMPORT_FILE))
+        return redirect(url_for("index", tab="dashboard", documento_status="O.S. salva sem impressao."))
+
     arquivos_docx = []
     for modo_key in modos_pacote:
         config_modo = OS_MODE_CONFIGS[modo_key]
@@ -4010,16 +4162,7 @@ def gerar_os():
         "03 - Requisicao de Materiais",
     )
 
-    limpar_importacao(OS_IMPORT_FILE)
-
     chassi_nome = (dados.get("chassis", "") or "").strip()
-    dados_historico = dict(dados)
-    dados_historico["modo_os"] = "pacote_os"
-    historico_id = (request.form.get("os_historico_id", "") or "").strip()
-    if historico_id:
-        historico_existente = obter_historico_documento(historico_id)
-        if not historico_existente or historico_existente.get("tipo") != "os":
-            historico_id = ""
     registrar_historico(
         "os",
         numero_os,
@@ -4028,8 +4171,11 @@ def gerar_os():
         processos=processos_final,
         componentes=componentes,
         composicao=composicao_enriquecida,
-        documento_id=historico_id or None,
+        documento_id=historico_form_id or None,
+        status="emitido",
+        submit_token=submit_token,
     )
+    limpar_importacao(_user_scoped_file(OS_IMPORT_FILE))
 
     arquivos_saida = [
         *arquivos_docx,
@@ -4619,7 +4765,7 @@ def importar_oc_documento():
         else:
             data = {}
         if data:
-            salvar_json(OC_IMPORT_FILE, data)
+            salvar_json(_user_scoped_file(OC_IMPORT_FILE), data)
     return redirect(url_for("index", tab="oc"))
 
 
@@ -4639,7 +4785,7 @@ def importar_os_documento():
             # deve ser recalculada pela B.O.M atual no Supabase para evitar
             # duplicidade, dados antigos e payloads grandes demais.
             data["composicao"] = []
-            salvar_json(OS_IMPORT_FILE, data)
+            salvar_json(_user_scoped_file(OS_IMPORT_FILE), data)
     return redirect(url_for("index", tab="os"))
 
 
@@ -4751,40 +4897,47 @@ def resetar_base():
 
 @app.route("/exportar_dashboard", methods=["GET"])
 def exportar_dashboard():
-    historico = carregar_historico()
+    tipo_filtro = (request.args.get("tipo", "") or "").strip().lower()
+    if tipo_filtro not in {"", "oc", "os"}:
+        return "Tipo de relatorio invalido.", 400
+    historico = [
+        entry for entry in carregar_historico()
+        if not tipo_filtro or entry.get("tipo") == tipo_filtro
+    ]
     wb = Workbook()
     wb.remove(wb.active)
-
-    ws_oc = wb.create_sheet("OC")
-    ws_oc.append([
-        "Data Criacao", "Numero", "Fornecedor", "Razao Social", "CNPJ", "Email", "Telefone",
-        "Endereco", "Bairro", "Cidade", "UF", "CEP", "Previsao", "Tipo Frete", "Frete",
-        "Total Itens", "Total Pedido", "Forma Pagamento", "Prazo", "Vencimento", "Obs"
-    ])
-
-    ws_oc_itens = wb.create_sheet("OC Itens")
-    ws_oc_itens.append([
-        "Data Criacao", "Numero", "Codigo", "Descricao", "Unidade", "Qtd", "Valor",
-        "Desconto", "IPI", "ICMS", "COFINS", "Total"
-    ])
-
-    ws_os = wb.create_sheet("OS")
-    ws_os.append([
-        "Data Criacao", "Numero", "Cliente", "Chassis", "Municipio", "MMV",
-        "Previsao Inicio", "Previsao Termino", "Descricao Servico",
-        "Obs Materiais", "Obs"
-    ])
-
-    ws_os_itens = wb.create_sheet("OS Itens")
-    ws_os_itens.append([
-        "Data Criacao", "Numero", "Codigo", "Descricao", "Qtd", "Serie", "Unidade"
-    ])
-
-    ws_os_proc = wb.create_sheet("OS Processos")
-    ws_os_proc.append(["Data Criacao", "Numero", "Grupo", "Indice", "Atividade", "Responsavel"])
-
-    ws_os_comp = wb.create_sheet("OS Componentes")
-    ws_os_comp.append(["Data Criacao", "Numero", "Item", "Codigo", "Descricao", "Unidade", "Qtd"])
+    base_headers = ["ID", "Status", "Data Criacao", "Numero", "Criado Por", "Atualizado Por"]
+    ws_oc = ws_oc_itens = ws_os = ws_os_itens = ws_os_proc = ws_os_comp = None
+    if tipo_filtro in {"", "oc"}:
+        ws_oc = wb.create_sheet("Compras")
+        ws_oc.append(base_headers + [
+            "Fornecedor", "Razao Social", "CNPJ", "Email", "Telefone", "Endereco", "Bairro",
+            "Cidade", "UF", "CEP", "Previsao", "Tipo Frete", "Frete", "Total Itens",
+            "Total Pedido", "Forma Pagamento", "Prazo", "Vencimento", "Observacoes"
+        ])
+        ws_oc_itens = wb.create_sheet("Compras Itens")
+        ws_oc_itens.append(base_headers + [
+            "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
+            "IPI", "ICMS", "COFINS", "Total"
+        ])
+    if tipo_filtro in {"", "os"}:
+        ws_os = wb.create_sheet("Ordens de Servico")
+        ws_os.append(base_headers + [
+            "Cliente", "Chassis", "Municipio", "MMV", "Previsao Inicio", "Previsao Termino",
+            "Descricao Servico", "Processo Vinculado", "Observacoes Materiais", "Observacoes"
+        ])
+        ws_os_itens = wb.create_sheet("OS Itens")
+        ws_os_itens.append(base_headers + [
+            "Indice", "Codigo", "Descricao", "Quantidade", "Serie", "Unidade", "Grupo",
+            "Categoria", "Fornecedor"
+        ])
+        ws_os_proc = wb.create_sheet("OS Processos")
+        ws_os_proc.append(base_headers + ["Grupo", "Indice", "Atividade", "Responsavel"])
+        ws_os_comp = wb.create_sheet("OS Componentes")
+        ws_os_comp.append(base_headers + [
+            "Indice", "Item Pai", "Codigo", "Descricao", "Unidade", "Quantidade", "Nivel",
+            "Destino", "Destino Manual"
+        ])
 
     for entry in historico:
         tipo = entry.get("tipo")
@@ -4792,10 +4945,16 @@ def exportar_dashboard():
         numero = entry.get("numero", "")
         dados = entry.get("dados", {}) or {}
         itens = entry.get("itens", []) or []
+        base = [
+            entry.get("id", ""),
+            entry.get("status", "emitido"),
+            data,
+            numero,
+            entry.get("criado_por", ""),
+            entry.get("atualizado_por", ""),
+        ]
         if tipo == "oc":
-            ws_oc.append([
-                data,
-                numero,
+            ws_oc.append(base + [
                 dados.get("fornecedor", ""),
                 dados.get("razao_social", ""),
                 dados.get("cnpj", ""),
@@ -4816,10 +4975,9 @@ def exportar_dashboard():
                 dados.get("vencimento", ""),
                 dados.get("obs", ""),
             ])
-            for item in itens:
-                ws_oc_itens.append([
-                    data,
-                    numero,
+            for idx, item in enumerate(itens, start=1):
+                ws_oc_itens.append(base + [
+                    idx,
                     item.get("codigo", ""),
                     item.get("descricao", ""),
                     item.get("unidade", ""),
@@ -4832,9 +4990,7 @@ def exportar_dashboard():
                     item.get("total", ""),
                 ])
         elif tipo == "os":
-            ws_os.append([
-                data,
-                numero,
+            ws_os.append(base + [
                 dados.get("cliente", ""),
                 dados.get("chassis", ""),
                 dados.get("municipio", ""),
@@ -4842,46 +4998,68 @@ def exportar_dashboard():
                 dados.get("previsao_inicio", ""),
                 dados.get("previsao_termino", ""),
                 dados.get("descricao_servico", ""),
+                dados.get("processo_conjunto", ""),
                 dados.get("obs_materiais", ""),
                 dados.get("obs", ""),
             ])
-            for item in itens:
-                ws_os_itens.append([
-                    data,
-                    numero,
+            for idx, item in enumerate(itens, start=1):
+                ws_os_itens.append(base + [
+                    idx,
                     item.get("codigo", ""),
                     item.get("descricao", ""),
                     item.get("qtd", ""),
                     item.get("serie", ""),
                     item.get("unidade", ""),
+                    item.get("grupo", ""),
+                    item.get("categoria", ""),
+                    item.get("fornecedor", ""),
                 ])
             processos = entry.get("processos", {}) or {}
             for grupo, linhas in processos.items():
                 for idx, linha in enumerate(linhas, start=1):
-                    ws_os_proc.append([
-                        data,
-                        numero,
+                    ws_os_proc.append(base + [
                         grupo,
                         idx,
                         linha.get("atividade", ""),
                         linha.get("responsavel", ""),
                     ])
             composicao = entry.get("composicao", []) or []
-            for comp in composicao:
-                ws_os_comp.append([
-                    data,
-                    numero,
+            for idx, comp in enumerate(composicao, start=1):
+                ws_os_comp.append(base + [
+                    idx,
                     comp.get("item", ""),
                     comp.get("codigo", ""),
                     comp.get("descricao", ""),
                     comp.get("unidade", ""),
                     comp.get("qtd", ""),
+                    comp.get("level", ""),
+                    comp.get("setor", ""),
+                    "Sim" if comp.get("setor_manual") else "Nao",
                 ])
+
+    for ws in wb.worksheets:
+        ws.freeze_panes = "A2"
+        ws.auto_filter.ref = ws.dimensions
+        for cell in ws[1]:
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill("solid", fgColor="0B1C3A")
+            cell.alignment = Alignment(horizontal="center")
+        for col_idx, column_cells in enumerate(ws.columns, start=1):
+            width = max((len(str(cell.value or "")) for cell in column_cells), default=0) + 2
+            ws.column_dimensions[get_column_letter(col_idx)].width = min(max(width, 10), 45)
 
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
     tmp.close()
     wb.save(tmp.name)
-    return send_file(tmp.name, as_attachment=True, download_name="dashboard_export.xlsx")
+    nome = {"oc": "relatorio_compras", "os": "relatorio_ordens_servico"}.get(tipo_filtro, "relatorio_suprimentos")
+    @after_this_request
+    def _cleanup_relatorio(response):
+        try:
+            os.remove(tmp.name)
+        except OSError:
+            pass
+        return response
+    return send_file(tmp.name, as_attachment=True, download_name=f"{nome}_{date.today().isoformat()}.xlsx")
 
 
 if __name__ == "__main__":

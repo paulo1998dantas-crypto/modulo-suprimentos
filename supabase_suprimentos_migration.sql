@@ -82,6 +82,10 @@ create table if not exists public.suprimentos_documentos (
     tipo text not null,
     numero text not null,
     data_criacao date not null default current_date,
+    status text not null default 'emitido',
+    submit_token text null,
+    criado_por text not null default '',
+    atualizado_por text not null default '',
     dados jsonb not null default '{}'::jsonb,
     itens jsonb not null default '[]'::jsonb,
     processos jsonb not null default '{}'::jsonb,
@@ -93,6 +97,71 @@ create table if not exists public.suprimentos_documentos (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+alter table public.suprimentos_documentos
+    add column if not exists status text not null default 'emitido',
+    add column if not exists submit_token text null,
+    add column if not exists criado_por text not null default '',
+    add column if not exists atualizado_por text not null default '';
+
+do $$
+begin
+    if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'suprimentos_documentos_status_check'
+          and conrelid = 'public.suprimentos_documentos'::regclass
+    ) then
+        alter table public.suprimentos_documentos
+            add constraint suprimentos_documentos_status_check
+            check (status in ('rascunho', 'emitido', 'cancelado', 'concluido'));
+    end if;
+    if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'suprimentos_documentos_submit_token_key'
+          and conrelid = 'public.suprimentos_documentos'::regclass
+    ) then
+        alter table public.suprimentos_documentos
+            add constraint suprimentos_documentos_submit_token_key unique (submit_token);
+    end if;
+end
+$$;
+
+create table if not exists public.suprimentos_documento_contadores (
+    tipo text primary key check (tipo in ('oc', 'os')),
+    ultimo_numero bigint not null default 0,
+    updated_at timestamptz not null default now()
+);
+
+insert into public.suprimentos_documento_contadores (tipo, ultimo_numero)
+select tipo, coalesce(max(numero::bigint) filter (where numero ~ '^[0-9]+$'), 0)
+from public.suprimentos_documentos
+where tipo in ('oc', 'os')
+group by tipo
+on conflict (tipo) do update
+set ultimo_numero = greatest(
+    public.suprimentos_documento_contadores.ultimo_numero,
+    excluded.ultimo_numero
+);
+
+insert into public.suprimentos_documento_contadores (tipo, ultimo_numero)
+values ('oc', 0), ('os', 0)
+on conflict (tipo) do nothing;
+
+create or replace function public.suprimentos_proximo_numero(p_tipo text)
+returns bigint
+language sql
+security invoker
+set search_path = ''
+as $$
+    insert into public.suprimentos_documento_contadores as contador (tipo, ultimo_numero, updated_at)
+    values (lower(p_tipo), 1, now())
+    on conflict (tipo) do update
+    set ultimo_numero = contador.ultimo_numero + 1,
+        updated_at = now()
+    returning ultimo_numero;
+$$;
 
 create index if not exists suprimentos_pessoas_nome_idx
     on public.suprimentos_pessoas (nome_fantasia);
@@ -167,3 +236,19 @@ alter table public.suprimentos_processos enable row level security;
 alter table public.suprimentos_regras_popup_item enable row level security;
 alter table public.suprimentos_relacoes_processo_item enable row level security;
 alter table public.suprimentos_documentos enable row level security;
+alter table public.suprimentos_documento_contadores enable row level security;
+
+-- O aplicativo acessa estas tabelas exclusivamente no servidor com a service role.
+-- Grants explicitos mantem compatibilidade com projetos que nao expoem novas tabelas automaticamente.
+grant select, insert, update, delete on table
+    public.suprimentos_pessoas,
+    public.suprimentos_processos,
+    public.suprimentos_regras_popup_item,
+    public.suprimentos_relacoes_processo_item,
+    public.suprimentos_documentos,
+    public.suprimentos_documento_contadores
+to service_role;
+
+grant usage, select on all sequences in schema public to service_role;
+revoke all on function public.suprimentos_proximo_numero(text) from public, anon, authenticated;
+grant execute on function public.suprimentos_proximo_numero(text) to service_role;

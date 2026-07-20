@@ -1204,6 +1204,10 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .sector-badge{display:inline-block;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:700;background:#e7eef8;color:#29466f;}
 .sector-badge.prep{background:#fff1cc;color:#795500;}
 .sector-badge.fd{background:#e6f5ef;color:#006b4f;}
+.status-badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;background:#e7eef8;color:#29466f;}
+.status-badge.rascunho{background:#fff1cc;color:#795500;}
+.status-badge.cancelado{background:#fee4e2;color:#b42318;}
+.status-badge.concluido{background:#dcfae6;color:#067647;}
 .history-footer{justify-content:flex-end;margin-top:12px;}
 @media(max-width:800px){
 .container{padding:8px;}
@@ -1242,9 +1246,25 @@ let osPopupRegraFila = [];
 const OS_POPUP_NAO_APLICAVEL = "__NAO_APLICAVEL__";
 const osProcessoMap = Object.fromEntries(osProcessoDefs.map((processo) => [processo.nome, processo.key]));
 const osProcessoTableIds = osProcessoDefs.map((processo) => `processo_${processo.key}`);
-const osDraftStorageKey = "modulo_suprimentos_os_draft_v1";
+const currentLoginScope = {{ ((current_user or {}).get('id') or (current_user or {}).get('username') or 'local')|string|tojson }};
+const osDraftStorageKey = `modulo_suprimentos_os_draft_v2:${currentLoginScope}`;
 let osDraftRestoring = false;
 let osDraftSaveTimer = null;
+
+function novoSubmissionToken(){
+if (window.crypto && typeof window.crypto.randomUUID === "function"){
+return window.crypto.randomUUID();
+}
+return `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
+}
+
+function garantirSubmissionToken(inputId){
+const input = document.getElementById(inputId);
+if (input && !input.value){
+input.value = novoSubmissionToken();
+}
+return input ? input.value : "";
+}
 
 function initOsTab(){
 if (osTabInitialized){
@@ -3403,6 +3423,7 @@ tbody.innerHTML = "";
 osComposicaoSource = "bom";
 const historicoId = document.getElementById("os_historico_id");
 if (historicoId) historicoId.value = "";
+garantirSubmissionToken("os_submit_token");
 sincronizarFonteComposicao();
 definirProcessoConjuntoUI("");
 atualizarHintProcessoAutomatico({ conjunto: "", conflito: false });
@@ -3456,6 +3477,7 @@ if (fornecedorBusca) fornecedorBusca.value = "";
 
 calcularTotais();
 calcularVencimento();
+garantirSubmissionToken("oc_submit_token");
 }
 
 function setSelectValue(select, value){
@@ -3691,6 +3713,7 @@ const campos = {};
 "os_obs_materiais",
 "os_obs",
 "os_historico_id",
+"os_submit_token",
 ].forEach((name) => {
 const input = form.querySelector(`[name="${name}"]`);
 campos[name] = input ? input.value : "";
@@ -4064,6 +4087,98 @@ atualizarMetaArquivo(input);
 }
 
 let historicoOSAtual = null;
+let historicoOCAtual = null;
+
+async function carregarHistoricoOC(id){
+const response = await fetch(`/api/historico/oc/${encodeURIComponent(id)}`, { headers: { "Accept": "application/json" } });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok){
+throw new Error(payload.erro || "Não foi possível carregar a compra.");
+}
+return payload.documento;
+}
+
+async function visualizarHistoricoOC(id){
+try {
+const doc = await carregarHistoricoOC(id);
+historicoOCAtual = doc;
+const dados = doc.dados || {};
+document.getElementById("historico_oc_title").textContent = `O.C. ${doc.numero || ""}`;
+document.getElementById("historico_oc_meta").textContent = `${doc.data_criacao || "-"} · ${doc.status || "emitido"}`;
+document.getElementById("historico_oc_dados").innerHTML = [
+["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
+].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
+document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="7">Sem itens.</td></tr>';
+document.getElementById("historico_oc_editar").onclick = () => editarDocumentoHistoricoOC(doc);
+const modal = document.getElementById("historico_oc_modal");
+modal.classList.add("open");
+modal.setAttribute("aria-hidden", "false");
+} catch (error) {
+alert(error.message);
+}
+}
+
+function fecharHistoricoOC(){
+const modal = document.getElementById("historico_oc_modal");
+if (!modal) return;
+modal.classList.remove("open");
+modal.setAttribute("aria-hidden", "true");
+}
+
+function editarDocumentoHistoricoOC(doc){
+limparOCForm();
+const form = document.getElementById("form-oc");
+const dados = doc.dados || {};
+document.getElementById("oc_historico_id").value = doc.id || "";
+document.getElementById("oc_numero").value = doc.numero || "";
+document.getElementById("oc_submit_token").value = doc.submit_token || novoSubmissionToken();
+const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep","previsao","tipo_frete","frete","forma_pagamento","prazo","vencimento","obs"];
+campos.forEach((name) => {
+const input = form.elements[name];
+if (input) input.value = dados[name] === undefined || dados[name] === null ? "" : dados[name];
+});
+const fornecedor = dados.fornecedor || dados.razao_social || "";
+if (form.elements.fornecedor) form.elements.fornecedor.value = fornecedor;
+if (form.elements.fornecedor_busca) form.elements.fornecedor_busca.value = fornecedor;
+const tabela = document.getElementById("tabela_itens");
+const itens = Array.isArray(doc.itens) && doc.itens.length ? doc.itens : [{}];
+while (tabela.rows.length > 2) tabela.deleteRow(2);
+itens.forEach((item, index) => {
+if (index > 0) adicionarLinha();
+const row = tabela.rows[index + 1];
+const valores = {"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
+Object.entries(valores).forEach(([name, value]) => { const input = row.querySelector(`[name="${name}"]`); if (input) input.value = value === undefined || value === null ? "" : value; });
+});
+calcularTotais();
+fecharHistoricoOC();
+const tabButton = document.querySelector('[data-tab="tab-oc"]');
+if (tabButton) tabButton.click();
+form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function editarHistoricoOC(id){
+try { editarDocumentoHistoricoOC(await carregarHistoricoOC(id)); } catch (error) { alert(error.message); }
+}
+
+async function excluirHistoricoOC(id, numero){
+if (!confirm(`Excluir definitivamente a O.C. ${numero} do histórico?`)) return;
+try {
+const response = await fetch(`/api/historico/oc/${encodeURIComponent(id)}/excluir`, { method: "POST", headers: { "Accept": "application/json" } });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível excluir a compra.");
+window.location.href = "/?tab=dashboard";
+} catch (error) { alert(error.message); }
+}
+
+async function alterarStatusDocumento(tipo, id, status, mensagem){
+if (mensagem && !confirm(mensagem)) return;
+try {
+const response = await fetch(`/api/historico/${encodeURIComponent(tipo)}/${encodeURIComponent(id)}/status`, { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível atualizar o status.");
+window.location.href = "/?tab=dashboard";
+} catch (error) { alert(error.message); }
+}
 
 async function carregarHistoricoOS(id){
 const response = await fetch(`/api/historico/os/${encodeURIComponent(id)}`, { headers: { "Accept": "application/json" } });
@@ -4123,6 +4238,7 @@ os_descricao_servico: dados.descricao_servico || "",
 os_obs_materiais: dados.obs_materiais || "",
 os_obs: dados.obs || "",
 os_historico_id: doc.id || "",
+os_submit_token: doc.submit_token || novoSubmissionToken(),
 },
 itens: doc.itens || [],
 processos: doc.processos || {},
@@ -4161,6 +4277,8 @@ alert(error.message);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+garantirSubmissionToken("oc_submit_token");
+garantirSubmissionToken("os_submit_token");
 inicializarLookupsEscopo(document);
 inicializarFileInputs(document);
 definirProcessoConjuntoUI(conjuntoProcessoAtual());
@@ -4171,6 +4289,16 @@ if (historySearch){
 historySearch.addEventListener("input", () => {
 const termo = normalizarBusca(historySearch.value || "");
 document.querySelectorAll("#os_history_table tbody tr[data-history-search]").forEach((row) => {
+row.hidden = termo && !normalizarBusca(row.dataset.historySearch || "").includes(termo);
+});
+});
+}
+
+const purchaseHistorySearch = document.getElementById("oc_history_search");
+if (purchaseHistorySearch){
+purchaseHistorySearch.addEventListener("input", () => {
+const termo = normalizarBusca(purchaseHistorySearch.value || "");
+document.querySelectorAll("#oc_history_table tbody tr[data-history-search]").forEach((row) => {
 row.hidden = termo && !normalizarBusca(row.dataset.historySearch || "").includes(termo);
 });
 });
@@ -4191,6 +4319,23 @@ tabela.addEventListener("input", (e) => {
 if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]"].includes(e.target.name)){
 calcularTotais();
 }
+});
+}
+
+const formOc = document.getElementById("form-oc");
+if (formOc){
+formOc.addEventListener("submit", (event) => {
+garantirSubmissionToken("oc_submit_token");
+if (formOc.dataset.submitting === "1"){
+event.preventDefault();
+return;
+}
+formOc.dataset.submitting = "1";
+formOc.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = true; });
+setTimeout(() => {
+formOc.dataset.submitting = "0";
+formOc.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = false; });
+}, 5000);
 });
 }
 
@@ -4365,6 +4510,11 @@ if (formOs){
 formOs.addEventListener("input", agendarSalvarRascunhoOS);
 formOs.addEventListener("change", agendarSalvarRascunhoOS);
 formOs.addEventListener("submit", (event) => {
+garantirSubmissionToken("os_submit_token");
+if (formOs.dataset.submitting === "1"){
+event.preventDefault();
+return;
+}
 const reemissaoHistorica = Boolean((document.getElementById("os_historico_id") || {}).value) && osComposicaoSource === "custom";
 if (!reemissaoHistorica && !validarLuminariasObrigatoriasOS()){
 event.preventDefault();
@@ -4380,6 +4530,13 @@ return;
 }
 salvarRascunhoOS();
 prepararComposicaoEnvioOS();
+formOs.dataset.submitting = "1";
+formOs.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = true; });
+setTimeout(() => {
+formOs.dataset.submitting = "0";
+formOs.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = false; });
+reativarCamposComposicaoOS();
+}, 7000);
 });
 }
 
@@ -4512,7 +4669,10 @@ salvarRascunhoOS();
 <button type="submit">Importar Pedido</button>
 </form>
 </div>
-<form method="POST" action="/gerar_oc" onsubmit="setTimeout(limparOCForm, 500)">
+<form id="form-oc" method="POST" action="/gerar_oc">
+<input type="hidden" id="oc_historico_id" name="oc_historico_id" value="">
+<input type="hidden" id="oc_numero" name="oc_numero" value="">
+<input type="hidden" id="oc_submit_token" name="oc_submit_token" value="">
 
 <div class="card">
 
@@ -4712,6 +4872,11 @@ salvarRascunhoOS();
 <div class="card footer">
 
   <div>
+  <button type="submit" name="acao" value="salvar" class="btn-secondary">
+  Salvar sem imprimir
+  </button>
+  </div>
+  <div>
   <button type="submit" name="oc_mode" value="completo">
   Emitir Pedido
   </button>
@@ -4728,8 +4893,11 @@ salvarRascunhoOS();
 </div>
 
 <div id="tab-dashboard" class="tab-content">
+{% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
 <div class="dashboard-actions">
-<a class="btn" href="/exportar_dashboard">Exportar Excel</a>
+<a class="btn" href="/exportar_dashboard">Relatório completo</a>
+<a class="btn btn-secondary" href="/exportar_dashboard?tipo=oc">Relatório de compras</a>
+<a class="btn btn-secondary" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
 </div>
 <div class="dashboard-metrics">
 <div class="metric-card">
@@ -4795,22 +4963,56 @@ salvarRascunhoOS();
 <div class="dashboard-table os-history-panel">
 <div class="table-toolbar">
 <div>
+<h3>Gestão de compras emitidas</h3>
+<span>{{ (dashboard.ordens_compra or [])|length }} compra(s) registrada(s) em {{ dashboard.persistencia }}</span>
+</div>
+<input id="oc_history_search" type="search" placeholder="Buscar número, fornecedor, CNPJ ou status">
+</div>
+<table id="oc_history_table">
+<thead><tr><th>O.C.</th><th>Data</th><th>Fornecedor</th><th>Total</th><th>Status</th><th>Usuário</th><th>Ações</th></tr></thead>
+<tbody>
+{% for doc in dashboard.ordens_compra %}
+{% set dados = doc.dados or {} %}
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ (doc.status or 'emitido'))|lower }}">
+<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.fornecedor or dados.razao_social or "-" }}</td><td>R$ {{ dados.total_pedido or "0" }}</td><td><span class="status-badge {{ doc.status or 'emitido' }}">{{ doc.status or "emitido" }}</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra?')">Concluir</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
+</tr>
+{% else %}
+<tr><td colspan="7">Nenhuma compra registrada ainda.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div id="historico_oc_modal" class="history-modal" aria-hidden="true">
+<div class="history-modal-box" role="dialog" aria-modal="true" aria-labelledby="historico_oc_title">
+<div class="card-heading-row"><div><h3 id="historico_oc_title">O.C.</h3><span id="historico_oc_meta"></span></div><button type="button" class="icon-close" title="Fechar" onclick="fecharHistoricoOC()">×</button></div>
+<div id="historico_oc_dados" class="history-summary"></div>
+<h4>Itens da compra</h4>
+<div class="table-scroll"><table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th><th>Valor</th><th>Desconto</th><th>Total</th></tr></thead><tbody id="historico_oc_itens"></tbody></table></div>
+<div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOC()">Fechar</button><button id="historico_oc_editar" type="button">Editar</button></div>
+</div>
+</div>
+
+<div class="dashboard-table os-history-panel">
+<div class="table-toolbar">
+<div>
 <h3>Gestão de ordens de serviço</h3>
 <span>{{ (dashboard.ordens_servico or [])|length }} O.S. registrada(s) em {{ dashboard.persistencia }}</span>
 </div>
 <input id="os_history_search" type="search" placeholder="Buscar número, chassi, cliente, município ou MMV">
 </div>
 <table id="os_history_table">
-<thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Ações</th></tr></thead>
+<thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Status</th><th>Usuário</th><th>Ações</th></tr></thead>
 <tbody>
 {% for doc in dashboard.ordens_servico %}
 {% set dados = doc.dados or {} %}
 <tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or ''))|lower }}">
-<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td>
-<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar / reemitir</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
+<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ doc.status or 'emitido' }}">{{ doc.status or "emitido" }}</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.?')">Concluir</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
 </tr>
 {% else %}
-<tr><td colspan="7">Nenhuma O.S. registrada ainda.</td></tr>
+<tr><td colspan="9">Nenhuma O.S. registrada ainda.</td></tr>
 {% endfor %}
 </tbody>
 </table>
@@ -4861,6 +5063,7 @@ salvarRascunhoOS();
 </div>
 <form id="form-os" method="POST" action="/gerar_os" enctype="multipart/form-data">
 <input type="hidden" id="os_historico_id" name="os_historico_id" value="">
+<input type="hidden" id="os_submit_token" name="os_submit_token" value="">
 <input type="hidden" id="os_composicao_source" name="os_composicao_source" value="bom">
 <input type="hidden" id="os_composicao_json" name="os_composicao_json" value="">
 
@@ -5325,7 +5528,8 @@ salvarRascunhoOS();
 <div class="card footer">
 <div>
 <div class="dashboard-actions os-actions">
-<button type="submit">Gerar O.S</button>
+<button type="submit" name="acao" value="salvar" class="btn-secondary">Salvar sem imprimir</button>
+<button type="submit" name="acao" value="imprimir">Gerar O.S</button>
 </div>
 <p style="margin:10px 0 0;font-size:12px;color:#64748b;">A geracao baixa um unico ZIP com: O.S Completa, O.S Expedicao, O.S Preparacao, O.S Producao e as planilhas de pendencias.</p>
 </div>

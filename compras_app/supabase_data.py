@@ -457,10 +457,32 @@ def salvar_regras(regras):
 
 
 def normalizar_documento(documento):
-    row = dict(documento or {})
+    source = dict(documento or {})
+    row = {
+        key: source.get(key)
+        for key in (
+            "tipo",
+            "numero",
+            "data_criacao",
+            "dados",
+            "itens",
+            "processos",
+            "componentes",
+            "composicao",
+            "status",
+            "submit_token",
+            "criado_por",
+            "atualizado_por",
+        )
+        if key in source
+    }
     row["tipo"] = _clean(row.get("tipo")).lower()
     row["numero"] = _clean(row.get("numero"))
     row["data_criacao"] = _date_or_none(row.get("data_criacao")) or datetime.now().date().isoformat()
+    row["status"] = _clean(row.get("status")).lower() or "emitido"
+    row["submit_token"] = _clean(row.get("submit_token")) or None
+    row["criado_por"] = _clean(row.get("criado_por"))
+    row["atualizado_por"] = _clean(row.get("atualizado_por"))
     for key in ("dados", "itens", "processos", "componentes", "composicao"):
         value = row.get(key)
         if value is None:
@@ -490,6 +512,11 @@ def documento_to_legacy(row):
         "tipo": _clean(row.get("tipo")),
         "numero": _clean(row.get("numero")),
         "data_criacao": _clean(row.get("data_criacao")),
+        "status": _clean(row.get("status")) or "emitido",
+        "submit_token": _clean(row.get("submit_token")),
+        "criado_por": _clean(row.get("criado_por")),
+        "atualizado_por": _clean(row.get("atualizado_por")),
+        "updated_at": _clean(row.get("updated_at")),
         "dados": row.get("dados") or {},
         "itens": row.get("itens") or [],
         "processos": row.get("processos") or {},
@@ -502,9 +529,14 @@ def salvar_documento(documento):
     row = normalizar_documento(documento)
     if not row.get("tipo") or not row.get("numero"):
         return False
-    _request("POST", DOCUMENTOS_TABLE, payload=row, prefer="return=minimal")
+    query = []
+    prefer = "return=representation"
+    if row.get("submit_token"):
+        query.append(("on_conflict", "submit_token"))
+        prefer = "resolution=merge-duplicates,return=representation"
+    rows = _request("POST", DOCUMENTOS_TABLE, query=query, payload=row, prefer=prefer) or []
     clear_cache()
-    return True
+    return documento_to_legacy(rows[0]) if rows else True
 
 
 def obter_documento(documento_id):
@@ -512,7 +544,7 @@ def obter_documento(documento_id):
         "GET",
         DOCUMENTOS_TABLE,
         query=[
-            ("select", "id,created_at,tipo,numero,data_criacao,dados,itens,processos,componentes,composicao"),
+            ("select", "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,dados,itens,processos,componentes,composicao"),
             ("id", f"eq.{documento_id}"),
             ("limit", "1"),
         ],
@@ -549,12 +581,38 @@ def excluir_documento(documento_id):
 def carregar_documentos(force=False, limit=1000):
     rows = _all_rows(
         DOCUMENTOS_TABLE,
-        select="id,created_at,tipo,numero,data_criacao,dados,itens,processos,componentes,composicao",
+        select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,dados,itens,processos,componentes,composicao",
         order="data_criacao.desc,created_at.desc",
         cache_key="documentos",
         force=force,
     )
     return [documento_to_legacy(row) for row in rows[:limit]]
+
+
+def proximo_numero_documento(tipo):
+    tipo = _clean(tipo).lower()
+    if tipo not in {"oc", "os"}:
+        raise ValueError("Tipo de documento invalido.")
+    if not configured():
+        raise SupabaseDataError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
+    url = f"{_supabase_url()}/rest/v1/rpc/suprimentos_proximo_numero"
+    payload = json.dumps({"p_tipo": tipo}, ensure_ascii=False).encode("utf-8")
+    rpc_request = urllib.request.Request(url, data=payload, headers=_headers(), method="POST")
+    try:
+        with urllib.request.urlopen(rpc_request, timeout=30) as response:
+            body = response.read().decode("utf-8")
+            value = json.loads(body) if body else None
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise SupabaseDataError(f"Erro Supabase {exc.code}: {body}") from exc
+    except urllib.error.URLError as exc:
+        raise SupabaseDataError(f"Nao foi possivel conectar ao Supabase: {exc}") from exc
+    if isinstance(value, list):
+        value = value[0] if value else None
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise SupabaseDataError("O contador do Supabase retornou um valor invalido.") from exc
 
 
 def verify_user(username, password):
