@@ -237,6 +237,7 @@ display:block;
 .dashboard-actions{
 display:flex;
 justify-content:flex-end;
+gap:8px;
 margin-bottom:16px;
 }
 
@@ -253,6 +254,16 @@ overflow:auto;
 font-size:15px;
 margin:0;
 padding:16px 18px 0 18px;
+}
+
+.dashboard-table > form{
+padding:12px 18px 18px;
+}
+
+.muted-text{
+margin:10px 0 0;
+font-size:12px;
+color:#64748b;
 }
 
 .dashboard-table table{
@@ -281,7 +292,8 @@ font-size:14px;
 
 @media (max-width:900px){
 .dashboard-grid,
-.dashboard-metrics{
+.dashboard-metrics,
+.grid-3{
 grid-template-columns:1fr;
 }
 }
@@ -310,6 +322,12 @@ filter:brightness(0.98);
 display:grid;
 grid-template-columns:repeat(3, 1fr);
 gap:18px;
+}
+
+.grid-3{
+display:grid;
+grid-template-columns:repeat(3, 1fr);
+gap:16px;
 }
 
 .grid-4{
@@ -4924,6 +4942,29 @@ salvarRascunhoOS();
 <a class="btn" href="/exportar_dashboard">Relatório completo</a>
 <a class="btn btn-secondary" href="/exportar_dashboard?tipo=oc">Relatório de compras</a>
 <a class="btn btn-secondary" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
+</div>
+<div class="dashboard-table">
+<h3>Baixa em massa</h3>
+<form method="POST" action="/importar_baixa_documentos" enctype="multipart/form-data">
+<div class="grid-3">
+<div>
+<label>Tipo</label>
+<select name="tipo_baixa_documentos">
+<option value="">O.C. e O.S.</option>
+<option value="oc">Somente compras</option>
+<option value="os">Somente O.S.</option>
+</select>
+</div>
+<div>
+<label>Planilha de baixa</label>
+<input type="file" name="arquivo_baixa_documentos" accept=".xlsx,.xlsm,.csv" required>
+</div>
+<div style="align-self:end;">
+<button type="submit">Importar baixas</button>
+</div>
+</div>
+<p class="muted-text">Use as colunas ID ou ID Linha e preencha ACAO com concluir, cancelar ou excluir.</p>
+</form>
 </div>
 <div class="dashboard-metrics">
 <div class="metric-card">

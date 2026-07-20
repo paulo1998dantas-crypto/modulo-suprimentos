@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 
 
 APP_DIR = Path(__file__).resolve().parents[1] / "compras_app"
@@ -83,6 +83,55 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertTrue(entry["itens"][0]["line_id"].startswith("os-item-"))
         self.assertTrue(entry["processos"]["CORTE"][0]["line_id"].startswith("os-proc-"))
         self.assertTrue(entry["composicao"][0]["line_id"].startswith("os-comp-"))
+
+    def test_bulk_status_upload_uses_document_or_line_id(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            history_path = Path(tmpdir) / "historico.json"
+            history_path.write_text(json.dumps([
+                {
+                    "id": "local-oc",
+                    "tipo": "oc",
+                    "numero": "100",
+                    "data_criacao": "2026-07-19",
+                    "status": "emitido",
+                    "dados": {"fornecedor": "Fornecedor"},
+                    "itens": [{"line_id": "oc-item-abc", "codigo": "SKU-1"}],
+                },
+                {
+                    "id": "local-os",
+                    "tipo": "os",
+                    "numero": "200",
+                    "data_criacao": "2026-07-19",
+                    "status": "emitido",
+                    "dados": {"cliente": "Cliente"},
+                    "itens": [{"line_id": "os-item-def", "codigo": "SKU-2"}],
+                },
+            ], ensure_ascii=False), encoding="utf-8")
+
+            wb = Workbook()
+            ws = wb.active
+            ws.append(["ID", "ID Linha", "ACAO"])
+            ws.append(["", "oc-item-abc", "concluir"])
+            ws.append(["local-os", "", "excluir"])
+            upload = io.BytesIO()
+            wb.save(upload)
+            upload.seek(0)
+
+            with (
+                patch.object(app_module, "HISTORICO_FILE", str(history_path)),
+                patch.object(app_module, "login_enabled", return_value=False),
+                patch.object(app_module.supabase_data, "enabled", return_value=False),
+            ):
+                response = app_module.app.test_client().post(
+                    "/importar_baixa_documentos",
+                    data={"arquivo_baixa_documentos": (upload, "baixas.xlsx")},
+                    content_type="multipart/form-data",
+                )
+
+            rows = json.loads(history_path.read_text(encoding="utf-8"))
+            self.assertEqual(302, response.status_code)
+            self.assertEqual(["local-oc"], [row["id"] for row in rows])
+            self.assertEqual("concluido", rows[0]["status"])
 
     def test_transient_import_path_is_scoped_by_login(self):
         with app_module.app.test_request_context("/"):

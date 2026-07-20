@@ -2,6 +2,7 @@ from functools import wraps
 
 from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session, jsonify
 from flask.wrappers import Request as FlaskRequest
+import csv
 import re
 import json
 import io
@@ -2330,6 +2331,241 @@ def ler_linhas_arquivo(file_storage):
     return []
 
 
+BAIXA_HEADERS = {
+    "documento_id": {
+        "id",
+        "documento_id",
+        "id_documento",
+        "historico_id",
+        "id_historico",
+        "doc_id",
+    },
+    "line_id": {
+        "id_linha",
+        "linha_id",
+        "line_id",
+        "id_item",
+        "item_id",
+        "id_da_linha",
+        "codigo_linha",
+    },
+    "acao": {
+        "acao",
+        "ação",
+        "baixa",
+        "status",
+        "situacao",
+        "situação",
+        "operacao",
+        "operação",
+    },
+    "tipo": {"tipo", "documento", "tipo_documento"},
+    "numero": {"numero", "número", "oc", "os", "o_c", "o_s"},
+}
+
+
+def _canonicalizar_header_baixa(texto):
+    normalizado = normalizar_header(texto)
+    if not normalizado:
+        return ""
+    for canonico, aliases in BAIXA_HEADERS.items():
+        aliases_norm = {normalizar_header(alias) for alias in aliases}
+        if normalizado == canonico or normalizado in aliases_norm:
+            return canonico
+    return normalizado
+
+
+def _resolver_header_baixa(linhas):
+    melhor_idx = None
+    melhor_score = 0
+    for idx in range(min(len(linhas), 8)):
+        headers = [_canonicalizar_header_baixa(valor) for valor in linhas[idx]]
+        score = sum(1 for header in headers if header in {"documento_id", "line_id", "acao", "tipo", "numero"})
+        if "acao" in headers:
+            score += 3
+        if score > melhor_score:
+            melhor_idx = idx
+            melhor_score = score
+    if melhor_idx is None:
+        return {}, []
+    header = [_canonicalizar_header_baixa(h) for h in linhas[melhor_idx]]
+    mapa = {}
+    for idx, nome in enumerate(header):
+        if nome and nome not in mapa:
+            mapa[nome] = idx
+    return mapa, linhas[melhor_idx + 1:]
+
+
+def _linhas_worksheet(ws):
+    linhas = []
+    for row in ws.iter_rows(values_only=True):
+        linha = ["" if cell is None else str(cell).strip() for cell in row]
+        if any(linha):
+            linhas.append(linha)
+    return linhas
+
+
+def _ler_abas_baixa(file_storage):
+    filename = secure_filename(file_storage.filename or "")
+    ext = os.path.splitext(filename)[1].lower()
+    try:
+        file_storage.stream.seek(0)
+    except Exception:
+        pass
+
+    if ext in [".xlsx", ".xlsm", ".xltx", ".xltm"]:
+        wb = load_workbook(file_storage, data_only=True, read_only=True)
+        try:
+            return [(ws.title, _linhas_worksheet(ws)) for ws in wb.worksheets]
+        finally:
+            wb.close()
+
+    if ext == ".csv":
+        raw = file_storage.stream.read()
+        texto = raw.decode("utf-8-sig", errors="replace")
+        amostra = texto[:2048]
+        try:
+            dialect = csv.Sniffer().sniff(amostra, delimiters=";,\t")
+            reader = csv.reader(io.StringIO(texto), dialect)
+        except Exception:
+            reader = csv.reader(io.StringIO(texto), delimiter=";")
+        linhas = [[cell.strip() for cell in row] for row in reader]
+        return [(filename or "CSV", [linha for linha in linhas if any(linha)])]
+
+    raise ValueError("Envie uma planilha XLSX ou CSV.")
+
+
+def _normalizar_acao_baixa(value):
+    texto = normalizar_header(value)
+    if texto in {"concluir", "concluido", "concluida", "baixar", "baixa", "finalizar", "finalizado", "finalizada"}:
+        return "concluido"
+    if texto in {"cancelar", "cancelado", "cancelada"}:
+        return "cancelado"
+    if texto in {"excluir", "excluido", "excluida", "deletar", "apagar", "remover"}:
+        return "excluir"
+    return ""
+
+
+def _normalizar_tipo_documento(value):
+    texto = normalizar_header(value)
+    if texto in {"oc", "o_c", "compra", "compras", "pedido", "pedido_compra", "ordem_compra"}:
+        return "oc"
+    if texto in {"os", "o_s", "ordem_servico", "ordens_servico", "servico", "producao"}:
+        return "os"
+    return ""
+
+
+def _line_ids_documento(documento):
+    for item in documento.get("itens", []) or []:
+        line_id = _normalizar_line_id((item or {}).get("line_id"))
+        if line_id:
+            yield line_id
+    for comp in documento.get("composicao", []) or []:
+        line_id = _normalizar_line_id((comp or {}).get("line_id"))
+        if line_id:
+            yield line_id
+    for linhas in (documento.get("processos", {}) or {}).values():
+        for linha in linhas or []:
+            line_id = _normalizar_line_id((linha or {}).get("line_id"))
+            if line_id:
+                yield line_id
+
+
+def _indexar_historico_para_baixa(historico):
+    por_id = {}
+    por_linha = {}
+    por_tipo_numero = {}
+    for documento in historico or []:
+        documento_id = str(documento.get("id") or "").strip()
+        tipo = str(documento.get("tipo") or "").strip().lower()
+        numero = str(documento.get("numero") or "").strip()
+        if documento_id:
+            por_id[documento_id] = documento
+        if tipo and numero:
+            por_tipo_numero[(tipo, numero)] = documento
+        for line_id in _line_ids_documento(documento):
+            por_linha[line_id] = documento
+    return por_id, por_linha, por_tipo_numero
+
+
+def _valor_baixa(row, mapa, campo):
+    idx = mapa.get(campo)
+    if idx is None or idx >= len(row):
+        return ""
+    return _corrigir_mojibake(row[idx])
+
+
+def _resolver_documento_baixa(row, mapa, indices):
+    por_id, por_linha, por_tipo_numero = indices
+    documento_id = _valor_baixa(row, mapa, "documento_id")
+    if documento_id and documento_id in por_id:
+        return por_id[documento_id], "ID"
+    line_id = _valor_baixa(row, mapa, "line_id")
+    if line_id and line_id in por_linha:
+        return por_linha[line_id], "ID Linha"
+    tipo = _normalizar_tipo_documento(_valor_baixa(row, mapa, "tipo"))
+    numero = _valor_baixa(row, mapa, "numero")
+    if tipo and numero and (tipo, numero) in por_tipo_numero:
+        return por_tipo_numero[(tipo, numero)], "Tipo/Numero"
+    return None, ""
+
+
+def importar_baixas_documentos(file_storage, tipo_filtro=""):
+    tipo_filtro = str(tipo_filtro or "").strip().lower()
+    if tipo_filtro not in {"", "oc", "os"}:
+        raise ValueError("Tipo de baixa invalido.")
+
+    historico = carregar_historico()
+    indices = _indexar_historico_para_baixa(historico)
+    pendentes = {}
+    resultado = {"linhas": 0, "atualizados": 0, "excluidos": 0, "ignorados": 0, "erros": []}
+
+    for aba, linhas in _ler_abas_baixa(file_storage):
+        if not linhas:
+            continue
+        mapa, rows = _resolver_header_baixa(linhas)
+        if "acao" not in mapa:
+            continue
+        for row_idx, row in enumerate(rows, start=2):
+            acao = _normalizar_acao_baixa(_valor_baixa(row, mapa, "acao"))
+            if not acao:
+                resultado["ignorados"] += 1
+                continue
+            resultado["linhas"] += 1
+            documento, origem = _resolver_documento_baixa(row, mapa, indices)
+            if not documento:
+                resultado["erros"].append(f"{aba} linha {row_idx}: documento nao encontrado")
+                continue
+            if tipo_filtro and documento.get("tipo") != tipo_filtro:
+                resultado["ignorados"] += 1
+                continue
+            documento_id = str(documento.get("id") or "").strip()
+            if not documento_id:
+                resultado["erros"].append(f"{aba} linha {row_idx}: documento sem ID")
+                continue
+            existente = pendentes.get(documento_id)
+            if existente and existente["acao"] != acao:
+                resultado["erros"].append(
+                    f"{aba} linha {row_idx}: acao conflitante para documento {documento.get('numero') or documento_id}"
+                )
+                continue
+            pendentes[documento_id] = {"acao": acao, "documento": documento, "origem": origem}
+
+    for documento_id, item in pendentes.items():
+        acao = item["acao"]
+        if acao == "excluir":
+            excluir_historico_documento(documento_id)
+            resultado["excluidos"] += 1
+        else:
+            atualizado = atualizar_status_historico_documento(documento_id, acao)
+            if atualizado:
+                resultado["atualizados"] += 1
+            else:
+                resultado["erros"].append(f"documento {documento_id}: nao foi possivel atualizar")
+
+    return resultado
+
+
 def _corrigir_mojibake(texto):
     texto = "" if texto is None else str(texto).strip()
     if not texto:
@@ -3622,6 +3858,30 @@ def api_status_historico(tipo, documento_id):
         app.logger.exception("Falha ao atualizar status do documento %s", documento_id)
         return jsonify({"ok": False, "erro": "Nao foi possivel atualizar o status."}), 500
     return jsonify({"ok": True, "documento": atualizado})
+
+
+@app.route("/importar_baixa_documentos", methods=["POST"])
+def importar_baixa_documentos_route():
+    arquivo = request.files.get("arquivo_baixa_documentos")
+    tipo = request.form.get("tipo_baixa_documentos", "")
+    if not arquivo or not arquivo.filename:
+        return redirect(url_for("index", tab="dashboard", documento_status="Selecione uma planilha XLSX ou CSV para baixa em massa."))
+    try:
+        resultado = importar_baixas_documentos(arquivo, tipo)
+        status = (
+            f"Baixa em massa: {resultado['atualizados']} documento(s) atualizado(s), "
+            f"{resultado['excluidos']} excluido(s), {resultado['ignorados']} linha(s) ignorada(s)."
+        )
+        if resultado["erros"]:
+            status += " " + "; ".join(resultado["erros"][:3])
+            if len(resultado["erros"]) > 3:
+                status += f"; mais {len(resultado['erros']) - 3} erro(s)."
+    except ValueError as exc:
+        status = str(exc)
+    except Exception:
+        app.logger.exception("Falha ao importar baixa em massa de documentos")
+        status = "Falha inesperada ao importar a baixa em massa. Consulte o log."
+    return redirect(url_for("index", tab="dashboard", documento_status=status))
 
 
 @app.route("/healthz")
