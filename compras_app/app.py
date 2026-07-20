@@ -5279,30 +5279,30 @@ def exportar_dashboard():
         ws_oc.append(base_headers + [
             "Fornecedor", "Razao Social", "CNPJ", "Email", "Telefone", "Endereco", "Bairro",
             "Cidade", "UF", "CEP", "Previsao", "Tipo Frete", "Frete", "Total Itens",
-            "Total Pedido", "Forma Pagamento", "Prazo", "Vencimento", "Observacoes"
+            "Total Pedido", "Forma Pagamento", "Prazo", "Vencimento", "Observacoes", "ACAO"
         ])
         ws_oc_itens = wb.create_sheet("Compras Itens")
         ws_oc_itens.append(base_headers + [
             "ID Linha", "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
-            "IPI", "ICMS", "COFINS", "Total"
+            "IPI", "ICMS", "COFINS", "Total", "ACAO"
         ])
     if tipo_filtro in {"", "os"}:
         ws_os = wb.create_sheet("Ordens de Servico")
         ws_os.append(base_headers + [
             "Cliente", "Chassis", "Municipio", "MMV", "Previsao Inicio", "Previsao Termino",
-            "Descricao Servico", "Processo Vinculado", "Observacoes Materiais", "Observacoes"
+            "Descricao Servico", "Processo Vinculado", "Observacoes Materiais", "Observacoes", "ACAO"
         ])
         ws_os_itens = wb.create_sheet("OS Itens")
         ws_os_itens.append(base_headers + [
             "ID Linha", "Indice", "Codigo", "Descricao", "Quantidade", "Serie", "Unidade", "Grupo",
-            "Categoria", "Fornecedor"
+            "Categoria", "Fornecedor", "ACAO"
         ])
         ws_os_proc = wb.create_sheet("OS Processos")
-        ws_os_proc.append(base_headers + ["ID Linha", "Grupo", "Indice", "Atividade", "Responsavel"])
+        ws_os_proc.append(base_headers + ["ID Linha", "Grupo", "Indice", "Atividade", "Responsavel", "ACAO"])
         ws_os_comp = wb.create_sheet("OS Componentes")
         ws_os_comp.append(base_headers + [
             "ID Linha", "Indice", "Item Pai", "Codigo", "Descricao", "Unidade", "Quantidade", "Nivel",
-            "Destino", "Destino Manual"
+            "Destino", "Destino Manual", "ACAO"
         ])
 
     for entry in historico:
@@ -5340,6 +5340,7 @@ def exportar_dashboard():
                 dados.get("prazo", ""),
                 dados.get("vencimento", ""),
                 dados.get("obs", ""),
+                "",
             ])
             for idx, item in enumerate(itens, start=1):
                 ws_oc_itens.append(base + [
@@ -5355,6 +5356,7 @@ def exportar_dashboard():
                     item.get("icms", ""),
                     item.get("cofins", ""),
                     item.get("total", ""),
+                    "",
                 ])
         elif tipo == "os":
             ws_os.append(base + [
@@ -5368,6 +5370,7 @@ def exportar_dashboard():
                 dados.get("processo_conjunto", ""),
                 dados.get("obs_materiais", ""),
                 dados.get("obs", ""),
+                "",
             ])
             for idx, item in enumerate(itens, start=1):
                 ws_os_itens.append(base + [
@@ -5381,6 +5384,7 @@ def exportar_dashboard():
                     item.get("grupo", ""),
                     item.get("categoria", ""),
                     item.get("fornecedor", ""),
+                    "",
                 ])
             processos = entry.get("processos", {}) or {}
             for grupo, linhas in processos.items():
@@ -5391,6 +5395,7 @@ def exportar_dashboard():
                         idx,
                         linha.get("atividade", ""),
                         linha.get("responsavel", ""),
+                        "",
                     ])
             composicao = entry.get("composicao", []) or []
             for idx, comp in enumerate(composicao, start=1):
@@ -5405,6 +5410,7 @@ def exportar_dashboard():
                     comp.get("level", ""),
                     comp.get("setor", ""),
                     "Sim" if comp.get("setor_manual") else "Nao",
+                    "",
                 ])
 
     for ws in wb.worksheets:

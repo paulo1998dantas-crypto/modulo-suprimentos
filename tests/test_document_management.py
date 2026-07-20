@@ -185,9 +185,35 @@ class DocumentManagementTests(unittest.TestCase):
         item_rows = list(workbook["Compras Itens"].iter_rows(values_only=True))
         self.assertIn("Status", main_rows[0])
         self.assertIn("Criado Por", main_rows[0])
+        self.assertIn("ACAO", main_rows[0])
         self.assertIn("ID Linha", item_rows[0])
+        self.assertIn("ACAO", item_rows[0])
         self.assertEqual("rascunho", main_rows[1][1])
         self.assertEqual("SKU-1", item_rows[1][8])
+        workbook.close()
+        response.close()
+
+    def test_os_report_includes_action_column_for_bulk_upload(self):
+        history = [{
+            "id": "os-1",
+            "tipo": "os",
+            "numero": "200",
+            "data_criacao": "2026-07-19",
+            "status": "emitido",
+            "dados": {"cliente": "Cliente", "chassis": "ABC"},
+            "itens": [{"line_id": "os-item-1", "codigo": "SKU-1", "descricao": "Item"}],
+        }]
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "carregar_historico", return_value=history),
+        ):
+            response = app_module.app.test_client().get("/exportar_dashboard?tipo=os")
+
+        workbook = load_workbook(io.BytesIO(response.data), read_only=True)
+        self.assertEqual(["Ordens de Servico", "OS Itens", "OS Processos", "OS Componentes"], workbook.sheetnames)
+        self.assertIn("ACAO", [cell.value for cell in workbook["Ordens de Servico"][1]])
+        self.assertIn("ID Linha", [cell.value for cell in workbook["OS Itens"][1]])
+        self.assertIn("ACAO", [cell.value for cell in workbook["OS Itens"][1]])
         workbook.close()
         response.close()
 
