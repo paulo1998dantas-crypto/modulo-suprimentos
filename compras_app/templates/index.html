@@ -2465,6 +2465,7 @@ let linha = tabela.insertRow();
 linha.innerHTML = `
 <td>
 <div class="lookup-field">
+<input type="hidden" name="oc_line_id[]" value="">
 <input name="codigo[]" data-lookup-source="produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
 <div class="lookup-menu"></div>
 </div>
@@ -2498,6 +2499,7 @@ return;
 }
 if (tabela.rows.length <= 2){
 const select = row.querySelector('input[name="codigo[]"]');
+const lineId = row.querySelector('input[name="oc_line_id[]"]');
 const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
@@ -2508,6 +2510,7 @@ const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
 const total = row.querySelector('input[name="total_item[]"]');
 if (select) select.value = "";
+if (lineId) lineId.value = "";
 if (desc) desc.value = "";
 if (unidade) unidade.value = "";
 if (qtd) qtd.value = "";
@@ -2948,6 +2951,7 @@ linha.innerHTML = `
 <td class="os-drag-cell"><span class="os-drag-handle" draggable="true" title="Arrastar item">⋮⋮</span></td>
 <td>
 <div class="lookup-field">
+<input type="hidden" name="os_line_id[]" value="">
 <input name="os_codigo[]" data-lookup-source="os-produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
 <div class="lookup-menu"></div>
 </div>
@@ -2979,6 +2983,7 @@ return;
 }
 if (tabela.rows.length <= 2){
 const select = row.querySelector('input[name="os_codigo[]"]');
+const lineId = row.querySelector('input[name="os_line_id[]"]');
 const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
@@ -2987,6 +2992,7 @@ const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
 const luminaria = row.querySelector('input[name="os_luminaria[]"]');
 const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (select) select.value = "";
+if (lineId) lineId.value = "";
 if (desc) desc.value = "";
 if (qtd) qtd.value = "1";
 if (serie) serie.value = "";
@@ -3192,7 +3198,7 @@ const row = document.createElement("tr");
 const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.setor : destinoAutomaticoComposicao(comp);
 const setorManual = comp.setor_manual ? "1" : "0";
 row.innerHTML = `
-<td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"></td>
+<td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_line_id[]" value="${escapeHtmlOS(comp.line_id || "")}"><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"></td>
 <td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código"></td>
 <td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição"></td>
 <td><input name="os_comp_unidade[]" value="${escapeHtmlOS(comp.unidade || "")}" placeholder="Un."></td>
@@ -3207,6 +3213,7 @@ sincronizarFonteComposicao();
 
 function coletarComposicaoTabela(){
 return Array.from(document.querySelectorAll("#tabela_componentes_body tr")).map((row) => ({
+line_id: (row.querySelector('[name="os_comp_line_id[]"]') || {}).value || "",
 item: (row.querySelector('[name="os_comp_item[]"]') || {}).value || "",
 codigo: (row.querySelector('[name="os_comp_codigo[]"]') || {}).value || "",
 descricao: (row.querySelector('[name="os_comp_descricao[]"]') || {}).value || "",
@@ -3318,7 +3325,7 @@ tabela.deleteRow(1);
 if (!linhas.length){
 const row = tabela.insertRow();
 row.innerHTML = `
-<td><input name="proc_${key}_atividade[]"></td>
+<td><input type="hidden" name="proc_${key}_line_id[]" value=""><input name="proc_${key}_atividade[]"></td>
 <td>
 <input name="proc_${key}_responsavel[]">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
@@ -3330,7 +3337,7 @@ return;
 linhas.forEach((linha) => {
 const row = tabela.insertRow();
 row.innerHTML = `
-<td><input name="proc_${key}_atividade[]" value="${linha.atividade || ""}"></td>
+<td><input type="hidden" name="proc_${key}_line_id[]" value="${linha.line_id || ""}"><input name="proc_${key}_atividade[]" value="${linha.atividade || ""}"></td>
 <td>
 <input name="proc_${key}_responsavel[]" value="${linha.responsavel || ""}">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
@@ -3350,12 +3357,14 @@ return;
 const linhas = [];
 for (let i = 1; i < tabela.rows.length; i++){
 const row = tabela.rows[i];
+const lineIdInput = row.querySelector(`input[name="proc_${key}_line_id[]"]`);
 const atvInput = row.querySelector(`input[name="proc_${key}_atividade[]"]`);
 const respInput = row.querySelector(`input[name="proc_${key}_responsavel[]"]`);
+const line_id = lineIdInput ? lineIdInput.value.trim() : "";
 const atividade = atvInput ? atvInput.value.trim() : "";
 const responsavel = respInput ? respInput.value.trim() : "";
 if (atividade){
-linhas.push({atividade, responsavel});
+linhas.push({line_id, atividade, responsavel});
 }
 }
 data[processo.nome] = linhas;
@@ -3378,6 +3387,7 @@ tabelaOS.deleteRow(2);
 const row = tabelaOS.rows[1];
 if (row){
 const select = row.querySelector('input[name="os_codigo[]"]');
+const lineId = row.querySelector('input[name="os_line_id[]"]');
 const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
 const serie = row.querySelector('input[name="os_serie[]"]');
@@ -3386,6 +3396,7 @@ const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
 const luminaria = row.querySelector('input[name="os_luminaria[]"]');
 const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
 if (select) select.value = "";
+if (lineId) lineId.value = "";
 if (desc) desc.value = "";
 if (qtd) qtd.value = "1";
 if (serie) serie.value = "";
@@ -3409,8 +3420,10 @@ tabela.deleteRow(2);
 }
 const row = tabela.rows[1];
 if (row){
+const lineId = row.querySelector('input[name$="_line_id[]"]');
 const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
 const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
+if (lineId) lineId.value = "";
 if (atv) atv.value = "";
 if (resp) resp.value = "";
 }
@@ -3448,6 +3461,7 @@ tabela.deleteRow(2);
 const row = tabela.rows[1];
 if (row){
 const select = row.querySelector('input[name="codigo[]"]');
+const lineId = row.querySelector('input[name="oc_line_id[]"]');
 const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
@@ -3458,6 +3472,7 @@ const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
 const total = row.querySelector('input[name="total_item[]"]');
 if (select) select.value = "";
+if (lineId) lineId.value = "";
 if (desc) desc.value = "";
 if (unidade) unidade.value = "";
 if (qtd) qtd.value = "";
@@ -3551,12 +3566,14 @@ adicionarLinha();
 }
 const row = tabela.rows[i + 1];
 const item = items[i];
+const lineId = row.querySelector('input[name="oc_line_id[]"]');
 const sel = row.querySelector('input[name="codigo[]"]');
 const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
 const desconto = row.querySelector('input[name="desconto[]"]');
+if (lineId) lineId.value = item.line_id || "";
 if (item.codigo){
 setSelectValue(sel, item.codigo);
 preencherPorCodigo(sel);
@@ -3621,6 +3638,7 @@ adicionarLinhaOS();
 }
 const row = tabela.rows[i + 1];
 const item = items[i];
+const lineId = row.querySelector('input[name="os_line_id[]"]');
 const sel = row.querySelector('input[name="os_codigo[]"]');
 const desc = row.querySelector('input[name="os_descricao[]"]');
 const qtd = row.querySelector('input[name="os_qtd[]"]');
@@ -3629,6 +3647,7 @@ const unidade = row.querySelector('input[name="os_unidade[]"]');
 const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
 const luminaria = row.querySelector('input[name="os_luminaria[]"]');
 const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
+if (lineId) lineId.value = item.line_id || "";
 if (item.codigo){
 setSelectValue(sel, item.codigo);
 aplicarProdutoLinhaOS(row, item.codigo, { semPopup: true });
@@ -3724,6 +3743,7 @@ const input = row.querySelector(selector);
 return input ? input.value : "";
 };
 return {
+line_id: valor('input[name="os_line_id[]"]'),
 codigo: valor('input[name="os_codigo[]"]'),
 descricao: valor('input[name="os_descricao[]"]'),
 qtd: valor('input[name="os_qtd[]"]'),
@@ -3819,6 +3839,7 @@ if (input){
 input.value = value || "";
 }
 };
+set('input[name="os_line_id[]"]', item.line_id);
 set('input[name="os_codigo[]"]', item.codigo);
 set('input[name="os_descricao[]"]', item.descricao);
 set('input[name="os_qtd[]"]', item.qtd || "1");
@@ -3884,7 +3905,7 @@ return;
 }
 const row = tabela.insertRow();
 row.innerHTML = `
-<td><input name="proc_${key}_atividade[]"></td>
+<td><input type="hidden" name="proc_${key}_line_id[]" value=""><input name="proc_${key}_atividade[]"></td>
 <td>
 <input name="proc_${key}_responsavel[]">
 <button type="button" class="btn-row-remove" onclick="removerLinhaProcesso(this)">-</button>
@@ -3900,8 +3921,10 @@ if (!row || !tabela){
 return;
 }
 if (tabela.rows.length <= 2){
+const lineId = row.querySelector('input[name$="_line_id[]"]');
 const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
 const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
+if (lineId) lineId.value = "";
 if (atv) atv.value = "";
 if (resp) resp.value = "";
 agendarSalvarRascunhoOS();
@@ -3923,8 +3946,10 @@ tabela.deleteRow(2);
 }
 const row = tabela.rows[1];
 if (row){
+const lineId = row.querySelector('input[name$="_line_id[]"]');
 const atv = row.querySelector('input[name^="proc_"][name$="_atividade[]"]');
 const resp = row.querySelector('input[name^="proc_"][name$="_responsavel[]"]');
+if (lineId) lineId.value = "";
 if (atv) atv.value = "";
 if (resp) resp.value = "";
 }
@@ -4146,7 +4171,7 @@ while (tabela.rows.length > 2) tabela.deleteRow(2);
 itens.forEach((item, index) => {
 if (index > 0) adicionarLinha();
 const row = tabela.rows[index + 1];
-const valores = {"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
+const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
 Object.entries(valores).forEach(([name, value]) => { const input = row.querySelector(`[name="${name}"]`); if (input) input.value = value === undefined || value === null ? "" : value; });
 });
 calcularTotais();
@@ -4766,6 +4791,7 @@ salvarRascunhoOS();
 <tr>
 <td>
 <div class="lookup-field">
+<input type="hidden" name="oc_line_id[]" value="">
 <input name="codigo[]" data-lookup-source="produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
 <div class="lookup-menu"></div>
 </div>
@@ -5151,6 +5177,7 @@ salvarRascunhoOS();
 <td class="os-drag-cell"><span class="os-drag-handle" draggable="true" title="Arrastar item">⋮⋮</span></td>
 <td>
 <div class="lookup-field">
+<input type="hidden" name="os_line_id[]" value="">
 <input name="os_codigo[]" data-lookup-source="os-produtos" data-lookup-mode="codigo" autocomplete="off" placeholder="Codigo">
 <div class="lookup-menu"></div>
 </div>

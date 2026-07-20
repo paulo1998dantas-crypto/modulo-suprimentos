@@ -60,6 +60,30 @@ class DocumentManagementTests(unittest.TestCase):
             self.assertEqual("emitido", rows[0]["status"])
             self.assertEqual("paulo", rows[0]["atualizado_por"])
 
+    def test_document_history_assigns_line_ids(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            history_path = str(Path(tmpdir) / "historico.json")
+            Path(history_path).write_text("[]", encoding="utf-8")
+            with (
+                patch.object(app_module, "HISTORICO_FILE", history_path),
+                patch.object(app_module.supabase_data, "enabled", return_value=False),
+                app_module.app.test_request_context("/"),
+            ):
+                entry = app_module.registrar_historico(
+                    "os",
+                    77,
+                    {"cliente": "Cliente"},
+                    itens=[{"codigo": "SKU-1", "descricao": "Item", "qtd": 1}],
+                    processos={"CORTE": [{"atividade": "Cortar", "responsavel": "Ana"}]},
+                    composicao=[{"item": "SKU-1", "codigo": "COMP-1", "qtd": 1}],
+                    status="emitido",
+                    submit_token="token-os",
+                )
+
+        self.assertTrue(entry["itens"][0]["line_id"].startswith("os-item-"))
+        self.assertTrue(entry["processos"]["CORTE"][0]["line_id"].startswith("os-proc-"))
+        self.assertTrue(entry["composicao"][0]["line_id"].startswith("os-comp-"))
+
     def test_transient_import_path_is_scoped_by_login(self):
         with app_module.app.test_request_context("/"):
             app_module.session["suprimentos_user"] = {"id": 1, "username": "compras"}
@@ -112,8 +136,9 @@ class DocumentManagementTests(unittest.TestCase):
         item_rows = list(workbook["Compras Itens"].iter_rows(values_only=True))
         self.assertIn("Status", main_rows[0])
         self.assertIn("Criado Por", main_rows[0])
+        self.assertIn("ID Linha", item_rows[0])
         self.assertEqual("rascunho", main_rows[1][1])
-        self.assertEqual("SKU-1", item_rows[1][7])
+        self.assertEqual("SKU-1", item_rows[1][8])
         workbook.close()
         response.close()
 

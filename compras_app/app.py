@@ -14,6 +14,7 @@ import zipfile
 import subprocess
 import threading
 import unicodedata
+import uuid
 from datetime import date, timedelta, datetime
 import tempfile
 import zipfile
@@ -538,6 +539,75 @@ def salvar_historico(entries):
         pass
 
 
+def _line_id(prefix):
+    safe_prefix = re.sub(r"[^a-z0-9_-]+", "-", str(prefix or "linha").lower()).strip("-") or "linha"
+    return f"{safe_prefix}-{uuid.uuid4().hex}"
+
+
+def _normalizar_line_id(value):
+    texto = str(value or "").strip()
+    return texto if texto else ""
+
+
+def _linha_signature(linha, campos):
+    if not isinstance(linha, dict):
+        return ()
+    return tuple(str(linha.get(campo, "") or "").strip().lower() for campo in campos or ())
+
+
+def _ids_existentes_por_signature(linhas, campos):
+    por_signature = {}
+    for linha in linhas or []:
+        if not isinstance(linha, dict):
+            continue
+        line_id = _normalizar_line_id(
+            linha.get("line_id") or linha.get("linha_id") or linha.get("id_linha") or linha.get("lineId")
+        )
+        if not line_id:
+            continue
+        por_signature.setdefault(_linha_signature(linha, campos), []).append(line_id)
+    return por_signature
+
+
+def _atribuir_line_ids(linhas, prefix, existentes=None, campos_chave=None):
+    campos_chave = tuple(campos_chave or ())
+    ids_por_signature = _ids_existentes_por_signature(existentes, campos_chave)
+    resultado = []
+    usados = set()
+    for linha in linhas or []:
+        if not isinstance(linha, dict):
+            continue
+        item = dict(linha)
+        line_id = _normalizar_line_id(
+            item.get("line_id") or item.get("linha_id") or item.get("id_linha") or item.get("lineId")
+        )
+        if not line_id:
+            candidatos = ids_por_signature.get(_linha_signature(item, campos_chave), [])
+            while candidatos and candidatos[0] in usados:
+                candidatos.pop(0)
+            if candidatos:
+                line_id = candidatos.pop(0)
+        while not line_id or line_id in usados:
+            line_id = _line_id(prefix)
+        item["line_id"] = line_id
+        usados.add(line_id)
+        resultado.append(item)
+    return resultado
+
+
+def _atribuir_line_ids_processos(processos, existentes=None):
+    resultado = {}
+    existentes = existentes if isinstance(existentes, dict) else {}
+    for grupo, linhas in (processos or {}).items():
+        resultado[grupo] = _atribuir_line_ids(
+            linhas or [],
+            "os-proc",
+            existentes.get(grupo),
+            ("atividade", "responsavel"),
+        )
+    return resultado
+
+
 def registrar_historico(
     tipo,
     numero,
@@ -552,6 +622,19 @@ def registrar_historico(
 ):
     existente = obter_historico_documento(documento_id) if documento_id else None
     usuario = current_username()
+    itens = _atribuir_line_ids(
+        itens or [],
+        f"{tipo}-item",
+        (existente or {}).get("itens"),
+        ("codigo", "descricao", "qtd", "unidade", "serie"),
+    )
+    composicao = _atribuir_line_ids(
+        composicao or [],
+        f"{tipo}-comp",
+        (existente or {}).get("composicao"),
+        ("item", "codigo", "descricao", "qtd", "unidade", "level", "setor"),
+    )
+    processos = _atribuir_line_ids_processos(processos or {}, (existente or {}).get("processos"))
     entry = {
         "tipo": tipo,
         "numero": str(numero),
@@ -561,10 +644,10 @@ def registrar_historico(
         "criado_por": (existente or {}).get("criado_por") or usuario,
         "atualizado_por": usuario,
         "dados": dados or {},
-        "itens": itens or [],
-        "processos": processos or {},
+        "itens": itens,
+        "processos": processos,
         "componentes": componentes or {},
-        "composicao": composicao or [],
+        "composicao": composicao,
     }
     if documento_id:
         entry["id"] = documento_id
@@ -3588,6 +3671,7 @@ def gerar_oc():
     ipis = request.form.getlist("ipi[]")
     icmss = request.form.getlist("icms[]")
     cofins_list = request.form.getlist("cofins[]")
+    line_ids = request.form.getlist("oc_line_id[]")
 
     produtos = carregar_produtos()
     for i in range(len(codigos)):
@@ -3615,6 +3699,7 @@ def gerar_oc():
 
         total = calcular_total_item(qtd, valor, desconto, ipi_val, icms_val, cofins_val)
         itens.append({
+            "line_id": line_ids[i].strip() if i < len(line_ids) else "",
             "codigo": codigo_item,
             "descricao": descricao_final,
             "descricao_primaria": descricao_final,
@@ -3750,10 +3835,12 @@ def _parse_os_composition_form(form):
         comp_levels = form.getlist("os_comp_level[]")
         comp_setores = form.getlist("os_comp_setor[]")
         comp_setores_manuais = form.getlist("os_comp_setor_manual[]")
+        comp_line_ids = form.getlist("os_comp_line_id[]")
         source_rows = []
         for idx in range(len(comp_codigos)):
             source_rows.append(
                 {
+                    "line_id": comp_line_ids[idx] if idx < len(comp_line_ids) else "",
                     "item": comp_itens[idx] if idx < len(comp_itens) else "",
                     "codigo": comp_codigos[idx],
                     "descricao": comp_descricoes[idx] if idx < len(comp_descricoes) else "",
@@ -3781,6 +3868,7 @@ def _parse_os_composition_form(form):
         if not (codigo or descricao or qtd or unidade):
             continue
         linha = {
+            "line_id": _normalizar_line_id(raw_row.get("line_id")),
             "item": item_pai,
             "codigo": codigo,
             "descricao": descricao,
@@ -3838,6 +3926,7 @@ def gerar_os():
     luminarias_linha = request.form.getlist("os_luminaria[]")
     luminarias_qtd_linha = request.form.getlist("os_luminaria_qtd[]")
     popup_itens_linha = request.form.getlist("os_popup_itens[]")
+    line_ids = request.form.getlist("os_line_id[]")
     luminarias_extra = []
     popup_itens_extra = []
     regras_popup_por_gatilho = {}
@@ -3868,6 +3957,7 @@ def gerar_os():
             )
         itens.append(
             {
+                "line_id": line_ids[idx].strip() if idx < len(line_ids) else "",
                 "codigo": codigo_item,
                 "descricao": descricao_final,
                 "qtd": qtd,
@@ -3995,12 +4085,17 @@ def gerar_os():
         key = processo["key"]
         atividades = request.form.getlist(f"proc_{key}_atividade[]")
         responsaveis = request.form.getlist(f"proc_{key}_responsavel[]")
+        line_ids_processo = request.form.getlist(f"proc_{key}_line_id[]")
         linhas = []
         for idx in range(len(atividades)):
             atividade = atividades[idx].strip()
             responsavel = responsaveis[idx].strip() if idx < len(responsaveis) else ""
             if atividade:
-                linhas.append({"atividade": atividade, "responsavel": responsavel})
+                linhas.append({
+                    "line_id": line_ids_processo[idx].strip() if idx < len(line_ids_processo) else "",
+                    "atividade": atividade,
+                    "responsavel": responsavel,
+                })
         if linhas:
             algum_processo_informado = True
         processos_final[nome] = linhas
@@ -4765,6 +4860,11 @@ def importar_oc_documento():
         else:
             data = {}
         if data:
+            data["itens"] = _atribuir_line_ids(
+                data.get("itens") or [],
+                "oc-item",
+                campos_chave=("codigo", "descricao", "qtd", "unidade"),
+            )
             salvar_json(_user_scoped_file(OC_IMPORT_FILE), data)
     return redirect(url_for("index", tab="oc"))
 
@@ -4784,6 +4884,12 @@ def importar_os_documento():
             # A importacao de O.S serve como base de preenchimento. A composicao
             # deve ser recalculada pela B.O.M atual no Supabase para evitar
             # duplicidade, dados antigos e payloads grandes demais.
+            data["itens"] = _atribuir_line_ids(
+                data.get("itens") or [],
+                "os-item",
+                campos_chave=("codigo", "descricao", "qtd", "unidade", "serie"),
+            )
+            data["processos"] = _atribuir_line_ids_processos(data.get("processos") or {})
             data["composicao"] = []
             salvar_json(_user_scoped_file(OS_IMPORT_FILE), data)
     return redirect(url_for("index", tab="os"))
@@ -4917,7 +5023,7 @@ def exportar_dashboard():
         ])
         ws_oc_itens = wb.create_sheet("Compras Itens")
         ws_oc_itens.append(base_headers + [
-            "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
+            "ID Linha", "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
             "IPI", "ICMS", "COFINS", "Total"
         ])
     if tipo_filtro in {"", "os"}:
@@ -4928,14 +5034,14 @@ def exportar_dashboard():
         ])
         ws_os_itens = wb.create_sheet("OS Itens")
         ws_os_itens.append(base_headers + [
-            "Indice", "Codigo", "Descricao", "Quantidade", "Serie", "Unidade", "Grupo",
+            "ID Linha", "Indice", "Codigo", "Descricao", "Quantidade", "Serie", "Unidade", "Grupo",
             "Categoria", "Fornecedor"
         ])
         ws_os_proc = wb.create_sheet("OS Processos")
-        ws_os_proc.append(base_headers + ["Grupo", "Indice", "Atividade", "Responsavel"])
+        ws_os_proc.append(base_headers + ["ID Linha", "Grupo", "Indice", "Atividade", "Responsavel"])
         ws_os_comp = wb.create_sheet("OS Componentes")
         ws_os_comp.append(base_headers + [
-            "Indice", "Item Pai", "Codigo", "Descricao", "Unidade", "Quantidade", "Nivel",
+            "ID Linha", "Indice", "Item Pai", "Codigo", "Descricao", "Unidade", "Quantidade", "Nivel",
             "Destino", "Destino Manual"
         ])
 
@@ -4977,6 +5083,7 @@ def exportar_dashboard():
             ])
             for idx, item in enumerate(itens, start=1):
                 ws_oc_itens.append(base + [
+                    item.get("line_id", ""),
                     idx,
                     item.get("codigo", ""),
                     item.get("descricao", ""),
@@ -5004,6 +5111,7 @@ def exportar_dashboard():
             ])
             for idx, item in enumerate(itens, start=1):
                 ws_os_itens.append(base + [
+                    item.get("line_id", ""),
                     idx,
                     item.get("codigo", ""),
                     item.get("descricao", ""),
@@ -5018,6 +5126,7 @@ def exportar_dashboard():
             for grupo, linhas in processos.items():
                 for idx, linha in enumerate(linhas, start=1):
                     ws_os_proc.append(base + [
+                        linha.get("line_id", ""),
                         grupo,
                         idx,
                         linha.get("atividade", ""),
@@ -5026,6 +5135,7 @@ def exportar_dashboard():
             composicao = entry.get("composicao", []) or []
             for idx, comp in enumerate(composicao, start=1):
                 ws_os_comp.append(base + [
+                    comp.get("line_id", ""),
                     idx,
                     comp.get("item", ""),
                     comp.get("codigo", ""),
