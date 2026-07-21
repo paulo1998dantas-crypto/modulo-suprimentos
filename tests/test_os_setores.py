@@ -240,6 +240,38 @@ class PreparacaoFilterTests(unittest.TestCase):
         self.assertIn("30520001", codigos)
         self.assertNotIn("10520005", codigos)
 
+    def test_cj_teto_revestimento_vai_para_preparacao(self):
+        catalogo = {
+            "30180023": {
+                "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
+                "unidade": "cj",
+                "grupo": "30 - CONJUNTO / KIT",
+                "categoria": "18 - REVESTIMENTO",
+            },
+        }
+        linhas = enriquecer_composicao(
+            [
+                {
+                    "item": "30180025",
+                    "codigo": "30180023",
+                    "descricao": "CJ TETO E/S/J VELUDO PRETO SALAO/CABINE/COLUNA B/COLUNA A/ACESSORIOS ORI TETO CABINE",
+                    "qtd": 1,
+                },
+            ],
+            catalogo,
+        )
+
+        preparacao = filtrar_linhas_preparacao(propagar_setor_preparacao(linhas, catalogo, {}))
+        self.assertEqual([linha["codigo"] for linha in preparacao], ["30180023"])
+        self.assertEqual(preparacao[0]["regra_preparacao"], "CJ_TETO")
+
+        layout = linhas_layout_preparacao(
+            [{"codigo": "30180023", "qtd": 1}],
+            catalogo,
+        )
+        self.assertEqual([linha["codigo"] for linha in layout], ["30180023"])
+        self.assertEqual(layout[0]["regra_preparacao"], "CJ_TETO")
+
     def test_destino_manual_pode_incluir_ou_retirar_linha_da_preparacao(self):
         linhas = [
             {

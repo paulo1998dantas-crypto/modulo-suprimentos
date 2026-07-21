@@ -22,12 +22,28 @@ def normalizar_texto(valor):
     return " ".join(texto.replace("_", " ").split())
 
 
+def _eh_cj_teto(codigo, grupo, descricao):
+    descricao = normalizar_texto(descricao)
+    grupo = normalizar_texto(grupo)
+    codigo = normalizar_codigo(codigo)
+    if not descricao.startswith("CJ TETO"):
+        return False
+    return (
+        codigo[:2] in {"20", "30"}
+        or "CONJUNTO" in grupo
+        or "KIT" in grupo
+        or "PRODUTO EM PROCESSO" in grupo
+    )
+
+
 def classificar_item(item_info):
     categoria = normalizar_texto((item_info or {}).get("categoria", ""))
     grupo = normalizar_texto((item_info or {}).get("grupo", ""))
     descricao = normalizar_texto((item_info or {}).get("descricao", ""))
     codigo = normalizar_codigo((item_info or {}).get("codigo", ""))
     referencia = f"{categoria} {grupo} {descricao}"
+    if _eh_cj_teto(codigo, grupo, descricao):
+        return SETOR_PREPARACAO
     if "TRILHO" in referencia or "REFORCO" in referencia or "ISOLAMENTO" in referencia:
         return SETOR_PREPARACAO
     if any(marcador in descricao for marcador in _MARCADORES_EXPEDICAO_DESCRICAO):
@@ -153,6 +169,8 @@ def _regra_preparacao(linha, catalogo=None):
 
     if codigo.startswith("3020") and "BANCO" in referencia:
         return "CJ_BANCOS"
+    if _eh_cj_teto(codigo, grupo, descricao):
+        return "CJ_TETO"
     if "TRILHO" in referencia:
         return "TRILHO"
     if "REFORCO" in referencia:
