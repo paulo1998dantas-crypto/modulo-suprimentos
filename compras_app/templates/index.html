@@ -5265,6 +5265,16 @@ salvarRascunhoOS();
 </form>
 </div>
 <div class="dashboard-table">
+<div class="table-toolbar"><div><h3>Recalcular O.S. importadas</h3><span>Atualização seletiva por número e chassi</span></div></div>
+<form method="POST" action="/recalcular_os_importadas" enctype="multipart/form-data">
+<div class="grid-3">
+<div><label>ZIP, manifesto JSON ou arquivos DOCX</label><input type="file" name="arquivos_os_recalculo" accept=".zip,.json,.docx" multiple required></div>
+<div style="align-self:end;"><label><input type="checkbox" name="confirmar_recalculo_os" value="sim" required> Confirmar atualização das correspondências</label></div>
+<div style="align-self:end;"><button type="submit">Recalcular importadas</button></div>
+</div>
+</form>
+</div>
+<div class="dashboard-table">
 <div class="table-toolbar"><div><h3>Sincronizar marco zero</h3><span>Substituição integral da base de O.S.</span></div></div>
 <form method="POST" action="/reconciliar_os_marco_zero" enctype="multipart/form-data">
 <div class="grid-3">

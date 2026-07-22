@@ -1654,17 +1654,21 @@ def _normalizar_qtd(texto):
     texto = _limpar_placeholder(texto)
     if texto == "":
         return ""
-    texto = str(texto).strip()
-    texto = texto.replace(" ", "")
-    texto = texto.replace(".", "")
-    texto = texto.replace(",", ".")
+    texto = str(texto).strip().replace(" ", "")
+    if "," in texto and "." in texto:
+        if texto.rfind(",") > texto.rfind("."):
+            texto = texto.replace(".", "").replace(",", ".")
+        else:
+            texto = texto.replace(",", "")
+    elif "," in texto:
+        texto = texto.replace(",", ".")
     try:
         numero = float(texto)
     except ValueError:
         return ""
     if abs(numero - int(numero)) < 1e-9:
         return str(int(numero))
-    return f"{numero:.2f}".rstrip("0").rstrip(".")
+    return f"{numero:.6f}".rstrip("0").rstrip(".")
 
 
 def _parse_date_ddmmyyyy(texto):
@@ -4425,14 +4429,7 @@ def _montar_os_reconciliada(fonte, referencia, contexto):
     }
 
 
-def reconciliar_os_marco_zero(arquivos):
-    if not supabase_data.enabled():
-        raise ValueError("A reconciliacao do marco zero exige a base Supabase.")
-    fontes = _fontes_os_reconciliacao(arquivos)
-    fontes_por_numero, duplicadas_fonte = _parsear_fontes_os_reconciliacao(fontes)
-    historico_atual = supabase_data.carregar_documentos(force=True)
-    referencias = [*historico_atual, *_carregar_historico_local()]
-
+def _contexto_reconciliacao_os():
     os_produtos = carregar_os_produtos()
     componentes = carregar_os_componentes()
     processos = carregar_os_processos()
@@ -4441,7 +4438,7 @@ def reconciliar_os_marco_zero(arquivos):
     regras_por_gatilho = {}
     for regra in carregar_regras_popup_item():
         regras_por_gatilho.setdefault(regra.get("gatilho", ""), []).append(regra)
-    contexto = {
+    return {
         "os_produtos": os_produtos,
         "produtos_catalogo": carregar_produtos(),
         "componentes": componentes,
@@ -4449,6 +4446,135 @@ def reconciliar_os_marco_zero(arquivos):
         "processo_por_item": processo_por_item,
         "regras_por_gatilho": regras_por_gatilho,
     }
+
+
+def _alvo_os_importada(documentos, numero, chassis):
+    numero = str(numero or "").strip()
+    chassis_norm = str(chassis or "").strip().casefold()
+    candidatas = [
+        documento for documento in (documentos or [])
+        if documento.get("tipo") == "os" and str(documento.get("numero") or "").strip() == numero
+    ]
+    if chassis_norm:
+        candidatas = [
+            documento for documento in candidatas
+            if str((documento.get("dados") or {}).get("chassis") or "").strip().casefold() == chassis_norm
+        ]
+    if len(candidatas) != 1:
+        raise ValueError(
+            f"O.S. {numero}: esperado um registro com chassi {chassis or '-'}, encontrados {len(candidatas)}."
+        )
+    if candidatas[0].get("id") is None:
+        raise ValueError(f"O.S. {numero}: registro sem ID no Supabase.")
+    return candidatas[0]
+
+
+def _assinatura_os_recalculada(documento):
+    def normalizar(valor):
+        if isinstance(valor, dict):
+            return {str(chave): normalizar(conteudo) for chave, conteudo in valor.items()}
+        if isinstance(valor, list):
+            return [normalizar(conteudo) for conteudo in valor]
+        if isinstance(valor, float):
+            return int(valor) if valor.is_integer() else float(f"{valor:.12g}")
+        return valor
+
+    conteudo = {
+        "numero": str(documento.get("numero") or ""),
+        "dados": documento.get("dados") or {},
+        "itens": documento.get("itens") or [],
+        "processos": documento.get("processos") or {},
+        "composicao": documento.get("composicao") or [],
+    }
+    serializado = json.dumps(
+        normalizar(conteudo),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    return hashlib.sha256(serializado.encode("utf-8")).hexdigest()
+
+
+def recalcular_os_importadas(arquivos):
+    if not supabase_data.enabled():
+        raise ValueError("O recalculo seletivo de O.S. exige a base Supabase.")
+    fontes = _fontes_os_reconciliacao(arquivos)
+    fontes_por_numero, duplicadas_fonte = _parsear_fontes_os_reconciliacao(fontes)
+    historico_atual = supabase_data.carregar_documentos(force=True)
+    os_atuais = [documento for documento in historico_atual if documento.get("tipo") == "os"]
+    referencias = [*historico_atual, *_carregar_historico_local()]
+    contexto = _contexto_reconciliacao_os()
+
+    atualizacoes = []
+    for numero, fonte in sorted(fontes_por_numero.items(), key=lambda item: item[0]):
+        dados_origem = fonte["dados"]
+        alvo = _alvo_os_importada(os_atuais, numero, dados_origem.get("chassis", ""))
+        referencia = _referencia_os_recente(referencias, numero, dados_origem.get("chassis", "")) or alvo
+        corrigida = _montar_os_reconciliada(fonte, referencia, contexto)
+        corrigida.update({
+            "data_criacao": alvo.get("data_criacao") or corrigida.get("data_criacao"),
+            "status": alvo.get("status") or "emitido",
+            "submit_token": alvo.get("submit_token") or corrigida.get("submit_token"),
+            "criado_por": alvo.get("criado_por") or corrigida.get("criado_por"),
+            "atualizado_por": current_username(),
+        })
+        atualizacoes.append({
+            "id": str(alvo["id"]),
+            "original": alvo,
+            "corrigida": corrigida,
+        })
+
+    ids_atualizados = []
+    try:
+        for atualizacao in atualizacoes:
+            confirmado = supabase_data.atualizar_documento(atualizacao["id"], atualizacao["corrigida"])
+            if not confirmado:
+                raise RuntimeError(f"O Supabase nao confirmou a O.S. {atualizacao['corrigida']['numero']}.")
+            ids_atualizados.append(atualizacao["id"])
+
+        final = supabase_data.carregar_documentos(force=True)
+        final_por_id = {str(documento.get("id")): documento for documento in final}
+        divergentes = [
+            atualizacao["corrigida"]["numero"]
+            for atualizacao in atualizacoes
+            if atualizacao["id"] not in final_por_id
+            or _assinatura_os_recalculada(final_por_id[atualizacao["id"]])
+            != _assinatura_os_recalculada(atualizacao["corrigida"])
+        ]
+        if divergentes:
+            raise RuntimeError("A verificacao final divergiu nas O.S.: " + ", ".join(divergentes[:10]))
+    except Exception:
+        for atualizacao in reversed(atualizacoes):
+            if atualizacao["id"] not in ids_atualizados:
+                continue
+            try:
+                supabase_data.atualizar_documento(atualizacao["id"], atualizacao["original"])
+            except Exception:
+                app.logger.exception("Falha ao restaurar a O.S. %s", atualizacao["original"].get("numero"))
+        raise
+
+    return {
+        "fontes": len(fontes),
+        "atualizadas": len(atualizacoes),
+        "preservadas": len(os_atuais) - len(atualizacoes),
+        "duplicadas_fonte": duplicadas_fonte,
+        "itens": sum(len(atualizacao["corrigida"].get("itens") or []) for atualizacao in atualizacoes),
+        "componentes": sum(
+            len(atualizacao["corrigida"].get("composicao") or []) for atualizacao in atualizacoes
+        ),
+    }
+
+
+def reconciliar_os_marco_zero(arquivos):
+    if not supabase_data.enabled():
+        raise ValueError("A reconciliacao do marco zero exige a base Supabase.")
+    fontes = _fontes_os_reconciliacao(arquivos)
+    fontes_por_numero, duplicadas_fonte = _parsear_fontes_os_reconciliacao(fontes)
+    historico_atual = supabase_data.carregar_documentos(force=True)
+    referencias = [*historico_atual, *_carregar_historico_local()]
+
+    contexto = _contexto_reconciliacao_os()
 
     novos = []
     for numero, fonte in sorted(fontes_por_numero.items(), key=lambda item: item[0]):
@@ -4515,6 +4641,28 @@ def reconciliar_os_marco_zero_route():
     except Exception:
         app.logger.exception("Falha ao reconciliar marco zero de O.S.")
         status = "Falha ao reconciliar o marco zero de O.S. Consulte o log e o relatorio de backup."
+    return redirect(url_for("index", tab="gestao-os", documento_status=status))
+
+
+@app.route("/recalcular_os_importadas", methods=["POST"])
+def recalcular_os_importadas_route():
+    try:
+        if request.form.get("confirmar_recalculo_os") != "sim":
+            raise ValueError("Confirme o recalculo seletivo das O.S. importadas.")
+        arquivos = request.files.getlist("arquivos_os_recalculo")
+        resultado = recalcular_os_importadas(arquivos)
+        status = (
+            f"Recalculo seletivo concluido: {resultado['atualizadas']} O.S. atualizada(s), "
+            f"{resultado['preservadas']} O.S. nova(s) preservada(s), "
+            f"{resultado['itens']} item(ns) e {resultado['componentes']} componente(s) recalculado(s)."
+        )
+        if resultado["duplicadas_fonte"]:
+            status += f" {resultado['duplicadas_fonte']} arquivo(s) duplicado(s) descartado(s)."
+    except ValueError as exc:
+        status = str(exc)
+    except Exception:
+        app.logger.exception("Falha ao recalcular O.S. importadas")
+        status = "Falha ao recalcular as O.S. importadas. Nenhuma O.S. nova foi excluida."
     return redirect(url_for("index", tab="gestao-os", documento_status=status))
 
 

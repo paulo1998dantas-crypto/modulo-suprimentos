@@ -19,6 +19,18 @@ import supabase_data
 
 
 class DocumentManagementTests(unittest.TestCase):
+    def test_quantity_parser_preserves_decimal_points_from_os_documents(self):
+        self.assertEqual("1", app_module._normalizar_qtd("1.0"))
+        self.assertEqual("2", app_module._normalizar_qtd("2.0"))
+        self.assertEqual("0.025", app_module._normalizar_qtd("0.025"))
+        self.assertEqual("1.064", app_module._normalizar_qtd("1.064"))
+        self.assertEqual("1.5", app_module._normalizar_qtd("1,5"))
+        self.assertEqual("1234.5", app_module._normalizar_qtd("1.234,5"))
+        self.assertEqual(
+            app_module._assinatura_os_recalculada({"numero": "1", "itens": [{"qtd": 1}]}),
+            app_module._assinatura_os_recalculada({"numero": "1", "itens": [{"qtd": 1.0}]}),
+        )
+
     def test_dashboard_documents_exposes_compact_filter_data(self):
         rows = app_module._dashboard_documentos([{
             "id": 42,
@@ -455,6 +467,78 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual({"COMP-1", "10260092", "FD-1"}, composition_codes)
         self.assertEqual("INSTALL TECH", direct_item["fornecedor"])
         self.assertTrue(all(line.get("line_id") for line in document["composicao"]))
+
+    def test_selective_recalculation_preserves_new_service_orders(self):
+        source = {
+            "nome": "OS-3090.docx",
+            "data_arquivo": datetime(2026, 7, 21, 10, 0),
+            "dados": {"os_numero": "3090", "chassis": "BASE-1", "itens": [{"codigo": "SKU-1"}]},
+        }
+        baseline = {
+            "id": 10,
+            "tipo": "os",
+            "numero": "3090",
+            "data_criacao": "2026-07-21",
+            "status": "emitido",
+            "submit_token": "baseline-token",
+            "criado_por": "paulo",
+            "dados": {"chassis": "BASE-1"},
+            "itens": [{"codigo": "SKU-1", "qtd": 10}],
+            "processos": {},
+            "composicao": [],
+        }
+        new_order = {
+            "id": 11,
+            "tipo": "os",
+            "numero": "4000",
+            "data_criacao": "2026-07-22",
+            "status": "emitido",
+            "dados": {"chassis": "NOVA-1"},
+            "itens": [{"codigo": "SKU-NOVA", "qtd": 1}],
+            "processos": {},
+            "composicao": [],
+        }
+        corrected = {
+            "tipo": "os",
+            "numero": "3090",
+            "data_criacao": "2026-07-21",
+            "status": "emitido",
+            "submit_token": "novo-token",
+            "criado_por": "codex",
+            "atualizado_por": "codex",
+            "dados": {"chassis": "BASE-1"},
+            "itens": [{"codigo": "SKU-1", "qtd": 1}],
+            "processos": {},
+            "composicao": [{"codigo": "COMP-1", "qtd": 2}],
+        }
+        final_baseline = {"id": 10, **corrected}
+        final_rows = [final_baseline, new_order]
+
+        with (
+            patch.object(app_module.supabase_data, "enabled", return_value=True),
+            patch.object(app_module, "_fontes_os_reconciliacao", return_value=[source]),
+            patch.object(app_module, "_parsear_fontes_os_reconciliacao", return_value=({"3090": source}, 0)),
+            patch.object(app_module, "_carregar_historico_local", return_value=[]),
+            patch.object(app_module, "_contexto_reconciliacao_os", return_value={}),
+            patch.object(app_module, "_montar_os_reconciliada", return_value=corrected),
+            patch.object(app_module, "current_username", return_value="codex"),
+            patch.object(
+                app_module.supabase_data,
+                "carregar_documentos",
+                side_effect=[[baseline, new_order], final_rows],
+            ),
+            patch.object(app_module.supabase_data, "atualizar_documento", return_value=True) as update,
+            patch.object(app_module.supabase_data, "excluir_documento") as delete_one,
+            patch.object(app_module.supabase_data, "excluir_documentos") as delete_many,
+        ):
+            result = app_module.recalcular_os_importadas([object()])
+
+        self.assertEqual(1, result["atualizadas"])
+        self.assertEqual(1, result["preservadas"])
+        self.assertEqual("10", update.call_args.args[0])
+        self.assertEqual("3090", update.call_args.args[1]["numero"])
+        delete_one.assert_not_called()
+        delete_many.assert_not_called()
 
 
 if __name__ == "__main__":
