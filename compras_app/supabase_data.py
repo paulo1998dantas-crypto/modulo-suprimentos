@@ -539,6 +539,21 @@ def salvar_documento(documento):
     return documento_to_legacy(rows[0]) if rows else True
 
 
+def salvar_documentos(documentos):
+    rows_payload = [normalizar_documento(documento) for documento in (documentos or [])]
+    rows_payload = [row for row in rows_payload if row.get("tipo") and row.get("numero")]
+    if not rows_payload:
+        return []
+    rows = _request(
+        "POST",
+        DOCUMENTOS_TABLE,
+        payload=rows_payload,
+        prefer="return=representation",
+    ) or []
+    clear_cache()
+    return [documento_to_legacy(row) for row in rows]
+
+
 def obter_documento(documento_id):
     rows = _request(
         "GET",
@@ -576,6 +591,21 @@ def excluir_documento(documento_id):
     )
     clear_cache()
     return True
+
+
+def excluir_documentos(documento_ids):
+    ids = [str(documento_id).strip() for documento_id in (documento_ids or []) if str(documento_id).strip()]
+    if not ids:
+        return 0
+    filtro = ",".join(ids)
+    _request(
+        "DELETE",
+        DOCUMENTOS_TABLE,
+        query=[("id", f"in.({filtro})")],
+        prefer="return=minimal",
+    )
+    clear_cache()
+    return len(ids)
 
 
 def carregar_documentos(force=False, limit=1000):

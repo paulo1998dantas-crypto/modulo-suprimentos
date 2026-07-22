@@ -4966,6 +4966,23 @@ salvarRascunhoOS();
 <p class="muted-text">Na aba principal a ACAO baixa o documento inteiro. Nas abas com ID Linha, a ACAO baixa somente aquela linha.</p>
 </form>
 </div>
+<div class="dashboard-table">
+<h3>Sincronizar marco zero de O.S.</h3>
+<form method="POST" action="/reconciliar_os_marco_zero" enctype="multipart/form-data">
+<div class="grid-3">
+<div>
+<label>ZIP da pasta de O.S. ou arquivos DOCX</label>
+<input type="file" name="arquivos_os_marco_zero" accept=".zip,.docx" multiple required>
+</div>
+<div style="align-self:end;">
+<label><input type="checkbox" name="confirmar_substituicao_os" value="sim" required> Substituir a base atual de O.S.</label>
+</div>
+<div style="align-self:end;">
+<button type="submit" class="btn-danger">Sincronizar O.S.</button>
+</div>
+</div>
+</form>
+</div>
 <div class="dashboard-metrics">
 <div class="metric-card">
 <span>Ordens de compra</span>

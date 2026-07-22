@@ -3,6 +3,7 @@ from functools import wraps
 from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session, jsonify
 from flask.wrappers import Request as FlaskRequest
 import csv
+import hashlib
 import re
 import json
 import io
@@ -4011,6 +4012,451 @@ def api_status_historico(tipo, documento_id):
         app.logger.exception("Falha ao atualizar status do documento %s", documento_id)
         return jsonify({"ok": False, "erro": "Nao foi possivel atualizar o status."}), 500
     return jsonify({"ok": True, "documento": atualizado})
+
+
+OS_LUMINARIAS_CODIGOS = {"10260092", "10260095"}
+
+
+def _revisao_nome_arquivo_os(nome):
+    match = re.search(r"(?:^|[ _-])R(\d+)(?:\D|$)", str(nome or ""), re.IGNORECASE)
+    return int(match.group(1)) if match else 0
+
+
+def _fontes_os_reconciliacao(arquivos):
+    fontes = []
+    total_descompactado = 0
+    ordem = 0
+    for arquivo in arquivos or []:
+        nome_arquivo = secure_filename(getattr(arquivo, "filename", "") or "")
+        if not nome_arquivo:
+            continue
+        extensao = os.path.splitext(nome_arquivo)[1].lower()
+        conteudo = arquivo.read() or b""
+        if extensao == ".docx":
+            fontes.append({
+                "nome": nome_arquivo,
+                "conteudo": conteudo,
+                "data_arquivo": datetime.now(),
+                "revisao": _revisao_nome_arquivo_os(nome_arquivo),
+                "ordem": ordem,
+            })
+            ordem += 1
+            continue
+        if extensao != ".zip":
+            raise ValueError(f"Arquivo nao suportado: {nome_arquivo}.")
+        try:
+            with zipfile.ZipFile(io.BytesIO(conteudo)) as pacote:
+                membros = [
+                    info for info in pacote.infolist()
+                    if not info.is_dir() and os.path.splitext(info.filename)[1].lower() == ".docx"
+                ]
+                if len(membros) > 500:
+                    raise ValueError("O ZIP excede o limite de 500 arquivos DOCX.")
+                for info in membros:
+                    total_descompactado += int(info.file_size or 0)
+                    if total_descompactado > 128 * 1024 * 1024:
+                        raise ValueError("O ZIP excede o limite descompactado de 128 MB.")
+                    nome = secure_filename(os.path.basename(info.filename))
+                    fontes.append({
+                        "nome": nome,
+                        "conteudo": pacote.read(info),
+                        "data_arquivo": datetime(*info.date_time),
+                        "revisao": _revisao_nome_arquivo_os(nome),
+                        "ordem": ordem,
+                    })
+                    ordem += 1
+        except zipfile.BadZipFile as exc:
+            raise ValueError(f"ZIP invalido: {nome_arquivo}.") from exc
+    if not fontes:
+        raise ValueError("Nenhum arquivo DOCX foi encontrado para reconciliar.")
+    return fontes
+
+
+def _parsear_fontes_os_reconciliacao(fontes):
+    por_numero = {}
+    descartadas = 0
+    for fonte in fontes:
+        armazenamento = FileStorage(
+            stream=io.BytesIO(fonte["conteudo"]),
+            filename=fonte["nome"],
+            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+        try:
+            dados = parse_os_docx_atualizado(armazenamento)
+        except Exception as exc:
+            raise ValueError(f"Nao foi possivel ler {fonte['nome']}.") from exc
+        numero = str(dados.get("os_numero") or "").strip()
+        if not numero:
+            raise ValueError(f"O arquivo {fonte['nome']} nao possui numero de O.S.")
+        if not (dados.get("itens") or []):
+            raise ValueError(f"A O.S. {numero} de {fonte['nome']} nao possui itens.")
+        candidata = dict(fonte)
+        candidata["dados"] = dados
+        candidata["hash"] = hashlib.sha256(fonte["conteudo"]).hexdigest()
+        atual = por_numero.get(numero)
+        if atual is None:
+            por_numero[numero] = candidata
+            continue
+        descartadas += 1
+        chave_atual = (atual["data_arquivo"], atual["revisao"], atual["ordem"])
+        chave_nova = (candidata["data_arquivo"], candidata["revisao"], candidata["ordem"])
+        if candidata["hash"] != atual["hash"] and chave_nova > chave_atual:
+            por_numero[numero] = candidata
+    return por_numero, descartadas
+
+
+def _referencia_os_recente(documentos, numero, chassis=""):
+    numero = str(numero or "").strip()
+    chassis_norm = str(chassis or "").strip().casefold()
+    candidatas = [
+        documento for documento in (documentos or [])
+        if documento.get("tipo") == "os" and str(documento.get("numero") or "").strip() == numero
+    ]
+    exatas = [
+        documento for documento in candidatas
+        if str((documento.get("dados") or {}).get("chassis") or "").strip().casefold() == chassis_norm
+    ]
+    if exatas:
+        candidatas = exatas
+    if not candidatas:
+        return None
+    return max(
+        candidatas,
+        key=lambda documento: (
+            str(documento.get("updated_at") or ""),
+            str(documento.get("created_at") or ""),
+            str(documento.get("data_criacao") or ""),
+            str(documento.get("id") or ""),
+        ),
+    )
+
+
+def _fornecedor_item_referencia(referencia, codigo):
+    codigo = normalizar_codigo(codigo)
+    for item in (referencia or {}).get("itens", []) or []:
+        if normalizar_codigo((item or {}).get("codigo", "")) != codigo:
+            continue
+        fornecedor = str((item or {}).get("fornecedor") or "").strip()
+        if fornecedor:
+            return fornecedor
+    return ""
+
+
+def _linhas_inferencia_os(dados_origem, referencia):
+    linhas = []
+    for linha in (referencia or {}).get("composicao", []) or []:
+        if isinstance(linha, dict):
+            copia = dict(linha)
+            copia["_origem_inferencia"] = "referencia"
+            linhas.append(copia)
+    for linha in dados_origem.get("composicao", []) or []:
+        if isinstance(linha, dict):
+            copia = dict(linha)
+            copia["_origem_inferencia"] = "arquivo"
+            linhas.append(copia)
+    return linhas
+
+
+def _selecionar_codigo_relacionado(linhas, item_raiz, opcoes):
+    item_raiz = normalizar_codigo(item_raiz)
+    opcoes = {normalizar_codigo(codigo) for codigo in opcoes if normalizar_codigo(codigo)}
+    grupos = [
+        [
+            linha for linha in linhas
+            if linha.get("_origem_inferencia") == "arquivo"
+            and normalizar_codigo(linha.get("item", "")) == item_raiz
+            and normalizar_codigo(linha.get("codigo", "")) in opcoes
+        ],
+        [
+            linha for linha in linhas
+            if linha.get("_origem_inferencia") == "arquivo"
+            and normalizar_codigo(linha.get("codigo", "")) in opcoes
+        ],
+        [
+            linha for linha in linhas
+            if linha.get("_origem_inferencia") == "referencia"
+            and normalizar_codigo(linha.get("item", "")) == item_raiz
+            and normalizar_codigo(linha.get("codigo", "")) in opcoes
+        ],
+        [
+            linha for linha in linhas
+            if linha.get("_origem_inferencia") == "referencia"
+            and normalizar_codigo(linha.get("codigo", "")) in opcoes
+        ],
+    ]
+    for candidatas in grupos:
+        codigos = list(dict.fromkeys(normalizar_codigo(linha.get("codigo", "")) for linha in candidatas))
+        if len(codigos) == 1:
+            codigo = codigos[0]
+            linha = next(linha for linha in candidatas if normalizar_codigo(linha.get("codigo", "")) == codigo)
+            return codigo, _parse_numero_form(linha.get("qtd", 1), 1.0) or 1.0
+    return "", 0
+
+
+def _gatilhos_popup_alcancaveis(codigo_raiz, componentes, regras_por_gatilho):
+    encontrados = []
+    visitados = set()
+
+    def visitar(codigo):
+        codigo = normalizar_codigo(codigo)
+        if not codigo or codigo in visitados:
+            return
+        visitados.add(codigo)
+        if codigo in regras_por_gatilho:
+            encontrados.append(codigo)
+        for componente in (componentes or {}).get(codigo, []) or []:
+            visitar((componente or {}).get("codigo", ""))
+
+    visitar(codigo_raiz)
+    return encontrados
+
+
+def _montar_os_reconciliada(fonte, referencia, contexto):
+    dados_origem = fonte["dados"]
+    os_produtos = contexto["os_produtos"]
+    produtos_catalogo = contexto["produtos_catalogo"]
+    componentes = contexto["componentes"]
+    regras_por_gatilho = contexto["regras_por_gatilho"]
+    itens = []
+    extras = []
+    linhas_inferencia = _linhas_inferencia_os(dados_origem, referencia)
+
+    for item_origem in dados_origem.get("itens", []) or []:
+        codigo = normalizar_codigo(item_origem.get("codigo", ""))
+        if not codigo:
+            continue
+        item_info = os_produtos.get(codigo, {}) or {}
+        qtd = _parse_numero_form(item_origem.get("qtd", 1), 1.0)
+        if qtd <= 0:
+            qtd = 1.0
+        descricao = item_info.get("descricao") or item_origem.get("descricao", "")
+        categoria = item_info.get("categoria", "") or ""
+        fornecedor = item_info.get("fornecedor", "") or ""
+        if _eh_faturamento_direto(descricao):
+            fornecedor_referencia = _fornecedor_item_referencia(referencia, codigo)
+            fornecedor = _fornecedor_faturamento_direto(
+                descricao,
+                categoria,
+                fornecedor_referencia or ("" if _categoria_ar_condicionado(categoria) else "SJ"),
+                fornecedor,
+            )
+            if not fornecedor:
+                raise ValueError(f"O.S. {dados_origem.get('os_numero')}: fornecedor ausente no item {codigo}.")
+        itens.append({
+            "codigo": codigo,
+            "descricao": descricao,
+            "qtd": qtd,
+            "serie": item_origem.get("serie", "") or "",
+            "unidade": item_origem.get("unidade", "") or item_info.get("unidade", "") or "",
+            "grupo": item_info.get("grupo", "") or "",
+            "categoria": categoria,
+            "fornecedor": fornecedor,
+            "valor": 0,
+            "total": calcular_total_item(qtd, 0, 0),
+        })
+
+        if codigo.startswith("4034"):
+            luminaria_codigo, luminaria_qtd = _selecionar_codigo_relacionado(
+                linhas_inferencia,
+                codigo,
+                OS_LUMINARIAS_CODIGOS,
+            )
+            if not luminaria_codigo:
+                raise ValueError(f"O.S. {dados_origem.get('os_numero')}: luminaria nao identificada para {codigo}.")
+            luminaria_info = produtos_catalogo.get(luminaria_codigo, {}) or os_produtos.get(luminaria_codigo, {}) or {}
+            extras.append({
+                "item": codigo,
+                "codigo": luminaria_codigo,
+                "descricao": luminaria_info.get("descricao", "") or luminaria_info.get("nome", "") or "",
+                "qtd": luminaria_qtd,
+                "unidade": luminaria_info.get("unidade", "") or "",
+                "level": 0,
+            })
+
+        for gatilho in _gatilhos_popup_alcancaveis(codigo, componentes, regras_por_gatilho):
+            for regra in regras_por_gatilho.get(gatilho, []):
+                relacionado, relacionado_qtd = _selecionar_codigo_relacionado(
+                    linhas_inferencia,
+                    codigo,
+                    regra.get("opcoes") or [],
+                )
+                if not relacionado:
+                    continue
+                relacionado_info = produtos_catalogo.get(relacionado, {}) or os_produtos.get(relacionado, {}) or {}
+                extras.append({
+                    "item": codigo,
+                    "codigo": relacionado,
+                    "descricao": relacionado_info.get("descricao", "") or relacionado_info.get("nome", "") or "",
+                    "qtd": relacionado_qtd or regra.get("quantidade", 1) or 1,
+                    "unidade": relacionado_info.get("unidade", "") or "",
+                    "level": 0,
+                })
+
+    if not itens:
+        raise ValueError(f"O.S. {dados_origem.get('os_numero')}: nenhum item valido para salvar.")
+
+    extras_unicos = []
+    chaves_extras = set()
+    for extra in extras:
+        chave = (normalizar_codigo(extra.get("item", "")), normalizar_codigo(extra.get("codigo", "")))
+        if chave in chaves_extras:
+            continue
+        chaves_extras.add(chave)
+        extras_unicos.append(extra)
+
+    processos = contexto["processos"]
+    processo_por_item = contexto["processo_por_item"]
+    codigos_processo = [item["codigo"] for item in itens] + [extra["codigo"] for extra in extras_unicos]
+    conjuntos = resolver_processos_transformacao(codigos_processo, processo_por_item)
+    processos_final = mesclar_processos_modelo(processos, conjuntos)
+
+    composicao_final = resolver_composicao_final(itens, componentes)
+    extras_composicao = expandir_composicao_referenciada(extras_unicos, componentes)
+    chaves_composicao = {
+        (normalizar_codigo(linha.get("item", "")), normalizar_codigo(linha.get("codigo", "")))
+        for linha in composicao_final
+    }
+    for linha in extras_composicao:
+        chave = (normalizar_codigo(linha.get("item", "")), normalizar_codigo(linha.get("codigo", "")))
+        if chave not in chaves_composicao:
+            composicao_final.append(linha)
+            chaves_composicao.add(chave)
+    composicao_final = propagar_setor_preparacao(
+        enriquecer_composicao(composicao_final, os_produtos),
+        os_produtos,
+        componentes,
+    )
+
+    total_itens = sum(item["total"] for item in itens)
+    dados = {
+        "cliente": _resolver_nome_cliente_os(dados_origem.get("cliente", "")),
+        "previsao_inicio": dados_origem.get("previsao_inicio", "") or "",
+        "previsao_termino": dados_origem.get("previsao_termino", "") or "",
+        "chassis": dados_origem.get("chassis", "") or "",
+        "municipio": dados_origem.get("municipio", "") or "",
+        "mmv": dados_origem.get("mmv", "") or "",
+        "descricao_servico": dados_origem.get("descricao_servico", "") or "",
+        "total_itens": total_itens,
+        "total_pedido": total_itens,
+        "obs_materiais": dados_origem.get("obs_materiais", "") or "",
+        "obs": dados_origem.get("obs", "") or "",
+        "processo_conjunto": " + ".join(conjuntos),
+        "modo_os": "pacote_os",
+    }
+    usuario = current_username()
+    numero = str(dados_origem.get("os_numero") or "").strip()
+    return {
+        "tipo": "os",
+        "numero": numero,
+        "data_criacao": str((referencia or {}).get("data_criacao") or fonte["data_arquivo"].date().isoformat()),
+        "status": "emitido",
+        "submit_token": f"marco-zero-os-{numero}-{uuid.uuid4().hex}",
+        "criado_por": usuario,
+        "atualizado_por": usuario,
+        "dados": dados,
+        "itens": _atribuir_line_ids(itens, "os-item", campos_chave=("codigo", "descricao", "qtd", "unidade", "serie")),
+        "processos": _atribuir_line_ids_processos(processos_final),
+        "componentes": componentes,
+        "composicao": _atribuir_line_ids(
+            composicao_final,
+            "os-comp",
+            campos_chave=("item", "codigo", "descricao", "qtd", "unidade", "level", "setor"),
+        ),
+    }
+
+
+def reconciliar_os_marco_zero(arquivos):
+    if not supabase_data.enabled():
+        raise ValueError("A reconciliacao do marco zero exige a base Supabase.")
+    fontes = _fontes_os_reconciliacao(arquivos)
+    fontes_por_numero, duplicadas_fonte = _parsear_fontes_os_reconciliacao(fontes)
+    historico_atual = supabase_data.carregar_documentos(force=True)
+    referencias = [*historico_atual, *_carregar_historico_local()]
+
+    os_produtos = carregar_os_produtos()
+    componentes = carregar_os_componentes()
+    processos = carregar_os_processos()
+    relacoes = carregar_relacoes_processo_item()
+    processo_por_item = construir_processo_por_item(os_produtos, processos.keys(), relacoes)
+    regras_por_gatilho = {}
+    for regra in carregar_regras_popup_item():
+        regras_por_gatilho.setdefault(regra.get("gatilho", ""), []).append(regra)
+    contexto = {
+        "os_produtos": os_produtos,
+        "produtos_catalogo": carregar_produtos(),
+        "componentes": componentes,
+        "processos": processos,
+        "processo_por_item": processo_por_item,
+        "regras_por_gatilho": regras_por_gatilho,
+    }
+
+    novos = []
+    for numero, fonte in sorted(fontes_por_numero.items(), key=lambda item: item[0]):
+        referencia = _referencia_os_recente(referencias, numero, fonte["dados"].get("chassis", ""))
+        novos.append(_montar_os_reconciliada(fonte, referencia, contexto))
+
+    ids_antigos = [
+        str(documento.get("id")) for documento in historico_atual
+        if documento.get("tipo") == "os" and documento.get("id") is not None
+    ]
+    ids_novos = []
+    try:
+        for inicio in range(0, len(novos), 10):
+            lote = novos[inicio:inicio + 10]
+            salvos = supabase_data.salvar_documentos(lote)
+            if len(salvos) != len(lote) or any(documento.get("id") is None for documento in salvos):
+                raise RuntimeError("O Supabase nao confirmou todas as O.S. do novo marco zero.")
+            ids_novos.extend(str(documento["id"]) for documento in salvos)
+        supabase_data.excluir_documentos(ids_antigos)
+    except Exception:
+        if ids_novos:
+            try:
+                supabase_data.excluir_documentos(ids_novos)
+            except Exception:
+                app.logger.exception("Falha ao reverter O.S. novas apos erro na reconciliacao")
+        raise
+
+    final = supabase_data.carregar_documentos(force=True)
+    os_finais = [documento for documento in final if documento.get("tipo") == "os"]
+    numeros_finais = {str(documento.get("numero") or "").strip() for documento in os_finais}
+    numeros_esperados = set(fontes_por_numero)
+    if len(os_finais) != len(numeros_esperados) or numeros_finais != numeros_esperados:
+        raise RuntimeError("A verificacao final encontrou divergencia na base de O.S.")
+    residuos = len({
+        str(documento.get("numero") or "").strip()
+        for documento in historico_atual
+        if documento.get("tipo") == "os"
+    } - numeros_esperados)
+    return {
+        "fontes": len(fontes),
+        "ordens": len(novos),
+        "antigas_removidas": len(ids_antigos),
+        "duplicadas_fonte": duplicadas_fonte,
+        "residuos": residuos,
+    }
+
+
+@app.route("/reconciliar_os_marco_zero", methods=["POST"])
+def reconciliar_os_marco_zero_route():
+    if request.form.get("confirmar_substituicao_os") != "sim":
+        status = "Confirme a substituicao das O.S. antes de sincronizar."
+        return redirect(url_for("index", tab="dashboard", documento_status=status))
+    arquivos = request.files.getlist("arquivos_os_marco_zero")
+    try:
+        resultado = reconciliar_os_marco_zero(arquivos)
+        status = (
+            f"Marco zero concluido: {resultado['ordens']} O.S. recalculada(s), "
+            f"{resultado['antigas_removidas']} registro(s) antigo(s) removido(s), "
+            f"{resultado['residuos']} numero(s) residual(is) eliminado(s)."
+        )
+        if resultado["duplicadas_fonte"]:
+            status += f" {resultado['duplicadas_fonte']} arquivo(s) duplicado(s) descartado(s)."
+    except ValueError as exc:
+        status = str(exc)
+    except Exception:
+        app.logger.exception("Falha ao reconciliar marco zero de O.S.")
+        status = "Falha ao reconciliar o marco zero de O.S. Consulte o log e o relatorio de backup."
+    return redirect(url_for("index", tab="dashboard", documento_status=status))
 
 
 @app.route("/importar_baixa_documentos", methods=["POST"])

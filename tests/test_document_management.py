@@ -3,6 +3,7 @@ import json
 import sys
 import tempfile
 import unittest
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -316,6 +317,86 @@ class DocumentManagementTests(unittest.TestCase):
         generate.assert_not_called()
         self.assertEqual("rascunho", register.call_args.kwargs["status"])
         self.assertEqual("os-token", register.call_args.kwargs["submit_token"])
+
+    def test_marco_zero_prefers_newest_duplicate_source(self):
+        sources = [
+            {
+                "nome": "OS-antiga.docx",
+                "conteudo": b"antiga",
+                "data_arquivo": datetime(2026, 7, 20, 10, 0),
+                "revisao": 0,
+                "ordem": 0,
+            },
+            {
+                "nome": "OS-R01.docx",
+                "conteudo": b"nova",
+                "data_arquivo": datetime(2026, 7, 21, 10, 0),
+                "revisao": 1,
+                "ordem": 1,
+            },
+        ]
+        with patch.object(
+            app_module,
+            "parse_os_docx_atualizado",
+            side_effect=[
+                {"os_numero": "3090", "itens": [{"codigo": "A"}]},
+                {"os_numero": "3090", "itens": [{"codigo": "B"}]},
+            ],
+        ):
+            selected, discarded = app_module._parsear_fontes_os_reconciliacao(sources)
+
+        self.assertEqual(1, discarded)
+        self.assertEqual("OS-R01.docx", selected["3090"]["nome"])
+
+    def test_marco_zero_recalculates_bom_and_keeps_required_choices(self):
+        source = {
+            "nome": "OS-3090.docx",
+            "data_arquivo": datetime(2026, 7, 21, 10, 0),
+            "dados": {
+                "os_numero": "3090",
+                "cliente": "Cliente",
+                "chassis": "CHASSI",
+                "itens": [
+                    {"codigo": "40340001", "descricao": "CJ TETO", "qtd": 1, "unidade": "un"},
+                    {"codigo": "FD-1", "descricao": "FATURAMENTO DIRETO SERVICO", "qtd": 1, "unidade": "un"},
+                ],
+                "composicao": [{"codigo": "10260092", "qtd": 2}],
+            },
+        }
+        reference = {
+            "tipo": "os",
+            "numero": "3090",
+            "data_criacao": "2026-07-20",
+            "itens": [{"codigo": "FD-1", "fornecedor": "INSTALL TECH"}],
+            "composicao": [],
+        }
+        products = {
+            "40340001": {"descricao": "CJ TETO", "unidade": "un"},
+            "FD-1": {"descricao": "FATURAMENTO DIRETO SERVICO", "unidade": "un"},
+            "10260092": {"descricao": "LUMINARIA", "unidade": "un"},
+            "COMP-1": {"descricao": "COMPONENTE", "unidade": "un"},
+        }
+        context = {
+            "os_produtos": products,
+            "produtos_catalogo": products,
+            "componentes": {
+                "40340001": [{"codigo": "COMP-1", "descricao": "COMPONENTE", "unidade": "un", "quantidade": 3}],
+            },
+            "processos": {},
+            "processo_por_item": {},
+            "regras_por_gatilho": {},
+        }
+        with (
+            patch.object(app_module, "_resolver_nome_cliente_os", return_value="Cliente"),
+            app_module.app.test_request_context("/"),
+        ):
+            document = app_module._montar_os_reconciliada(source, reference, context)
+
+        composition_codes = {line["codigo"] for line in document["composicao"]}
+        direct_item = next(item for item in document["itens"] if item["codigo"] == "FD-1")
+        self.assertEqual({"COMP-1", "10260092", "FD-1"}, composition_codes)
+        self.assertEqual("INSTALL TECH", direct_item["fornecedor"])
+        self.assertTrue(all(line.get("line_id") for line in document["composicao"]))
 
 
 if __name__ == "__main__":
