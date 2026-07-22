@@ -19,6 +19,38 @@ import supabase_data
 
 
 class DocumentManagementTests(unittest.TestCase):
+    def test_dashboard_documents_exposes_compact_filter_data(self):
+        rows = app_module._dashboard_documentos([{
+            "id": 42,
+            "tipo": "OS",
+            "numero": 3090,
+            "data_criacao": "2026-07-21T14:30:00",
+            "status": "concluido",
+            "updated_at": "2026-07-21T15:00:00",
+            "dados": {
+                "cliente": "Cliente A",
+                "chassis": "ABC123",
+                "mmv": "MODELO X",
+                "campo_pesado": "nao deve ser enviado",
+            },
+            "itens": [{"codigo": "SKU-1"}, {"codigo": "SKU-2"}],
+            "processos": {"CORTE": [{"atividade": "Cortar"}]},
+        }])
+
+        self.assertEqual([{
+            "id": "42",
+            "tipo": "os",
+            "numero": "3090",
+            "data": "2026-07-21",
+            "status": "concluido",
+            "nome": "Cliente A",
+            "chassis": "ABC123",
+            "mmv": "MODELO X",
+            "total": 0.0,
+            "itens": 2,
+            "ordem": "2026-07-21T15:00:00",
+        }], rows)
+
     def test_production_upgrade_is_additive_and_transactional(self):
         migration_path = Path(__file__).resolve().parents[1] / "supabase_suprimentos_gestao_documentos_additive.sql"
         sql = migration_path.read_text(encoding="utf-8")
@@ -134,6 +166,32 @@ class DocumentManagementTests(unittest.TestCase):
             self.assertEqual(["local-oc"], [row["id"] for row in rows])
             self.assertEqual("emitido", rows[0]["status"])
             self.assertEqual("concluido", rows[0]["itens"][0]["line_status"])
+
+    def test_bulk_status_upload_returns_to_selected_management_tab(self):
+        upload = io.BytesIO(b"fake spreadsheet")
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "importar_baixas_documentos", return_value={
+                "atualizados": 1,
+                "excluidos": 0,
+                "linhas_atualizadas": 0,
+                "linhas_excluidas": 0,
+                "ignorados": 0,
+                "erros": [],
+            }),
+        ):
+            response = app_module.app.test_client().post(
+                "/importar_baixa_documentos",
+                data={
+                    "tipo_baixa_documentos": "os",
+                    "next_tab": "gestao-os",
+                    "arquivo_baixa_documentos": (upload, "baixas.xlsx"),
+                },
+                content_type="multipart/form-data",
+            )
+
+        self.assertEqual(302, response.status_code)
+        self.assertIn("tab=gestao-os", response.headers["Location"])
 
     def test_bulk_status_upload_can_delete_specific_os_line(self):
         with tempfile.TemporaryDirectory() as tmpdir:

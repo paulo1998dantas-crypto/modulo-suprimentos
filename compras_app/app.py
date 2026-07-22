@@ -816,6 +816,34 @@ def _dashboard_recentes(entries, limit=20):
     return recentes[:limit]
 
 
+def _dashboard_documentos(entries):
+    documentos = []
+    for entry in entries or []:
+        tipo = str(entry.get("tipo") or "").strip().lower()
+        if tipo not in {"oc", "os"}:
+            continue
+        dados = entry.get("dados") or {}
+        documentos.append({
+            "id": str(entry.get("id") or ""),
+            "tipo": tipo,
+            "numero": str(entry.get("numero") or ""),
+            "data": str(entry.get("data_criacao") or "")[:10],
+            "status": str(entry.get("status") or "emitido").strip().lower() or "emitido",
+            "nome": str(
+                dados.get("cliente")
+                if tipo == "os"
+                else dados.get("fornecedor") or dados.get("razao_social")
+                or ""
+            ),
+            "chassis": str(dados.get("chassis") or ""),
+            "mmv": str(dados.get("mmv") or ""),
+            "total": _parse_numero_form(dados.get("total_pedido"), 0.0) if tipo == "oc" else 0.0,
+            "itens": len(entry.get("itens") or []),
+            "ordem": str(entry.get("updated_at") or entry.get("created_at") or ""),
+        })
+    return documentos
+
+
 def _get_free_port():
     import socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -3889,6 +3917,7 @@ def index():
         "os_quantidades": os_quantidades,
         "totais": _dashboard_totais(historico),
         "recentes": _dashboard_recentes(historico),
+        "documentos": _dashboard_documentos(historico),
         "ordens_compra": [entry for entry in historico if entry.get("tipo") == "oc"],
         "ordens_servico": [entry for entry in historico if entry.get("tipo") == "os"],
         "persistencia": "supabase" if supabase_data.enabled() else "local",
@@ -4486,15 +4515,18 @@ def reconciliar_os_marco_zero_route():
     except Exception:
         app.logger.exception("Falha ao reconciliar marco zero de O.S.")
         status = "Falha ao reconciliar o marco zero de O.S. Consulte o log e o relatorio de backup."
-    return redirect(url_for("index", tab="dashboard", documento_status=status))
+    return redirect(url_for("index", tab="gestao-os", documento_status=status))
 
 
 @app.route("/importar_baixa_documentos", methods=["POST"])
 def importar_baixa_documentos_route():
     arquivo = request.files.get("arquivo_baixa_documentos")
     tipo = request.form.get("tipo_baixa_documentos", "")
+    next_tab = str(request.form.get("next_tab") or "dashboard").strip().lower()
+    if next_tab not in {"dashboard", "gestao-oc", "gestao-os"}:
+        next_tab = "dashboard"
     if not arquivo or not arquivo.filename:
-        return redirect(url_for("index", tab="dashboard", documento_status="Selecione uma planilha XLSX ou CSV para baixa em massa."))
+        return redirect(url_for("index", tab=next_tab, documento_status="Selecione uma planilha XLSX ou CSV para baixa em massa."))
     try:
         resultado = importar_baixas_documentos(arquivo, tipo)
         status = (
@@ -4513,7 +4545,7 @@ def importar_baixa_documentos_route():
     except Exception:
         app.logger.exception("Falha ao importar baixa em massa de documentos")
         status = "Falha inesperada ao importar a baixa em massa. Consulte o log."
-    return redirect(url_for("index", tab="dashboard", documento_status=status))
+    return redirect(url_for("index", tab=next_tab, documento_status=status))
 
 
 @app.route("/healthz")

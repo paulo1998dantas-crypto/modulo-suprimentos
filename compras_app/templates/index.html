@@ -1204,6 +1204,57 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .dashboard-table{margin-top:10px;}
 .dashboard-table h3{padding:10px 12px 0;font-size:13px;}
 .dashboard-table th,.dashboard-table td{padding:7px 9px;}
+.dashboard-page-header,.management-page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:10px;padding:4px 0 10px;border-bottom:1px solid #d8e0ea;}
+.dashboard-page-title h2,.management-page-title h2{margin:0;font-size:20px;color:#172033;}
+.dashboard-page-title p,.management-page-title p{margin:4px 0 0;color:#607085;font-size:12px;}
+.dashboard-shortcuts,.management-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;}
+.dashboard-filterbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:10px 12px;margin-bottom:10px;border:1px solid #d8e0ea;border-radius:5px;background:#fff;}
+.dashboard-filter-main{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;}
+.dashboard-filter-group{display:flex;flex-direction:column;gap:4px;}
+.dashboard-filter-group>span{font-size:10px;font-weight:800;text-transform:uppercase;color:#607085;}
+.segmented-control{display:inline-flex;border:1px solid #b9c5d3;border-radius:4px;overflow:hidden;background:#f8fafc;}
+.segmented-control button{min-height:31px;margin:0;border:0;border-right:1px solid #b9c5d3;border-radius:0!important;background:#f8fafc;color:#334155;box-shadow:none!important;}
+.segmented-control button:last-child{border-right:0;}
+.segmented-control button.active{background:#172033;color:#fff;}
+.dashboard-date-range{display:grid;grid-template-columns:repeat(2,145px);gap:6px;}
+.dashboard-date-range input{margin:0;}
+.dashboard-filter-status{display:flex;align-items:center;gap:8px;color:#526174;font-size:11px;}
+.dashboard-filter-status button{padding:5px 8px;}
+.dashboard-metrics{grid-template-columns:repeat(auto-fit,minmax(155px,1fr));}
+.dashboard-metric{position:relative;text-align:left;cursor:pointer;width:100%;color:#172033;background:#fff!important;border-top:3px solid var(--metric-color,#64748b)!important;transition:border-color 120ms ease,background 120ms ease,transform 120ms ease;}
+.dashboard-metric:hover{background:#f8fafc!important;transform:translateY(-1px);}
+.dashboard-metric.active{outline:2px solid var(--metric-color,#64748b);outline-offset:-2px;background:#f8fafc!important;}
+.dashboard-metric strong{font-variant-numeric:tabular-nums;}
+.dashboard-metric small{display:block;margin-top:4px;color:#718096;font-size:10px;}
+.dashboard-primary-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+.dashboard-insights-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);margin-top:8px;}
+.dashboard-lists-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-top:8px;align-items:start;}
+.dashboard-grid,.dashboard-grid>*{min-width:0;}
+.dashboard-lists-grid .dashboard-table{margin-top:0;min-width:0;overflow:auto;}
+.panel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.panel-heading h3{margin:0;font-size:13px;}
+.panel-heading span{color:#718096;font-size:10px;}
+.ranking-list,.status-overview{display:flex;flex-direction:column;gap:9px;min-height:180px;}
+.ranking-row,.status-overview-row{display:grid;grid-template-columns:minmax(115px,1.1fr) minmax(120px,2fr) auto;gap:10px;align-items:center;}
+.ranking-label,.status-overview-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:700;color:#334155;}
+.ranking-track,.status-overview-track{height:8px;border-radius:2px;background:#e9eef5;overflow:hidden;}
+.ranking-fill,.status-overview-fill{height:100%;background:#087f78;}
+.status-overview-fill{background:#d4663f;}
+.ranking-value,.status-overview-value{font-size:11px;font-weight:800;color:#172033;font-variant-numeric:tabular-nums;}
+.empty-state{display:flex;align-items:center;justify-content:center;min-height:150px;color:#718096;font-size:12px;border:1px dashed #c7d2df;}
+.dashboard-latest-table{min-width:560px!important;}
+.dashboard-latest-table td,.dashboard-latest-table th{padding:7px 9px;}
+.link-button{padding:0!important;border:0!important;background:transparent!important;color:#087f78!important;font-weight:800;box-shadow:none!important;}
+.management-statline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#607085;font-size:11px;}
+.management-statline strong{color:#172033;font-size:13px;}
+.management-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 180px auto;gap:8px;align-items:end;padding:10px 12px;border-bottom:1px solid #d8e0ea;}
+.management-toolbar input,.management-toolbar select{margin:0;}
+.management-tools-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:8px;align-items:start;}
+.management-tools-grid .dashboard-table{margin-top:0;}
+.management-tools-grid .grid-3{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;}
+.management-tools-grid input[type="checkbox"]{width:auto;min-height:0;margin:0 5px 0 0;}
+.management-table-wrap{overflow:auto;}
+.dashboard-table .table-toolbar+.management-toolbar{border-top:1px solid #d8e0ea;}
 .table-toolbar{padding:10px 12px;border-bottom:1px solid #d8e0ea;}
 .table-toolbar h3{padding:0;margin:0 0 2px;}
 .table-toolbar input{width:min(480px,45vw);}
@@ -1232,10 +1283,25 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .topbar{align-items:stretch;}
 .topbar-actions{width:100%;margin-left:0;justify-content:space-between;overflow:auto;}
 .dashboard-metrics,.dashboard-grid,.history-summary{grid-template-columns:1fr 1fr;}
+.dashboard-page-header,.management-page-header{align-items:stretch;flex-direction:column;}
+.dashboard-shortcuts,.management-actions{justify-content:flex-start;}
+.dashboard-filterbar{align-items:stretch;flex-direction:column;}
+.dashboard-date-range{grid-template-columns:repeat(2,minmax(0,1fr));}
+.management-toolbar{grid-template-columns:1fr 1fr;}
+.management-tools-grid{grid-template-columns:1fr;}
+.management-tools-grid .grid-3{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;}
 .card-heading-row,.table-toolbar{align-items:stretch;flex-direction:column;}
 .table-toolbar input{width:100%;}
 }
-@media(max-width:520px){.dashboard-metrics,.dashboard-grid,.history-summary{grid-template-columns:1fr;}}
+@media(max-width:520px){
+.dashboard-metrics,.dashboard-grid,.history-summary,.management-toolbar{grid-template-columns:1fr;}
+.dashboard-filter-main{align-items:stretch;flex-direction:column;}
+.segmented-control{display:grid;grid-template-columns:repeat(4,1fr);}
+.segmented-control button{border-bottom:1px solid #b9c5d3;}
+.dashboard-date-range{grid-template-columns:1fr;}
+.management-tools-grid .grid-3{grid-template-columns:1fr;}
+.ranking-row,.status-overview-row{grid-template-columns:minmax(100px,1fr) minmax(90px,1.2fr) auto;}
+}
 
 </style>
 
@@ -3985,46 +4051,74 @@ if (!ctx){
 return;
 }
 const parent = canvas.parentElement;
-const width = (parent && parent.clientWidth ? parent.clientWidth : canvas.clientWidth) || 600;
+const parentStyle = parent ? window.getComputedStyle(parent) : null;
+const parentPadding = parentStyle
+? parseFloat(parentStyle.paddingLeft || "0") + parseFloat(parentStyle.paddingRight || "0")
+: 0;
+const width = (parent && parent.clientWidth ? parent.clientWidth - parentPadding : canvas.clientWidth) || 600;
 const height = canvas.clientHeight || 280;
-canvas.width = width;
-canvas.height = height;
+const scale = Math.max(1, window.devicePixelRatio || 1);
+canvas.width = Math.round(width * scale);
+canvas.height = Math.round(height * scale);
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
+ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
 ctx.clearRect(0, 0, width, height);
-const padding = 42;
-const chartWidth = width - padding * 2;
-const chartHeight = height - padding * 2;
+const padding = { top: 24, right: 14, bottom: 34, left: 48 };
+const chartWidth = width - padding.left - padding.right;
+const chartHeight = height - padding.top - padding.bottom;
 if (!values || values.length === 0){
 ctx.font = "14px Manrope, Arial, sans-serif";
 ctx.fillStyle = "#64748b";
-ctx.fillText("Sem dados", padding, height / 2);
+ctx.textAlign = "center";
+ctx.fillText("Sem dados no período", width / 2, height / 2);
 return;
 }
 const maxVal = Math.max(1, ...values);
 const barWidth = values.length ? chartWidth / values.length : chartWidth;
 
+ctx.font = "12px Manrope, Arial, sans-serif";
+ctx.textAlign = "right";
+ctx.textBaseline = "middle";
+for (let gridIndex = 0; gridIndex <= 4; gridIndex += 1){
+const ratio = gridIndex / 4;
+const y = padding.top + chartHeight - chartHeight * ratio;
 ctx.strokeStyle = "#e2e8f0";
 ctx.lineWidth = 1;
 ctx.beginPath();
-ctx.moveTo(padding, padding);
-ctx.lineTo(padding, height - padding);
-ctx.lineTo(width - padding, height - padding);
+ctx.moveTo(padding.left, y);
+ctx.lineTo(width - padding.right, y);
 ctx.stroke();
-
-ctx.font = "12px Manrope, Arial, sans-serif";
-ctx.fillStyle = "#475569";
+const gridValue = maxVal * ratio;
+ctx.fillStyle = "#718096";
+const gridLabel = valuePrefix
+? new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(gridValue)
+: Math.round(gridValue).toLocaleString("pt-BR");
+ctx.fillText(gridLabel, padding.left - 7, y);
+}
 
 values.forEach((val, idx) => {
-const barHeight = (val / maxVal) * (chartHeight - 10);
-const x = padding + idx * barWidth + 8;
-const y = height - padding - barHeight;
-const w = Math.max(14, barWidth - 16);
+const barHeight = (val / maxVal) * Math.max(1, chartHeight - 6);
+const inset = Math.min(9, Math.max(3, barWidth * 0.18));
+const x = padding.left + idx * barWidth + inset;
+const y = padding.top + chartHeight - barHeight;
+const w = Math.max(5, barWidth - inset * 2);
 ctx.fillStyle = color;
 ctx.fillRect(x, y, w, barHeight);
-ctx.fillStyle = "#334155";
-ctx.fillText(labels[idx] || "", x, height - padding + 16);
-const label = valuePrefix ? `${valuePrefix}${val.toFixed ? val.toFixed(2) : val}` : `${val}`;
-ctx.fillText(label, x, y - 6);
+ctx.fillStyle = "#526174";
+ctx.textAlign = "center";
+ctx.textBaseline = "top";
+ctx.font = "10px Manrope, Arial, sans-serif";
+ctx.fillText(labels[idx] || "", x + w / 2, padding.top + chartHeight + 8);
+if (values.length <= 8 && barHeight > 18){
+ctx.fillStyle = "#172033";
+ctx.textBaseline = "bottom";
+const label = valuePrefix
+? new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(val)
+: Number(val).toLocaleString("pt-BR");
+ctx.fillText(label, x + w / 2, y - 4);
+}
 });
 }
 
@@ -4209,7 +4303,7 @@ try {
 const response = await fetch(`/api/historico/oc/${encodeURIComponent(id)}/excluir`, { method: "POST", headers: { "Accept": "application/json" } });
 const payload = await response.json().catch(() => ({}));
 if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível excluir a compra.");
-window.location.href = "/?tab=dashboard";
+window.location.href = "/?tab=gestao-oc";
 } catch (error) { alert(error.message); }
 }
 
@@ -4219,7 +4313,7 @@ try {
 const response = await fetch(`/api/historico/${encodeURIComponent(tipo)}/${encodeURIComponent(id)}/status`, { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
 const payload = await response.json().catch(() => ({}));
 if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível atualizar o status.");
-window.location.href = "/?tab=dashboard";
+window.location.href = `/?tab=gestao-${tipo}`;
 } catch (error) { alert(error.message); }
 }
 
@@ -4313,7 +4407,7 @@ try {
 const response = await fetch(`/api/historico/os/${encodeURIComponent(id)}/excluir`, { method: "POST", headers: { "Accept": "application/json" } });
 const payload = await response.json().catch(() => ({}));
 if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível excluir a O.S.");
-window.location.href = "/?tab=dashboard";
+window.location.href = "/?tab=gestao-os";
 } catch (error) {
 alert(error.message);
 }
@@ -4327,25 +4421,44 @@ inicializarFileInputs(document);
 definirProcessoConjuntoUI(conjuntoProcessoAtual());
 inicializarOrdenacaoItensOS();
 
-const historySearch = document.getElementById("os_history_search");
-if (historySearch){
-historySearch.addEventListener("input", () => {
-const termo = normalizarBusca(historySearch.value || "");
-document.querySelectorAll("#os_history_table tbody tr[data-history-search]").forEach((row) => {
-row.hidden = termo && !normalizarBusca(row.dataset.historySearch || "").includes(termo);
+function filtrarHistoricoGestao(tipo){
+const search = document.getElementById(`${tipo}_history_search`);
+const status = document.getElementById(`${tipo}_history_status`);
+const count = document.getElementById(`${tipo}_history_count`);
+if (!search || !status){
+return;
+}
+const termo = normalizarBusca(search.value || "");
+const statusSelecionado = String(status.value || "").toLowerCase();
+let visiveis = 0;
+document.querySelectorAll(`#${tipo}_history_table tbody tr[data-history-search]`).forEach((row) => {
+const correspondeBusca = !termo || normalizarBusca(row.dataset.historySearch || "").includes(termo);
+const correspondeStatus = !statusSelecionado || String(row.dataset.historyStatus || "emitido").toLowerCase() === statusSelecionado;
+row.hidden = !(correspondeBusca && correspondeStatus);
+if (!row.hidden){
+visiveis += 1;
+}
 });
-});
+if (count){
+count.textContent = String(visiveis);
+}
 }
 
-const purchaseHistorySearch = document.getElementById("oc_history_search");
-if (purchaseHistorySearch){
-purchaseHistorySearch.addEventListener("input", () => {
-const termo = normalizarBusca(purchaseHistorySearch.value || "");
-document.querySelectorAll("#oc_history_table tbody tr[data-history-search]").forEach((row) => {
-row.hidden = termo && !normalizarBusca(row.dataset.historySearch || "").includes(termo);
-});
+["oc", "os"].forEach((tipo) => {
+const search = document.getElementById(`${tipo}_history_search`);
+const status = document.getElementById(`${tipo}_history_status`);
+if (search) search.addEventListener("input", () => filtrarHistoricoGestao(tipo));
+if (status) status.addEventListener("change", () => filtrarHistoricoGestao(tipo));
+const clear = document.querySelector(`[data-clear-history="${tipo}"]`);
+if (clear){
+clear.addEventListener("click", () => {
+if (search) search.value = "";
+if (status) status.value = "";
+filtrarHistoricoGestao(tipo);
 });
 }
+filtrarHistoricoGestao(tipo);
+});
 
 const tabela = document.getElementById("tabela_itens");
 if (tabela){
@@ -4605,24 +4718,15 @@ const tabButtons = document.querySelectorAll(".tab-btn");
 const cadastroActions = document.getElementById("cadastro-actions");
 const defaultTab = document.body.getAttribute("data-default-tab") || "oc";
 let initialTarget = "tab-oc";
-const dashboardData = {
-oc_totais: {{ dashboard.oc_totais|tojson }},
-os_quantidades: {{ dashboard.os_quantidades|tojson }},
+window.suprimentosDashboardData = {
+documentos: {{ dashboard.documentos|tojson }},
 };
 let dashboardRendered = false;
 function renderDashboardCharts(){
-if (!dashboardData){
-return;
-}
-const ocLabels = (dashboardData.oc_totais || []).map((d) => d.data);
-const ocValues = (dashboardData.oc_totais || []).map((d) => parseNumber(d.valor));
-const osLabels = (dashboardData.os_quantidades || []).map((d) => d.data);
-const osValues = (dashboardData.os_quantidades || []).map((d) => parseNumber(d.valor));
-setTimeout(() => {
-renderBarChart("chart-compras", ocLabels, ocValues, "#0ea5a3", "R$ ");
-renderBarChart("chart-os", osLabels, osValues, "#0b1c3a", "");
+if (typeof window.renderSuprimentosDashboard === "function"){
+window.renderSuprimentosDashboard();
 dashboardRendered = true;
-}, 0);
+}
 }
 tabButtons.forEach((btn) => {
 btn.addEventListener("click", () => {
@@ -4636,6 +4740,9 @@ const target = btn.getAttribute("data-tab");
 document.querySelectorAll(".tab-content").forEach((pane) => {
 pane.classList.toggle("active", pane.id === target);
 });
+const currentUrl = new URL(window.location.href);
+currentUrl.searchParams.set("tab", target.replace(/^tab-/, ""));
+window.history.replaceState({}, "", currentUrl);
 if (cadastroActions){
 cadastroActions.style.display = target === "tab-cadastro" ? "flex" : "none";
 }
@@ -4681,6 +4788,8 @@ salvarRascunhoOS();
 
 </script>
 
+<script src="/static/dashboard.js" defer></script>
+
 </head>
 
 <body data-default-tab="{{ tab }}">
@@ -4692,6 +4801,8 @@ salvarRascunhoOS();
 <button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
 <button type="button" class="tab-btn" data-tab="tab-os">Producao</button>
 <button type="button" class="tab-btn" data-tab="tab-dashboard">Dashboard</button>
+<button type="button" class="tab-btn" data-tab="tab-gestao-oc">Gestão O.C.</button>
+<button type="button" class="tab-btn" data-tab="tab-gestao-os">Gestão O.S.</button>
 </div>
 {% if current_user %}
 <span class="topbar-user">{{ current_user.username }}</span>
@@ -4938,126 +5049,133 @@ salvarRascunhoOS();
 
 <div id="tab-dashboard" class="tab-content">
 {% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
-<div class="dashboard-actions">
+<div class="dashboard-page-header">
+<div class="dashboard-page-title">
+<h2>Visão de suprimentos</h2>
+<p id="dashboard_period_summary">Indicadores do período selecionado</p>
+</div>
+<div class="dashboard-shortcuts">
+<button type="button" class="btn-secondary" data-open-tab="tab-gestao-oc">Gestão O.C.</button>
+<button type="button" class="btn-secondary" data-open-tab="tab-gestao-os">Gestão O.S.</button>
 <a class="btn" href="/exportar_dashboard">Relatório completo</a>
-<a class="btn btn-secondary" href="/exportar_dashboard?tipo=oc">Relatório de compras</a>
-<a class="btn btn-secondary" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
-</div>
-<div class="dashboard-table">
-<h3>Baixa em massa</h3>
-<form method="POST" action="/importar_baixa_documentos" enctype="multipart/form-data">
-<div class="grid-3">
-<div>
-<label>Tipo</label>
-<select name="tipo_baixa_documentos">
-<option value="">O.C. e O.S.</option>
-<option value="oc">Somente compras</option>
-<option value="os">Somente O.S.</option>
-</select>
-</div>
-<div>
-<label>Planilha de baixa</label>
-<input type="file" name="arquivo_baixa_documentos" accept=".xlsx,.xlsm,.csv" required>
-</div>
-<div style="align-self:end;">
-<button type="submit">Importar baixas</button>
 </div>
 </div>
-<p class="muted-text">Na aba principal a ACAO baixa o documento inteiro. Nas abas com ID Linha, a ACAO baixa somente aquela linha.</p>
-</form>
-</div>
-<div class="dashboard-table">
-<h3>Sincronizar marco zero de O.S.</h3>
-<form method="POST" action="/reconciliar_os_marco_zero" enctype="multipart/form-data">
-<div class="grid-3">
-<div>
-<label>ZIP, manifesto JSON ou arquivos DOCX</label>
-<input type="file" name="arquivos_os_marco_zero" accept=".zip,.json,.docx" multiple required>
-</div>
-<div style="align-self:end;">
-<label><input type="checkbox" name="confirmar_substituicao_os" value="sim" required> Substituir a base atual de O.S.</label>
-</div>
-<div style="align-self:end;">
-<button type="submit" class="btn-danger">Sincronizar O.S.</button>
+
+<div class="dashboard-filterbar">
+<div class="dashboard-filter-main">
+<div class="dashboard-filter-group">
+<span>Período</span>
+<div class="segmented-control" role="group" aria-label="Período do dashboard">
+<button type="button" data-dashboard-period="today">Hoje</button>
+<button type="button" data-dashboard-period="week">Semana</button>
+<button type="button" data-dashboard-period="month" class="active">Mês</button>
+<button type="button" data-dashboard-period="all">Tudo</button>
 </div>
 </div>
-</form>
+<div class="dashboard-filter-group">
+<span>Intervalo personalizado</span>
+<div class="dashboard-date-range">
+<input id="dashboard_date_start" type="date" aria-label="Data inicial">
+<input id="dashboard_date_end" type="date" aria-label="Data final">
 </div>
+</div>
+</div>
+<div class="dashboard-filter-status">
+<span id="dashboard_status_filter">Todos os status</span>
+<button id="dashboard_clear_status" type="button" class="btn-secondary" hidden>Limpar status</button>
+</div>
+</div>
+
 <div class="dashboard-metrics">
-<div class="metric-card">
-<span>Ordens de compra</span>
-<strong>{{ dashboard.totais.qtd_oc }}</strong>
+<button type="button" class="metric-card dashboard-metric" data-dashboard-status="os-active" style="--metric-color:#087f78;">
+<span>O.S. ativas</span><strong id="metric_os_active">0</strong><small>Emitidas ou em rascunho</small>
+</button>
+<button type="button" class="metric-card dashboard-metric" data-dashboard-status="os-closed" style="--metric-color:#2878b5;">
+<span>O.S. encerradas</span><strong id="metric_os_closed">0</strong><small>Concluídas no período</small>
+</button>
+<button type="button" class="metric-card dashboard-metric" data-dashboard-status="oc-active" style="--metric-color:#8b6f1d;">
+<span>O.C. ativas</span><strong id="metric_oc_active">0</strong><small>Emitidas ou em rascunho</small>
+</button>
+<button type="button" class="metric-card dashboard-metric" data-dashboard-status="oc-closed" style="--metric-color:#6c5aa7;">
+<span>O.C. encerradas</span><strong id="metric_oc_closed">0</strong><small>Concluídas no período</small>
+</button>
+<button type="button" class="metric-card dashboard-metric" data-dashboard-status="cancelled" style="--metric-color:#b5473d;">
+<span>Canceladas</span><strong id="metric_cancelled">0</strong><small>O.S. e O.C.</small>
+</button>
+<button type="button" class="metric-card dashboard-metric" data-dashboard-status="all" style="--metric-color:#334155;">
+<span>Total em compras</span><strong id="metric_purchase_total">R$ 0,00</strong><small>Sem documentos cancelados</small>
+</button>
 </div>
-<div class="metric-card">
-<span>Ordens de servico</span>
-<strong>{{ dashboard.totais.qtd_os }}</strong>
-</div>
-<div class="metric-card">
-<span>Total em compras</span>
-<strong>R$ {{ "{:,.2f}".format(dashboard.totais.total_oc or 0).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong>
-</div>
-</div>
-<div class="dashboard-grid">
+
+<div class="dashboard-grid dashboard-primary-grid">
 <div class="chart-card">
-<h3>Compras - Valor Total Gasto x Data de Criacao</h3>
+<div class="panel-heading"><div><h3>Compras por emissão</h3><span>Valor emitido por dia</span></div></div>
 <canvas id="chart-compras" class="chart-canvas"></canvas>
 </div>
 <div class="chart-card">
-<h3>O.S - Quantidade x Data de Criacao</h3>
+<div class="panel-heading"><div><h3>Ordens de serviço</h3><span>Quantidade emitida por dia</span></div></div>
 <canvas id="chart-os" class="chart-canvas"></canvas>
 </div>
 </div>
+
+<div class="dashboard-grid dashboard-insights-grid">
+<div class="chart-card">
+<div class="panel-heading"><div><h3>Top 5 clientes</h3><span>Clientes com mais O.S. no período</span></div></div>
+<div id="dashboard_top_clients" class="ranking-list"></div>
+</div>
+<div class="chart-card">
+<div class="panel-heading"><div><h3>Situação operacional</h3><span>Distribuição por tipo e status</span></div></div>
+<div id="dashboard_status_overview" class="status-overview"></div>
+</div>
+</div>
+
+<div class="dashboard-grid dashboard-lists-grid">
 <div class="dashboard-table">
-<h3>Ultimas emissoes</h3>
-<table>
-<thead>
-<tr>
-<th>Data</th>
-<th>Tipo</th>
-<th>Numero</th>
-<th>Cliente/Fornecedor</th>
-<th>Resumo</th>
-</tr>
-</thead>
-<tbody>
-{% for doc in dashboard.recentes %}
-{% set dados = doc.dados or {} %}
-<tr>
-<td>{{ doc.data_criacao or "-" }}</td>
-<td>{{ "O.C" if doc.tipo == "oc" else "O.S" }}</td>
-<td>{{ doc.numero or "-" }}</td>
-<td>{{ dados.fornecedor or dados.cliente or dados.razao_social or "-" }}</td>
-<td>
-{% if doc.tipo == "oc" %}
-{{ dados.total_pedido or "0" }}
-{% else %}
-{{ (doc.itens or [])|length }} item(ns)
-{% endif %}
-</td>
-</tr>
-{% else %}
-<tr>
-<td colspan="5">Nenhuma emissao registrada ainda.</td>
-</tr>
-{% endfor %}
-</tbody>
+<div class="table-toolbar"><div><h3>Últimas 5 O.S.</h3><span id="latest_os_count">0 registro(s)</span></div></div>
+<table class="dashboard-latest-table">
+<thead><tr><th>Data</th><th>O.S.</th><th>Cliente</th><th>Status</th><th>Itens</th></tr></thead>
+<tbody id="dashboard_latest_os"></tbody>
 </table>
+</div>
+<div class="dashboard-table">
+<div class="table-toolbar"><div><h3>Últimas 5 O.C.</h3><span id="latest_oc_count">0 registro(s)</span></div></div>
+<table class="dashboard-latest-table">
+<thead><tr><th>Data</th><th>O.C.</th><th>Fornecedor</th><th>Status</th><th>Total</th></tr></thead>
+<tbody id="dashboard_latest_oc"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="tab-gestao-oc" class="tab-content">
+{% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
+<div class="management-page-header">
+<div class="management-page-title"><h2>Gestão O.C.</h2><p>Pedidos de compra emitidos e suas ações operacionais</p></div>
+<div class="management-actions">
+<button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
+<a class="btn" href="/exportar_dashboard?tipo=oc">Relatório de compras</a>
+</div>
 </div>
 
 <div class="dashboard-table os-history-panel">
 <div class="table-toolbar">
 <div>
-<h3>Gestão de compras emitidas</h3>
-<span>{{ (dashboard.ordens_compra or [])|length }} compra(s) registrada(s) em {{ dashboard.persistencia }}</span>
+<h3>Pedidos de compra</h3>
+<span><strong id="oc_history_count">{{ (dashboard.ordens_compra or [])|length }}</strong> compra(s) exibida(s) em {{ dashboard.persistencia }}</span>
 </div>
-<input id="oc_history_search" type="search" placeholder="Buscar número, fornecedor, CNPJ ou status">
 </div>
+<div class="management-toolbar">
+<div><label for="oc_history_search">Busca</label><input id="oc_history_search" type="search" placeholder="Número, fornecedor ou CNPJ"></div>
+<div><label for="oc_history_status">Status</label><select id="oc_history_status"><option value="">Todos</option><option value="emitido">Emitido</option><option value="rascunho">Rascunho</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></div>
+<button type="button" class="btn-secondary" data-clear-history="oc">Limpar filtros</button>
+</div>
+<div class="management-table-wrap">
 <table id="oc_history_table">
 <thead><tr><th>O.C.</th><th>Data</th><th>Fornecedor</th><th>Total</th><th>Status</th><th>Usuário</th><th>Ações</th></tr></thead>
 <tbody>
 {% for doc in dashboard.ordens_compra %}
 {% set dados = doc.dados or {} %}
-<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ (doc.status or 'emitido'))|lower }}">
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ (doc.status or 'emitido'))|lower }}" data-history-status="{{ doc.status or 'emitido' }}" data-history-date="{{ doc.data_criacao or '' }}">
 <td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.fornecedor or dados.razao_social or "-" }}</td><td>R$ {{ dados.total_pedido or "0" }}</td><td><span class="status-badge {{ doc.status or 'emitido' }}">{{ doc.status or "emitido" }}</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
 <td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra?')">Concluir</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
 </tr>
@@ -5066,6 +5184,20 @@ salvarRascunhoOS();
 {% endfor %}
 </tbody>
 </table>
+</div>
+</div>
+
+<div class="dashboard-table">
+<div class="table-toolbar"><div><h3>Baixa em massa de O.C.</h3><span>Atualização por documento ou ID de linha</span></div></div>
+<form method="POST" action="/importar_baixa_documentos" enctype="multipart/form-data">
+<input type="hidden" name="tipo_baixa_documentos" value="oc">
+<input type="hidden" name="next_tab" value="gestao-oc">
+<div class="grid-3">
+<div><label>Planilha de baixa</label><input type="file" name="arquivo_baixa_documentos" accept=".xlsx,.xlsm,.csv" required></div>
+<div style="align-self:end;"><a class="btn btn-secondary" href="/exportar_dashboard?tipo=oc">Baixar relatório base</a></div>
+<div style="align-self:end;"><button type="submit">Importar baixas</button></div>
+</div>
+</form>
 </div>
 
 <div id="historico_oc_modal" class="history-modal" aria-hidden="true">
@@ -5077,21 +5209,37 @@ salvarRascunhoOS();
 <div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOC()">Fechar</button><button id="historico_oc_editar" type="button">Editar</button></div>
 </div>
 </div>
+</div>
+
+<div id="tab-gestao-os" class="tab-content">
+{% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
+<div class="management-page-header">
+<div class="management-page-title"><h2>Gestão O.S.</h2><p>Ordens de serviço emitidas, status e composição operacional</p></div>
+<div class="management-actions">
+<button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
+<a class="btn" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
+</div>
+</div>
 
 <div class="dashboard-table os-history-panel">
 <div class="table-toolbar">
 <div>
-<h3>Gestão de ordens de serviço</h3>
-<span>{{ (dashboard.ordens_servico or [])|length }} O.S. registrada(s) em {{ dashboard.persistencia }}</span>
+<h3>Ordens de serviço</h3>
+<span><strong id="os_history_count">{{ (dashboard.ordens_servico or [])|length }}</strong> O.S. exibida(s) em {{ dashboard.persistencia }}</span>
 </div>
-<input id="os_history_search" type="search" placeholder="Buscar número, chassi, cliente, município ou MMV">
 </div>
+<div class="management-toolbar">
+<div><label for="os_history_search">Busca</label><input id="os_history_search" type="search" placeholder="Número, chassi, cliente, município ou MMV"></div>
+<div><label for="os_history_status">Status</label><select id="os_history_status"><option value="">Todos</option><option value="emitido">Emitido</option><option value="rascunho">Rascunho</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></div>
+<button type="button" class="btn-secondary" data-clear-history="os">Limpar filtros</button>
+</div>
+<div class="management-table-wrap">
 <table id="os_history_table">
 <thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Status</th><th>Usuário</th><th>Ações</th></tr></thead>
 <tbody>
 {% for doc in dashboard.ordens_servico %}
 {% set dados = doc.dados or {} %}
-<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or ''))|lower }}">
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ (doc.status or 'emitido'))|lower }}" data-history-status="{{ doc.status or 'emitido' }}" data-history-date="{{ doc.data_criacao or '' }}">
 <td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ doc.status or 'emitido' }}">{{ doc.status or "emitido" }}</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
 <td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.?')">Concluir</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
 </tr>
@@ -5100,6 +5248,32 @@ salvarRascunhoOS();
 {% endfor %}
 </tbody>
 </table>
+</div>
+</div>
+
+<div class="management-tools-grid">
+<div class="dashboard-table">
+<div class="table-toolbar"><div><h3>Baixa em massa de O.S.</h3><span>Atualização por documento ou ID de linha</span></div></div>
+<form method="POST" action="/importar_baixa_documentos" enctype="multipart/form-data">
+<input type="hidden" name="tipo_baixa_documentos" value="os">
+<input type="hidden" name="next_tab" value="gestao-os">
+<div class="grid-3">
+<div><label>Planilha de baixa</label><input type="file" name="arquivo_baixa_documentos" accept=".xlsx,.xlsm,.csv" required></div>
+<div style="align-self:end;"><a class="btn btn-secondary" href="/exportar_dashboard?tipo=os">Baixar relatório base</a></div>
+<div style="align-self:end;"><button type="submit">Importar baixas</button></div>
+</div>
+</form>
+</div>
+<div class="dashboard-table">
+<div class="table-toolbar"><div><h3>Sincronizar marco zero</h3><span>Substituição integral da base de O.S.</span></div></div>
+<form method="POST" action="/reconciliar_os_marco_zero" enctype="multipart/form-data">
+<div class="grid-3">
+<div><label>ZIP, manifesto JSON ou arquivos DOCX</label><input type="file" name="arquivos_os_marco_zero" accept=".zip,.json,.docx" multiple required></div>
+<div style="align-self:end;"><label><input type="checkbox" name="confirmar_substituicao_os" value="sim" required> Substituir a base atual</label></div>
+<div style="align-self:end;"><button type="submit" class="btn-danger">Sincronizar O.S.</button></div>
+</div>
+</form>
+</div>
 </div>
 
 <div id="historico_os_modal" class="history-modal" aria-hidden="true">
