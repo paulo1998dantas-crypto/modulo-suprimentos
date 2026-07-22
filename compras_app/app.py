@@ -4271,7 +4271,7 @@ def _montar_os_reconciliada(fonte, referencia, contexto):
                 fornecedor_referencia or ("" if _categoria_ar_condicionado(categoria) else "SJ"),
                 fornecedor,
             )
-            if not fornecedor:
+            if not fornecedor and not _categoria_ar_condicionado(categoria):
                 raise ValueError(f"O.S. {dados_origem.get('os_numero')}: fornecedor ausente no item {codigo}.")
         itens.append({
             "codigo": codigo,
