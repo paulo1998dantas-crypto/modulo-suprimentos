@@ -4032,6 +4032,33 @@ def _fontes_os_reconciliacao(arquivos):
             continue
         extensao = os.path.splitext(nome_arquivo)[1].lower()
         conteudo = arquivo.read() or b""
+        if extensao == ".json":
+            try:
+                manifesto = json.loads(conteudo.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise ValueError(f"Manifesto JSON invalido: {nome_arquivo}.") from exc
+            entradas = manifesto.get("ordens", []) if isinstance(manifesto, dict) else manifesto
+            if not isinstance(entradas, list) or len(entradas) > 500:
+                raise ValueError("O manifesto deve conter uma lista de ate 500 O.S.")
+            for entrada in entradas:
+                if not isinstance(entrada, dict) or not isinstance(entrada.get("dados"), dict):
+                    raise ValueError("O manifesto possui uma entrada de O.S. invalida.")
+                nome = secure_filename(entrada.get("nome") or f"os-{ordem + 1}.docx")
+                try:
+                    data_arquivo = datetime.fromisoformat(str(entrada.get("data_arquivo") or ""))
+                except ValueError:
+                    data_arquivo = datetime.now()
+                fontes.append({
+                    "nome": nome,
+                    "conteudo": b"",
+                    "dados": entrada["dados"],
+                    "hash": str(entrada.get("hash") or "").strip(),
+                    "data_arquivo": data_arquivo,
+                    "revisao": int(entrada.get("revisao") or _revisao_nome_arquivo_os(nome)),
+                    "ordem": ordem,
+                })
+                ordem += 1
+            continue
         if extensao == ".docx":
             fontes.append({
                 "nome": nome_arquivo,
@@ -4076,15 +4103,17 @@ def _parsear_fontes_os_reconciliacao(fontes):
     por_numero = {}
     descartadas = 0
     for fonte in fontes:
-        armazenamento = FileStorage(
-            stream=io.BytesIO(fonte["conteudo"]),
-            filename=fonte["nome"],
-            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        )
-        try:
-            dados = parse_os_docx_atualizado(armazenamento)
-        except Exception as exc:
-            raise ValueError(f"Nao foi possivel ler {fonte['nome']}.") from exc
+        dados = fonte.get("dados")
+        if not isinstance(dados, dict):
+            armazenamento = FileStorage(
+                stream=io.BytesIO(fonte["conteudo"]),
+                filename=fonte["nome"],
+                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+            try:
+                dados = parse_os_docx_atualizado(armazenamento)
+            except Exception as exc:
+                raise ValueError(f"Nao foi possivel ler {fonte['nome']}.") from exc
         numero = str(dados.get("os_numero") or "").strip()
         if not numero:
             raise ValueError(f"O arquivo {fonte['nome']} nao possui numero de O.S.")
@@ -4092,7 +4121,9 @@ def _parsear_fontes_os_reconciliacao(fontes):
             raise ValueError(f"A O.S. {numero} de {fonte['nome']} nao possui itens.")
         candidata = dict(fonte)
         candidata["dados"] = dados
-        candidata["hash"] = hashlib.sha256(fonte["conteudo"]).hexdigest()
+        candidata["hash"] = fonte.get("hash") or hashlib.sha256(
+            fonte.get("conteudo") or json.dumps(dados, ensure_ascii=False, sort_keys=True).encode("utf-8")
+        ).hexdigest()
         atual = por_numero.get(numero)
         if atual is None:
             por_numero[numero] = candidata
@@ -4438,11 +4469,10 @@ def reconciliar_os_marco_zero(arquivos):
 
 @app.route("/reconciliar_os_marco_zero", methods=["POST"])
 def reconciliar_os_marco_zero_route():
-    if request.form.get("confirmar_substituicao_os") != "sim":
-        status = "Confirme a substituicao das O.S. antes de sincronizar."
-        return redirect(url_for("index", tab="dashboard", documento_status=status))
-    arquivos = request.files.getlist("arquivos_os_marco_zero")
     try:
+        if request.form.get("confirmar_substituicao_os") != "sim":
+            raise ValueError("Confirme a substituicao das O.S. antes de sincronizar.")
+        arquivos = request.files.getlist("arquivos_os_marco_zero")
         resultado = reconciliar_os_marco_zero(arquivos)
         status = (
             f"Marco zero concluido: {resultado['ordens']} O.S. recalculada(s), "
