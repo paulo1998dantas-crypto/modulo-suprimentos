@@ -31,6 +31,74 @@ class DocumentManagementTests(unittest.TestCase):
             app_module._assinatura_os_recalculada({"numero": "1", "itens": [{"qtd": 1.0}]}),
         )
 
+    def test_historical_luminaire_fallback_requires_one_consistent_relation(self):
+        documents = [
+            {
+                "tipo": "os",
+                "composicao": [
+                    {"item": "40340010", "codigo": "10260092", "qtd": 2},
+                    {"item": "40340020", "codigo": "10260092", "qtd": 2},
+                ],
+            },
+            {
+                "tipo": "os",
+                "composicao": [
+                    {"item": "40340010", "codigo": "10260092", "qtd": 2.0},
+                    {"item": "40340020", "codigo": "10260095", "qtd": 2},
+                    {
+                        "item": "40340030",
+                        "codigo": "10260095",
+                        "qtd": 3,
+                        "line_status": "cancelado",
+                    },
+                ],
+            },
+        ]
+
+        result = app_module._luminarias_historicas_por_item(documents)
+
+        self.assertEqual({"codigo": "10260092", "qtd": 2.0}, result["40340010"])
+        self.assertNotIn("40340020", result)
+        self.assertNotIn("40340030", result)
+
+    def test_reconciled_os_uses_historical_luminaire_when_source_has_none(self):
+        source = {
+            "nome": "OS-3102.docx",
+            "data_arquivo": datetime(2026, 7, 24, 16, 26),
+            "dados": {
+                "os_numero": "3102",
+                "cliente": "BELISA",
+                "chassis": "VE277925",
+                "itens": [{"codigo": "40340010", "qtd": 1}],
+                "composicao": [],
+            },
+        }
+        context = {
+            "os_produtos": {
+                "40340010": {"descricao": "ITEM RAIZ", "unidade": "un"},
+                "10260092": {"descricao": "ELETRICA LUMINARIA ALURE 30", "unidade": "un"},
+            },
+            "produtos_catalogo": {},
+            "componentes": {},
+            "processos": {},
+            "processo_por_item": {},
+            "regras_por_gatilho": {},
+            "luminarias_por_item": {
+                "40340010": {"codigo": "10260092", "qtd": 2},
+            },
+        }
+
+        with patch.object(app_module, "current_username", return_value="codex"):
+            result = app_module._montar_os_reconciliada(source, None, context)
+
+        luminaires = [
+            line for line in result["composicao"]
+            if line.get("codigo") == "10260092"
+        ]
+        self.assertEqual(1, len(luminaires))
+        self.assertEqual("40340010", luminaires[0]["item"])
+        self.assertEqual(2.0, luminaires[0]["qtd"])
+
     def test_dashboard_documents_exposes_compact_filter_data(self):
         rows = app_module._dashboard_documentos([{
             "id": 42,

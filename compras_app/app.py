@@ -4257,6 +4257,29 @@ def _selecionar_codigo_relacionado(linhas, item_raiz, opcoes):
     return "", 0
 
 
+def _luminarias_historicas_por_item(documentos):
+    candidatas = {}
+    for documento in documentos or []:
+        if str((documento or {}).get("tipo") or "").strip().lower() != "os":
+            continue
+        for linha in (documento or {}).get("composicao", []) or []:
+            if not isinstance(linha, dict) or _linha_status(linha) == "cancelado":
+                continue
+            item = normalizar_codigo(linha.get("item", ""))
+            codigo = normalizar_codigo(linha.get("codigo", ""))
+            if not item.startswith("4034") or codigo not in OS_LUMINARIAS_CODIGOS:
+                continue
+            qtd = _parse_numero_form(linha.get("qtd", 1), 1.0) or 1.0
+            candidatas.setdefault(item, set()).add((codigo, qtd))
+
+    return {
+        item: {"codigo": codigo, "qtd": qtd}
+        for item, relacoes in candidatas.items()
+        if len(relacoes) == 1
+        for codigo, qtd in relacoes
+    }
+
+
 def _gatilhos_popup_alcancaveis(codigo_raiz, componentes, regras_por_gatilho):
     encontrados = []
     visitados = set()
@@ -4325,6 +4348,10 @@ def _montar_os_reconciliada(fonte, referencia, contexto):
                 codigo,
                 OS_LUMINARIAS_CODIGOS,
             )
+            if not luminaria_codigo:
+                luminaria_historica = (contexto.get("luminarias_por_item") or {}).get(codigo, {})
+                luminaria_codigo = normalizar_codigo(luminaria_historica.get("codigo", ""))
+                luminaria_qtd = _parse_numero_form(luminaria_historica.get("qtd", 1), 1.0) or 1.0
             if not luminaria_codigo:
                 raise ValueError(f"O.S. {dados_origem.get('os_numero')}: luminaria nao identificada para {codigo}.")
             luminaria_info = produtos_catalogo.get(luminaria_codigo, {}) or os_produtos.get(luminaria_codigo, {}) or {}
@@ -4429,7 +4456,7 @@ def _montar_os_reconciliada(fonte, referencia, contexto):
     }
 
 
-def _contexto_reconciliacao_os():
+def _contexto_reconciliacao_os(documentos_referencia=None):
     os_produtos = carregar_os_produtos()
     componentes = carregar_os_componentes()
     processos = carregar_os_processos()
@@ -4445,6 +4472,7 @@ def _contexto_reconciliacao_os():
         "processos": processos,
         "processo_por_item": processo_por_item,
         "regras_por_gatilho": regras_por_gatilho,
+        "luminarias_por_item": _luminarias_historicas_por_item(documentos_referencia),
     }
 
 
@@ -4504,7 +4532,7 @@ def recalcular_os_importadas(arquivos):
     historico_atual = supabase_data.carregar_documentos(force=True)
     os_atuais = [documento for documento in historico_atual if documento.get("tipo") == "os"]
     referencias = [*historico_atual, *_carregar_historico_local()]
-    contexto = _contexto_reconciliacao_os()
+    contexto = _contexto_reconciliacao_os(historico_atual)
 
     atualizacoes = []
     for numero, fonte in sorted(fontes_por_numero.items(), key=lambda item: item[0]):
@@ -4594,7 +4622,7 @@ def adicionar_os_ausentes(arquivos):
         }
 
     referencias = [*historico_atual, *_carregar_historico_local()]
-    contexto = _contexto_reconciliacao_os()
+    contexto = _contexto_reconciliacao_os(historico_atual)
     novos = []
     for numero, fonte in sorted(fontes_ausentes.items(), key=lambda item: item[0]):
         referencia = _referencia_os_recente(
@@ -4664,7 +4692,7 @@ def reconciliar_os_marco_zero(arquivos):
     historico_atual = supabase_data.carregar_documentos(force=True)
     referencias = [*historico_atual, *_carregar_historico_local()]
 
-    contexto = _contexto_reconciliacao_os()
+    contexto = _contexto_reconciliacao_os(historico_atual)
 
     novos = []
     for numero, fonte in sorted(fontes_por_numero.items(), key=lambda item: item[0]):
