@@ -4566,6 +4566,96 @@ def recalcular_os_importadas(arquivos):
     }
 
 
+def adicionar_os_ausentes(arquivos):
+    if not supabase_data.enabled():
+        raise ValueError("A inclusao seletiva de O.S. exige a base Supabase.")
+    fontes = _fontes_os_reconciliacao(arquivos)
+    fontes_por_numero, duplicadas_fonte = _parsear_fontes_os_reconciliacao(fontes)
+    historico_atual = supabase_data.carregar_documentos(force=True)
+    os_atuais = [documento for documento in historico_atual if documento.get("tipo") == "os"]
+    numeros_existentes = {
+        str(documento.get("numero") or "").strip()
+        for documento in os_atuais
+    }
+    fontes_ausentes = {
+        numero: fonte
+        for numero, fonte in fontes_por_numero.items()
+        if numero not in numeros_existentes
+    }
+    ignoradas_existentes = len(fontes_por_numero) - len(fontes_ausentes)
+    if not fontes_ausentes:
+        return {
+            "fontes": len(fontes),
+            "inseridas": 0,
+            "preservadas": len(os_atuais),
+            "ignoradas_existentes": ignoradas_existentes,
+            "duplicadas_fonte": duplicadas_fonte,
+            "numeros": [],
+        }
+
+    referencias = [*historico_atual, *_carregar_historico_local()]
+    contexto = _contexto_reconciliacao_os()
+    novos = []
+    for numero, fonte in sorted(fontes_ausentes.items(), key=lambda item: item[0]):
+        referencia = _referencia_os_recente(
+            referencias,
+            numero,
+            fonte["dados"].get("chassis", ""),
+        )
+        novos.append(_montar_os_reconciliada(fonte, referencia, contexto))
+
+    ids_novos = []
+    try:
+        for inicio in range(0, len(novos), 10):
+            lote = novos[inicio:inicio + 10]
+            salvos = supabase_data.salvar_documentos(lote)
+            ids_novos.extend(
+                str(documento["id"])
+                for documento in salvos
+                if documento.get("id") is not None
+            )
+            if len(salvos) != len(lote) or any(documento.get("id") is None for documento in salvos):
+                raise RuntimeError("O Supabase nao confirmou todas as O.S. ausentes.")
+
+        final = supabase_data.carregar_documentos(force=True)
+        final_por_id = {str(documento.get("id")): documento for documento in final}
+        esperadas_por_numero = {
+            str(documento.get("numero") or "").strip(): documento
+            for documento in novos
+        }
+        divergentes = []
+        for documento_id in ids_novos:
+            salvo = final_por_id.get(documento_id)
+            esperado = esperadas_por_numero.get(str((salvo or {}).get("numero") or "").strip())
+            if (
+                not salvo
+                or not esperado
+                or _assinatura_os_recalculada(salvo) != _assinatura_os_recalculada(esperado)
+            ):
+                divergentes.append(str((salvo or {}).get("numero") or documento_id))
+        if len(ids_novos) != len(novos) or divergentes:
+            raise RuntimeError(
+                "A verificacao final divergiu nas O.S. adicionadas: "
+                + ", ".join(divergentes[:10])
+            )
+    except Exception:
+        if ids_novos:
+            try:
+                supabase_data.excluir_documentos(ids_novos)
+            except Exception:
+                app.logger.exception("Falha ao reverter O.S. apos erro na inclusao seletiva")
+        raise
+
+    return {
+        "fontes": len(fontes),
+        "inseridas": len(novos),
+        "preservadas": len(os_atuais),
+        "ignoradas_existentes": ignoradas_existentes,
+        "duplicadas_fonte": duplicadas_fonte,
+        "numeros": [documento["numero"] for documento in novos],
+    }
+
+
 def reconciliar_os_marco_zero(arquivos):
     if not supabase_data.enabled():
         raise ValueError("A reconciliacao do marco zero exige a base Supabase.")
@@ -4663,6 +4753,33 @@ def recalcular_os_importadas_route():
     except Exception:
         app.logger.exception("Falha ao recalcular O.S. importadas")
         status = "Falha ao recalcular as O.S. importadas. Nenhuma O.S. nova foi excluida."
+    return redirect(url_for("index", tab="gestao-os", documento_status=status))
+
+
+@app.route("/adicionar_os_ausentes", methods=["POST"])
+def adicionar_os_ausentes_route():
+    try:
+        if request.form.get("confirmar_inclusao_os") != "sim":
+            raise ValueError("Confirme a inclusao seletiva das O.S. ausentes.")
+        arquivos = request.files.getlist("arquivos_os_ausentes")
+        resultado = adicionar_os_ausentes(arquivos)
+        numeros = ", ".join(resultado["numeros"]) or "nenhuma"
+        status = (
+            f"Inclusao seletiva concluida: {resultado['inseridas']} O.S. adicionada(s) "
+            f"({numeros}), {resultado['preservadas']} O.S. existente(s) preservada(s)."
+        )
+        if resultado["ignoradas_existentes"]:
+            status += (
+                f" {resultado['ignoradas_existentes']} O.S. ja existente(s) "
+                "foi(ram) ignorada(s)."
+            )
+        if resultado["duplicadas_fonte"]:
+            status += f" {resultado['duplicadas_fonte']} arquivo(s) duplicado(s) descartado(s)."
+    except ValueError as exc:
+        status = str(exc)
+    except Exception:
+        app.logger.exception("Falha ao adicionar O.S. ausentes")
+        status = "Falha ao adicionar as O.S. ausentes. As insercoes foram revertidas."
     return redirect(url_for("index", tab="gestao-os", documento_status=status))
 
 

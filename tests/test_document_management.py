@@ -610,6 +610,74 @@ class DocumentManagementTests(unittest.TestCase):
         delete_one.assert_not_called()
         delete_many.assert_not_called()
 
+    def test_add_missing_service_orders_preserves_existing_numbers(self):
+        source_existing = {
+            "nome": "OS-3088.docx",
+            "data_arquivo": datetime(2026, 7, 21, 10, 0),
+            "dados": {"os_numero": "3088", "chassis": "BASE-1", "itens": [{"codigo": "SKU-1"}]},
+        }
+        source_missing = {
+            "nome": "OS-3090.docx",
+            "data_arquivo": datetime(2026, 7, 21, 11, 0),
+            "dados": {"os_numero": "3090", "chassis": "BASE-2", "itens": [{"codigo": "SKU-2"}]},
+        }
+        existing = {
+            "id": 10,
+            "tipo": "os",
+            "numero": "3088",
+            "data_criacao": "2026-07-21",
+            "dados": {"chassis": "BASE-1"},
+            "itens": [{"codigo": "SKU-1"}],
+            "processos": {},
+            "composicao": [],
+        }
+        missing = {
+            "tipo": "os",
+            "numero": "3090",
+            "data_criacao": "2026-07-21",
+            "dados": {"chassis": "BASE-2"},
+            "itens": [{"codigo": "SKU-2"}],
+            "processos": {},
+            "composicao": [],
+        }
+        saved = {"id": 11, **missing}
+
+        with (
+            patch.object(app_module.supabase_data, "enabled", return_value=True),
+            patch.object(
+                app_module,
+                "_fontes_os_reconciliacao",
+                return_value=[source_existing, source_missing],
+            ),
+            patch.object(
+                app_module,
+                "_parsear_fontes_os_reconciliacao",
+                return_value=({"3088": source_existing, "3090": source_missing}, 0),
+            ),
+            patch.object(app_module, "_carregar_historico_local", return_value=[]),
+            patch.object(app_module, "_contexto_reconciliacao_os", return_value={}),
+            patch.object(app_module, "_montar_os_reconciliada", return_value=missing) as build,
+            patch.object(
+                app_module.supabase_data,
+                "carregar_documentos",
+                side_effect=[[existing], [existing, saved]],
+            ),
+            patch.object(
+                app_module.supabase_data,
+                "salvar_documentos",
+                return_value=[saved],
+            ) as insert,
+            patch.object(app_module.supabase_data, "excluir_documentos") as delete_many,
+        ):
+            result = app_module.adicionar_os_ausentes([object()])
+
+        self.assertEqual(1, result["inseridas"])
+        self.assertEqual(1, result["ignoradas_existentes"])
+        self.assertEqual(["3090"], result["numeros"])
+        self.assertEqual(source_missing, build.call_args.args[0])
+        self.assertEqual(["3090"], [row["numero"] for row in insert.call_args.args[0]])
+        delete_many.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
