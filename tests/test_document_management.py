@@ -272,6 +272,76 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual("maria", row["criado_por"])
         self.assertEqual("joao", row["atualizado_por"])
 
+    def test_reused_submission_token_does_not_overwrite_another_document(self):
+        existing = [{
+            "id": 10,
+            "tipo": "os",
+            "numero": "3099",
+            "submit_token": "browser-token",
+        }]
+        saved = [{
+            "id": 11,
+            "tipo": "os",
+            "numero": "3100",
+            "submit_token": "browser-token::os::3100",
+        }]
+        with patch.object(supabase_data, "_request", side_effect=[existing, saved]) as request_mock:
+            result = supabase_data.salvar_documento({
+                "tipo": "os",
+                "numero": "3100",
+                "submit_token": "browser-token",
+                "dados": {},
+            })
+
+        self.assertEqual(11, result["id"])
+        self.assertEqual("browser-token::os::3100", result["submit_token"])
+        post_call = request_mock.call_args_list[1]
+        self.assertEqual("POST", post_call.args[0])
+        self.assertEqual("browser-token::os::3100", post_call.kwargs["payload"]["submit_token"])
+        self.assertIn(("on_conflict", "submit_token"), post_call.kwargs["query"])
+
+    def test_same_submission_token_and_number_remain_idempotent(self):
+        existing = [{
+            "id": 10,
+            "tipo": "os",
+            "numero": "3100",
+            "submit_token": "browser-token",
+        }]
+        saved = [{
+            "id": 10,
+            "tipo": "os",
+            "numero": "3100",
+            "submit_token": "browser-token",
+        }]
+        with patch.object(supabase_data, "_request", side_effect=[existing, saved]) as request_mock:
+            result = supabase_data.salvar_documento({
+                "tipo": "os",
+                "numero": "3100",
+                "submit_token": "browser-token",
+                "dados": {},
+            })
+
+        self.assertEqual(10, result["id"])
+        post_call = request_mock.call_args_list[1]
+        self.assertEqual("browser-token", post_call.kwargs["payload"]["submit_token"])
+
+    def test_document_history_has_no_default_quantity_limit(self):
+        rows = [
+            {
+                "id": idx,
+                "tipo": "os",
+                "numero": str(idx),
+                "data_criacao": "2026-07-27",
+            }
+            for idx in range(1005)
+        ]
+        with patch.object(supabase_data, "_all_rows", return_value=rows):
+            documents = supabase_data.carregar_documentos()
+            limited = supabase_data.carregar_documentos(limit=25)
+
+        self.assertEqual(1005, len(documents))
+        self.assertEqual(25, len(limited))
+
     def test_filtered_reports_include_status_users_and_details(self):
         history = [{
             "id": 12,

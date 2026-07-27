@@ -3520,7 +3520,8 @@ tbody.innerHTML = "";
 osComposicaoSource = "bom";
 const historicoId = document.getElementById("os_historico_id");
 if (historicoId) historicoId.value = "";
-garantirSubmissionToken("os_submit_token");
+const osSubmitToken = document.getElementById("os_submit_token");
+if (osSubmitToken) osSubmitToken.value = novoSubmissionToken();
 sincronizarFonteComposicao();
 definirProcessoConjuntoUI("");
 atualizarHintProcessoAutomatico({ conjunto: "", conflito: false });
@@ -3576,7 +3577,8 @@ if (fornecedorBusca) fornecedorBusca.value = "";
 
 calcularTotais();
 calcularVencimento();
-garantirSubmissionToken("oc_submit_token");
+const ocSubmitToken = document.getElementById("oc_submit_token");
+if (ocSubmitToken) ocSubmitToken.value = novoSubmissionToken();
 }
 
 function setSelectValue(select, value){

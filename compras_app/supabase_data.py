@@ -532,6 +532,26 @@ def salvar_documento(documento):
     query = []
     prefer = "return=representation"
     if row.get("submit_token"):
+        token_original = row["submit_token"]
+        existentes = _request(
+            "GET",
+            DOCUMENTOS_TABLE,
+            query=[
+                ("select", "id,tipo,numero,submit_token"),
+                ("submit_token", f"eq.{token_original}"),
+                ("limit", "1"),
+            ],
+        ) or []
+        if existentes:
+            existente = existentes[0]
+            mesma_identidade = (
+                _clean(existente.get("tipo")).lower() == row["tipo"]
+                and _clean(existente.get("numero")) == row["numero"]
+            )
+            if not mesma_identidade:
+                row["submit_token"] = (
+                    f"{token_original}::{row['tipo']}::{row['numero']}"
+                )
         query.append(("on_conflict", "submit_token"))
         prefer = "resolution=merge-duplicates,return=representation"
     rows = _request("POST", DOCUMENTOS_TABLE, query=query, payload=row, prefer=prefer) or []
@@ -608,7 +628,7 @@ def excluir_documentos(documento_ids):
     return len(ids)
 
 
-def carregar_documentos(force=False, limit=1000):
+def carregar_documentos(force=False, limit=None):
     rows = _all_rows(
         DOCUMENTOS_TABLE,
         select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,dados,itens,processos,componentes,composicao",
@@ -616,7 +636,9 @@ def carregar_documentos(force=False, limit=1000):
         cache_key="documentos",
         force=force,
     )
-    return [documento_to_legacy(row) for row in rows[:limit]]
+    if limit is not None:
+        rows = rows[:max(0, int(limit))]
+    return [documento_to_legacy(row) for row in rows]
 
 
 def proximo_numero_documento(tipo):
