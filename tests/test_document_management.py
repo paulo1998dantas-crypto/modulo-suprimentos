@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -13,6 +14,7 @@ from openpyxl import Workbook, load_workbook
 APP_DIR = Path(__file__).resolve().parents[1] / "compras_app"
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
+os.environ["SUPRIMENTOS_FILE_LOG"] = "0"
 
 import app as app_module
 import supabase_data
@@ -340,6 +342,42 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual("maria", row["criado_por"])
         self.assertEqual("joao", row["atualizado_por"])
 
+    def test_document_normalization_keeps_immutable_erp_links(self):
+        purchase_id = "11111111-1111-1111-1111-111111111111"
+        work_id = "22222222-2222-2222-2222-222222222222"
+
+        row = supabase_data.normalizar_documento({
+            "tipo": "oc",
+            "numero": "42",
+            "erp_purchase_order_id": purchase_id,
+            "erp_work_order_id": work_id,
+            "dados": {},
+        })
+        legacy = supabase_data.documento_to_legacy(row)
+
+        self.assertEqual(purchase_id, row["erp_purchase_order_id"])
+        self.assertEqual(work_id, row["erp_work_order_id"])
+        self.assertEqual(purchase_id, legacy["erp_purchase_order_id"])
+        self.assertEqual(work_id, legacy["erp_work_order_id"])
+
+    def test_erp_link_migration_is_additive_and_does_not_backfill_silently(self):
+        migration_path = (
+            Path(__file__).resolve().parents[1]
+            / "supabase_suprimentos_erp_links_additive.sql"
+        )
+        sql = "\n".join(
+            line for line in migration_path.read_text(encoding="utf-8").splitlines()
+            if not line.lstrip().startswith("--")
+        ).lower()
+
+        self.assertIn("begin;", sql)
+        self.assertIn("commit;", sql)
+        self.assertIn("not valid", sql)
+        self.assertNotIn("delete from", sql)
+        self.assertNotIn("truncate", sql)
+        self.assertNotIn("drop table", sql)
+        self.assertNotIn("update public.suprimentos_documentos", sql)
+
     def test_reused_submission_token_does_not_overwrite_another_document(self):
         existing = [{
             "id": 10,
@@ -497,6 +535,114 @@ class DocumentManagementTests(unittest.TestCase):
         generate.assert_not_called()
         self.assertEqual("rascunho", register.call_args.kwargs["status"])
         self.assertEqual("oc-token", register.call_args.kwargs["submit_token"])
+
+    def test_emitted_purchase_edit_updates_same_erp_order_without_printing(self):
+        existing = {
+            "id": "doc-10",
+            "tipo": "oc",
+            "numero": "10",
+            "status": "emitido",
+            "dados": {"fornecedor": "Fornecedor"},
+            "itens": [],
+        }
+        saved = {**existing, "dados": {"fornecedor": "Fornecedor atualizado"}}
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "obter_historico_documento", return_value=existing),
+            patch.object(
+                app_module,
+                "_sync_emitted_legacy_oc_to_erp",
+                return_value={"id": "11111111-1111-1111-1111-111111111111", "updated": True},
+            ) as sync,
+            patch.object(app_module, "registrar_historico", return_value=saved) as register,
+            patch.object(app_module, "vincular_documento_erp") as link,
+            patch.object(app_module, "gerar_word") as generate,
+        ):
+            response = app_module.app.test_client().post("/gerar_oc", data={
+                "acao": "salvar",
+                "oc_historico_id": "doc-10",
+                "oc_submit_token": "oc-token",
+                "oc_numero": "10",
+                "fornecedor": "Fornecedor atualizado",
+                "codigo[]": "SKU-1",
+                "descricao[]": "Item atualizado",
+                "unidade[]": "UN",
+                "qtd[]": "2",
+                "valor[]": "10",
+                "desconto[]": "0",
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        generate.assert_not_called()
+        sync.assert_called_once()
+        self.assertEqual("emitido", register.call_args.kwargs["status"])
+        link.assert_called_once_with(
+            saved,
+            "erp_purchase_order_id",
+            "11111111-1111-1111-1111-111111111111",
+        )
+
+    def test_purchase_edit_is_not_overwritten_after_stock_receipt(self):
+        existing = {
+            "id": "doc-10",
+            "tipo": "oc",
+            "numero": "10",
+            "status": "emitido",
+            "dados": {"fornecedor": "Fornecedor"},
+            "itens": [],
+        }
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "obter_historico_documento", return_value=existing),
+            patch.object(
+                app_module,
+                "_sync_emitted_legacy_oc_to_erp",
+                return_value={"id": "11111111-1111-1111-1111-111111111111", "locked": True},
+            ),
+            patch.object(app_module, "registrar_historico") as register,
+            patch.object(app_module, "gerar_word") as generate,
+        ):
+            response = app_module.app.test_client().post("/gerar_oc", data={
+                "acao": "salvar",
+                "oc_historico_id": "doc-10",
+                "oc_numero": "10",
+                "fornecedor": "Fornecedor",
+                "codigo[]": "SKU-1",
+                "descricao[]": "Item",
+                "unidade[]": "UN",
+                "qtd[]": "2",
+                "valor[]": "10",
+                "desconto[]": "0",
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        self.assertIn("gestao-oc", response.headers["Location"])
+        register.assert_not_called()
+        generate.assert_not_called()
+
+    def test_submitter_action_is_preserved_before_buttons_are_disabled(self):
+        template = (
+            Path(__file__).resolve().parents[1]
+            / "compras_app"
+            / "templates"
+            / "index.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("function preservarAcaoSubmitter", template)
+        self.assertGreaterEqual(
+            template.count("preservarAcaoSubmitter("),
+            3,
+        )
 
     def test_service_order_can_be_saved_without_generating_zip(self):
         with (

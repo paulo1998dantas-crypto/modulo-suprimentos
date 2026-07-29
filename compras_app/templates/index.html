@@ -1277,6 +1277,9 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .status-badge.rascunho{background:#fff1cc;color:#795500;}
 .status-badge.cancelado{background:#fee4e2;color:#b42318;}
 .status-badge.concluido{background:#dcfae6;color:#067647;}
+.integration-detail{display:block;margin-top:4px;color:#64748b;font-size:10px;font-weight:600;}
+.os-progress{width:110px;height:7px;margin-top:5px;overflow:hidden;border-radius:999px;background:#e2e8f0;}
+.os-progress span{display:block;height:100%;background:#087f78;}
 .history-footer{justify-content:flex-end;margin-top:12px;}
 @media(max-width:800px){
 .container{padding:8px;}
@@ -1348,6 +1351,19 @@ if (input && !input.value){
 input.value = novoSubmissionToken();
 }
 return input ? input.value : "";
+}
+
+function preservarAcaoSubmitter(form, submitter){
+if (!form || !submitter || !submitter.name){
+return;
+}
+form.querySelectorAll('input[data-submit-shadow="1"]').forEach((input) => input.remove());
+const shadow = document.createElement("input");
+shadow.type = "hidden";
+shadow.name = submitter.name;
+shadow.value = submitter.value || "";
+shadow.dataset.submitShadow = "1";
+form.appendChild(shadow);
 }
 
 function initOsTab(){
@@ -1854,28 +1870,40 @@ display.textContent = produto.descricao || produto.nome || "";
 }
 select.value = input.value || "";
 qtdInput.value = qtdHidden.value || "1";
+qtdInput.disabled = select.value === OS_POPUP_NAO_APLICAVEL;
 modal.classList.add("is-open");
 
 const finalizar = () => {
 const valor = select.value || "";
-const qtd = parseNumber(qtdInput.value);
+const naoAplicavel = valor === OS_POPUP_NAO_APLICAVEL;
+const qtd = naoAplicavel ? 0 : parseNumber(qtdInput.value);
 if (!valor){
 select.focus();
 return;
 }
-if (!qtd || qtd <= 0){
+if (!naoAplicavel && (!qtd || qtd <= 0)){
 qtdInput.focus();
 return;
 }
 input.value = valor;
-qtdHidden.value = String(Math.max(1, Math.round(qtd)));
+qtdHidden.value = naoAplicavel ? "0" : String(Math.max(1, Math.round(qtd)));
 modal.classList.remove("is-open");
 renderComponentes();
 aplicarProcessoAutomaticoOS({ forcar: true });
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
 modal.removeEventListener("click", onBackdrop);
+select.removeEventListener("change", onSelectChange);
 iniciarPopupsItemOS(row, normalizarCodigoOS(row.querySelector('input[name="os_codigo[]"]').value));
+};
+const onSelectChange = () => {
+const naoAplicavel = select.value === OS_POPUP_NAO_APLICAVEL;
+qtdInput.disabled = naoAplicavel;
+if (naoAplicavel){
+qtdInput.value = "0";
+} else if (!parseNumber(qtdInput.value)){
+qtdInput.value = "1";
+}
 };
 const onOk = () => finalizar();
 const onCancel = () => {
@@ -1883,6 +1911,7 @@ modal.classList.remove("is-open");
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
 modal.removeEventListener("click", onBackdrop);
+select.removeEventListener("change", onSelectChange);
 };
 const onBackdrop = (event) => {
 if (event.target === modal){
@@ -1892,6 +1921,7 @@ onCancel();
 okBtn.addEventListener("click", onOk);
 cancelBtn.addEventListener("click", onCancel);
 modal.addEventListener("click", onBackdrop);
+select.addEventListener("change", onSelectChange);
 }
 
 function atualizarLuminariaLinhaOS(row, options){
@@ -1933,6 +1963,9 @@ continue;
 }
 const luminaria = row.querySelector('input[name="os_luminaria[]"]');
 const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
+if (luminaria && luminaria.value === OS_POPUP_NAO_APLICAVEL){
+continue;
+}
 if (luminaria && luminaria.value && luminariaQtd && luminariaQtd.value){
 continue;
 }
@@ -4488,6 +4521,7 @@ if (formOc.dataset.submitting === "1"){
 event.preventDefault();
 return;
 }
+preservarAcaoSubmitter(formOc, event.submitter);
 formOc.dataset.submitting = "1";
 formOc.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = true; });
 setTimeout(() => {
@@ -4688,6 +4722,7 @@ return;
 }
 salvarRascunhoOS();
 prepararComposicaoEnvioOS();
+preservarAcaoSubmitter(formOs, event.submitter);
 formOs.dataset.submitting = "1";
 formOs.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = true; });
 setTimeout(() => {
@@ -5152,9 +5187,10 @@ salvarRascunhoOS();
 <div id="tab-gestao-oc" class="tab-content">
 {% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
 <div class="management-page-header">
-<div class="management-page-title"><h2>Gestão O.C.</h2><p>Pedidos de compra emitidos e suas ações operacionais</p></div>
+<div class="management-page-title"><h2>Gestão O.C. — Comprador</h2><p>Pedidos de compra emitidos e suas ações operacionais</p></div>
 <div class="management-actions">
 <button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
+<a class="btn btn-secondary" href="/erp/ordens-compra">Gestão Compras</a>
 <a class="btn" href="/exportar_dashboard?tipo=oc">Relatório de compras</a>
 </div>
 </div>
@@ -5168,7 +5204,7 @@ salvarRascunhoOS();
 </div>
 <div class="management-toolbar">
 <div><label for="oc_history_search">Busca</label><input id="oc_history_search" type="search" placeholder="Número, fornecedor ou CNPJ"></div>
-<div><label for="oc_history_status">Status</label><select id="oc_history_status"><option value="">Todos</option><option value="emitido">Emitido</option><option value="rascunho">Rascunho</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></div>
+<div><label for="oc_history_status">Status</label><select id="oc_history_status"><option value="">Todos</option><option value="EMITIDA">Emitida</option><option value="PARCIALMENTE_RECEBIDA">Recebida parcialmente</option><option value="RECEBIDA">Recebida</option><option value="rascunho">Rascunho</option><option value="concluido">Conclusão técnica</option><option value="CANCELADA">Cancelada</option></select></div>
 <button type="button" class="btn-secondary" data-clear-history="oc">Limpar filtros</button>
 </div>
 <div class="management-table-wrap">
@@ -5177,9 +5213,11 @@ salvarRascunhoOS();
 <tbody>
 {% for doc in dashboard.ordens_compra %}
 {% set dados = doc.dados or {} %}
-<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ (doc.status or 'emitido'))|lower }}" data-history-status="{{ doc.status or 'emitido' }}" data-history-date="{{ doc.data_criacao or '' }}">
-<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.fornecedor or dados.razao_social or "-" }}</td><td>R$ {{ dados.total_pedido or "0" }}</td><td><span class="status-badge {{ doc.status or 'emitido' }}">{{ doc.status or "emitido" }}</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
-<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra?')">Concluir</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
+{% set erp_oc = doc.erp_purchase_order or {} %}
+{% set status_oc = erp_oc.status or doc.status or 'emitido' %}
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ status_oc)|lower }}" data-history-status="{{ status_oc }}" data-history-date="{{ doc.data_criacao or '' }}">
+<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.fornecedor or dados.razao_social or "-" }}</td><td>R$ {{ dados.total_pedido or "0" }}</td><td><span class="status-badge {{ status_oc|lower }}">{{ status_oc|replace('_', ' ') }}</span>{% if erp_oc %}<span class="integration-detail">Técnica: {{ 'CONCLUÍDA' if erp_oc.technical_status == 'CONCLUIDA' else 'ABERTA' }} · Financeira: {{ 'CONCLUÍDA' if erp_oc.financial_status == 'CONCLUIDA' else 'PENDENTE' }}</span>{% endif %}</td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra? Esta ação não movimenta estoque.')">Conclusão técnica</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button>{% if (doc.status or 'emitido') == 'rascunho' %}<button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
 {% else %}
 <tr><td colspan="7">Nenhuma compra registrada ainda.</td></tr>
@@ -5219,6 +5257,7 @@ salvarRascunhoOS();
 <div class="management-page-title"><h2>Gestão O.S.</h2><p>Ordens de serviço emitidas, status e composição operacional</p></div>
 <div class="management-actions">
 <button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
+<a class="btn" href="/erp/gestao-os">Gestão Operacional O.S.</a>
 <a class="btn" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
 </div>
 </div>
@@ -5232,21 +5271,26 @@ salvarRascunhoOS();
 </div>
 <div class="management-toolbar">
 <div><label for="os_history_search">Busca</label><input id="os_history_search" type="search" placeholder="Número, chassi, cliente, município ou MMV"></div>
-<div><label for="os_history_status">Status</label><select id="os_history_status"><option value="">Todos</option><option value="emitido">Emitido</option><option value="rascunho">Rascunho</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></div>
+<div><label for="os_history_status">Status</label><select id="os_history_status"><option value="">Todos</option><option value="emitido">Emitido</option><option value="RASCUNHO">Rascunho MES</option><option value="ATIVA">Ativa</option><option value="EM_PRODUÇÃO">Em produção</option><option value="FINALIZADA">Finalizada</option><option value="ENTREGUE">Entregue</option><option value="RETIRADA">Retirada</option><option value="CANCELADA">Cancelada</option></select></div>
 <button type="button" class="btn-secondary" data-clear-history="os">Limpar filtros</button>
 </div>
 <div class="management-table-wrap">
 <table id="os_history_table">
-<thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Status</th><th>Usuário</th><th>Ações</th></tr></thead>
+<thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Status MES</th><th>Conclusão</th><th>Usuário</th><th>Ações</th></tr></thead>
 <tbody>
 {% for doc in dashboard.ordens_servico %}
 {% set dados = doc.dados or {} %}
-<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ (doc.status or 'emitido'))|lower }}" data-history-status="{{ doc.status or 'emitido' }}" data-history-date="{{ doc.data_criacao or '' }}">
-<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ doc.status or 'emitido' }}">{{ doc.status or "emitido" }}</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
-<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.?')">Concluir</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button></td>
+{% set mes_os = doc.mes_work_order or {} %}
+{% set status_os = mes_os.status or doc.status or 'emitido' %}
+{% set etapas_total = mes_os.etapas_aplicaveis|default(0)|int %}
+{% set etapas_concluidas = mes_os.etapas_concluidas|default(0)|int %}
+{% set percentual = ((etapas_concluidas * 100 / etapas_total)|round|int) if etapas_total else 0 %}
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ status_os)|lower }}" data-history-status="{{ status_os }}" data-history-date="{{ doc.data_criacao or '' }}">
+<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ status_os|lower }}">{{ status_os|replace('_', ' ') }}</span>{% if mes_os %}<span class="integration-detail">Atualizado pelo MES</span>{% endif %}</td><td><strong>{{ percentual }}%</strong><div class="os-progress"><span style="width:{{ percentual }}%"></span></div><span class="integration-detail">{{ etapas_concluidas }}/{{ etapas_total }} etapas</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir documento</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar documento</button>{% if (doc.status or 'emitido') != 'concluido' %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.? Isso não finaliza a produção nem movimenta estoque.')">Conclusão técnica</button>{% endif %}{% if mes_os %}<a class="btn btn-secondary" href="/erp/gestao-os">Abrir gestão MES</a>{% else %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
 {% else %}
-<tr><td colspan="9">Nenhuma O.S. registrada ainda.</td></tr>
+<tr><td colspan="10">Nenhuma O.S. registrada ainda.</td></tr>
 {% endfor %}
 </tbody>
 </table>
@@ -5504,6 +5548,7 @@ salvarRascunhoOS();
 <label for="luminaria_os_select">Escolha uma luminaria</label>
 <select id="luminaria_os_select">
 <option value="" selected disabled>Selecione</option>
+<option value="__NAO_APLICAVEL__">Não aplicável</option>
 <option value="10260092">10260092 - ELETRICA LUMINARIA ALURE 30</option>
 <option value="10260095">10260095 - ELETRICA LUMINARIA VAN TAMANHO M</option>
 </select>

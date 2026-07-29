@@ -8,6 +8,8 @@ import re
 import json
 import io
 import os
+import urllib.error
+import urllib.request
 import logging
 import tempfile
 import sys
@@ -97,6 +99,23 @@ import supabase_catalog
 import supabase_data
 
 
+def _load_local_env():
+    """Developer-only local settings; never overrides Render environment values."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env.local")
+    if not os.path.isfile(path):
+        return
+    with open(path, "r", encoding="utf-8") as handle:
+        for raw in handle:
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+_load_local_env()
+
+
 def _positive_env_int(name, default):
     try:
         value = int(os.environ.get(name, default))
@@ -123,6 +142,21 @@ def _env_bool(name, default=False):
     if value is None:
         return default
     return value.strip().lower() not in {"0", "false", "nao", "não", "no", "n"}
+
+
+def erp_feature_enabled():
+    return _env_bool("ERP_FEATURE_FLAG", default=False)
+
+
+def erp_feature_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if erp_feature_enabled():
+            return view(*args, **kwargs)
+        if request.path.startswith("/api/"):
+            return jsonify({"ok": False, "error": "Integração ERP desativada pela feature flag."}), 404
+        return "Integração ERP desativada pela feature flag.", 404
+    return wrapped
 
 
 def login_enabled():
@@ -308,6 +342,11 @@ def _open_for_read(path):
 
 
 def _setup_logging():
+    if os.environ.get("SUPRIMENTOS_FILE_LOG", "1").strip().lower() in {
+        "0", "false", "no", "nao", "não", "off",
+    }:
+        app.logger.setLevel(logging.INFO)
+        return
     log_dir = DATA_DIR
     try:
         os.makedirs(log_dir, exist_ok=True)
@@ -664,6 +703,8 @@ def registrar_historico(
         "submit_token": submit_token or (existente or {}).get("submit_token") or "",
         "criado_por": (existente or {}).get("criado_por") or usuario,
         "atualizado_por": usuario,
+        "erp_purchase_order_id": (existente or {}).get("erp_purchase_order_id") or None,
+        "erp_work_order_id": (existente or {}).get("erp_work_order_id") or None,
         "dados": dados or {},
         "itens": itens,
         "processos": processos,
@@ -766,6 +807,26 @@ def salvar_historico_documento_atualizado(documento_id, documento):
     if not atualizado:
         return None
     salvar_historico(entries)
+    return documento
+
+
+def vincular_documento_erp(documento, campo, entity_id):
+    """Persist an immutable ERP id inside the existing JSON document.
+
+    Keeping this link in ``dados`` is backward compatible with the current
+    Supabase table and avoids matching new records by visible O.C./O.S. number.
+    """
+    if not documento or not entity_id:
+        return documento
+    documento = dict(documento)
+    dados = dict(documento.get("dados") or {})
+    dados[campo] = str(entity_id)
+    documento["dados"] = dados
+    if campo in {"erp_purchase_order_id", "erp_work_order_id"}:
+        documento[campo] = str(entity_id)
+    documento_id = documento.get("id")
+    if documento_id:
+        salvar_historico_documento_atualizado(documento_id, documento)
     return documento
 
 
@@ -3889,6 +3950,69 @@ def logout():
     return redirect(url_for("login"))
 
 
+def _enriquecer_historico_integrado(historico, tab):
+    """Attach live read models without rewriting legacy document JSON."""
+    if not erp_feature_enabled() or tab not in {"dashboard", "gestao-oc", "gestao-os"}:
+        return historico
+
+    try:
+        compras = _erp_stock_request("dashboard").get("orders", [])
+        por_id = {
+            str(ordem.get("id") or ""): ordem
+            for ordem in compras
+            if ordem.get("id")
+        }
+        por_chave = {
+            str(ordem.get("idempotency_key") or ""): ordem
+            for ordem in compras
+            if ordem.get("idempotency_key")
+        }
+        for documento in historico:
+            if documento.get("tipo") != "oc":
+                continue
+            erp_id = str(
+                documento.get("erp_purchase_order_id")
+                or (documento.get("dados") or {}).get("erp_purchase_order_id")
+                or ""
+            )
+            chave = f"suprimentos-oc:{documento.get('id')}"
+            if erp_id in por_id:
+                documento["erp_purchase_order"] = por_id[erp_id]
+            elif chave in por_chave:
+                documento["erp_purchase_order"] = por_chave[chave]
+    except Exception:
+        app.logger.exception("Falha ao consultar estados integrados de O.C.; historico legado preservado.")
+
+    try:
+        ordens_mes = _erp_mes_request("work-orders").get("orders", [])
+        por_id = {
+            str(ordem.get("id") or ""): ordem
+            for ordem in ordens_mes
+            if ordem.get("id")
+        }
+        por_numero = {}
+        for ordem in ordens_mes:
+            numero = str(ordem.get("numero_os") or "").strip()
+            if numero and numero not in por_numero:
+                por_numero[numero] = ordem
+        for documento in historico:
+            if documento.get("tipo") != "os":
+                continue
+            erp_id = str(
+                documento.get("erp_work_order_id")
+                or (documento.get("dados") or {}).get("erp_work_order_id")
+                or ""
+            )
+            numero = str(documento.get("numero") or "").strip()
+            if erp_id in por_id:
+                documento["mes_work_order"] = por_id[erp_id]
+            elif numero in por_numero:
+                documento["mes_work_order"] = por_numero[numero]
+    except Exception:
+        app.logger.exception("Falha ao consultar estados do MES; historico legado preservado.")
+    return historico
+
+
 @app.route("/")
 def index():
     if request.method == "HEAD":
@@ -3913,7 +4037,7 @@ def index():
     tab = request.args.get("tab", "oc")
     if tab == "cadastro":
         tab = "oc"
-    historico = carregar_historico()
+    historico = _enriquecer_historico_integrado(carregar_historico(), tab)
     oc_totais = _agrupar_por_data(historico, "oc", "total_pedido")
     os_quantidades = _agrupar_por_data(historico, "os", None)
     dashboard = {
@@ -4020,6 +4144,8 @@ def api_excluir_historico_oc(documento_id):
     documento = obter_historico_documento(documento_id)
     if not documento or documento.get("tipo") != "oc":
         return jsonify({"ok": False, "erro": "O.C nao encontrada."}), 404
+    if erp_feature_enabled() and str(documento.get("status") or "").lower() != "rascunho":
+        return jsonify({"ok": False, "erro": "O.C. emitida nao pode ser excluida. Use Cancelar para manter a auditoria e a integracao."}), 409
     try:
         excluir_historico_documento(documento_id)
     except Exception:
@@ -4038,6 +4164,22 @@ def api_status_historico(tipo, documento_id):
         return jsonify({"ok": False, "erro": "Documento nao encontrado."}), 404
     payload = request.get_json(silent=True) or request.form
     try:
+        novo_status = str(payload.get("status") or "").strip().lower()
+        if tipo == "oc" and novo_status == "cancelado" and erp_feature_enabled():
+            _cancel_emitted_legacy_oc_in_erp(documento, "Cancelada pelo comprador no Suprimentos.")
+        if tipo == "oc" and novo_status == "concluido" and erp_feature_enabled():
+            _close_emitted_legacy_oc_in_erp(documento, "Concluida tecnicamente pelo comprador no Suprimentos.")
+        if tipo == "os" and erp_feature_enabled():
+            if novo_status == "concluido":
+                _close_linked_legacy_os_in_mes(
+                    documento,
+                    "Concluída tecnicamente pelo PCP em Suprimentos.",
+                )
+            elif str(documento.get("status") or "").lower() == "concluido":
+                _reopen_linked_legacy_os_in_mes(
+                    documento,
+                    "Conclusão técnica reaberta em Suprimentos.",
+                )
         atualizado = atualizar_status_historico_documento(documento_id, payload.get("status"))
     except ValueError as exc:
         return jsonify({"ok": False, "erro": str(exc)}), 400
@@ -4990,8 +5132,42 @@ def gerar_oc():
         if historico_existente
         else "rascunho"
     )
+    sync_result = None
+    if historico_existente and status_documento != "rascunho":
+        try:
+            sync_result = _sync_emitted_legacy_oc_to_erp(
+                historico_existente,
+                dados_pedido,
+                itens,
+                numero_oc,
+                fornecedor_nome,
+            )
+        except Exception as exc:
+            app.logger.exception(
+                "Falha ao atualizar a O.C. %s no ERP; documento legado nao foi sobrescrito.",
+                numero_oc,
+            )
+            return redirect(url_for(
+                "index",
+                tab="oc",
+                documento_status=(
+                    "A compra não foi salva porque a atualização integrada falhou: "
+                    f"{exc}"
+                ),
+            ))
+        if sync_result and sync_result.get("locked"):
+            return redirect(url_for(
+                "index",
+                tab="gestao-oc",
+                documento_status=(
+                    "A compra não foi alterada: já existe recebimento confirmado no Estoque. "
+                    "Faça a correção por estorno/ajuste rastreável antes de mudar suas linhas."
+                ),
+            ))
+        if sync_result and sync_result.get("id"):
+            dados_hist["erp_purchase_order_id"] = str(sync_result["id"])
     if acao == "salvar":
-        registrar_historico(
+        historico_salvo = registrar_historico(
             "oc",
             numero_oc,
             dados_hist,
@@ -5000,6 +5176,12 @@ def gerar_oc():
             status=status_documento,
             submit_token=submit_token,
         )
+        if sync_result and sync_result.get("id"):
+            vincular_documento_erp(
+                historico_salvo,
+                "erp_purchase_order_id",
+                sync_result["id"],
+            )
         limpar_importacao(_user_scoped_file(OC_IMPORT_FILE))
         return redirect(url_for("index", tab="dashboard", documento_status="Compra salva sem impressao."))
     arquivo = gerar_word(
@@ -5011,7 +5193,7 @@ def gerar_oc():
         componentes=componentes,
     )
     nome_docx = construir_nome_oc(numero_oc, fornecedor_nome, dados_pedido)
-    registrar_historico(
+    historico_emitido = registrar_historico(
         "oc",
         numero_oc,
         dados_hist,
@@ -5020,6 +5202,24 @@ def gerar_oc():
         status="emitido",
         submit_token=submit_token,
     )
+    try:
+        if sync_result is None:
+            sync_result = _sync_emitted_legacy_oc_to_erp(
+                historico_emitido, dados_pedido, itens, numero_oc, fornecedor_nome
+            )
+        if sync_result and sync_result.get("id"):
+            vincular_documento_erp(
+                historico_emitido,
+                "erp_purchase_order_id",
+                sync_result["id"],
+            )
+        if sync_result and sync_result.get("locked"):
+            app.logger.warning("O.C. %s emitida, mas ja possui recebimento e nao foi alterada no ERP.", numero_oc)
+    except Exception:
+        # Preserve the existing document workflow if the optional integration is
+        # unavailable.  The failure is explicit in the application log and no
+        # receipt/movement is ever fabricated in Estoque.
+        app.logger.exception("Falha ao publicar O.C. %s no ERP", numero_oc)
     limpar_importacao(_user_scoped_file(OC_IMPORT_FILE))
     @after_this_request
     def _cleanup_oc(response):
@@ -5189,7 +5389,7 @@ def gerar_os():
         )
 
         luminaria_codigo = normalizar_codigo(luminarias_linha[idx]) if idx < len(luminarias_linha) else ""
-        if luminaria_codigo:
+        if luminaria_codigo and luminaria_codigo != POPUP_ITEM_NAO_APLICAVEL:
             luminaria_info = produtos_catalogo.get(luminaria_codigo, {}) or os_produtos.get(luminaria_codigo, {})
             luminaria_qtd_raw = str(luminarias_qtd_linha[idx]).strip() if idx < len(luminarias_qtd_linha) else ""
             luminaria_qtd = _parse_numero_form(luminaria_qtd_raw, 1.0)
@@ -6399,7 +6599,414 @@ def exportar_dashboard():
     return send_file(tmp.name, as_attachment=True, download_name=f"{nome}_{date.today().isoformat()}.xlsx")
 
 
+def _erp_stock_request(path, method="GET", payload=None):
+    base = os.environ.get("ERP_STOCK_API_URL", "").rstrip("/")
+    token = os.environ.get("ERP_BACKEND_TOKEN", "")
+    if not base or not token:
+        raise ValueError("Integracao ERP nao configurada. Defina ERP_STOCK_API_URL e ERP_BACKEND_TOKEN no backend.")
+    body = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(
+        f"{base}/api/erp/internal/{path.lstrip('/')}", data=body, method=method,
+        headers={"Content-Type": "application/json", "X-ERP-Backend-Token": token, "X-ERP-Actor": current_username()},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=25) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        data = json.loads(exc.read().decode("utf-8") or "{}")
+        raise ValueError(data.get("error") or "Falha no Estoque.")
+
+
+def _erp_stock_binary_request(path):
+    base = os.environ.get("ERP_STOCK_API_URL", "").rstrip("/")
+    token = os.environ.get("ERP_BACKEND_TOKEN", "")
+    if not base or not token:
+        raise ValueError("Integracao ERP nao configurada para exportacao.")
+    req = urllib.request.Request(
+        f"{base}/api/erp/internal/{path.lstrip('/')}",
+        method="GET",
+        headers={
+            "X-ERP-Backend-Token": token,
+            "X-ERP-Actor": current_username(),
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as response:
+            return response.read()
+    except urllib.error.HTTPError as exc:
+        try:
+            data = json.loads(exc.read().decode("utf-8") or "{}")
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            data = {}
+        raise ValueError(data.get("error") or "Falha ao gerar relatório no Estoque.") from exc
+    except urllib.error.URLError as exc:
+        raise ValueError(f"Estoque indisponível: {exc.reason}") from exc
+
+
+def _erp_mes_request(path, method="GET", payload=None):
+    base = os.environ.get("ERP_MES_API_URL", "").rstrip("/")
+    token = os.environ.get("ERP_BACKEND_TOKEN", "")
+    if not base or not token:
+        raise ValueError("Integração MES não configurada. Defina ERP_MES_API_URL e ERP_BACKEND_TOKEN no backend.")
+    body = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(
+        f"{base}/api/erp/internal/{path.lstrip('/')}",
+        data=body,
+        method=method,
+        headers={
+            "Content-Type": "application/json",
+            "X-ERP-Backend-Token": token,
+            "X-ERP-Actor": current_username(),
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=25) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        data = json.loads(exc.read().decode("utf-8") or "{}")
+        raise ValueError(data.get("error") or "Falha no MES.")
+    except urllib.error.URLError as exc:
+        raise ValueError(f"MES indisponível: {exc.reason}") from exc
+
+
+def _resolve_linked_legacy_os_work_id(documento):
+    """Resolve and persist the structural MES link without guessing duplicates."""
+    direct_id = str(
+        (documento or {}).get("erp_work_order_id")
+        or ((documento or {}).get("dados") or {}).get("erp_work_order_id")
+        or ""
+    ).strip()
+    if direct_id:
+        return direct_id
+
+    numero = str((documento or {}).get("numero") or "").strip()
+    if not numero:
+        return None
+    orders = _erp_mes_request("work-orders").get("orders", [])
+    matches = [
+        item for item in orders
+        if str(item.get("numero_os") or "").strip() == numero and item.get("work_order_id")
+    ]
+    if len(matches) > 1:
+        raise ValueError(
+            f"A O.S. {numero} possui mais de um vínculo possível no MES. "
+            "Associe o UUID antes da conclusão técnica."
+        )
+    if not matches:
+        return None
+    work_id = str(matches[0]["work_order_id"])
+    vincular_documento_erp(documento, "erp_work_order_id", work_id)
+    return work_id
+
+
+def _close_linked_legacy_os_in_mes(documento, motivo):
+    work_id = _resolve_linked_legacy_os_work_id(documento)
+    if not work_id:
+        # Documentos antigos sem uma O.S. MES correspondente continuam
+        # consultáveis, mas não podem arquivar um registro inexistente.
+        return None
+    return _erp_mes_request(
+        f"work-orders/{work_id}/technical-close",
+        "POST",
+        {"motivo": str(motivo or "")},
+    )
+
+
+def _reopen_linked_legacy_os_in_mes(documento, motivo):
+    work_id = _resolve_linked_legacy_os_work_id(documento)
+    if not work_id:
+        return None
+    return _erp_mes_request(
+        f"work-orders/{work_id}/technical-reopen",
+        "POST",
+        {"motivo": str(motivo or "")},
+    )
+
+
+def _erp_iso_date(value):
+    """Normalize legacy form dates before sending them to the ERP service."""
+    if isinstance(value, (date, datetime)):
+        return value.date().isoformat() if isinstance(value, datetime) else value.isoformat()
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    for pattern in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(raw, pattern).date().isoformat()
+        except ValueError:
+            pass
+    return None
+
+
+def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fornecedor_nome):
+    """Publish the existing full Suprimentos O.C. as the single receipt source.
+
+    The legacy history id is deliberately used as a stable idempotency key.  A
+    reprint or edit before receiving updates the same ERP O.C.; it never creates
+    a duplicate pending receipt in Estoque.
+    """
+    if not erp_feature_enabled():
+        return None
+    history_id = str((historico or {}).get("id") or "").strip()
+    if not history_id:
+        raise ValueError("A O.C. nao recebeu identificador de historico para sincronizacao.")
+    payload = {
+        "numero_oc": numero_oc,
+        "categoria": (request.form.get("oc_categoria", "") or "GERAL").strip().upper(),
+        "fornecedor_nome": fornecedor_nome,
+        "data_emissao": _erp_iso_date((historico or {}).get("data_criacao")) or date.today().isoformat(),
+        "data_necessidade": _erp_iso_date(dados_pedido.get("previsao")),
+        "destino": (request.form.get("destino", "") or "").strip(),
+        "frete": dados_pedido.get("frete", 0),
+        "observacoes": dados_pedido.get("obs", ""),
+        "idempotency_key": f"suprimentos-oc:{history_id}",
+        "lines": [
+            {
+                "sku_codigo": item.get("codigo"),
+                "descricao_original": item.get("descricao"),
+                "unidade": item.get("unidade") or "UN",
+                "quantidade_pedida": item.get("qtd"),
+                "valor_unitario_pedido": item.get("valor"),
+                "destino": (request.form.get("destino", "") or "").strip(),
+                "data_necessidade": _erp_iso_date(dados_pedido.get("previsao")),
+            }
+            for item in itens
+        ],
+    }
+    return _erp_stock_request("purchase-orders/legacy-sync", "POST", payload)
+
+
+def _cancel_emitted_legacy_oc_in_erp(historico, motivo):
+    if str((historico or {}).get("status") or "").lower() == "rascunho":
+        return None
+    history_id = str((historico or {}).get("id") or "").strip()
+    if not history_id:
+        raise ValueError("A O.C. nao possui identificador para cancelamento integrado.")
+    return _erp_stock_request("purchase-orders/legacy-cancel", "POST", {
+        "idempotency_key": f"suprimentos-oc:{history_id}", "motivo": motivo or "",
+    })
+
+
+def _close_emitted_legacy_oc_in_erp(historico, motivo):
+    if str((historico or {}).get("status") or "").lower() == "rascunho":
+        return None
+    history_id = str((historico or {}).get("id") or "").strip()
+    if not history_id:
+        raise ValueError("A O.C. nao possui identificador para conclusao integrada.")
+    return _erp_stock_request("purchase-orders/legacy-close", "POST", {
+        "idempotency_key": f"suprimentos-oc:{history_id}", "motivo": motivo or "",
+    })
+
+
+@app.route("/erp/ordens-compra")
+@login_required
+@erp_feature_required
+def erp_purchase_orders_screen():
+    """Operational monitoring; O.C. creation remains in the complete legacy form."""
+    return render_template("erp_ordens_compra.html")
+
+
+@app.route("/erp/relatorios/compras-inspecao.xlsx")
+@login_required
+@erp_feature_required
+def erp_purchase_inspection_report():
+    try:
+        content = _erp_stock_binary_request("reports/purchases-inspections.xlsx")
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    return send_file(
+        io.BytesIO(content),
+        as_attachment=True,
+        download_name=f"Compras_Bancos_e_Inspecao_{date.today().isoformat()}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@app.route("/api/erp/purchase-orders", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_purchase_order_proxy():
+    try:
+        result = _erp_stock_request("purchase-orders", "POST", request.get_json(silent=True) or {})
+        return jsonify(result), 201 if not result.get("replayed") else 200
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/receipts/pending")
+@login_required
+@erp_feature_required
+def erp_pending_receipts_proxy():
+    try: return jsonify(_erp_stock_request("receipts/pending"))
+    except ValueError as exc: return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/dashboard")
+@login_required
+@erp_feature_required
+def erp_dashboard_proxy():
+    try: return jsonify(_erp_stock_request("dashboard"))
+    except ValueError as exc: return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/purchase-orders/<order_id>/technical-close", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_purchase_order_technical_close_proxy(order_id):
+    try:
+        return jsonify(_erp_stock_request(
+            f"purchase-orders/{order_id}/technical-close",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/purchase-orders/<order_id>/financial-close", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_purchase_order_financial_close_proxy(order_id):
+    try:
+        return jsonify(_erp_stock_request(
+            f"purchase-orders/{order_id}/financial-close",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/purchase-orders/<order_id>/financial-detail")
+@login_required
+@erp_feature_required
+def erp_purchase_order_financial_detail_proxy(order_id):
+    try:
+        return jsonify(_erp_stock_request(
+            f"purchase-orders/{order_id}/financial-detail",
+            "GET",
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/erp/gestao-os")
+@login_required
+@erp_feature_required
+def erp_work_order_management_screen():
+    return render_template(
+        "erp_gestao_os.html",
+        mes_url=os.environ.get("ERP_MES_PUBLIC_URL") or os.environ.get("ERP_MES_API_URL", "http://127.0.0.1:8010"),
+    )
+
+@app.route("/api/erp/os-management")
+@login_required
+@erp_feature_required
+def erp_work_order_management_list():
+    try:
+        return jsonify(_erp_mes_request("work-orders"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/catalogs")
+@login_required
+@erp_feature_required
+def erp_work_order_catalogs():
+    try:
+        return jsonify(_erp_mes_request("catalogs"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/<work_id>")
+@login_required
+@erp_feature_required
+def erp_work_order_management_detail(work_id):
+    try:
+        return jsonify(_erp_mes_request(f"work-orders/{work_id}"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/entries", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_vehicle_entry_proxy():
+    try:
+        return jsonify(_erp_mes_request("vehicle-entries", "POST", request.get_json(silent=True) or {})), 201
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/entries/<entry_id>/work-orders", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_work_order_create_proxy(entry_id):
+    try:
+        return jsonify(_erp_mes_request(
+            f"vehicle-entries/{entry_id}/work-orders", "POST", request.get_json(silent=True) or {}
+        )), 201
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/work-orders/<work_id>", methods=["PUT"])
+@login_required
+@erp_feature_required
+def erp_work_order_update_proxy(work_id):
+    try:
+        return jsonify(_erp_mes_request(
+            f"work-orders/{work_id}", "PUT", request.get_json(silent=True) or {}
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/work-orders/<work_id>/activate", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_work_order_activate_proxy(work_id):
+    try:
+        return jsonify(_erp_mes_request(f"work-orders/{work_id}/activate", "POST", {}))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+@app.route("/api/erp/os-management/work-orders/<work_id>/technical-close", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_work_order_technical_close_proxy(work_id):
+    try:
+        return jsonify(_erp_mes_request(
+            f"work-orders/{work_id}/technical-close",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/os-management/work-orders/<work_id>/technical-reopen", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_work_order_technical_reopen_proxy(work_id):
+    try:
+        return jsonify(_erp_mes_request(
+            f"work-orders/{work_id}/technical-reopen",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/os-management/work-orders/<work_id>/schedules", methods=["POST"])
+@login_required
+@erp_feature_required
+def erp_work_order_schedule_proxy(work_id):
+    try:
+        return jsonify(_erp_mes_request(
+            f"work-orders/{work_id}/schedules", "POST", request.get_json(silent=True) or {}
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 if __name__ == "__main__":
-    port = _get_free_port()
+    port = int(os.environ.get("PORT", _get_free_port()))
     _abrir_navegador(port)
     app.run(debug=False, use_reloader=False, port=port)

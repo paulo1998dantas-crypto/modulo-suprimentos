@@ -10,6 +10,7 @@ from werkzeug.datastructures import MultiDict
 APP_DIR = Path(__file__).resolve().parents[1] / "compras_app"
 sys.path.insert(0, str(APP_DIR))
 os.environ["SUPRIMENTOS_REQUIRE_LOGIN"] = "0"
+os.environ["SUPRIMENTOS_FILE_LOG"] = "0"
 
 from app import (  # noqa: E402
     POPUP_ITEM_NAO_APLICAVEL,
