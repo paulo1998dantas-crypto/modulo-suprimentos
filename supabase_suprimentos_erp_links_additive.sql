@@ -2,6 +2,8 @@
 -- Aditiva: não altera JSON, número, status ou qualquer registro existente.
 -- Aplicar somente depois de 20260728_erp_operational_integration.sql.
 begin;
+set local lock_timeout = '5s';
+set local statement_timeout = '60s';
 
 do $$
 begin
