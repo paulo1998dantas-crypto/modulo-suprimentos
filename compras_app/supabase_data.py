@@ -21,6 +21,11 @@ RELACOES_TABLE = "suprimentos_relacoes_processo_item"
 BOM_COMPONENTS_TABLE = "cadastro_bom_componentes"
 USERS_TABLE = "users"
 DOCUMENTOS_TABLE = "suprimentos_documentos"
+ROLES_TABLE = "erp_roles"
+PERMISSIONS_TABLE = "erp_permissions"
+ROLE_PERMISSIONS_TABLE = "erp_role_permissions"
+USER_ROLES_TABLE = "erp_user_roles"
+USER_PERMISSION_OVERRIDES_TABLE = "erp_user_permission_overrides"
 
 _cache = {}
 
@@ -29,8 +34,99 @@ class SupabaseDataError(RuntimeError):
     pass
 
 
+ROLE_PERMISSION_FALLBACKS = {
+    "OPERADOR": {
+        "estoque.inspection.receive",
+        "suprimentos.dashboard.view",
+        "suprimentos.purchase.view",
+        "suprimentos.work_order.view",
+    },
+    "COMPRADOR": {
+        "suprimentos.dashboard.view",
+        "suprimentos.purchase.view",
+        "suprimentos.purchase.create",
+        "suprimentos.purchase.edit",
+        "suprimentos.purchase.cancel",
+        "suprimentos.purchase.export",
+        "suprimentos.work_order.view",
+    },
+    "FINANCEIRO": {
+        "suprimentos.dashboard.view",
+        "suprimentos.purchase.view",
+        "suprimentos.purchase.financial_close",
+        "suprimentos.purchase.export",
+        "suprimentos.work_order.view",
+    },
+    "PCP": {
+        "estoque.inspection.receive",
+        "suprimentos.dashboard.view",
+        "suprimentos.purchase.view",
+        "suprimentos.purchase.create",
+        "suprimentos.purchase.edit",
+        "suprimentos.purchase.cancel",
+        "suprimentos.purchase.technical_close",
+        "suprimentos.purchase.financial_close",
+        "suprimentos.purchase.export",
+        "suprimentos.purchase.bulk_manage",
+        "suprimentos.work_order.view",
+        "suprimentos.work_order.manage",
+        "suprimentos.work_order.schedule",
+        "suprimentos.work_order.technical_close",
+        "suprimentos.work_order.import",
+    },
+    "ENGENHARIA": {
+        "estoque.inspection.receive",
+        "suprimentos.dashboard.view",
+        "suprimentos.purchase.view",
+        "suprimentos.purchase.create",
+        "suprimentos.purchase.edit",
+        "suprimentos.purchase.cancel",
+        "suprimentos.purchase.technical_close",
+        "suprimentos.purchase.financial_close",
+        "suprimentos.purchase.export",
+        "suprimentos.purchase.bulk_manage",
+        "suprimentos.work_order.view",
+        "suprimentos.work_order.manage",
+        "suprimentos.work_order.schedule",
+        "suprimentos.work_order.technical_close",
+        "suprimentos.work_order.import",
+        "cadastro.access",
+    },
+    "ADMIN": {"*"},
+}
+
+
 def _clean(value):
     return "" if value is None else str(value).strip()
+
+
+def _env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return _clean(value).lower() not in {"0", "false", "nao", "não", "no", "n", "off"}
+
+
+def shared_rbac_enabled():
+    return _env_bool("ERP_SHARED_RBAC_ENABLED", default=False)
+
+
+def _role_codes(value):
+    if isinstance(value, (list, tuple, set)):
+        values = value
+    else:
+        text = _clean(value).replace(";", ",")
+        values = text.split(",") if text else []
+    result = []
+    for item in values:
+        role = _clean(item).upper().replace(" ", "_")
+        if not role:
+            continue
+        if role == "ADM":
+            role = "ADMIN"
+        if role not in result:
+            result.append(role)
+    return result
 
 
 def _supabase_url():
@@ -78,7 +174,13 @@ def status():
             BOM_COMPONENTS_TABLE,
             DOCUMENTOS_TABLE,
             USERS_TABLE,
+            ROLES_TABLE,
+            PERMISSIONS_TABLE,
+            ROLE_PERMISSIONS_TABLE,
+            USER_ROLES_TABLE,
+            USER_PERMISSION_OVERRIDES_TABLE,
         ],
+        "shared_rbac_enabled": shared_rbac_enabled(),
     }
 
 
@@ -593,6 +695,22 @@ def obter_documento(documento_id):
     return documento_to_legacy(rows[0]) if rows else None
 
 
+def obter_documento_por_submit_token(submit_token):
+    token = _clean(submit_token)
+    if not token:
+        return None
+    rows = _request(
+        "GET",
+        DOCUMENTOS_TABLE,
+        query=[
+            ("select", "id,tipo,numero,submit_token"),
+            ("submit_token", f"eq.{token}"),
+            ("limit", "1"),
+        ],
+    ) or []
+    return rows[0] if rows else None
+
+
 def atualizar_documento(documento_id, documento):
     row = normalizar_documento(documento)
     if not row.get("tipo") or not row.get("numero"):
@@ -673,29 +791,218 @@ def proximo_numero_documento(tipo):
         raise SupabaseDataError("O contador do Supabase retornou um valor invalido.") from exc
 
 
+def _load_user_record(*, user_id=None, username=None, include_password=False):
+    fields = ["id", "username", "role", "active", "auth_version"]
+    if include_password:
+        fields.append("password_hash")
+    filters = []
+    if user_id is not None:
+        filters.append(("id", f"eq.{user_id}"))
+    elif username:
+        filters.append(("username", f"eq.{_clean(username)}"))
+    else:
+        return None
+    try:
+        rows = _request(
+            "GET",
+            USERS_TABLE,
+            query=[("select", ",".join(fields)), *filters, ("limit", "1")],
+        ) or []
+    except SupabaseDataError as exc:
+        # Compatibilidade durante a janela entre o deploy do código e a
+        # migration aditiva que cria users.auth_version.
+        if shared_rbac_enabled() or "auth_version" not in str(exc):
+            raise
+        fields.remove("auth_version")
+        rows = _request(
+            "GET",
+            USERS_TABLE,
+            query=[("select", ",".join(fields)), *filters, ("limit", "1")],
+        ) or []
+    return rows[0] if rows else None
+
+
+def _fallback_permissions(roles):
+    permissions = set()
+    for role in roles:
+        permissions.update(ROLE_PERMISSION_FALLBACKS.get(role, set()))
+    return permissions
+
+
+def _load_active_role_codes(role_codes):
+    candidates = _role_codes(role_codes)
+    if not candidates:
+        return []
+    role_filter = ",".join(candidates)
+    rows = _request(
+        "GET",
+        ROLES_TABLE,
+        query=[
+            ("select", "code"),
+            ("code", f"in.({role_filter})"),
+            ("active", "eq.true"),
+        ],
+    ) or []
+    active = set(_role_codes([
+        row.get("code") for row in rows
+        if row.get("code")
+    ]))
+    return [role for role in candidates if role in active]
+
+
+def load_user_authorization(user_id, force=False):
+    cache_key = f"user_authorization:{user_id}"
+    now = time.time()
+    cached = _cache.get(cache_key)
+    if cached and not force and now - cached["loaded_at"] < CACHE_TTL_SECONDS:
+        return dict(cached["user"])
+
+    user = _load_user_record(user_id=user_id)
+    if not user or not bool(user.get("active", True)):
+        return None
+
+    legacy_roles = _role_codes(user.get("role"))
+    roles = list(legacy_roles)
+    permissions = set()
+    overrides = {}
+    rbac_source = "legacy"
+
+    if shared_rbac_enabled():
+        try:
+            role_rows = _request(
+                "GET",
+                USER_ROLES_TABLE,
+                query=[
+                    ("select", "role_code"),
+                    ("user_id", f"eq.{user_id}"),
+                    ("order", "role_code.asc"),
+                ],
+            ) or []
+            assigned_roles = _role_codes([
+                row.get("role_code") for row in role_rows
+                if row.get("role_code")
+            ])
+            # Shared mode never falls back to users.role. A missing or
+            # intentionally removed membership must remove access.
+            roles = _load_active_role_codes(assigned_roles)
+            rbac_source = "shared"
+
+            if roles:
+                role_filter = ",".join(roles)
+                permission_rows = _request(
+                    "GET",
+                    ROLE_PERMISSIONS_TABLE,
+                    query=[
+                        ("select", "permission_code"),
+                        ("role_code", f"in.({role_filter})"),
+                    ],
+                ) or []
+                permissions.update(
+                    _clean(row.get("permission_code"))
+                    for row in permission_rows
+                    if _clean(row.get("permission_code"))
+                )
+
+            override_rows = _request(
+                "GET",
+                USER_PERMISSION_OVERRIDES_TABLE,
+                query=[
+                    ("select", "permission_code,allowed"),
+                    ("user_id", f"eq.{user_id}"),
+                ],
+            ) or []
+            overrides = {
+                _clean(row.get("permission_code")): bool(row.get("allowed"))
+                for row in override_rows
+                if _clean(row.get("permission_code"))
+            }
+        except SupabaseDataError:
+            # Shared mode is intentionally fail-closed. Keep the flag disabled
+            # until the additive schema has been migrated and reconciled.
+            raise
+
+    if not permissions and rbac_source == "legacy":
+        permissions.update(_fallback_permissions(roles))
+    for permission, allowed in overrides.items():
+        if allowed:
+            permissions.add(permission)
+        else:
+            permissions.discard(permission)
+    if "ADMIN" in roles:
+        # O contrato compartilhado trata ADMIN como superperfil também no
+        # backend, independentemente de uma nova permissão ainda não ter sido
+        # copiada para erp_role_permissions.
+        permissions.add("*")
+
+    result = {
+        "id": user.get("id"),
+        "username": _clean(user.get("username")),
+        "role": _clean(user.get("role")),
+        "roles": roles,
+        "permissions": sorted(permissions),
+        "auth_version": int(user.get("auth_version") or 0),
+        "rbac_source": rbac_source,
+    }
+    _cache[cache_key] = {"loaded_at": now, "user": result}
+    return dict(result)
+
+
+def shared_rbac_schema_status():
+    """Probe the REST-visible RBAC contract without reading operational data."""
+    if not shared_rbac_enabled():
+        return {"enabled": False, "ready": False, "error": ""}
+    probes = (
+        (USERS_TABLE, "auth_version"),
+        (ROLES_TABLE, "code,active"),
+        (ROLE_PERMISSIONS_TABLE, "role_code,permission_code"),
+        (USER_ROLES_TABLE, "user_id,role_code"),
+        (USER_PERMISSION_OVERRIDES_TABLE, "user_id,permission_code,allowed"),
+    )
+    try:
+        for table_name, fields in probes:
+            _request(
+                "GET",
+                table_name,
+                query=[("select", fields), ("limit", "1")],
+            )
+    except SupabaseDataError as exc:
+        return {"enabled": True, "ready": False, "error": str(exc)}
+    return {"enabled": True, "ready": True, "error": ""}
+
+
+def revalidate_session_user(session_user):
+    """Invalidate signed sessions immediately after any auth_version change."""
+    if not isinstance(session_user, dict) or session_user.get("id") is None:
+        return None
+    user = _load_user_record(user_id=session_user.get("id"))
+    if not user or not bool(user.get("active", True)):
+        return None
+    try:
+        session_version = int(session_user.get("auth_version"))
+    except (TypeError, ValueError):
+        return None
+    current_version = int(user.get("auth_version") or 0)
+    if session_version != current_version:
+        return None
+    if (
+        _clean(session_user.get("username")) != _clean(user.get("username"))
+        or _clean(session_user.get("role")) != _clean(user.get("role"))
+    ):
+        return None
+    # Re-read the role matrix on every authenticated request. Membership and
+    # user changes also bump auth_version, while matrix-only changes become
+    # effective immediately without waiting for the short cache TTL.
+    return load_user_authorization(user.get("id"), force=True)
+
+
 def verify_user(username, password):
     username = _clean(username)
     if not username or not password:
         return None
-    rows = _request(
-        "GET",
-        USERS_TABLE,
-        query=[
-            ("select", "id,username,password_hash,role,active"),
-            ("username", f"eq.{username}"),
-            ("limit", "1"),
-        ],
-    ) or []
-    if not rows:
-        return None
-    user = rows[0]
-    if not bool(user.get("active", True)):
+    user = _load_user_record(username=username, include_password=True)
+    if not user or not bool(user.get("active", True)):
         return None
     password_hash = _clean(user.get("password_hash"))
     if not password_hash or not check_password_hash(password_hash, password):
         return None
-    return {
-        "id": user.get("id"),
-        "username": _clean(user.get("username")),
-        "role": _clean(user.get("role")),
-    }
+    return load_user_authorization(user.get("id"), force=True)

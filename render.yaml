@@ -12,7 +12,21 @@ services:
         value: supabase
       - key: SUPRIMENTOS_REQUIRE_LOGIN
         value: "1"
+      - key: ERP_SHARED_RBAC_ENABLED
+        value: "0"
+      - key: ERP_FEATURE_FLAG
+        value: "false"
       - key: SUPRIMENTOS_SESSION_SECRET
+        sync: false
+      - key: ERP_STOCK_API_URL
+        sync: false
+      - key: ERP_STOCK_PUBLIC_URL
+        sync: false
+      - key: ERP_MES_API_URL
+        sync: false
+      - key: ERP_MES_PUBLIC_URL
+        sync: false
+      - key: ERP_BACKEND_TOKEN
         sync: false
       - key: SUPABASE_URL
         sync: false

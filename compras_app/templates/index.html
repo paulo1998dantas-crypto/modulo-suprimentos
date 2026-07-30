@@ -4281,7 +4281,8 @@ document.getElementById("historico_oc_dados").innerHTML = [
 ["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Categoria", dados.oc_categoria || (doc.erp_purchase_order || {}).categoria], ["Destino", dados.destino || (doc.erp_purchase_order || {}).destino], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
 document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="7">Sem itens.</td></tr>';
-document.getElementById("historico_oc_editar").onclick = () => editarDocumentoHistoricoOC(doc);
+const editButton = document.getElementById("historico_oc_editar");
+if (editButton) editButton.onclick = () => editarDocumentoHistoricoOC(doc);
 const modal = document.getElementById("historico_oc_modal");
 modal.classList.add("open");
 modal.setAttribute("aria-hidden", "false");
@@ -4380,7 +4381,8 @@ document.getElementById("historico_os_composicao").innerHTML = (doc.composicao |
 const setor = item.setor === "PREPARACAO" ? { classe: "prep", label: "Preparação" } : item.setor === "F.D" ? { classe: "fd", label: "Faturamento direto" } : { classe: "exp", label: "Expedição" };
 return `<tr><td>${escapeHtmlOS(item.item || "")}</td><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td><span class="sector-badge ${setor.classe}">${setor.label}</span></td></tr>`;
 }).join("") || '<tr><td colspan="6">Sem composição.</td></tr>';
-document.getElementById("historico_os_editar").onclick = () => editarDocumentoHistoricoOS(doc);
+const editButton = document.getElementById("historico_os_editar");
+if (editButton) editButton.onclick = () => editarDocumentoHistoricoOS(doc);
 const modal = document.getElementById("historico_os_modal");
 modal.classList.add("open");
 modal.setAttribute("aria-hidden", "false");
@@ -4805,9 +4807,13 @@ initialTarget = active ? active.getAttribute("data-tab") : "tab-oc";
 cadastroActions.style.display = initialTarget === "tab-cadastro" ? "flex" : "none";
 }
 
+if (document.getElementById("form-oc")){
 calcularTotais();
-renderComponentes();
 aplicarPrefillOC();
+}
+if (document.getElementById("form-os")){
+renderComponentes();
+}
 if (initialTarget === "tab-os"){
 initOsTab();
 }
@@ -4839,11 +4845,21 @@ salvarRascunhoOS();
 <img class="logo" src="/static/logo.png" alt="Logo">
 <div class="topbar-actions">
 <div class="nav-tabs">
+{% if can('suprimentos.purchase.create') %}
 <button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
+{% endif %}
+{% if can('suprimentos.work_order.manage') %}
 <button type="button" class="tab-btn" data-tab="tab-os">Producao</button>
+{% endif %}
+{% if can('suprimentos.dashboard.view') %}
 <button type="button" class="tab-btn" data-tab="tab-dashboard">Dashboard</button>
+{% endif %}
+{% if can('suprimentos.purchase.view') %}
 <button type="button" class="tab-btn" data-tab="tab-gestao-oc">Gestão O.C.</button>
+{% endif %}
+{% if can('suprimentos.work_order.view') %}
 <button type="button" class="tab-btn" data-tab="tab-gestao-os">Gestão O.S.</button>
+{% endif %}
 </div>
 {% if current_user %}
 <span class="topbar-user">{{ current_user.username }}</span>
@@ -4854,6 +4870,7 @@ salvarRascunhoOS();
 
 <div class="container">
 
+{% if can('suprimentos.purchase.create') %}
 <div id="tab-oc" class="tab-content active">
 <div class="card">
 <h3>Importar Pedido de Compra (DOCX/PDF)</h3>
@@ -5100,7 +5117,9 @@ salvarRascunhoOS();
 
 </form>
 </div>
+{% endif %}
 
+{% if can('suprimentos.dashboard.view') %}
 <div id="tab-dashboard" class="tab-content">
 {% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
 <div class="dashboard-page-header">
@@ -5109,9 +5128,15 @@ salvarRascunhoOS();
 <p id="dashboard_period_summary">Indicadores do período selecionado</p>
 </div>
 <div class="dashboard-shortcuts">
+{% if can('suprimentos.purchase.view') %}
 <button type="button" class="btn-secondary" data-open-tab="tab-gestao-oc">Gestão O.C.</button>
+{% endif %}
+{% if can('suprimentos.work_order.view') %}
 <button type="button" class="btn-secondary" data-open-tab="tab-gestao-os">Gestão O.S.</button>
+{% endif %}
+{% if can('suprimentos.purchase.export') and can('suprimentos.work_order.view') %}
 <a class="btn" href="/exportar_dashboard">Relatório completo</a>
+{% endif %}
 </div>
 </div>
 
@@ -5200,15 +5225,21 @@ salvarRascunhoOS();
 </div>
 </div>
 </div>
+{% endif %}
 
+{% if can('suprimentos.purchase.view') %}
 <div id="tab-gestao-oc" class="tab-content">
 {% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
 <div class="management-page-header">
 <div class="management-page-title"><h2>Gestão O.C. — Comprador</h2><p>Pedidos de compra emitidos e suas ações operacionais</p></div>
 <div class="management-actions">
+{% if can('suprimentos.dashboard.view') %}
 <button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
+{% endif %}
 <a class="btn btn-secondary" href="/erp/ordens-compra">Gestão Compras</a>
+{% if can('suprimentos.purchase.export') %}
 <a class="btn" href="/exportar_dashboard?tipo=oc">Relatório de compras</a>
+{% endif %}
 </div>
 </div>
 
@@ -5234,7 +5265,7 @@ salvarRascunhoOS();
 {% set status_oc = erp_oc.status or doc.status or 'emitido' %}
 <tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ status_oc)|lower }}" data-history-status="{{ status_oc }}" data-history-date="{{ doc.data_criacao or '' }}">
 <td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.fornecedor or dados.razao_social or "-" }}</td><td>R$ {{ dados.total_pedido or "0" }}</td><td><span class="status-badge {{ status_oc|lower }}">{{ status_oc|replace('_', ' ') }}</span>{% if erp_oc %}<span class="integration-detail">Técnica: {{ 'CONCLUÍDA' if erp_oc.technical_status == 'CONCLUIDA' else 'ABERTA' }} · Financeira: {{ 'CONCLUÍDA' if erp_oc.financial_status == 'CONCLUIDA' else 'PENDENTE' }}</span>{% endif %}</td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
-<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button><button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra? Esta ação não movimenta estoque.')">Conclusão técnica</button><button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button>{% if (doc.status or 'emitido') == 'rascunho' %}<button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button>{% if can('suprimentos.purchase.edit') %}<button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button>{% endif %}{% if can('suprimentos.purchase.technical_close') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra? Esta ação não movimenta estoque.')">Conclusão técnica</button>{% endif %}{% if can('suprimentos.purchase.cancel') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button>{% endif %}{% if can('suprimentos.purchase.edit') and (doc.status or 'emitido') == 'rascunho' %}<button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
 {% else %}
 <tr><td colspan="7">Nenhuma compra registrada ainda.</td></tr>
@@ -5244,6 +5275,7 @@ salvarRascunhoOS();
 </div>
 </div>
 
+{% if can('suprimentos.purchase.bulk_manage') %}
 <div class="dashboard-table">
 <div class="table-toolbar"><div><h3>Baixa em massa de O.C.</h3><span>Atualização por documento ou ID de linha</span></div></div>
 <form method="POST" action="/importar_baixa_documentos" enctype="multipart/form-data">
@@ -5256,6 +5288,7 @@ salvarRascunhoOS();
 </div>
 </form>
 </div>
+{% endif %}
 
 <div id="historico_oc_modal" class="history-modal" aria-hidden="true">
 <div class="history-modal-box" role="dialog" aria-modal="true" aria-labelledby="historico_oc_title">
@@ -5263,17 +5296,21 @@ salvarRascunhoOS();
 <div id="historico_oc_dados" class="history-summary"></div>
 <h4>Itens da compra</h4>
 <div class="table-scroll"><table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th><th>Valor</th><th>Desconto</th><th>Total</th></tr></thead><tbody id="historico_oc_itens"></tbody></table></div>
-<div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOC()">Fechar</button><button id="historico_oc_editar" type="button">Editar</button></div>
+<div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOC()">Fechar</button>{% if can('suprimentos.purchase.edit') %}<button id="historico_oc_editar" type="button">Editar</button>{% endif %}</div>
 </div>
 </div>
 </div>
+{% endif %}
 
+{% if can('suprimentos.work_order.view') %}
 <div id="tab-gestao-os" class="tab-content">
 {% if documento_status %}<div class="total-box" style="margin-bottom:10px;">{{ documento_status }}</div>{% endif %}
 <div class="management-page-header">
 <div class="management-page-title"><h2>Gestão O.S.</h2><p>Ordens de serviço emitidas, status e composição operacional</p></div>
 <div class="management-actions">
+{% if can('suprimentos.dashboard.view') %}
 <button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
+{% endif %}
 <a class="btn" href="/erp/gestao-os">Gestão Operacional O.S.</a>
 <a class="btn" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
 </div>
@@ -5304,7 +5341,7 @@ salvarRascunhoOS();
 {% set percentual = ((etapas_concluidas * 100 / etapas_total)|round|int) if etapas_total else 0 %}
 <tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ status_os)|lower }}" data-history-status="{{ status_os }}" data-history-date="{{ doc.data_criacao or '' }}">
 <td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ status_os|lower }}">{{ status_os|replace('_', ' ') }}</span>{% if mes_os %}<span class="integration-detail">Atualizado pelo MES</span>{% endif %}</td><td><strong>{{ percentual }}%</strong><div class="os-progress"><span style="width:{{ percentual }}%"></span></div><span class="integration-detail">{{ etapas_concluidas }}/{{ etapas_total }} etapas</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
-<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir documento</button><button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar documento</button>{% if (doc.status or 'emitido') != 'concluido' %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.? Isso não finaliza a produção nem movimenta estoque.')">Conclusão técnica</button>{% endif %}{% if mes_os %}<a class="btn btn-secondary" href="/erp/gestao-os">Abrir gestão MES</a>{% else %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir documento</button>{% if can('suprimentos.work_order.manage') %}<button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar documento</button>{% endif %}{% if can('suprimentos.work_order.technical_close') and (doc.status or 'emitido') != 'concluido' %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.? Isso não finaliza a produção nem movimenta estoque.')">Conclusão técnica</button>{% endif %}{% if mes_os %}<a class="btn btn-secondary" href="/erp/gestao-os">Abrir gestão MES</a>{% elif can('suprimentos.work_order.manage') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
 {% else %}
 <tr><td colspan="10">Nenhuma O.S. registrada ainda.</td></tr>
@@ -5314,6 +5351,7 @@ salvarRascunhoOS();
 </div>
 </div>
 
+{% if can('suprimentos.work_order.import') %}
 <div class="management-tools-grid">
 <div class="dashboard-table">
 <div class="table-toolbar"><div><h3>Baixa em massa de O.S.</h3><span>Atualização por documento ou ID de linha</span></div></div>
@@ -5358,6 +5396,7 @@ salvarRascunhoOS();
 </form>
 </div>
 </div>
+{% endif %}
 
 <div id="historico_os_modal" class="history-modal" aria-hidden="true">
 <div class="history-modal-box" role="dialog" aria-modal="true" aria-labelledby="historico_os_title">
@@ -5367,11 +5406,13 @@ salvarRascunhoOS();
 <div class="table-scroll"><table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th></tr></thead><tbody id="historico_os_itens"></tbody></table></div>
 <h4>Composição e destino</h4>
 <div class="table-scroll"><table><thead><tr><th>Item pai</th><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th><th>Destino</th></tr></thead><tbody id="historico_os_composicao"></tbody></table></div>
-<div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOS()">Fechar</button><button id="historico_os_editar" type="button">Editar / reemitir</button></div>
+<div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOS()">Fechar</button>{% if can('suprimentos.work_order.manage') %}<button id="historico_os_editar" type="button">Editar / reemitir</button>{% endif %}</div>
 </div>
 </div>
 </div>
+{% endif %}
 
+{% if can('suprimentos.work_order.manage') %}
 <div id="tab-os" class="tab-content">
 <div class="card">
 <h3>Importar Ordem de Servico (DOCX/PDF)</h3>
@@ -5880,7 +5921,9 @@ salvarRascunhoOS();
 
 </form>
 </div>
+{% endif %}
 
+{% if can('suprimentos.master_data.manage') %}
 <div id="tab-cadastro" class="tab-content">
 <div class="card">
 <h3>Cadastros</h3>
@@ -6392,7 +6435,9 @@ salvarRascunhoOS();
 </div>
 </div>
 </div>
+{% endif %}
 
+{% if can('suprimentos.master_data.manage') %}
 <div id="cadastro-actions" class="floating-actions" style="display:none">
 <div class="fab-group">
 <button id="cadastro-compras-toggle" class="fab fab-parent" type="button" title="Cadastro - Compras" onclick="return toggleCadastroMenu('cadastro-compras-menu', 'cadastro-producao-menu')">Cadastro - Compras</button>
@@ -6413,6 +6458,7 @@ salvarRascunhoOS();
 </div>
 </div>
 </div>
+{% endif %}
 
 <script>
 (() => {

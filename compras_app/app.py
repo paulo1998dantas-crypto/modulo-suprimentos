@@ -163,6 +163,10 @@ def login_enabled():
     return _env_bool("SUPRIMENTOS_REQUIRE_LOGIN", default=supabase_data.enabled())
 
 
+def shared_rbac_enabled():
+    return _env_bool("ERP_SHARED_RBAC_ENABLED", default=False)
+
+
 def current_user():
     return session.get("suprimentos_user")
 
@@ -170,6 +174,70 @@ def current_user():
 def current_username():
     user = current_user() or {}
     return str(user.get("username") or user.get("id") or "local").strip() or "local"
+
+
+def current_user_id():
+    user = current_user() or {}
+    value = user.get("id")
+    return "" if value is None else str(value).strip()
+
+
+def can(permission):
+    """Return the effective permission while preserving the pre-RBAC rollout."""
+    if not shared_rbac_enabled():
+        return True
+    user = current_user() or {}
+    permissions = set(user.get("permissions") or [])
+    return "*" in permissions or str(permission or "").strip() in permissions
+
+
+def can_any(*permissions):
+    return any(can(permission) for permission in permissions)
+
+
+def _authorization_denied(permission):
+    message = f"Seu perfil nao possui a permissao necessaria: {permission}."
+    if request.path.startswith("/api/"):
+        return jsonify({"ok": False, "error": message}), 403
+    return message, 403
+
+
+def permission_required(permission):
+    def decorator(view):
+        @wraps(view)
+        def wrapped(*args, **kwargs):
+            try:
+                required_permission = (
+                    permission(*args, **kwargs)
+                    if callable(permission)
+                    else permission
+                )
+            except Exception:
+                app.logger.exception(
+                    "Falha ao resolver a permissao da rota %s",
+                    request.path,
+                )
+                if request.path.startswith("/api/"):
+                    return jsonify({
+                        "ok": False,
+                        "error": "Nao foi possivel validar a autorizacao.",
+                    }), 503
+                return "Nao foi possivel validar a autorizacao.", 503
+            required_permissions = (
+                list(required_permission)
+                if isinstance(required_permission, (list, tuple, set))
+                else [required_permission]
+            )
+            for item in required_permissions:
+                if not can(item):
+                    return _authorization_denied(item)
+            return view(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
+app.jinja_env.globals["can"] = can
+app.jinja_env.globals["can_any"] = can_any
 
 
 def _user_scoped_file(path):
@@ -196,7 +264,25 @@ def require_login_global():
     public_endpoints = {"login", "logout", "healthz", "static"}
     if request.endpoint in public_endpoints:
         return None
-    if current_user():
+    user = current_user()
+    if user:
+        if shared_rbac_enabled():
+            try:
+                fresh_user = supabase_data.revalidate_session_user(user)
+            except Exception:
+                app.logger.exception("Falha ao revalidar a autorizacao compartilhada")
+                if request.path.startswith("/api/"):
+                    return jsonify({"ok": False, "error": "Autorizacao temporariamente indisponivel."}), 503
+                return "Autorizacao temporariamente indisponivel.", 503
+            if not fresh_user:
+                session.clear()
+                if request.path.startswith("/api/"):
+                    return jsonify({
+                        "ok": False,
+                        "error": "Sessao expirada apos alteracao de usuario ou acesso.",
+                    }), 401
+                return redirect(url_for("login", next=request.path))
+            session["suprimentos_user"] = fresh_user
         return None
     return redirect(url_for("login", next=request.full_path if request.query_string else request.path))
 
@@ -753,6 +839,18 @@ def obter_historico_documento(documento_id):
             app.logger.exception("Falha ao consultar documento no Supabase")
     for entry in _carregar_historico_local():
         if str(entry.get("id")) == str(documento_id):
+            return entry
+    return None
+
+
+def obter_historico_por_submit_token(submit_token):
+    token = str(submit_token or "").strip()
+    if not token:
+        return None
+    if supabase_data.enabled():
+        return supabase_data.obter_documento_por_submit_token(token)
+    for entry in _carregar_historico_local():
+        if str(entry.get("submit_token") or "").strip() == token:
             return entry
     return None
 
@@ -3925,6 +4023,12 @@ def login():
             user = supabase_data.verify_user(username, password)
         except Exception:
             app.logger.exception("Falha ao validar login no Supabase")
+            if shared_rbac_enabled():
+                return render_template(
+                    "login.html",
+                    erro="Autorizacao compartilhada temporariamente indisponivel.",
+                    next_url=request.args.get("next") or url_for("index"),
+                ), 503
             user = None
         if user:
             session.clear()
@@ -4042,9 +4146,23 @@ def index():
     )
     oc_prefill = carregar_importacao(_user_scoped_file(OC_IMPORT_FILE))
     os_prefill = carregar_importacao(_user_scoped_file(OS_IMPORT_FILE))
-    tab = request.args.get("tab", "oc")
-    if tab == "cadastro":
-        tab = "oc"
+    requested_tab = str(request.args.get("tab") or "").strip().lower()
+    tab = requested_tab or "oc"
+    tab_permissions = {
+        "oc": "suprimentos.purchase.create",
+        "dashboard": "suprimentos.dashboard.view",
+        "gestao-oc": "suprimentos.purchase.view",
+        "gestao-os": "suprimentos.work_order.view",
+        "os": "suprimentos.work_order.manage",
+        "cadastro": "suprimentos.master_data.manage",
+    }
+    if shared_rbac_enabled() and not can(tab_permissions.get(tab, "suprimentos.dashboard.view")):
+        if requested_tab:
+            return _authorization_denied(tab_permissions.get(tab, "suprimentos.dashboard.view"))
+        for candidate in ("dashboard", "gestao-oc", "gestao-os", "oc", "os", "cadastro"):
+            if can(tab_permissions[candidate]):
+                tab = candidate
+                break
     historico = _enriquecer_historico_integrado(carregar_historico(), tab)
     oc_totais = _agrupar_por_data(historico, "oc", "total_pedido")
     os_quantidades = _agrupar_por_data(historico, "os", None)
@@ -4119,6 +4237,7 @@ def index():
 
 
 @app.route("/api/historico/os/<documento_id>")
+@permission_required("suprimentos.work_order.view")
 def api_historico_os(documento_id):
     documento = obter_historico_documento(documento_id)
     if not documento or documento.get("tipo") != "os":
@@ -4127,6 +4246,7 @@ def api_historico_os(documento_id):
 
 
 @app.route("/api/historico/os/<documento_id>/excluir", methods=["POST"])
+@permission_required("suprimentos.work_order.manage")
 def api_excluir_historico_os(documento_id):
     documento = obter_historico_documento(documento_id)
     if not documento or documento.get("tipo") != "os":
@@ -4140,6 +4260,7 @@ def api_excluir_historico_os(documento_id):
 
 
 @app.route("/api/historico/oc/<documento_id>")
+@permission_required("suprimentos.purchase.view")
 def api_historico_oc(documento_id):
     documento = obter_historico_documento(documento_id)
     if not documento or documento.get("tipo") != "oc":
@@ -4149,6 +4270,7 @@ def api_historico_oc(documento_id):
 
 
 @app.route("/api/historico/oc/<documento_id>/excluir", methods=["POST"])
+@permission_required("suprimentos.purchase.edit")
 def api_excluir_historico_oc(documento_id):
     documento = obter_historico_documento(documento_id)
     if not documento or documento.get("tipo") != "oc":
@@ -4163,7 +4285,37 @@ def api_excluir_historico_oc(documento_id):
     return jsonify({"ok": True})
 
 
+def _historico_status_required_permission(tipo, documento_id):
+    document_type = str(tipo or "").strip().lower()
+    payload = request.get_json(silent=True) or request.form
+    new_status = str(payload.get("status") or "").strip().lower()
+    target_permission = {
+        ("oc", "cancelado"): "suprimentos.purchase.cancel",
+        ("oc", "concluido"): "suprimentos.purchase.technical_close",
+        ("os", "concluido"): "suprimentos.work_order.technical_close",
+    }.get((document_type, new_status))
+    if not target_permission and document_type == "oc":
+        target_permission = "suprimentos.purchase.edit"
+    if not target_permission and document_type == "os":
+        target_permission = "suprimentos.work_order.manage"
+    if not target_permission:
+        return "suprimentos.system.admin"
+
+    permissions = [target_permission]
+    document = obter_historico_documento(documento_id)
+    current_status = str((document or {}).get("status") or "").strip().lower()
+    if current_status != new_status:
+        if document_type == "oc" and current_status == "cancelado":
+            permissions.append("suprimentos.purchase.cancel")
+        if document_type == "oc" and current_status == "concluido":
+            permissions.append("suprimentos.purchase.technical_close")
+        if document_type == "os" and current_status == "concluido":
+            permissions.append("suprimentos.work_order.technical_close")
+    return tuple(dict.fromkeys(permissions))
+
+
 @app.route("/api/historico/<tipo>/<documento_id>/status", methods=["POST"])
+@permission_required(_historico_status_required_permission)
 def api_status_historico(tipo, documento_id):
     tipo = str(tipo or "").strip().lower()
     if tipo not in {"oc", "os"}:
@@ -4892,6 +5044,7 @@ def reconciliar_os_marco_zero(arquivos):
 
 
 @app.route("/reconciliar_os_marco_zero", methods=["POST"])
+@permission_required("suprimentos.work_order.import")
 def reconciliar_os_marco_zero_route():
     try:
         if request.form.get("confirmar_substituicao_os") != "sim":
@@ -4914,6 +5067,7 @@ def reconciliar_os_marco_zero_route():
 
 
 @app.route("/recalcular_os_importadas", methods=["POST"])
+@permission_required("suprimentos.work_order.import")
 def recalcular_os_importadas_route():
     try:
         if request.form.get("confirmar_recalculo_os") != "sim":
@@ -4936,6 +5090,7 @@ def recalcular_os_importadas_route():
 
 
 @app.route("/adicionar_os_ausentes", methods=["POST"])
+@permission_required("suprimentos.work_order.import")
 def adicionar_os_ausentes_route():
     try:
         if request.form.get("confirmar_inclusao_os") != "sim":
@@ -4962,7 +5117,17 @@ def adicionar_os_ausentes_route():
     return redirect(url_for("index", tab="gestao-os", documento_status=status))
 
 
+def _bulk_document_required_permission():
+    tipo = request.form.get("tipo_baixa_documentos", "")
+    return (
+        "suprimentos.purchase.bulk_manage"
+        if str(tipo).strip().lower() == "oc"
+        else "suprimentos.work_order.import"
+    )
+
+
 @app.route("/importar_baixa_documentos", methods=["POST"])
+@permission_required(_bulk_document_required_permission)
 def importar_baixa_documentos_route():
     arquivo = request.files.get("arquivo_baixa_documentos")
     tipo = request.form.get("tipo_baixa_documentos", "")
@@ -5005,25 +5170,50 @@ def healthz():
                 "catalog": supabase_catalog.status(),
                 "error": str(exc),
             }, 500
+    rbac_status = supabase_data.shared_rbac_schema_status()
+    if rbac_status["enabled"] and not rbac_status["ready"]:
+        return {
+            "ok": False,
+            "catalog": supabase_catalog.status(),
+            "data": supabase_data.status(),
+            "shared_rbac": {
+                "enabled": True,
+                "ready": False,
+            },
+        }, 503
     return {
         "ok": True,
         "catalog": supabase_catalog.status(),
         "data": supabase_data.status(),
+        "shared_rbac": {
+            "enabled": rbac_status["enabled"],
+            "ready": rbac_status["ready"],
+        },
         "produtos_count": produtos_count,
     }
 
 
+def _purchase_save_required_permission():
+    historico_id = (request.form.get("oc_historico_id", "") or "").strip()
+    if historico_id:
+        return "suprimentos.purchase.edit"
+    submit_token = (request.form.get("oc_submit_token", "") or "").strip()
+    if submit_token and obter_historico_por_submit_token(submit_token):
+        return "suprimentos.purchase.edit"
+    return "suprimentos.purchase.create"
+
+
 @app.route("/gerar_oc", methods=["POST"])
+@permission_required(_purchase_save_required_permission)
 def gerar_oc():
 
-    atualizar_skus_automatico()
     acao = (request.form.get("acao", "imprimir") or "imprimir").strip().lower()
     historico_id = (request.form.get("oc_historico_id", "") or "").strip()
     submit_token = (request.form.get("oc_submit_token", "") or "").strip()
     historico_existente = obter_historico_documento(historico_id) if historico_id else None
     if historico_id and (not historico_existente or historico_existente.get("tipo") != "oc"):
-        historico_id = ""
-        historico_existente = None
+        return "O.C. indicada para edicao nao foi encontrada.", 404
+    atualizar_skus_automatico()
     fornecedor = request.form.get("fornecedor", "")
     fornecedores = carregar_fornecedores()
     fornecedor_info = fornecedores.get(fornecedor, {})
@@ -5326,6 +5516,7 @@ def _parse_os_composition_form(form):
 
 
 @app.route("/gerar_os", methods=["POST"])
+@permission_required("suprimentos.work_order.manage")
 def gerar_os():
     atualizar_skus_automatico()
     acao = (request.form.get("acao", "imprimir") or "imprimir").strip().lower()
@@ -5736,6 +5927,7 @@ def gerar_os():
 
 
 @app.route("/salvar_caminhos", methods=["POST"])
+@permission_required("suprimentos.system.admin")
 def salvar_caminhos():
     pedidos_dir = request.form.get("pedidos_dir", "")
     os_dir = request.form.get("os_dir", "")
@@ -5750,6 +5942,7 @@ def salvar_caminhos():
 
 
 @app.route("/cadastrar_fornecedor", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_fornecedor():
 
     fornecedores = carregar_fornecedores()
@@ -5781,6 +5974,7 @@ def cadastrar_fornecedor():
 
 
 @app.route("/cadastrar_pessoa", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_pessoa():
     pessoa = {
         "identificador": request.form.get("identificador", "").strip(),
@@ -5838,6 +6032,7 @@ def cadastrar_pessoa():
 
 
 @app.route("/cadastrar_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_item():
 
     produtos = carregar_produtos()
@@ -5860,6 +6055,7 @@ def cadastrar_item():
 
 
 @app.route("/cadastrar_os_fornecedor", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_os_fornecedor():
 
     fornecedores = carregar_os_fornecedores()
@@ -5875,6 +6071,7 @@ def cadastrar_os_fornecedor():
 
 
 @app.route("/cadastrar_os_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_os_item():
 
     produtos = carregar_os_produtos()
@@ -5941,6 +6138,7 @@ def cadastrar_os_item():
 
 
 @app.route("/cadastrar_relacao_processo_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_relacao_processo_item():
     relacoes = carregar_relacoes_processo_item()
     codigo = normalizar_codigo(request.form.get("relacao_item", ""))
@@ -5959,6 +6157,7 @@ def cadastrar_relacao_processo_item():
 
 
 @app.route("/excluir_relacao_processo_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def excluir_relacao_processo_item():
     relacoes = carregar_relacoes_processo_item()
     codigo = normalizar_codigo(request.form.get("relacao_item", ""))
@@ -5969,6 +6168,7 @@ def excluir_relacao_processo_item():
 
 
 @app.route("/cadastrar_regra_popup_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def cadastrar_regra_popup_item():
     regras = carregar_regras_popup_item()
     gatilho = normalizar_codigo(request.form.get("popup_regra_gatilho", ""))
@@ -6005,6 +6205,7 @@ def cadastrar_regra_popup_item():
 
 
 @app.route("/excluir_regra_popup_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def excluir_regra_popup_item():
     regra_id = str(request.form.get("popup_regra_id", "") or "").strip()
     if regra_id:
@@ -6032,6 +6233,7 @@ def _status_importacao_planilha(resultado, nome):
 
 
 @app.route("/importar_regras_popup_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_regras_popup_item_route():
     arquivo = request.files.get("arquivo_regras_popup_item")
     if not arquivo or not arquivo.filename:
@@ -6050,6 +6252,7 @@ def importar_regras_popup_item_route():
 
 
 @app.route("/importar_relacoes_processo_item", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_relacoes_processo_item_route():
     arquivo = request.files.get("arquivo_relacoes_processo_item")
     if not arquivo or not arquivo.filename:
@@ -6068,6 +6271,7 @@ def importar_relacoes_processo_item_route():
 
 
 @app.route("/importar_produtos", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_produtos_route():
 
     arquivo = request.files.get("arquivo_produtos")
@@ -6078,6 +6282,7 @@ def importar_produtos_route():
 
 
 @app.route("/importar_fornecedores", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_fornecedores_route():
 
     arquivo = request.files.get("arquivo_fornecedores")
@@ -6088,6 +6293,7 @@ def importar_fornecedores_route():
 
 
 @app.route("/importar_pessoas", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_pessoas_route():
     arquivo = request.files.get("arquivo_pessoas")
     status = ""
@@ -6102,6 +6308,7 @@ def importar_pessoas_route():
 
 
 @app.route("/importar_os_produtos", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_os_produtos_route():
 
     arquivo = request.files.get("arquivo_os_produtos")
@@ -6112,6 +6319,7 @@ def importar_os_produtos_route():
 
 
 @app.route("/importar_os_fornecedores", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_os_fornecedores_route():
 
     arquivo = request.files.get("arquivo_os_fornecedores")
@@ -6122,6 +6330,7 @@ def importar_os_fornecedores_route():
 
 
 @app.route("/importar_os_componentes", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def importar_os_componentes_route():
     if supabase_data.enabled():
         status = "B.O.M. deve ser importada no ModuloCadastro; o suprimentos apenas consome a base Supabase."
@@ -6135,6 +6344,7 @@ def importar_os_componentes_route():
 
 
 @app.route("/atualizar_bom", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def atualizar_bom():
     if supabase_data.enabled():
         status = "B.O.M. lida diretamente do Supabase pelo ModuloCadastro."
@@ -6180,6 +6390,7 @@ def atualizar_bom():
 
 
 @app.route("/atualizar_skus", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def atualizar_skus():
     if supabase_catalog.enabled():
         try:
@@ -6203,6 +6414,7 @@ def atualizar_skus():
 
 
 @app.route("/atualizar_processos", methods=["POST"])
+@permission_required("suprimentos.master_data.manage")
 def atualizar_processos():
     tab_destino = (request.form.get("next_tab", "") or "").strip() or "cadastro"
     if supabase_data.enabled():
@@ -6268,6 +6480,7 @@ def atualizar_processos():
 
 
 @app.route("/importar_os_processos", methods=["POST"])
+@permission_required("suprimentos.work_order.import")
 def importar_os_processos_route():
 
     tab_destino = (request.form.get("next_tab", "") or "").strip() or "os"
@@ -6288,6 +6501,7 @@ def importar_os_processos_route():
 
 
 @app.route("/importar_oc_documento", methods=["POST"])
+@permission_required("suprimentos.purchase.create")
 def importar_oc_documento():
     arquivo = request.files.get("arquivo_oc_template")
     if arquivo and arquivo.filename:
@@ -6309,6 +6523,7 @@ def importar_oc_documento():
 
 
 @app.route("/importar_os_documento", methods=["POST"])
+@permission_required("suprimentos.work_order.manage")
 def importar_os_documento():
     arquivo = request.files.get("arquivo_os_template")
     if arquivo and arquivo.filename:
@@ -6335,6 +6550,7 @@ def importar_os_documento():
 
 
 @app.route("/exportar_modelo_produtos")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_produtos():
     path, nome = _criar_modelo_xlsx(
         MODELO_ITENS_HEADERS,
@@ -6345,6 +6561,7 @@ def exportar_modelo_produtos():
 
 
 @app.route("/exportar_modelo_fornecedores")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_fornecedores():
     path, nome = _criar_modelo_xlsx(
         ["fornecedor", "razao_social", "cnpj", "email", "telefone", "endereco", "bairro", "cidade", "uf", "cep"],
@@ -6354,12 +6571,14 @@ def exportar_modelo_fornecedores():
 
 
 @app.route("/exportar_modelo_os_clientes")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_os_clientes():
     path, nome = _criar_modelo_xlsx(["cliente"], "modelo_os_clientes.xlsx")
     return send_file(path, as_attachment=True, download_name=nome)
 
 
 @app.route("/exportar_modelo_os_itens")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_os_itens():
     path, nome = _criar_modelo_xlsx(
         MODELO_ITENS_HEADERS,
@@ -6370,6 +6589,7 @@ def exportar_modelo_os_itens():
 
 
 @app.route("/exportar_modelo_os_componentes")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_os_componentes():
     path, nome = _criar_modelo_xlsx(
         ["item_codigo", "componente_codigo", "descricao", "unidade", "quantidade"],
@@ -6379,18 +6599,21 @@ def exportar_modelo_os_componentes():
 
 
 @app.route("/exportar_modelo_os_processos")
+@permission_required("suprimentos.work_order.import")
 def exportar_modelo_os_processos():
     path, nome = _criar_modelo_os_processos_xlsx()
     return send_file(path, as_attachment=True, download_name=nome)
 
 
 @app.route("/exportar_modelo_regras_popup_item")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_regras_popup_item():
     path, nome = _criar_planilha_regras_popup_item()
     return send_file(path, as_attachment=True, download_name=nome)
 
 
 @app.route("/exportar_regras_popup_item")
+@permission_required("suprimentos.master_data.manage")
 def exportar_regras_popup_item():
     path, nome = _criar_planilha_regras_popup_item(
         carregar_regras_popup_item(),
@@ -6400,12 +6623,14 @@ def exportar_regras_popup_item():
 
 
 @app.route("/exportar_modelo_relacoes_processo_item")
+@permission_required("suprimentos.master_data.manage")
 def exportar_modelo_relacoes_processo_item():
     path, nome = _criar_planilha_relacoes_processo_item()
     return send_file(path, as_attachment=True, download_name=nome)
 
 
 @app.route("/exportar_relacoes_processo_item")
+@permission_required("suprimentos.master_data.manage")
 def exportar_relacoes_processo_item():
     path, nome = _criar_planilha_relacoes_processo_item(
         carregar_relacoes_processo_item(),
@@ -6415,6 +6640,7 @@ def exportar_relacoes_processo_item():
 
 
 @app.route("/gerar_zip_release", methods=["POST"])
+@permission_required("suprimentos.system.admin")
 def gerar_zip_release():
     ok, err = _run_release_build()
     if not ok:
@@ -6436,6 +6662,7 @@ def gerar_zip_release():
 
 
 @app.route("/resetar_base", methods=["POST"])
+@permission_required("suprimentos.system.admin")
 def resetar_base():
     return "Reset da base de dados desativado.", 403
 
@@ -6445,6 +6672,14 @@ def exportar_dashboard():
     tipo_filtro = (request.args.get("tipo", "") or "").strip().lower()
     if tipo_filtro not in {"", "oc", "os"}:
         return "Tipo de relatorio invalido.", 400
+    required_permissions = []
+    if tipo_filtro in {"", "oc"}:
+        required_permissions.append("suprimentos.purchase.export")
+    if tipo_filtro in {"", "os"}:
+        required_permissions.append("suprimentos.work_order.view")
+    for permission in required_permissions:
+        if not can(permission):
+            return _authorization_denied(permission)
     historico = [
         entry for entry in carregar_historico()
         if not tipo_filtro or entry.get("tipo") == tipo_filtro
@@ -6629,7 +6864,12 @@ def _erp_stock_request(path, method="GET", payload=None):
     body = json.dumps(payload).encode("utf-8") if payload is not None else None
     req = urllib.request.Request(
         f"{base}/api/erp/internal/{path.lstrip('/')}", data=body, method=method,
-        headers={"Content-Type": "application/json", "X-ERP-Backend-Token": token, "X-ERP-Actor": current_username()},
+        headers={
+            "Content-Type": "application/json",
+            "X-ERP-Backend-Token": token,
+            "X-ERP-Actor": current_username(),
+            "X-ERP-Actor-ID": current_user_id(),
+        },
     )
     try:
         with urllib.request.urlopen(req, timeout=25) as response:
@@ -6650,6 +6890,7 @@ def _erp_stock_binary_request(path):
         headers={
             "X-ERP-Backend-Token": token,
             "X-ERP-Actor": current_username(),
+            "X-ERP-Actor-ID": current_user_id(),
         },
     )
     try:
@@ -6680,6 +6921,7 @@ def _erp_mes_request(path, method="GET", payload=None):
             "Content-Type": "application/json",
             "X-ERP-Backend-Token": token,
             "X-ERP-Actor": current_username(),
+            "X-ERP-Actor-ID": current_user_id(),
         },
     )
     try:
@@ -6834,14 +7076,25 @@ def _close_emitted_legacy_oc_in_erp(historico, motivo):
 @app.route("/erp/ordens-compra")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.view")
 def erp_purchase_orders_screen():
     """Operational monitoring; O.C. creation remains in the complete legacy form."""
-    return render_template("erp_ordens_compra.html")
+    stock_public_url = (
+        os.environ.get("ERP_STOCK_PUBLIC_URL")
+        or os.environ.get("ERP_STOCK_API_URL")
+        or "http://127.0.0.1:5000"
+    ).rstrip("/")
+    return render_template(
+        "erp_ordens_compra.html",
+        current_user=current_user(),
+        stock_public_url=stock_public_url,
+    )
 
 
 @app.route("/erp/relatorios/compras-inspecao.xlsx")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.export")
 def erp_purchase_inspection_report():
     try:
         content = _erp_stock_binary_request("reports/purchases-inspections.xlsx")
@@ -6858,6 +7111,7 @@ def erp_purchase_inspection_report():
 @app.route("/api/erp/purchase-orders", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.create")
 def erp_purchase_order_proxy():
     try:
         result = _erp_stock_request("purchase-orders", "POST", request.get_json(silent=True) or {})
@@ -6869,6 +7123,7 @@ def erp_purchase_order_proxy():
 @app.route("/api/erp/receipts/pending")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.view")
 def erp_pending_receipts_proxy():
     try: return jsonify(_erp_stock_request("receipts/pending"))
     except ValueError as exc: return jsonify({"ok": False, "error": str(exc)}), 400
@@ -6877,6 +7132,7 @@ def erp_pending_receipts_proxy():
 @app.route("/api/erp/dashboard")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.view")
 def erp_dashboard_proxy():
     try: return jsonify(_erp_stock_request("dashboard"))
     except ValueError as exc: return jsonify({"ok": False, "error": str(exc)}), 400
@@ -6885,6 +7141,7 @@ def erp_dashboard_proxy():
 @app.route("/api/erp/purchase-orders/<order_id>/technical-close", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.technical_close")
 def erp_purchase_order_technical_close_proxy(order_id):
     try:
         return jsonify(_erp_stock_request(
@@ -6899,6 +7156,7 @@ def erp_purchase_order_technical_close_proxy(order_id):
 @app.route("/api/erp/purchase-orders/<order_id>/financial-close", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.financial_close")
 def erp_purchase_order_financial_close_proxy(order_id):
     try:
         return jsonify(_erp_stock_request(
@@ -6913,6 +7171,7 @@ def erp_purchase_order_financial_close_proxy(order_id):
 @app.route("/api/erp/purchase-orders/<order_id>/financial-detail")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.purchase.view")
 def erp_purchase_order_financial_detail_proxy(order_id):
     try:
         return jsonify(_erp_stock_request(
@@ -6926,15 +7185,18 @@ def erp_purchase_order_financial_detail_proxy(order_id):
 @app.route("/erp/gestao-os")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.view")
 def erp_work_order_management_screen():
     return render_template(
         "erp_gestao_os.html",
         mes_url=os.environ.get("ERP_MES_PUBLIC_URL") or os.environ.get("ERP_MES_API_URL", "http://127.0.0.1:8010"),
+        current_user=current_user(),
     )
 
 @app.route("/api/erp/os-management")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.view")
 def erp_work_order_management_list():
     try:
         return jsonify(_erp_mes_request("work-orders"))
@@ -6944,6 +7206,7 @@ def erp_work_order_management_list():
 @app.route("/api/erp/os-management/catalogs")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.view")
 def erp_work_order_catalogs():
     try:
         return jsonify(_erp_mes_request("catalogs"))
@@ -6953,15 +7216,28 @@ def erp_work_order_catalogs():
 @app.route("/api/erp/os-management/<work_id>")
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.view")
 def erp_work_order_management_detail(work_id):
     try:
         return jsonify(_erp_mes_request(f"work-orders/{work_id}"))
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
+
+@app.route("/api/erp/os-management/work-orders/<work_id>/materials")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_work_order_materials_proxy(work_id):
+    try:
+        return jsonify(_erp_stock_request(f"work-orders/{work_id}/materials"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
 @app.route("/api/erp/os-management/entries", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.manage")
 def erp_vehicle_entry_proxy():
     try:
         return jsonify(_erp_mes_request("vehicle-entries", "POST", request.get_json(silent=True) or {})), 201
@@ -6971,6 +7247,7 @@ def erp_vehicle_entry_proxy():
 @app.route("/api/erp/os-management/entries/<entry_id>/work-orders", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.manage")
 def erp_work_order_create_proxy(entry_id):
     try:
         return jsonify(_erp_mes_request(
@@ -6982,6 +7259,7 @@ def erp_work_order_create_proxy(entry_id):
 @app.route("/api/erp/os-management/work-orders/<work_id>", methods=["PUT"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.manage")
 def erp_work_order_update_proxy(work_id):
     try:
         return jsonify(_erp_mes_request(
@@ -6993,6 +7271,7 @@ def erp_work_order_update_proxy(work_id):
 @app.route("/api/erp/os-management/work-orders/<work_id>/activate", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.manage")
 def erp_work_order_activate_proxy(work_id):
     try:
         return jsonify(_erp_mes_request(f"work-orders/{work_id}/activate", "POST", {}))
@@ -7002,6 +7281,7 @@ def erp_work_order_activate_proxy(work_id):
 @app.route("/api/erp/os-management/work-orders/<work_id>/technical-close", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.technical_close")
 def erp_work_order_technical_close_proxy(work_id):
     try:
         return jsonify(_erp_mes_request(
@@ -7016,6 +7296,7 @@ def erp_work_order_technical_close_proxy(work_id):
 @app.route("/api/erp/os-management/work-orders/<work_id>/technical-reopen", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.technical_close")
 def erp_work_order_technical_reopen_proxy(work_id):
     try:
         return jsonify(_erp_mes_request(
@@ -7030,6 +7311,7 @@ def erp_work_order_technical_reopen_proxy(work_id):
 @app.route("/api/erp/os-management/work-orders/<work_id>/schedules", methods=["POST"])
 @login_required
 @erp_feature_required
+@permission_required("suprimentos.work_order.schedule")
 def erp_work_order_schedule_proxy(work_id):
     try:
         return jsonify(_erp_mes_request(
