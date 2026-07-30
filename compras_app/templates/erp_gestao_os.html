@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ERP | Gestão de O.S.</title>
+  <style>
+    :root{--navy:#123d6a;--blue:#1769aa;--line:#dce4ed;--muted:#64748b;--bg:#f3f6f9;--green:#16837a;--red:#b42318;--amber:#a15c00}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172033;font:13px Arial,sans-serif}
+    main{max-width:1580px;margin:auto;padding:18px 22px 32px}.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:13px}
+    h1{margin:0;font-size:23px}h2{margin:0 0 10px}.head p{margin:4px 0;color:var(--muted)}.actions{display:flex;gap:7px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:35px;padding:7px 12px;border:1px solid #aebbc7;border-radius:5px;background:#fff;color:#172033;font-weight:800;text-decoration:none;cursor:pointer}
+    .btn.primary{background:var(--blue);border-color:#0f568f;color:#fff}.btn.success{background:var(--green);border-color:#0d6963;color:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}
+    .metrics{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:8px;margin-bottom:11px}.metric{padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:#fff}
+    .metric span{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}.metric strong{display:block;margin-top:4px;font-size:21px}
+    .panel{border:1px solid var(--line);border-radius:7px;background:#fff;overflow:hidden}.toolbar{display:flex;align-items:end;gap:8px;padding:10px 12px;background:#f8fafc;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    label{display:flex;flex-direction:column;gap:3px;color:#526174;font-size:11px;font-weight:750}label.required>span::after{content:" *";color:var(--red)}
+    input,select,textarea{width:100%;min-height:34px;padding:6px 8px;border:1px solid #cbd5e1;border-radius:5px;background:#fff;font:inherit}
+    input.missing,select.missing,textarea.missing{border:2px solid var(--red);background:#fff7f7;box-shadow:0 0 0 2px #fee2e2}
+    .search{min-width:320px;flex:1}.table-wrap{max-height:650px;overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px}th{position:sticky;top:0;background:#eef3f8;color:#475569;text-transform:uppercase;font-size:10px;letter-spacing:.03em}
+    th,td{padding:8px 9px;border-bottom:1px solid #e8edf3;text-align:left;vertical-align:middle}tbody tr:hover{background:#f8fbfd}.muted{color:var(--muted)}
+    .badge{display:inline-flex;padding:3px 7px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:850}.badge.RASCUNHO,.badge.AGUARDANDO_O_S{background:#f1f5f9;color:#475569}.badge.ATIVA,.badge.EM_PRODUÇÃO{background:#dcfce7;color:#166534}.badge.FINALIZADA,.badge.ENTREGUE,.badge.RETIRADA{background:#ede9fe;color:#6d28d9}
+    .available{display:inline-flex;margin-top:3px;padding:2px 6px;border-radius:4px;background:#fff7ed;color:#9a3412;font-size:10px;font-weight:850}.progress{width:90px;height:6px;border-radius:999px;background:#e2e8f0;overflow:hidden}.progress span{display:block;height:100%;background:var(--green)}
+    .message{margin:0 0 10px;padding:9px 11px;border-radius:5px;background:#eaf7f3;color:#075d57}.message.error{background:#fff0f0;color:var(--red)}
+    dialog{width:min(1120px,97vw);max-height:96vh;border:0;border-radius:9px;padding:0;box-shadow:0 24px 80px #0f172a55}dialog::backdrop{background:#0f172a99}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:var(--navy);color:#fff}.modal-head h2{margin:0;font-size:17px}.modal-body{padding:14px;overflow:auto;max-height:calc(96vh - 122px)}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.grid .span2{grid-column:span 2}.grid .span4{grid-column:1/-1}
+    .required-summary{margin:0 0 12px;padding:9px 11px;border:1px solid #fed7aa;border-radius:6px;background:#fff7ed;color:#7c2d12;font-weight:750}.required-summary.complete{border-color:#a7f3d0;background:#ecfdf5;color:#065f46}
+    .section-title{grid-column:1/-1;margin:5px 0 -1px;padding-bottom:5px;border-bottom:1px solid var(--line);font-size:12px;color:var(--navy)}
+    .modal-foot{display:flex;justify-content:space-between;gap:8px;padding:10px 14px;border-top:1px solid var(--line);background:#f8fafc}.empty{padding:32px;text-align:center;color:var(--muted)}
+    @media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.head{flex-direction:column}.grid{grid-template-columns:repeat(2,1fr)}.table-wrap{max-height:none}}
+  </style>
+</head>
+<body>
+<main>
+  <header class="head">
+    <div><h1>Gestão de O.S.</h1><p>Selecione uma entrada do MES, complete a O.S. e encaminhe as etapas para parametrização produtiva.</p></div>
+    <div class="actions">
+      <a class="btn" href="/?tab=gestao-os">Documentos de O.S.</a>
+      <a class="btn" href="/">Dashboard</a>
+      <a class="btn success" href="{{ mes_url }}/?visao=geral" target="_blank">Abrir painel MES</a>
+      <a class="btn primary" href="{{ mes_url }}/gestao-os?new_entry=1" target="_blank">+ Entrada de veículo no MES</a>
+    </div>
+  </header>
+  <div id="message" class="message" hidden></div>
+  <section class="metrics">
+    <div class="metric"><span>Chassis disponíveis</span><strong id="m-waiting">—</strong></div>
+    <div class="metric"><span>Ag. parametrização</span><strong id="m-draft">—</strong></div>
+    <div class="metric"><span>Ativas / produção</span><strong id="m-active">—</strong></div>
+    <div class="metric"><span>Finalizadas / entregues</span><strong id="m-done">—</strong></div>
+    <div class="metric"><span>Total de entradas</span><strong id="m-total">—</strong></div>
+  </section>
+  <section class="panel">
+    <div class="toolbar">
+      <label class="search">Buscar chassis e O.S.<input id="search" type="search" placeholder="ITEM, O.S., chassi, cliente, proposta ou transformação" oninput="render()"></label>
+      <label>Visão<select id="view-filter" onchange="render()"><option value="ACTION">Pendentes e rascunhos</option><option value="AVAILABLE">Somente chassis disponíveis</option><option value="ACTIVE">Ativas / produção</option><option value="DONE">Finalizadas / entregues</option><option value="ALL">Todas</option></select></label>
+      <button class="btn" type="button" onclick="clearFilters()">Limpar</button><button class="btn" type="button" onclick="loadOrders()">Atualizar</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>ITEM / O.S.</th><th>Chassi disponível</th><th>Cliente</th><th>Entrada</th><th>Serviço</th><th>Linha / transformação</th><th>Data de entrega</th><th>Etapas</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+      <div id="empty" class="empty" hidden>Nenhuma entrada ou O.S. encontrada nesta visão.</div>
+    </div>
+  </section>
+</main>
+
+<dialog id="work-dialog">
+  <form id="work-form" novalidate>
+    <input name="entry_id" type="hidden"><input name="work_order_id" type="hidden"><input name="transformacao_codigo" type="hidden"><input name="transformacao" type="hidden">
+    <header class="modal-head"><div><h2 id="work-title">Abrir O.S.</h2><small id="work-subtitle"></small></div><button class="btn" type="button" onclick="workDialog.close()">Fechar</button></header>
+    <div class="modal-body">
+      <div id="required-summary" class="required-summary">Preencha os campos obrigatórios destacados para ativar a O.S.</div>
+      <div class="grid">
+        <div class="section-title"><strong>Dados comerciais e do cliente</strong></div>
+        <label class="required"><span>Tipo de serviço</span><select name="tipo_servico" data-required><option value="TRANSFORMAÇÃO">TRANSFORMAÇÃO</option><option value="PÓS-VENDA">PÓS-VENDA</option><option value="INSTALAÇÃO_DE_ACESSÓRIO">INSTALAÇÃO DE ACESSÓRIO</option><option value="RETORNO">RETORNO</option><option value="OUTRO">OUTRO</option></select></label>
+        <label class="required"><span>Proposta</span><input name="proposta_numero" data-required></label>
+        <label class="required"><span>Data de aprovação</span><input name="data_aprovacao" type="date" data-required></label>
+        <label class="required"><span>Vendedor</span><select name="vendedor" data-required></select></label>
+        <label class="required"><span>Mercado</span><select name="mercado" data-required></select></label>
+        <label class="span2 required"><span>Cliente</span><input name="cliente_nome" data-required></label>
+        <label class="required"><span>Município</span><input name="municipio" data-required></label>
+        <label class="required"><span>UF</span><input name="uf" maxlength="2" data-required></label>
+
+        <div class="section-title"><strong>Configuração do veículo e transformação</strong></div>
+        <label class="required"><span>Tipo de veículo</span><select name="tipo_veiculo" data-required></select></label>
+        <label class="required"><span>Linha</span><select name="linha" data-required></select></label>
+        <label class="span2 required"><span>Transformação</span><select id="transformation-select" data-required></select></label>
+        <label>Código do banco<input name="codigo_banco"></label><label>Conjunto de bancos<input name="conjunto_bancos"></label><label>Acessibilidade<input name="acessibilidade"></label><label>Lotação<input name="lotacao"></label>
+
+        <div class="section-title"><strong>Climatização e complementos</strong></div>
+        <label id="air-provider-label"><span>Fornecedor do ar</span><select name="ar_condicionado"></select></label>
+        <label class="span2 required"><span>Tipo de sistema de ar</span><select name="tipo_sistema_ar" data-required></select></label>
+        <label class="required"><span>Ar quente?</span><select name="ar_quente" data-required></select></label>
+        <label class="span2">Acessório<input name="acessorio"></label><label class="span2">Plotagem<input name="plotagem"></label>
+
+        <div class="section-title"><strong>Programação inicial</strong></div>
+        <label class="span2 required"><span>Data inicial de entrega</span><input name="data_comercial_prevista" type="date" data-required></label>
+        <div class="span2 muted">Esta é a primeira data acordada. Alterações futuras, após a ativação, serão registradas no MES como reprogramações.</div>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <div class="actions">
+        <button id="activate-button" class="btn success" type="button" onclick="openMesConfiguration()" hidden>Salvar e parametrizar no MES</button>
+        <button id="technical-close-button" class="btn" type="button" onclick="technicalClose()" hidden>Conclusão técnica</button>
+      </div>
+      <button id="save-work" class="btn primary" type="submit">Salvar O.S. rascunho</button>
+    </footer>
+  </form>
+</dialog>
+
+<script>
+const state={orders:[],filtered:[],active:null,catalogs:{},required:[]};
+const mesBase={{ mes_url|tojson }};
+const workDialog=document.getElementById('work-dialog'),form=document.getElementById('work-form');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+const onlyDate=v=>v?String(v).slice(0,10):'';
+const date=v=>{if(!v)return '—';const d=new Date(`${onlyDate(v)}T12:00:00`);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('pt-BR')};
+function message(text,error=false){const box=document.getElementById('message');box.hidden=!text;box.className='message'+(error?' error':'');box.textContent=text||''}
+async function api(url,options={}){const response=await fetch(url,{headers:{'Content-Type':'application/json'},...options});let body={};try{body=await response.json()}catch{}if(!response.ok||body.ok===false)throw new Error(body.error||`Falha na operação (${response.status}).`);return body}
+function selectOptions(name,values,placeholder='Selecione...'){const el=form.elements[name];el.innerHTML=`<option value="">${placeholder}</option>`+(values||[]).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}
+function loadCatalogFields(){
+  selectOptions('vendedor',state.catalogs.vendedores);selectOptions('mercado',state.catalogs.mercados);
+  selectOptions('tipo_veiculo',state.catalogs.tipos_veiculo);selectOptions('linha',state.catalogs.linhas);
+  selectOptions('ar_condicionado',state.catalogs.ar_fornecedores);selectOptions('tipo_sistema_ar',state.catalogs.ar_tipos);
+  selectOptions('ar_quente',state.catalogs.sim_nao);
+  const transformations=state.catalogs.transformacoes||[],el=document.getElementById('transformation-select');
+  el.innerHTML='<option value="">Selecione código e transformação...</option>'+transformations.map(x=>`<option value="${esc(x.codigo)}">${esc(x.codigo)} — ${esc(x.descricao)}</option>`).join('');
+}
+function statusOf(row){if(row.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(row.status)&&row.stage_configuration_status==='PENDENTE')return 'AG. PARAMETRIZAÇÃO';return row.status||row.entry_status||'AGUARDANDO_O_S'}
+function metrics(){const rows=state.orders;document.getElementById('m-total').textContent=rows.length;document.getElementById('m-waiting').textContent=rows.filter(x=>!x.work_order_id).length;document.getElementById('m-draft').textContent=rows.filter(x=>x.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(x.status)&&x.stage_configuration_status==='PENDENTE').length;document.getElementById('m-active').textContent=rows.filter(x=>['ATIVA','EM_PRODUÇÃO'].includes(x.status)).length;document.getElementById('m-done').textContent=rows.filter(x=>['FINALIZADA','ENTREGUE','RETIRADA'].includes(x.status)).length}
+function matchesView(row,view){const status=row.status||row.entry_status;if(view==='ALL')return true;if(view==='AVAILABLE')return !row.work_order_id;if(view==='ACTION')return !row.work_order_id||['RASCUNHO','AGUARDANDO_O_S'].includes(status);if(view==='ACTIVE')return ['ATIVA','EM_PRODUÇÃO'].includes(status);return ['FINALIZADA','ENTREGUE','RETIRADA','ARQUIVADA'].includes(status)}
+function render(){
+  const query=norm(document.getElementById('search').value),view=document.getElementById('view-filter').value;
+  state.filtered=state.orders.filter(row=>matchesView(row,view)&&(!query||norm([row.item_number,row.numero_os,row.chassi,row.entry_client,row.cliente_nome,row.proposta_numero,row.linha,row.transformacao].join(' ')).includes(query)));
+  document.getElementById('empty').hidden=state.filtered.length>0;
+  document.getElementById('rows').innerHTML=state.filtered.map(row=>{const total=Number(row.etapas_aplicaveis||0),done=Number(row.etapas_concluidas||0),pct=total?Math.round(done*100/total):0,status=statusOf(row);
+    return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. ${esc(row.numero_os||'não aberta')}</span></td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id?'<br><span class="available">DISPONÍVEL PARA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td><button class="btn ${!row.work_order_id?'primary':''}" type="button" onclick="openWork('${row.entry_id}')">${row.work_order_id?'Abrir':'Alocar e abrir O.S.'}</button></td></tr>`}).join('');
+}
+async function loadOrders(){try{message('Atualizando entradas e O.S...');const [orders,catalogs]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.required=catalogs.required_work_order_fields||[];loadCatalogFields();metrics();render();message('')}catch(error){message(error.message,true)}}
+function clearFilters(){document.getElementById('search').value='';document.getElementById('view-filter').value='ACTION';render()}
+function fill(name,value){const input=form.elements[name];if(!input)return;const normalized=value??'';if(input.tagName==='SELECT'&&normalized&&![...input.options].some(option=>option.value===String(normalized)))input.add(new Option(`${normalized} (legado)`,normalized));input.value=normalized}
+function transformationDescription(code){return (state.catalogs.transformacoes||[]).find(x=>x.codigo===code)?.descricao||''}
+function checkMissing(){
+  const missing=[];form.querySelectorAll('[data-required]').forEach(el=>{const value=String(el.value||'').trim();el.classList.toggle('missing',!value);if(!value)missing.push(el.closest('label')?.querySelector('span')?.textContent||el.name||'campo')});
+  const airType=form.elements.tipo_sistema_ar.value,provider=form.elements.ar_condicionado,providerRequired=!['NÃO','AR ORIGINAL','AG'].includes(airType),providerLabel=document.getElementById('air-provider-label');
+  providerLabel.classList.toggle('required',providerRequired);provider.classList.toggle('missing',providerRequired&&!provider.value);if(providerRequired&&!provider.value)missing.push('Fornecedor do ar');
+  const box=document.getElementById('required-summary');box.classList.toggle('complete',missing.length===0);box.textContent=missing.length?`${missing.length} campo(s) obrigatório(s) pendente(s): ${missing.join(', ')}. O rascunho pode ser salvo, mas o MES não permitirá ativá-lo.`:'Todos os campos obrigatórios foram preenchidos. Falta parametrizar as etapas no MES.';
+  return missing;
+}
+form.addEventListener('input',checkMissing);form.elements.tipo_sistema_ar.addEventListener('change',()=>{if(['NÃO','AR ORIGINAL','AG'].includes(form.elements.tipo_sistema_ar.value))form.elements.ar_condicionado.value='';checkMissing()});
+function openWork(entryId){
+  const row=state.orders.find(item=>item.entry_id===entryId);if(!row)return;state.active=row;form.reset();loadCatalogFields();
+  fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
+  ['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','cliente_nome','municipio','uf','tipo_veiculo','linha','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'].forEach(name=>fill(name,name.startsWith('data_')?onlyDate(row[name]):row[name]));
+  if(!row.work_order_id){fill('cliente_nome',row.entry_client);fill('tipo_servico','TRANSFORMAÇÃO')}
+  let code=row.transformacao_codigo||'';if(!code&&row.transformacao)code=(state.catalogs.transformacoes||[]).find(x=>norm(x.descricao)===norm(row.transformacao))?.codigo||'';
+  const transformationSelect=document.getElementById('transformation-select');if(!code&&row.transformacao){transformationSelect.add(new Option(`${row.transformacao} (legado)`,'__LEGACY__'));transformationSelect.value='__LEGACY__'}else transformationSelect.value=code;fill('transformacao_codigo',code);fill('transformacao',row.transformacao||transformationDescription(code));
+  document.getElementById('work-title').textContent=row.work_order_id?`O.S. ${row.numero_os}`:`Abrir O.S. do ITEM ${row.item_number}`;
+  document.getElementById('work-subtitle').textContent=`${row.chassi} · ${[row.marca,row.modelo,row.versao].filter(Boolean).join(' ')} · ${row.entry_client||'Cliente não informado'}`;
+  const editable=!row.status||['RASCUNHO','AGUARDANDO_O_S','ATIVA','EM_PRODUÇÃO'].includes(row.status),active=['ATIVA','EM_PRODUÇÃO'].includes(row.status);[...form.elements].forEach(el=>{if(!['button','hidden'].includes(el.type))el.disabled=!editable});
+  form.elements.data_comercial_prevista.disabled=!editable||active;
+  const saveButton=document.getElementById('save-work');saveButton.hidden=!editable;saveButton.textContent=active?'Salvar alterações':'Salvar O.S. rascunho';
+  document.getElementById('activate-button').hidden=!(row.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(row.status));
+  const technicalButton=document.getElementById('technical-close-button');technicalButton.hidden=!row.work_order_id;technicalButton.disabled=row.technical_status==='CONCLUIDA'||row.status==='CANCELADA';technicalButton.textContent=row.technical_status==='CONCLUIDA'?'Técnica concluída':'Conclusão técnica';
+  checkMissing();if(!workDialog.open)workDialog.showModal();
+}
+document.getElementById('transformation-select').addEventListener('change',event=>{if(event.target.value!=='__LEGACY__'){fill('transformacao_codigo',event.target.value);fill('transformacao',transformationDescription(event.target.value))}checkMissing()});
+function workPayload(){const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;delete data.work_order_id;const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
+async function saveWork(silent=false){const entryId=form.elements.entry_id.value,workId=form.elements.work_order_id.value,payload=workPayload(),wasActive=['ATIVA','EM_PRODUÇÃO'].includes(state.active?.status);const result=workId?await api(`/api/erp/os-management/work-orders/${workId}`,{method:'PUT',body:JSON.stringify(payload)}):await api(`/api/erp/os-management/entries/${entryId}/work-orders`,{method:'POST',body:JSON.stringify(payload)});await loadOrders();const row=state.orders.find(item=>item.entry_id===entryId);if(row)openWork(entryId);if(!silent)message(wasActive?`Alterações da O.S. ${result.numero_os||row?.numero_os||''} salvas e refletidas no MES.`:`O.S. ${result.numero_os||row?.numero_os||''} salva. Ela já aparece no MES como AG. PARAMETRIZAÇÃO.`);return result.id||workId}
+form.onsubmit=async event=>{event.preventDefault();try{await saveWork()}catch(error){message(error.message,true)}};
+async function openMesConfiguration(){const missing=checkMissing();if(missing.length){message(`Preencha antes de parametrizar: ${missing.join(', ')}.`,true);form.querySelector('.missing')?.focus();return}const popup=window.open('about:blank','_blank');try{const workId=await saveWork(true);const target=`${mesBase.replace(/\/$/,'')}/gestao-os?work_order_id=${encodeURIComponent(workId)}`;if(popup)popup.location.href=target;else location.href=target;workDialog.close();message('O.S. salva. Defina as etapas no MES e conclua a ativação.')}catch(error){if(popup)popup.close();message(error.message,true)}}
+async function technicalClose(){const workId=form.elements.work_order_id.value;if(!workId||!confirm('Concluir tecnicamente esta O.S.? Isso não finaliza a produção e não movimenta estoque.'))return;try{await api(`/api/erp/os-management/work-orders/${workId}/technical-close`,{method:'POST',body:JSON.stringify({motivo:'Conclusão técnica registrada na Gestão de O.S. em Suprimentos.'})});await loadOrders();const row=state.orders.find(item=>item.work_order_id===workId);if(row)openWork(row.entry_id);message('Conclusão técnica registrada. O relatório do MES exibirá ARQUIVADO = SIM.')}catch(error){message(error.message,true)}}
+loadOrders();
+</script>
+</body>
+</html>

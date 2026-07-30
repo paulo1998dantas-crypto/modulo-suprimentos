@@ -473,6 +473,8 @@ def normalizar_documento(documento):
             "submit_token",
             "criado_por",
             "atualizado_por",
+            "erp_purchase_order_id",
+            "erp_work_order_id",
         )
         if key in source
     }
@@ -483,6 +485,8 @@ def normalizar_documento(documento):
     row["submit_token"] = _clean(row.get("submit_token")) or None
     row["criado_por"] = _clean(row.get("criado_por"))
     row["atualizado_por"] = _clean(row.get("atualizado_por"))
+    row["erp_purchase_order_id"] = _clean(row.get("erp_purchase_order_id")) or None
+    row["erp_work_order_id"] = _clean(row.get("erp_work_order_id")) or None
     for key in ("dados", "itens", "processos", "componentes", "composicao"):
         value = row.get(key)
         if value is None:
@@ -516,6 +520,8 @@ def documento_to_legacy(row):
         "submit_token": _clean(row.get("submit_token")),
         "criado_por": _clean(row.get("criado_por")),
         "atualizado_por": _clean(row.get("atualizado_por")),
+        "erp_purchase_order_id": _clean(row.get("erp_purchase_order_id")),
+        "erp_work_order_id": _clean(row.get("erp_work_order_id")),
         "updated_at": _clean(row.get("updated_at")),
         "dados": row.get("dados") or {},
         "itens": row.get("itens") or [],
@@ -579,7 +585,7 @@ def obter_documento(documento_id):
         "GET",
         DOCUMENTOS_TABLE,
         query=[
-            ("select", "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,dados,itens,processos,componentes,composicao"),
+            ("select", "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,dados,itens,processos,componentes,composicao"),
             ("id", f"eq.{documento_id}"),
             ("limit", "1"),
         ],
@@ -631,7 +637,7 @@ def excluir_documentos(documento_ids):
 def carregar_documentos(force=False, limit=None):
     rows = _all_rows(
         DOCUMENTOS_TABLE,
-        select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,dados,itens,processos,componentes,composicao",
+        select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,dados,itens,processos,componentes,composicao",
         order="data_criacao.desc,created_at.desc",
         cache_key="documentos",
         force=force,
