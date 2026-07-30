@@ -40,6 +40,8 @@ ROLE_PERMISSION_FALLBACKS = {
         "suprimentos.dashboard.view",
         "suprimentos.purchase.view",
         "suprimentos.work_order.view",
+        "suprimentos.production_order.view",
+        "suprimentos.production_order.execute",
     },
     "COMPRADOR": {
         "suprimentos.dashboard.view",
@@ -49,6 +51,7 @@ ROLE_PERMISSION_FALLBACKS = {
         "suprimentos.purchase.cancel",
         "suprimentos.purchase.export",
         "suprimentos.work_order.view",
+        "suprimentos.production_order.view",
     },
     "FINANCEIRO": {
         "suprimentos.dashboard.view",
@@ -56,6 +59,7 @@ ROLE_PERMISSION_FALLBACKS = {
         "suprimentos.purchase.financial_close",
         "suprimentos.purchase.export",
         "suprimentos.work_order.view",
+        "suprimentos.production_order.view",
     },
     "PCP": {
         "estoque.inspection.receive",
@@ -73,6 +77,9 @@ ROLE_PERMISSION_FALLBACKS = {
         "suprimentos.work_order.schedule",
         "suprimentos.work_order.technical_close",
         "suprimentos.work_order.import",
+        "suprimentos.production_order.view",
+        "suprimentos.production_order.manage",
+        "suprimentos.production_order.execute",
     },
     "ENGENHARIA": {
         "estoque.inspection.receive",
@@ -91,6 +98,9 @@ ROLE_PERMISSION_FALLBACKS = {
         "suprimentos.work_order.technical_close",
         "suprimentos.work_order.import",
         "cadastro.access",
+        "suprimentos.production_order.view",
+        "suprimentos.production_order.manage",
+        "suprimentos.production_order.execute",
     },
     "ADMIN": {"*"},
 }

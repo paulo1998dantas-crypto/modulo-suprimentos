@@ -69,6 +69,7 @@ from composicao import (
 )
 from gerar_oc import gerar_word, construir_nome_oc
 from gerar_os import gerar_os_docx
+from gerar_op import build_production_order_docx
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, identificar_nome_processo, normalizar_nome_processo
 from os_setores import (
@@ -7192,6 +7193,95 @@ def erp_work_order_management_screen():
         mes_url=os.environ.get("ERP_MES_PUBLIC_URL") or os.environ.get("ERP_MES_API_URL", "http://127.0.0.1:8010"),
         current_user=current_user(),
     )
+
+
+@app.route("/erp/ordens-producao")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.view")
+def erp_production_orders_screen():
+    return render_template("erp_ordens_producao.html", current_user=current_user())
+
+
+@app.route("/api/erp/production-orders")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.view")
+def erp_production_orders_proxy():
+    try:
+        return jsonify(_erp_stock_request("production-orders", "GET"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/production-orders/catalog/<sku>")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.view")
+def erp_production_order_catalog_proxy(sku):
+    try:
+        return jsonify({"ok": True, "catalog": supabase_catalog.registration_by_sku(sku)})
+    except supabase_catalog.SupabaseCatalogError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 404
+
+
+@app.route("/api/erp/production-orders", methods=["POST"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.manage")
+def erp_production_order_create_proxy():
+    try:
+        result = _erp_stock_request("production-orders", "POST", request.get_json(silent=True) or {})
+        return jsonify(result), 200 if result.get("replayed") else 201
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/production-orders/<order_id>")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.view")
+def erp_production_order_detail_proxy(order_id):
+    try:
+        return jsonify(_erp_stock_request(f"production-orders/{order_id}", "GET"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/production-orders/<order_id>/<action>", methods=["POST"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.execute")
+def erp_production_order_action_proxy(order_id, action):
+    if action not in {"commit", "complete", "cancel"}:
+        return jsonify({"ok": False, "error": "Ação de O.P. inválida."}), 404
+    try:
+        return jsonify(_erp_stock_request(
+            f"production-orders/{order_id}/{action}",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/erp/ordens-producao/<order_id>/documento.docx")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.production_order.view")
+def erp_production_order_document(order_id):
+    try:
+        order = _erp_stock_request(f"production-orders/{order_id}", "GET").get("order")
+        if not order:
+            raise ValueError("O.P. não encontrada.")
+        return send_file(
+            build_production_order_docx(order),
+            as_attachment=True,
+            download_name=f"{order.get('numero_op') or 'ordem_producao'}.docx",
+            mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
 
 @app.route("/api/erp/os-management")
 @login_required

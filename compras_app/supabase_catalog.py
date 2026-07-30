@@ -101,6 +101,49 @@ def _request_rows(offset):
         raise SupabaseCatalogError(f"Nao foi possivel conectar ao Supabase: {exc}") from exc
 
 
+def registration_by_sku(sku):
+    """Return the authoritative Cadastro fields for a specific active SKU."""
+    normalized = _clean(sku).upper()
+    if not normalized:
+        raise SupabaseCatalogError("Informe o SKU.")
+    if not configured():
+        raise SupabaseCatalogError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
+    query = urllib.parse.urlencode(
+        [
+            ("select", "sku,category_label,descricao_primaria,descricao_secundaria,sufixo,unidade,field_values,form_values,field_codes,updated_at"),
+            ("sku", f"eq.{normalized}"),
+            ("ativo", "is.true"),
+            ("limit", "1"),
+        ]
+    )
+    request = urllib.request.Request(
+        f"{_supabase_url()}/rest/v1/{REGISTRATIONS_TABLE}?{query}",
+        headers=_headers(),
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            rows = json.loads(response.read().decode("utf-8") or "[]")
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise SupabaseCatalogError(f"Erro Supabase {exc.code}: {body}") from exc
+    except urllib.error.URLError as exc:
+        raise SupabaseCatalogError(f"Nao foi possivel conectar ao Supabase: {exc}") from exc
+    if not rows:
+        raise SupabaseCatalogError("SKU ativo nao encontrado no Cadastro.")
+    row = rows[0]
+    values = row.get("field_values") if isinstance(row.get("field_values"), dict) else {}
+    return {
+        "sku": _clean(row.get("sku")),
+        "descricao": _clean(row.get("descricao_primaria")),
+        "descricao_secundaria": _clean(row.get("descricao_secundaria")),
+        "categoria": _clean(row.get("category_label")),
+        "unidade": _clean(row.get("unidade")),
+        "field_values": values,
+        "updated_at": row.get("updated_at"),
+    }
+
+
 def _all_rows():
     rows = []
     offset = 0
