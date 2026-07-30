@@ -6,6 +6,7 @@ the stock conversion auditable even if a SKU parameter is edited afterwards.
 """
 
 from io import BytesIO
+from decimal import Decimal, InvalidOperation
 
 from docx import Document
 from docx.enum.section import WD_SECTION
@@ -18,6 +19,16 @@ from docx.shared import Inches, Pt, RGBColor
 
 NAVY = "17365D"
 LIGHT = "D9EAF7"
+
+
+def _quantity(value):
+    """Formats a stored 3-decimal stock quantity for people, not for math."""
+    try:
+        normalized = Decimal(str(value or "0").replace(",", "."))
+    except (InvalidOperation, ValueError):
+        return str(value or "")
+    rendered = format(normalized, "f").rstrip("0").rstrip(".")
+    return rendered or "0"
 
 
 def _cell(cell, text, bold=False, fill=None, align=WD_ALIGN_PARAGRAPH.LEFT):
@@ -98,7 +109,7 @@ def build_production_order_docx(order):
         ("Tipo", "Produção para estoque" if order.get("producao_tipo") == "ESTOQUE" else "Produção destinada"),
         ("Setor interno", order.get("setor") or "SERRALHERIA"),
         ("Destino", order.get("destino_descricao") or "-"),
-        ("Quantidade", f"{order.get('quantidade_planejada', '')} {order.get('unidade', '')}"),
+        ("Quantidade", f"{_quantity(order.get('quantidade_planejada'))} {order.get('unidade', '')}"),
         ("Chassis / lote", order.get("chassi_lote") or "-"),
         ("Cliente", order.get("cliente_nome") or "-"),
         ("Município", order.get("municipio") or "-"),
@@ -119,7 +130,7 @@ def build_production_order_docx(order):
     _table_header(output, ["CÓDIGO", "PRODUTO FINAL", "QTDE", "UN."])
     _cell(output.rows[1].cells[0], order.get("target_sku"))
     _cell(output.rows[1].cells[1], order.get("target_descricao"))
-    _cell(output.rows[1].cells[2], order.get("quantidade_planejada"), align=WD_ALIGN_PARAGRAPH.CENTER)
+    _cell(output.rows[1].cells[2], _quantity(order.get("quantidade_planejada")), align=WD_ALIGN_PARAGRAPH.CENTER)
     _cell(output.rows[1].cells[3], order.get("unidade"), align=WD_ALIGN_PARAGRAPH.CENTER)
 
     parameters = _format_parameters(order)
@@ -141,7 +152,7 @@ def build_production_order_docx(order):
         row = inputs.add_row().cells
         _cell(row[0], item.get("sku"))
         _cell(row[1], item.get("descricao"))
-        _cell(row[2], item.get("quantidade_planejada"), align=WD_ALIGN_PARAGRAPH.CENTER)
+        _cell(row[2], _quantity(item.get("quantidade_planejada")), align=WD_ALIGN_PARAGRAPH.CENTER)
         _cell(row[3], item.get("unidade"), align=WD_ALIGN_PARAGRAPH.CENTER)
 
     _section(document, "PROCESSOS DE PRODUÇÃO - SERRALHERIA")
