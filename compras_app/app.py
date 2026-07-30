@@ -6648,6 +6648,7 @@ def _erp_mes_request(path, method="GET", payload=None):
     token = os.environ.get("ERP_BACKEND_TOKEN", "")
     if not base or not token:
         raise ValueError("Integração MES não configurada. Defina ERP_MES_API_URL e ERP_BACKEND_TOKEN no backend.")
+    timeout_seconds = _positive_env_int("ERP_MES_API_TIMEOUT_SECONDS", 75)
     body = json.dumps(payload).encode("utf-8") if payload is not None else None
     req = urllib.request.Request(
         f"{base}/api/erp/internal/{path.lstrip('/')}",
@@ -6660,12 +6661,22 @@ def _erp_mes_request(path, method="GET", payload=None):
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=25) as response:
+        with urllib.request.urlopen(req, timeout=timeout_seconds) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         data = json.loads(exc.read().decode("utf-8") or "{}")
         raise ValueError(data.get("error") or "Falha no MES.")
+    except TimeoutError as exc:
+        raise ValueError(
+            f"O MES demorou mais de {timeout_seconds} segundos para responder. "
+            "Aguarde a inicialização e tente novamente."
+        ) from exc
     except urllib.error.URLError as exc:
+        if isinstance(exc.reason, TimeoutError) or "timed out" in str(exc.reason).lower():
+            raise ValueError(
+                f"O MES demorou mais de {timeout_seconds} segundos para responder. "
+                "Aguarde a inicialização e tente novamente."
+            ) from exc
         raise ValueError(f"MES indisponível: {exc.reason}") from exc
 
 
