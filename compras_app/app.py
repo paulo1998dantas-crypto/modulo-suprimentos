@@ -3950,11 +3950,10 @@ def logout():
     return redirect(url_for("login"))
 
 
-def _enriquecer_historico_integrado(historico, tab):
-    """Attach live read models without rewriting legacy document JSON."""
-    if not erp_feature_enabled() or tab not in {"dashboard", "gestao-oc", "gestao-os"}:
+def _enriquecer_compras_integradas(historico):
+    """Attach the live ERP purchase-order read model without rewriting history."""
+    if not erp_feature_enabled():
         return historico
-
     try:
         compras = _erp_stock_request("dashboard").get("orders", [])
         por_id = {
@@ -3982,6 +3981,15 @@ def _enriquecer_historico_integrado(historico, tab):
                 documento["erp_purchase_order"] = por_chave[chave]
     except Exception:
         app.logger.exception("Falha ao consultar estados integrados de O.C.; historico legado preservado.")
+    return historico
+
+
+def _enriquecer_historico_integrado(historico, tab):
+    """Attach live read models without rewriting legacy document JSON."""
+    if not erp_feature_enabled() or tab not in {"dashboard", "gestao-oc", "gestao-os"}:
+        return historico
+
+    _enriquecer_compras_integradas(historico)
 
     try:
         ordens_mes = _erp_mes_request("work-orders").get("orders", [])
@@ -4136,6 +4144,7 @@ def api_historico_oc(documento_id):
     documento = obter_historico_documento(documento_id)
     if not documento or documento.get("tipo") != "oc":
         return jsonify({"ok": False, "erro": "O.C nao encontrada."}), 404
+    _enriquecer_compras_integradas([documento])
     return jsonify({"ok": True, "documento": documento})
 
 
@@ -5094,6 +5103,17 @@ def gerar_oc():
     if prazo_int is not None:
         vencimento = (date.today() + timedelta(days=prazo_int)).strftime("%d/%m/%Y")
 
+    dados_anteriores = ((historico_existente or {}).get("dados") or {})
+    categoria_oc = str(
+        request.form.get("oc_categoria")
+        or dados_anteriores.get("oc_categoria")
+        or "GERAL"
+    ).strip().upper()
+    destino_form = request.form.get("destino")
+    destino_oc = str(
+        (destino_form if destino_form is not None else dados_anteriores.get("destino", ""))
+        or ""
+    ).strip()
     dados_pedido = {
         "cnpj": fornecedor_info.get("cnpj", request.form.get("cnpj", "")),
         "bairro": fornecedor_info.get("bairro", request.form.get("bairro", "")),
@@ -5113,6 +5133,8 @@ def gerar_oc():
         "prazo": prazo_raw,
         "vencimento": vencimento,
         "obs": request.form.get("obs", ""),
+        "oc_categoria": categoria_oc,
+        "destino": destino_oc,
     }
 
     numero_oc = (
@@ -6763,11 +6785,11 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
         raise ValueError("A O.C. nao recebeu identificador de historico para sincronizacao.")
     payload = {
         "numero_oc": numero_oc,
-        "categoria": (request.form.get("oc_categoria", "") or "GERAL").strip().upper(),
+        "categoria": (dados_pedido.get("oc_categoria") or "GERAL").strip().upper(),
         "fornecedor_nome": fornecedor_nome,
         "data_emissao": _erp_iso_date((historico or {}).get("data_criacao")) or date.today().isoformat(),
         "data_necessidade": _erp_iso_date(dados_pedido.get("previsao")),
-        "destino": (request.form.get("destino", "") or "").strip(),
+        "destino": (dados_pedido.get("destino") or "").strip(),
         "frete": dados_pedido.get("frete", 0),
         "observacoes": dados_pedido.get("obs", ""),
         "idempotency_key": f"suprimentos-oc:{history_id}",
@@ -6778,7 +6800,7 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
                 "unidade": item.get("unidade") or "UN",
                 "quantidade_pedida": item.get("qtd"),
                 "valor_unitario_pedido": item.get("valor"),
-                "destino": (request.form.get("destino", "") or "").strip(),
+                "destino": (dados_pedido.get("destino") or "").strip(),
                 "data_necessidade": _erp_iso_date(dados_pedido.get("previsao")),
             }
             for item in itens

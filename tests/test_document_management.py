@@ -575,17 +575,105 @@ class DocumentManagementTests(unittest.TestCase):
                 "valor[]": "10",
                 "desconto[]": "0",
                 "frete": "0",
+                "oc_categoria": "BANCOS",
+                "destino": "O.S. 712",
             })
 
         self.assertEqual(302, response.status_code)
         generate.assert_not_called()
         sync.assert_called_once()
         self.assertEqual("emitido", register.call_args.kwargs["status"])
+        dados_sincronizados = sync.call_args.args[1]
+        self.assertEqual("BANCOS", dados_sincronizados["oc_categoria"])
+        self.assertEqual("O.S. 712", dados_sincronizados["destino"])
+        dados_salvos = register.call_args.args[2]
+        self.assertEqual("BANCOS", dados_salvos["oc_categoria"])
+        self.assertEqual("O.S. 712", dados_salvos["destino"])
         link.assert_called_once_with(
             saved,
             "erp_purchase_order_id",
             "11111111-1111-1111-1111-111111111111",
         )
+
+    def test_purchase_sync_uses_persisted_category_and_destination(self):
+        history = {
+            "id": "doc-10",
+            "data_criacao": "2026-07-20",
+        }
+        purchase_data = {
+            "previsao": "2026-08-01",
+            "frete": 25,
+            "obs": "Compra de bancos",
+            "oc_categoria": "BANCOS",
+            "destino": "O.S. 712",
+        }
+        items = [{
+            "codigo": "SKU-1",
+            "descricao": "Conjunto de bancos",
+            "unidade": "UN",
+            "qtd": 2,
+            "valor": 100,
+        }]
+
+        with (
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(
+                app_module,
+                "_erp_stock_request",
+                return_value={"id": "11111111-1111-1111-1111-111111111111"},
+            ) as request_erp,
+        ):
+            app_module._sync_emitted_legacy_oc_to_erp(
+                history,
+                purchase_data,
+                items,
+                "10",
+                "Fornecedor",
+            )
+
+        payload = request_erp.call_args.args[2]
+        self.assertEqual("BANCOS", payload["categoria"])
+        self.assertEqual("O.S. 712", payload["destino"])
+        self.assertEqual("O.S. 712", payload["lines"][0]["destino"])
+        self.assertEqual("suprimentos-oc:doc-10", payload["idempotency_key"])
+
+    def test_purchase_history_api_attaches_same_integrated_order_for_editing(self):
+        document = {
+            "id": "doc-10",
+            "tipo": "oc",
+            "numero": "10",
+            "dados": {"fornecedor": "Fornecedor"},
+        }
+        order = {
+            "id": "11111111-1111-1111-1111-111111111111",
+            "idempotency_key": "suprimentos-oc:doc-10",
+            "categoria": "BANCOS",
+            "destino": "O.S. 712",
+        }
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "obter_historico_documento", return_value=document),
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(app_module, "_erp_stock_request", return_value={"orders": [order]}),
+        ):
+            response = app_module.app.test_client().get("/api/historico/oc/doc-10")
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(order, response.get_json()["documento"]["erp_purchase_order"])
+
+    def test_purchase_editor_switches_tab_before_clearing_and_populating_form(self):
+        template = (
+            Path(__file__).resolve().parents[1]
+            / "compras_app"
+            / "templates"
+            / "index.html"
+        ).read_text(encoding="utf-8")
+        start = template.index("function editarDocumentoHistoricoOC(doc)")
+        end = template.index("async function editarHistoricoOC", start)
+        editor = template[start:end]
+
+        self.assertLess(editor.index("tabButton.click()"), editor.index("limparOCForm()"))
+        self.assertEqual(1, editor.count("tabButton.click()"))
 
     def test_purchase_edit_is_not_overwritten_after_stock_receipt(self):
         existing = {

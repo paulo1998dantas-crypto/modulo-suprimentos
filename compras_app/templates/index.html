@@ -4278,7 +4278,7 @@ const dados = doc.dados || {};
 document.getElementById("historico_oc_title").textContent = `O.C. ${doc.numero || ""}`;
 document.getElementById("historico_oc_meta").textContent = `${doc.data_criacao || "-"} · ${doc.status || "emitido"}`;
 document.getElementById("historico_oc_dados").innerHTML = [
-["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
+["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Categoria", dados.oc_categoria || (doc.erp_purchase_order || {}).categoria], ["Destino", dados.destino || (doc.erp_purchase_order || {}).destino], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
 document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="7">Sem itens.</td></tr>';
 document.getElementById("historico_oc_editar").onclick = () => editarDocumentoHistoricoOC(doc);
@@ -4298,17 +4298,23 @@ modal.setAttribute("aria-hidden", "true");
 }
 
 function editarDocumentoHistoricoOC(doc){
+const tabButton = document.querySelector('[data-tab="tab-oc"]');
+const tabOC = document.getElementById("tab-oc");
+if (tabButton && (!tabOC || !tabOC.classList.contains("active"))) tabButton.click();
 limparOCForm();
 const form = document.getElementById("form-oc");
 const dados = doc.dados || {};
+const erpOC = doc.erp_purchase_order || {};
 document.getElementById("oc_historico_id").value = doc.id || "";
 document.getElementById("oc_numero").value = doc.numero || "";
 document.getElementById("oc_submit_token").value = doc.submit_token || novoSubmissionToken();
-const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep","previsao","tipo_frete","frete","forma_pagamento","prazo","vencimento","obs"];
+const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep","previsao","tipo_frete","frete","forma_pagamento","prazo","vencimento","obs","oc_categoria","destino"];
 campos.forEach((name) => {
 const input = form.elements[name];
 if (input) input.value = dados[name] === undefined || dados[name] === null ? "" : dados[name];
 });
+if (form.elements.oc_categoria) form.elements.oc_categoria.value = dados.oc_categoria || erpOC.categoria || "GERAL";
+if (form.elements.destino) form.elements.destino.value = dados.destino || erpOC.destino || "";
 const fornecedor = dados.fornecedor || dados.razao_social || "";
 if (form.elements.fornecedor) form.elements.fornecedor.value = fornecedor;
 if (form.elements.fornecedor_busca) form.elements.fornecedor_busca.value = fornecedor;
@@ -4323,8 +4329,6 @@ Object.entries(valores).forEach(([name, value]) => { const input = row.querySele
 });
 calcularTotais();
 fecharHistoricoOC();
-const tabButton = document.querySelector('[data-tab="tab-oc"]');
-if (tabButton) tabButton.click();
 form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -4928,6 +4932,19 @@ salvarRascunhoOS();
 <div>
 <label>Previsao</label>
 <input name="previsao" type="date">
+</div>
+
+<div>
+<label>Categoria da compra</label>
+<select name="oc_categoria">
+<option value="GERAL">Geral</option>
+<option value="BANCOS">Bancos</option>
+</select>
+</div>
+
+<div>
+<label>Destino</label>
+<input name="destino" placeholder="Estoque, O.S., cliente ou setor">
 </div>
 
 </div>
