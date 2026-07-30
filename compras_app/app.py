@@ -7154,6 +7154,26 @@ def erp_purchase_order_technical_close_proxy(order_id):
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+@app.route("/api/erp/purchase-orders/<order_id>/correct-number", methods=["POST"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.purchase.edit")
+def erp_purchase_order_correct_number_proxy(order_id):
+    """Controlled correction of the visible O.C. number.
+
+    The stock service keeps the UUID, receipts and movements intact.  It also
+    updates the linked buyer document only when its immutable ERP UUID matches.
+    """
+    try:
+        return jsonify(_erp_stock_request(
+            f"purchase-orders/{order_id}/correct-number",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 @app.route("/api/erp/purchase-orders/<order_id>/financial-close", methods=["POST"])
 @login_required
 @erp_feature_required
