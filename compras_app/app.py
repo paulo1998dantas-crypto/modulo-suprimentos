@@ -7154,6 +7154,21 @@ def erp_purchase_order_technical_close_proxy(order_id):
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+@app.route("/api/erp/purchase-orders/<order_id>/technical-reopen", methods=["POST"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.purchase.technical_close")
+def erp_purchase_order_technical_reopen_proxy(order_id):
+    try:
+        return jsonify(_erp_stock_request(
+            f"purchase-orders/{order_id}/technical-reopen",
+            "POST",
+            request.get_json(silent=True) or {},
+        ))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 @app.route("/api/erp/purchase-orders/<order_id>/correct-number", methods=["POST"])
 @login_required
 @erp_feature_required
