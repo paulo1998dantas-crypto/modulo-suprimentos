@@ -7237,11 +7237,16 @@ def erp_work_order_management_screen():
 
 def _forecast_metrics(forecasts):
     active = [item for item in forecasts if item.get("status") == "ATIVO"]
+    planned_items = [
+        line for forecast in active
+        for line in (forecast.get("itens_planejados") or [])
+    ]
     return {
         "aguardando_chegada": sum(1 for item in active if item.get("tipo_demanda") == "AGUARDANDO_CHEGADA"),
         "previsao_demanda": sum(1 for item in active if item.get("tipo_demanda") == "PREVISAO_DEMANDA"),
         "convertidos": sum(1 for item in forecasts if item.get("status") == "CONVERTIDO"),
         "quantidade_planejada": sum(float(item.get("quantidade_planejada") or 0) for item in active),
+        "skus_planejados": len(planned_items),
     }
 
 
@@ -7275,6 +7280,45 @@ def erp_forecasts_list_api():
     try:
         forecasts = supabase_data.carregar_forecasts(force=True)
         return jsonify({"ok": True, "forecasts": forecasts, "metrics": _forecast_metrics(forecasts)})
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.route("/api/erp/forecasts/<forecast_id>/mrp")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_forecast_mrp_api(forecast_id):
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        forecast = supabase_data.obter_forecast(forecast_id)
+        if not forecast:
+            raise ValueError("Forecast nao encontrado.")
+        return jsonify({
+            "ok": True,
+            "forecast": forecast,
+            "itens": supabase_data.carregar_itens_forecast(forecast_id, force=True),
+            "necessidades": supabase_data.carregar_necessidades_forecast(forecast_id, force=True),
+        })
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.route("/api/erp/forecasts/skus")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_forecast_skus_api():
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        return jsonify({
+            "ok": True,
+            "skus": supabase_data.buscar_skus_forecast(
+                request.args.get("q", ""), request.args.get("limit", 30)
+            ),
+        })
     except Exception as exc:
         return _forecast_error_response(exc)
 

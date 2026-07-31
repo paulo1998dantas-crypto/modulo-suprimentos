@@ -23,6 +23,9 @@ BOM_COMPONENTS_TABLE = "cadastro_bom_componentes"
 USERS_TABLE = "users"
 DOCUMENTOS_TABLE = "suprimentos_documentos"
 FORECASTS_TABLE = "suprimentos_forecasts"
+FORECAST_ITEMS_TABLE = "suprimentos_forecast_itens"
+FORECAST_REQUIREMENTS_TABLE = "suprimentos_forecast_necessidades"
+SKUS_TABLE = "skus"
 ROLES_TABLE = "erp_roles"
 PERMISSIONS_TABLE = "erp_permissions"
 ROLE_PERMISSIONS_TABLE = "erp_role_permissions"
@@ -186,6 +189,8 @@ def status():
             BOM_COMPONENTS_TABLE,
             DOCUMENTOS_TABLE,
             FORECASTS_TABLE,
+            FORECAST_ITEMS_TABLE,
+            FORECAST_REQUIREMENTS_TABLE,
             USERS_TABLE,
             ROLES_TABLE,
             PERMISSIONS_TABLE,
@@ -879,6 +884,43 @@ def _forecast_quantity(value):
     return quantity
 
 
+def normalizar_itens_forecast(value):
+    """Normaliza e agrega a lista multi-SKU informada no Forecast.
+
+    A quantidade de cada item representa o consumo por veiculo/unidade da
+    demanda. O banco multiplica pelo volume planejado e explode a B.O.M.
+    somente como necessidade de MRP, sem reservar ou movimentar saldo.
+    """
+    source = value
+    if isinstance(source, str):
+        try:
+            source = json.loads(source)
+        except json.JSONDecodeError as exc:
+            raise ValueError("Itens planejados do Forecast estao invalidos.") from exc
+    if not isinstance(source, list):
+        raise ValueError("Informe a lista de SKUs planejados.")
+    if not source:
+        raise ValueError("Inclua ao menos um SKU na demanda planejada.")
+    if len(source) > 100:
+        raise ValueError("O Forecast suporta no maximo 100 SKUs por demanda.")
+
+    aggregated = {}
+    for position, item in enumerate(source, 1):
+        if not isinstance(item, dict):
+            raise ValueError(f"Item {position} do Forecast esta invalido.")
+        sku = _clean(item.get("sku_codigo") or item.get("sku")).upper()
+        if not sku:
+            raise ValueError(f"Informe o SKU na linha {position}.")
+        quantity = _forecast_quantity(
+            item.get("quantidade_por_veiculo", item.get("quantidade"))
+        )
+        aggregated[sku] = aggregated.get(sku, 0.0) + quantity
+    return [
+        {"sku_codigo": sku, "quantidade_por_veiculo": quantity}
+        for sku, quantity in aggregated.items()
+    ]
+
+
 def normalizar_forecast(forecast, actor=""):
     source = dict(forecast or {})
     tipo = _forecast_type(source.get("tipo_demanda"))
@@ -922,6 +964,13 @@ def normalizar_forecast(forecast, actor=""):
         "origem": _clean(source.get("origem")),
         "observacoes": _clean(source.get("observacoes")),
         "dados_planejamento": dados_planejamento,
+        "itens_planejados": normalizar_itens_forecast(
+            source.get("itens_planejados")
+            or ([{
+                "sku_codigo": source.get("produto_planejado_sku"),
+                "quantidade_por_veiculo": source.get("quantidade_produto_planejado", 1),
+            }] if _clean(source.get("produto_planejado_sku")) else [])
+        ),
         "vehicle_entry_id": vehicle_entry_id,
         "work_order_id": _clean(source.get("work_order_id")) or None,
         "convertido_at": source.get("convertido_at") or None,
@@ -936,17 +985,76 @@ def obter_forecast(forecast_id):
         FORECASTS_TABLE,
         query=[("select", "*"), ("id", f"eq.{_clean(forecast_id)}"), ("limit", "1")],
     ) or []
-    return rows[0] if rows else None
+    if not rows:
+        return None
+    forecast = rows[0]
+    forecast["itens_planejados"] = carregar_itens_forecast(forecast.get("id"), force=True)
+    return forecast
 
 
 def carregar_forecasts(force=False):
-    return _all_rows(
+    forecasts = _all_rows(
         FORECASTS_TABLE,
         select="*",
         order="created_at.desc",
         cache_key="forecasts",
         force=force,
     )
+    items = _all_rows(
+        FORECAST_ITEMS_TABLE,
+        select=("id,forecast_id,numero_linha,sku_id,sku_codigo,descricao,unidade,"
+                "quantidade_por_veiculo,quantidade_planejada,possui_bom,bom_explodida_em"),
+        order="forecast_id.asc,numero_linha.asc",
+        cache_key="forecast_items",
+        force=force,
+    )
+    grouped = {}
+    for item in items:
+        grouped.setdefault(item.get("forecast_id"), []).append(item)
+    for forecast in forecasts:
+        forecast["itens_planejados"] = grouped.get(forecast.get("id"), [])
+    return forecasts
+
+
+def carregar_itens_forecast(forecast_id, force=False):
+    if not _clean(forecast_id):
+        return []
+    return _all_rows(
+        FORECAST_ITEMS_TABLE,
+        select=("id,forecast_id,numero_linha,sku_id,sku_codigo,descricao,unidade,"
+                "quantidade_por_veiculo,quantidade_planejada,possui_bom,bom_explodida_em"),
+        order="numero_linha.asc",
+        extra_query=[("forecast_id", f"eq.{_clean(forecast_id)}")],
+        cache_key=f"forecast_items:{_clean(forecast_id)}",
+        force=force,
+    )
+
+
+def carregar_necessidades_forecast(forecast_id, force=False):
+    if not _clean(forecast_id):
+        return []
+    return _all_rows(
+        FORECAST_REQUIREMENTS_TABLE,
+        select=("id,forecast_id,forecast_item_id,sku_id,sku_codigo,descricao,unidade,"
+                "quantidade_planejada,nivel_maximo,origem,caminho_bom"),
+        order="sku_codigo.asc",
+        extra_query=[("forecast_id", f"eq.{_clean(forecast_id)}")],
+        cache_key=f"forecast_requirements:{_clean(forecast_id)}",
+        force=force,
+    )
+
+
+def buscar_skus_forecast(query="", limit=30):
+    term = _clean(query).upper()
+    try:
+        bounded_limit = max(1, min(int(limit), 100))
+    except (TypeError, ValueError):
+        bounded_limit = 30
+    filters = [("select", "id,sku,descricao,unidade"), ("active", "is.true"), ("order", "sku.asc"), ("limit", str(bounded_limit))]
+    if term:
+        safe = term.replace("%", "").replace(",", " ")
+        filters.append(("or", f"(sku.ilike.*{safe}*,descricao.ilike.*{safe}*)"))
+    return _request("GET", SKUS_TABLE, query=filters) or []
 
 
 def criar_forecast(forecast, actor):
@@ -960,17 +1068,14 @@ def criar_forecast(forecast, actor):
     ) or []
     if existing:
         return existing[0], True
-    number = proximo_numero_forecast()
     row = normalizar_forecast(forecast, actor)
     row.update({
-        "numero_forecast": number,
-        "codigo": f"FCT-{number:05d}",
         "idempotency_key": key,
         "criado_por": _clean(actor),
         "atualizado_por": _clean(actor),
     })
     try:
-        saved = _request("POST", FORECASTS_TABLE, payload=row, prefer="return=representation") or []
+        saved = _rpc("suprimentos_criar_forecast_com_itens", {"p_forecast": row})
     except SupabaseDataError:
         existing = _request(
             "GET",
@@ -980,10 +1085,11 @@ def criar_forecast(forecast, actor):
         if existing:
             return existing[0], True
         raise
-    if not saved:
+    if not isinstance(saved, dict) or not saved:
         raise SupabaseDataError("O Supabase nao confirmou a criacao do Forecast.")
     clear_cache()
-    return saved[0], False
+    saved["itens_planejados"] = carregar_itens_forecast(saved.get("id"), force=True)
+    return saved, False
 
 
 def atualizar_forecast(forecast_id, forecast, actor, expected_version=None):
@@ -991,20 +1097,19 @@ def atualizar_forecast(forecast_id, forecast, actor, expected_version=None):
     if not current:
         raise ValueError("Forecast nao encontrado.")
     row = normalizar_forecast({**current, **dict(forecast or {})}, actor)
-    query = [("id", f"eq.{_clean(forecast_id)}")]
-    if expected_version not in (None, ""):
-        query.append(("version", f"eq.{int(expected_version)}"))
-    saved = _request(
-        "PATCH",
-        FORECASTS_TABLE,
-        query=query,
-        payload=row,
-        prefer="return=representation",
-    ) or []
-    if not saved:
+    saved = _rpc(
+        "suprimentos_atualizar_forecast_com_itens",
+        {
+            "p_forecast_id": _clean(forecast_id),
+            "p_expected_version": int(expected_version) if expected_version not in (None, "") else None,
+            "p_forecast": row,
+        },
+    )
+    if not isinstance(saved, dict) or not saved:
         raise ValueError("O Forecast foi alterado por outro usuario. Atualize a tela e tente novamente.")
     clear_cache()
-    return saved[0]
+    saved["itens_planejados"] = carregar_itens_forecast(saved.get("id"), force=True)
+    return saved
 
 
 def _load_user_record(*, user_id=None, username=None, include_password=False):
