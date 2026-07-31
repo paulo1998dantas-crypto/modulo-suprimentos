@@ -149,6 +149,11 @@ def erp_feature_enabled():
     return _env_bool("ERP_FEATURE_FLAG", default=False)
 
 
+def forecast_feature_enabled():
+    """Keep the planning module independently reversible during rollout."""
+    return _env_bool("SUPRIMENTOS_FORECAST_ENABLED", default=True)
+
+
 def erp_feature_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
@@ -7228,6 +7233,112 @@ def erp_work_order_management_screen():
         mes_url=os.environ.get("ERP_MES_PUBLIC_URL") or os.environ.get("ERP_MES_API_URL", "http://127.0.0.1:8010"),
         current_user=current_user(),
     )
+
+
+def _forecast_metrics(forecasts):
+    active = [item for item in forecasts if item.get("status") == "ATIVO"]
+    return {
+        "aguardando_chegada": sum(1 for item in active if item.get("tipo_demanda") == "AGUARDANDO_CHEGADA"),
+        "previsao_demanda": sum(1 for item in active if item.get("tipo_demanda") == "PREVISAO_DEMANDA"),
+        "convertidos": sum(1 for item in forecasts if item.get("status") == "CONVERTIDO"),
+        "quantidade_planejada": sum(float(item.get("quantidade_planejada") or 0) for item in active),
+    }
+
+
+def _forecast_error_response(exc):
+    if isinstance(exc, ValueError):
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    app.logger.exception("Falha no Forecast de demanda")
+    return jsonify({
+        "ok": False,
+        "error": "Nao foi possivel acessar o Forecast. Confirme a migration aditiva e tente novamente.",
+    }), 503
+
+
+@app.route("/erp/forecast")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_forecast_screen():
+    if not forecast_feature_enabled():
+        return "Forecast desativado pela feature flag.", 404
+    return render_template("erp_forecast.html", current_user=current_user())
+
+
+@app.route("/api/erp/forecasts")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_forecasts_list_api():
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        forecasts = supabase_data.carregar_forecasts(force=True)
+        return jsonify({"ok": True, "forecasts": forecasts, "metrics": _forecast_metrics(forecasts)})
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.route("/api/erp/forecasts", methods=["POST"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_forecasts_create_api():
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        forecast, replayed = supabase_data.criar_forecast(
+            request.get_json(silent=True) or {}, current_username()
+        )
+        return jsonify({"ok": True, "forecast": forecast, "replayed": replayed}), 200 if replayed else 201
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.route("/api/erp/forecasts/<forecast_id>", methods=["PUT"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_forecasts_update_api(forecast_id):
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        body = request.get_json(silent=True) or {}
+        forecast = supabase_data.atualizar_forecast(
+            forecast_id, body, current_username(), body.get("version")
+        )
+        return jsonify({"ok": True, "forecast": forecast})
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.route("/api/erp/forecasts/<forecast_id>/cancel", methods=["POST"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_forecasts_cancel_api(forecast_id):
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        body = request.get_json(silent=True) or {}
+        reason = str(body.get("motivo") or "").strip()
+        if not reason:
+            raise ValueError("Informe o motivo do cancelamento.")
+        current = supabase_data.obter_forecast(forecast_id)
+        if not current:
+            raise ValueError("Forecast nao encontrado.")
+        observations = str(current.get("observacoes") or "").strip()
+        current.update({
+            "status": "CANCELADO",
+            "observacoes": (observations + "\n" if observations else "") + f"Cancelado: {reason}",
+            "version": body.get("version", current.get("version")),
+        })
+        forecast = supabase_data.atualizar_forecast(
+            forecast_id, current, current_username(), current.get("version")
+        )
+        return jsonify({"ok": True, "forecast": forecast})
+    except Exception as exc:
+        return _forecast_error_response(exc)
 
 
 @app.route("/erp/ordens-producao")

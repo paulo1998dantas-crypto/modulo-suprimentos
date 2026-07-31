@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -21,6 +22,7 @@ RELACOES_TABLE = "suprimentos_relacoes_processo_item"
 BOM_COMPONENTS_TABLE = "cadastro_bom_componentes"
 USERS_TABLE = "users"
 DOCUMENTOS_TABLE = "suprimentos_documentos"
+FORECASTS_TABLE = "suprimentos_forecasts"
 ROLES_TABLE = "erp_roles"
 PERMISSIONS_TABLE = "erp_permissions"
 ROLE_PERMISSIONS_TABLE = "erp_role_permissions"
@@ -183,6 +185,7 @@ def status():
             RELACOES_TABLE,
             BOM_COMPONENTS_TABLE,
             DOCUMENTOS_TABLE,
+            FORECASTS_TABLE,
             USERS_TABLE,
             ROLES_TABLE,
             PERMISSIONS_TABLE,
@@ -712,6 +715,7 @@ def obter_documento_por_submit_token(submit_token):
     rows = _request(
         "GET",
         DOCUMENTOS_TABLE,
+            FORECASTS_TABLE,
         query=[
             ("select", "id,tipo,numero,submit_token"),
             ("submit_token", f"eq.{token}"),
@@ -799,6 +803,208 @@ def proximo_numero_documento(tipo):
         return int(value)
     except (TypeError, ValueError) as exc:
         raise SupabaseDataError("O contador do Supabase retornou um valor invalido.") from exc
+
+
+FORECAST_TYPES = {"AGUARDANDO_CHEGADA", "PREVISAO_DEMANDA"}
+FORECAST_STATUSES = {"ATIVO", "CONVERTIDO", "CANCELADO"}
+
+
+def _rpc(name, payload=None):
+    if not configured():
+        raise SupabaseDataError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
+    body = json.dumps(payload or {}, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(
+        f"{_supabase_url()}/rest/v1/rpc/{name}",
+        data=body,
+        headers=_headers(),
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            response_body = response.read().decode("utf-8")
+            return json.loads(response_body) if response_body else None
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise SupabaseDataError(f"Erro Supabase {exc.code}: {body}") from exc
+    except urllib.error.URLError as exc:
+        raise SupabaseDataError(f"Nao foi possivel conectar ao Supabase: {exc}") from exc
+
+
+def proximo_numero_forecast():
+    value = _rpc("suprimentos_proximo_numero_forecast")
+    if isinstance(value, list):
+        value = value[0] if value else None
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise SupabaseDataError("O contador de Forecast retornou um valor invalido.") from exc
+
+
+def _forecast_type(value):
+    normalized = _clean(value).upper().replace(" ", "_").replace("Ã‡", "C").replace("Ãƒ", "A")
+    normalized = "".join(
+        char for char in unicodedata.normalize("NFKD", _clean(value).upper())
+        if not unicodedata.combining(char)
+    ).replace(" ", "_")
+    aliases = {
+        "AGUARDANDO_CHEGADA": "AGUARDANDO_CHEGADA",
+        "CONFIRMADA": "AGUARDANDO_CHEGADA",
+        "CONFIRMADO": "AGUARDANDO_CHEGADA",
+        "PREVISAO_DEMANDA": "PREVISAO_DEMANDA",
+        "PREVISAO_DE_DEMANDA": "PREVISAO_DEMANDA",
+        "SIMULACAO": "PREVISAO_DEMANDA",
+        "SIMULATIVA": "PREVISAO_DEMANDA",
+    }
+    result = aliases.get(normalized, normalized)
+    if result not in FORECAST_TYPES:
+        raise ValueError("Tipo de Forecast invalido.")
+    return result
+
+
+def _forecast_status(value):
+    result = _clean(value).upper() or "ATIVO"
+    if result not in FORECAST_STATUSES:
+        raise ValueError("Status de Forecast invalido.")
+    return result
+
+
+def _forecast_quantity(value):
+    raw = _clean(value).replace(".", "").replace(",", ".") if isinstance(value, str) and "," in _clean(value) else value
+    try:
+        quantity = float(raw)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Informe uma quantidade planejada valida.") from exc
+    if quantity <= 0:
+        raise ValueError("A quantidade planejada deve ser maior que zero.")
+    return quantity
+
+
+def normalizar_forecast(forecast, actor=""):
+    source = dict(forecast or {})
+    tipo = _forecast_type(source.get("tipo_demanda"))
+    status = _forecast_status(source.get("status"))
+    proposta = _clean(source.get("proposta_numero"))
+    if tipo == "AGUARDANDO_CHEGADA" and not proposta:
+        raise ValueError("Informe a proposta para uma demanda aguardando chegada.")
+    try:
+        probability = int(float(source.get("probabilidade", 100)))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Informe uma probabilidade entre 0 e 100.") from exc
+    if not 0 <= probability <= 100:
+        raise ValueError("Informe uma probabilidade entre 0 e 100.")
+    vehicle_entry_id = _clean(source.get("vehicle_entry_id")) or None
+    if status == "CONVERTIDO" and not vehicle_entry_id:
+        raise ValueError("Um Forecast convertido deve possuir a entrada real do veiculo.")
+    dados_planejamento = source.get("dados_planejamento")
+    if not isinstance(dados_planejamento, dict):
+        dados_planejamento = {}
+    return {
+        "tipo_demanda": tipo,
+        "status": status,
+        "proposta_numero": proposta,
+        "cliente_id": _clean(source.get("cliente_id")) or None,
+        "cliente_nome": _clean(source.get("cliente_nome")),
+        "vendedor": _clean(source.get("vendedor")),
+        "mercado": _clean(source.get("mercado")),
+        "data_confirmacao": _date_or_none(source.get("data_confirmacao")),
+        "data_prevista_chegada": _date_or_none(source.get("data_prevista_chegada")),
+        "data_entrega_prevista": _date_or_none(source.get("data_entrega_prevista")),
+        "quantidade_planejada": _forecast_quantity(source.get("quantidade_planejada", 1)),
+        "unidade": _clean(source.get("unidade")) or "VEICULO",
+        "tipo_servico": _clean(source.get("tipo_servico")) or "TRANSFORMACAO",
+        "tipo_veiculo": _clean(source.get("tipo_veiculo")),
+        "linha": _clean(source.get("linha")),
+        "transformacao_codigo": _clean(source.get("transformacao_codigo")),
+        "transformacao": _clean(source.get("transformacao")),
+        "produto_planejado_sku": _clean(source.get("produto_planejado_sku")),
+        "produto_planejado_descricao": _clean(source.get("produto_planejado_descricao")),
+        "probabilidade": probability,
+        "origem": _clean(source.get("origem")),
+        "observacoes": _clean(source.get("observacoes")),
+        "dados_planejamento": dados_planejamento,
+        "vehicle_entry_id": vehicle_entry_id,
+        "work_order_id": _clean(source.get("work_order_id")) or None,
+        "convertido_at": source.get("convertido_at") or None,
+        "convertido_por": _clean(source.get("convertido_por")) or None,
+        "atualizado_por": _clean(actor) or _clean(source.get("atualizado_por")),
+    }
+
+
+def obter_forecast(forecast_id):
+    rows = _request(
+        "GET",
+        FORECASTS_TABLE,
+        query=[("select", "*"), ("id", f"eq.{_clean(forecast_id)}"), ("limit", "1")],
+    ) or []
+    return rows[0] if rows else None
+
+
+def carregar_forecasts(force=False):
+    return _all_rows(
+        FORECASTS_TABLE,
+        select="*",
+        order="created_at.desc",
+        cache_key="forecasts",
+        force=force,
+    )
+
+
+def criar_forecast(forecast, actor):
+    key = _clean((forecast or {}).get("idempotency_key"))
+    if not key:
+        raise ValueError("Chave de idempotencia do Forecast e obrigatoria.")
+    existing = _request(
+        "GET",
+        FORECASTS_TABLE,
+        query=[("select", "*"), ("idempotency_key", f"eq.{key}"), ("limit", "1")],
+    ) or []
+    if existing:
+        return existing[0], True
+    number = proximo_numero_forecast()
+    row = normalizar_forecast(forecast, actor)
+    row.update({
+        "numero_forecast": number,
+        "codigo": f"FCT-{number:05d}",
+        "idempotency_key": key,
+        "criado_por": _clean(actor),
+        "atualizado_por": _clean(actor),
+    })
+    try:
+        saved = _request("POST", FORECASTS_TABLE, payload=row, prefer="return=representation") or []
+    except SupabaseDataError:
+        existing = _request(
+            "GET",
+            FORECASTS_TABLE,
+            query=[("select", "*"), ("idempotency_key", f"eq.{key}"), ("limit", "1")],
+        ) or []
+        if existing:
+            return existing[0], True
+        raise
+    if not saved:
+        raise SupabaseDataError("O Supabase nao confirmou a criacao do Forecast.")
+    clear_cache()
+    return saved[0], False
+
+
+def atualizar_forecast(forecast_id, forecast, actor, expected_version=None):
+    current = obter_forecast(forecast_id)
+    if not current:
+        raise ValueError("Forecast nao encontrado.")
+    row = normalizar_forecast({**current, **dict(forecast or {})}, actor)
+    query = [("id", f"eq.{_clean(forecast_id)}")]
+    if expected_version not in (None, ""):
+        query.append(("version", f"eq.{int(expected_version)}"))
+    saved = _request(
+        "PATCH",
+        FORECASTS_TABLE,
+        query=query,
+        payload=row,
+        prefer="return=representation",
+    ) or []
+    if not saved:
+        raise ValueError("O Forecast foi alterado por outro usuario. Atualize a tela e tente novamente.")
+    clear_cache()
+    return saved[0]
 
 
 def _load_user_record(*, user_id=None, username=None, include_password=False):

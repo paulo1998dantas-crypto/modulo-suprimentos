@@ -4861,7 +4861,10 @@ salvarRascunhoOS();
 <button type="button" class="tab-btn" data-tab="tab-gestao-os">Gestão O.S.</button>
 {% endif %}
 {% if can('suprimentos.production_order.view') %}
-<a class="tab-btn" href="/erp/ordens-producao">Ordens de Produção</a>
+<a class="tab-btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>
+{% endif %}
+{% if can('suprimentos.work_order.view') %}
+<a class="tab-btn" href="/erp/forecast">FORECAST</a>
 {% endif %}
 </div>
 {% if current_user %}
@@ -5315,7 +5318,8 @@ salvarRascunhoOS();
 <button type="button" class="btn-secondary" data-open-tab="tab-dashboard">Dashboard</button>
 {% endif %}
 <a class="btn" href="/erp/gestao-os">Gestão Operacional O.S.</a>
-{% if can('suprimentos.production_order.view') %}<a class="btn" href="/erp/ordens-producao">Ordens de Produção</a>{% endif %}
+{% if can('suprimentos.production_order.view') %}<a class="btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>{% endif %}
+{% if can('suprimentos.work_order.view') %}<a class="btn" href="/erp/forecast">FORECAST</a>{% endif %}
 <a class="btn" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
 </div>
 </div>
