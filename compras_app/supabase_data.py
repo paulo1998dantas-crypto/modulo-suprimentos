@@ -811,6 +811,7 @@ def proximo_numero_documento(tipo):
 
 FORECAST_TYPES = {"AGUARDANDO_CHEGADA", "PREVISAO_DEMANDA"}
 FORECAST_STATUSES = {"ATIVO", "CONVERTIDO", "CANCELADO"}
+LEGACY_AG_CHEGADA_ORIGIN = "MIGRACAO_AG_CHEGADA"
 
 
 def _rpc(name, payload=None):
@@ -925,7 +926,9 @@ def normalizar_forecast(forecast, actor=""):
     tipo = _forecast_type(source.get("tipo_demanda"))
     status = _forecast_status(source.get("status"))
     proposta = _clean(source.get("proposta_numero"))
-    if tipo == "AGUARDANDO_CHEGADA" and not proposta:
+    origem = _clean(source.get("origem"))
+    legacy_ag_chegada = origem == LEGACY_AG_CHEGADA_ORIGIN
+    if tipo == "AGUARDANDO_CHEGADA" and not proposta and not legacy_ag_chegada:
         raise ValueError("Informe a proposta para uma demanda aguardando chegada.")
     try:
         probability = int(float(source.get("probabilidade", 100)))
@@ -939,6 +942,19 @@ def normalizar_forecast(forecast, actor=""):
     dados_planejamento = source.get("dados_planejamento")
     if not isinstance(dados_planejamento, dict):
         dados_planejamento = {}
+    raw_items = source.get("itens_planejados") or ([{
+        "sku_codigo": source.get("produto_planejado_sku"),
+        "quantidade_por_veiculo": source.get("quantidade_produto_planejado", 1),
+    }] if _clean(source.get("produto_planejado_sku")) else [])
+    if raw_items:
+        itens_planejados = normalizar_itens_forecast(raw_items)
+    elif legacy_ag_chegada:
+        # Migrações do antigo marcador “AG CHEGADA” podem não ter proposta ou
+        # SKU definido. Elas permanecem no Forecast para complementação, sem
+        # gerar MRP, O.S., reserva ou movimentação.
+        itens_planejados = []
+    else:
+        itens_planejados = normalizar_itens_forecast(raw_items)
     return {
         "tipo_demanda": tipo,
         "status": status,
@@ -960,16 +976,10 @@ def normalizar_forecast(forecast, actor=""):
         "produto_planejado_sku": _clean(source.get("produto_planejado_sku")),
         "produto_planejado_descricao": _clean(source.get("produto_planejado_descricao")),
         "probabilidade": probability,
-        "origem": _clean(source.get("origem")),
+        "origem": origem,
         "observacoes": _clean(source.get("observacoes")),
         "dados_planejamento": dados_planejamento,
-        "itens_planejados": normalizar_itens_forecast(
-            source.get("itens_planejados")
-            or ([{
-                "sku_codigo": source.get("produto_planejado_sku"),
-                "quantidade_por_veiculo": source.get("quantidade_produto_planejado", 1),
-            }] if _clean(source.get("produto_planejado_sku")) else [])
-        ),
+        "itens_planejados": itens_planejados,
         "vehicle_entry_id": vehicle_entry_id,
         "work_order_id": _clean(source.get("work_order_id")) or None,
         "convertido_at": source.get("convertido_at") or None,

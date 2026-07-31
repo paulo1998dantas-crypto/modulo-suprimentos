@@ -42,6 +42,17 @@ class ForecastDataTests(unittest.TestCase):
                 "itens_planejados": [{"sku_codigo": "30180004", "quantidade_por_veiculo": 1}],
             })
 
+    def test_legacy_ag_chegada_is_preserved_without_proposal_or_sku(self):
+        row = supabase_data.normalizar_forecast({
+            "tipo_demanda": "AGUARDANDO_CHEGADA",
+            "origem": supabase_data.LEGACY_AG_CHEGADA_ORIGIN,
+            "quantidade_planejada": 1,
+            "itens_planejados": [],
+        }, "migracao")
+        self.assertEqual("AGUARDANDO_CHEGADA", row["tipo_demanda"])
+        self.assertEqual([], row["itens_planejados"])
+        self.assertEqual("", row["proposta_numero"])
+
     def test_converted_forecast_requires_real_entry(self):
         with self.assertRaisesRegex(ValueError, "entrada real"):
             supabase_data.normalizar_forecast({
