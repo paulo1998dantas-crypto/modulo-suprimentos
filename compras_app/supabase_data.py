@@ -720,7 +720,6 @@ def obter_documento_por_submit_token(submit_token):
     rows = _request(
         "GET",
         DOCUMENTOS_TABLE,
-            FORECASTS_TABLE,
         query=[
             ("select", "id,tipo,numero,submit_token"),
             ("submit_token", f"eq.{token}"),

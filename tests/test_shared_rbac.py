@@ -478,6 +478,38 @@ class SharedRbacTests(unittest.TestCase):
         self.assertEqual(403, response.status_code)
         update_skus.assert_not_called()
 
+    def test_new_purchase_token_for_buyer_resolves_create_permission(self):
+        with (
+            app_module.app.test_request_context(
+                "/gerar_oc",
+                method="POST",
+                data={"oc_submit_token": "new-browser-token"},
+            ),
+            patch.object(
+                app_module,
+                "obter_historico_por_submit_token",
+                return_value=None,
+            ),
+        ):
+            permission = app_module._purchase_save_required_permission()
+
+        self.assertEqual("suprimentos.purchase.create", permission)
+
+    def test_document_lookup_by_submit_token_uses_document_table(self):
+        with patch.object(supabase_data, "_request", return_value=[]) as request_mock:
+            result = supabase_data.obter_documento_por_submit_token("new-browser-token")
+
+        self.assertIsNone(result)
+        request_mock.assert_called_once_with(
+            "GET",
+            supabase_data.DOCUMENTOS_TABLE,
+            query=[
+                ("select", "id,tipo,numero,submit_token"),
+                ("submit_token", "eq.new-browser-token"),
+                ("limit", "1"),
+            ],
+        )
+
     def test_invalid_purchase_edit_id_cannot_fall_through_to_create(self):
         user = {
             "id": 15,
