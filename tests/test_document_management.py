@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import unittest
+import copy
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
@@ -979,6 +980,144 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual(source_missing, build.call_args.args[0])
         self.assertEqual(["3090"], [row["numero"] for row in insert.call_args.args[0]])
         delete_many.assert_not_called()
+
+    def test_refresh_open_service_orders_uses_current_bom_and_preserves_closed_orders(self):
+        open_order = {
+            "id": "open-1",
+            "tipo": "os",
+            "numero": "3100",
+            "data_criacao": "2026-08-03",
+            "status": "emitido",
+            "submit_token": "open-token",
+            "criado_por": "pcp",
+            "dados": {"cliente": "Cliente A", "observacao": "manter"},
+            "itens": [{"line_id": "os-item-root", "codigo": "ROOT-1", "descricao": "Conjunto", "qtd": 2, "unidade": "pc"}],
+            "processos": {"CORTE": [{"line_id": "processo-1", "atividade": "Cortar"}]},
+            "componentes": {"snapshot": "anterior"},
+            "composicao": [{
+                "line_id": "os-comp-comp-1",
+                "item": "ROOT-1",
+                "codigo": "COMP-1",
+                "descricao": "Componente antigo",
+                "qtd": 1,
+                "unidade": "pc",
+                "level": 0,
+                "setor": "PREPARACAO",
+                "setor_manual": True,
+                "line_status": "pendente",
+            }],
+        }
+        closed_order = {
+            "id": "closed-1",
+            "tipo": "os",
+            "numero": "3099",
+            "status": "concluido",
+            "dados": {"cliente": "Cliente B"},
+            "itens": [{"codigo": "ROOT-1", "qtd": 1}],
+            "processos": {},
+            "composicao": [{"codigo": "NAO-TOCAR"}],
+        }
+        purchase_order = {"id": "oc-1", "tipo": "oc", "numero": "2723", "status": "emitido"}
+        store = {row["id"]: copy.deepcopy(row) for row in (open_order, closed_order, purchase_order)}
+
+        def load_documents(*_args, **_kwargs):
+            return copy.deepcopy(list(store.values()))
+
+        def update_document(document_id, document):
+            saved = copy.deepcopy(document)
+            saved["id"] = str(document_id)
+            store[str(document_id)] = saved
+            return True
+
+        with (
+            patch.object(app_module.supabase_data, "enabled", return_value=True),
+            patch.object(app_module.supabase_data, "carregar_documentos", side_effect=load_documents),
+            patch.object(app_module.supabase_data, "atualizar_documento", side_effect=update_document) as update,
+            patch.object(app_module, "carregar_os_componentes", return_value={
+                "ROOT-1": [{"codigo": "COMP-1", "descricao": "Componente novo", "unidade": "pc", "quantidade": 3}],
+            }) as components,
+            patch.object(app_module, "carregar_os_produtos", return_value={
+                "ROOT-1": {"codigo": "ROOT-1", "descricao": "Conjunto", "unidade": "pc"},
+                "COMP-1": {"codigo": "COMP-1", "descricao": "Componente novo", "unidade": "pc"},
+            }) as catalog,
+            patch.object(app_module, "current_username", return_value="pcp"),
+        ):
+            result = app_module.atualizar_bom_os_abertas()
+
+        self.assertEqual(1, result["atualizadas"])
+        self.assertEqual(1, result["encerradas"])
+        self.assertEqual(1, update.call_count)
+        components.assert_called_once_with(force=True)
+        catalog.assert_called_once_with(force=True)
+        refreshed = store["open-1"]
+        self.assertEqual("COMP-1", refreshed["composicao"][0]["codigo"])
+        self.assertEqual(6, refreshed["composicao"][0]["qtd"])
+        self.assertEqual("os-comp-comp-1", refreshed["composicao"][0]["line_id"])
+        self.assertEqual("pendente", refreshed["composicao"][0]["line_status"])
+        self.assertEqual("PREPARACAO", refreshed["composicao"][0]["setor"])
+        self.assertTrue(refreshed["composicao"][0]["setor_manual"])
+        self.assertEqual("anterior", refreshed["componentes"]["snapshot"])
+        self.assertEqual("manter", refreshed["dados"]["observacao"])
+        self.assertEqual("pcp", refreshed["dados"]["bom_atualizada_por"])
+        self.assertEqual([{"codigo": "NAO-TOCAR"}], store["closed-1"]["composicao"])
+        self.assertEqual("emitido", store["oc-1"]["status"])
+
+    def test_refresh_open_service_orders_rolls_back_if_one_update_fails(self):
+        first = {
+            "id": "one",
+            "tipo": "os",
+            "numero": "3101",
+            "status": "emitido",
+            "dados": {},
+            "itens": [{"codigo": "ROOT-1", "qtd": 1}],
+            "processos": {},
+            "composicao": [{"item": "ROOT-1", "codigo": "OLD-1", "qtd": 1}],
+        }
+        second = {
+            "id": "two",
+            "tipo": "os",
+            "numero": "3102",
+            "status": "emitido",
+            "dados": {},
+            "itens": [{"codigo": "ROOT-2", "qtd": 1}],
+            "processos": {},
+            "composicao": [{"item": "ROOT-2", "codigo": "OLD-2", "qtd": 1}],
+        }
+        store = {row["id"]: copy.deepcopy(row) for row in (first, second)}
+        calls = []
+        failed_once = {"value": False}
+
+        def load_documents(*_args, **_kwargs):
+            return copy.deepcopy(list(store.values()))
+
+        def update_document(document_id, document):
+            document_id = str(document_id)
+            calls.append((document_id, copy.deepcopy(document)))
+            if document_id == "two" and not failed_once["value"]:
+                failed_once["value"] = True
+                raise RuntimeError("indisponibilidade simulada")
+            saved = copy.deepcopy(document)
+            saved["id"] = document_id
+            store[document_id] = saved
+            return True
+
+        with (
+            patch.object(app_module.supabase_data, "enabled", return_value=True),
+            patch.object(app_module.supabase_data, "carregar_documentos", side_effect=load_documents),
+            patch.object(app_module.supabase_data, "atualizar_documento", side_effect=update_document),
+            patch.object(app_module, "carregar_os_componentes", return_value={
+                "ROOT-1": [{"codigo": "NEW-1", "quantidade": 1}],
+                "ROOT-2": [{"codigo": "NEW-2", "quantidade": 1}],
+            }),
+            patch.object(app_module, "carregar_os_produtos", return_value={}),
+            patch.object(app_module, "current_username", return_value="pcp"),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "indisponibilidade simulada"):
+                app_module.atualizar_bom_os_abertas()
+
+        self.assertEqual([{"item": "ROOT-1", "codigo": "OLD-1", "qtd": 1}], store["one"]["composicao"])
+        self.assertEqual([{"item": "ROOT-2", "codigo": "OLD-2", "qtd": 1}], store["two"]["composicao"])
+        self.assertEqual(["one", "two", "one"], [document_id for document_id, _ in calls])
 
 
 if __name__ == "__main__":

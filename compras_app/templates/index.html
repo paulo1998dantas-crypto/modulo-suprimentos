@@ -1208,6 +1208,7 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .dashboard-page-title h2,.management-page-title h2{margin:0;font-size:20px;color:#172033;}
 .dashboard-page-title p,.management-page-title p{margin:4px 0 0;color:#607085;font-size:12px;}
 .dashboard-shortcuts,.management-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;}
+.management-actions form{display:inline-flex;margin:0;}
 .dashboard-filterbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:10px 12px;margin-bottom:10px;border:1px solid #d8e0ea;border-radius:5px;background:#fff;}
 .dashboard-filter-main{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;}
 .dashboard-filter-group{display:flex;flex-direction:column;gap:4px;}
@@ -5320,6 +5321,12 @@ salvarRascunhoOS();
 <a class="btn" href="/erp/gestao-os">Gestão Operacional O.S.</a>
 {% if can('suprimentos.production_order.view') %}<a class="btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>{% endif %}
 {% if can('suprimentos.work_order.view') %}<a class="btn" href="/erp/forecast">FORECAST</a>{% endif %}
+{% if can('suprimentos.work_order.manage') %}
+<form method="POST" action="/atualizar_bom_os_abertas" onsubmit="return confirm('Atualizar a B.O.M. de todas as O.S. abertas? A composição de materiais sera recriada pela B.O.M. vigente; componentes manuais que nao existirem mais na B.O.M. serao retirados. Itens, processos, status e O.S. concluidas/canceladas serao preservados. Esta acao nao movimenta estoque, empenhos, baixas ou O.C.');">
+<input type="hidden" name="confirmar_atualizacao_bom_os" value="sim">
+<button type="submit" class="btn-secondary">↻ REFRESH B.O.M. abertas</button>
+</form>
+{% endif %}
 <a class="btn" href="/exportar_dashboard?tipo=os">Relatório de O.S.</a>
 </div>
 </div>

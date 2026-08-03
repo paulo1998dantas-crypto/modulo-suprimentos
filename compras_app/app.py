@@ -3,6 +3,7 @@ from functools import wraps
 from flask import Flask, render_template, request, send_file, redirect, url_for, after_this_request, session, jsonify
 from flask.wrappers import Request as FlaskRequest
 import csv
+import copy
 import hashlib
 import re
 import json
@@ -1038,10 +1039,10 @@ def _abrir_navegador(port):
 
 
 
-def carregar_produtos():
+def carregar_produtos(force=False):
     if supabase_catalog.enabled():
         try:
-            return supabase_catalog.carregar_produtos()
+            return supabase_catalog.carregar_produtos(force=force)
         except Exception as exc:
             app.logger.exception("Falha ao carregar SKUs do Supabase")
             return {}
@@ -1068,9 +1069,9 @@ def carregar_fornecedores():
         return json.load(f)
 
 
-def carregar_os_produtos():
+def carregar_os_produtos(force=False):
     if supabase_catalog.enabled():
-        return carregar_produtos()
+        return carregar_produtos(force=force)
 
     if not os.path.exists(OS_PRODUTOS_FILE):
         return {}
@@ -1142,10 +1143,10 @@ def salvar_os_fornecedores(fornecedores):
     salvar_json(OS_FORNECEDORES_FILE, fornecedores or {})
 
 
-def carregar_os_componentes():
+def carregar_os_componentes(force=False):
     if supabase_data.enabled():
         try:
-            return supabase_data.carregar_bom_componentes()
+            return supabase_data.carregar_bom_componentes(force=force)
         except Exception:
             app.logger.exception("Falha ao carregar B.O.M. do Supabase")
             return {}
@@ -4290,6 +4291,37 @@ def api_historico_os(documento_id):
     return jsonify({"ok": True, "documento": documento})
 
 
+@app.route("/atualizar_bom_os_abertas", methods=["POST"])
+@permission_required("suprimentos.work_order.manage")
+def atualizar_bom_os_abertas_route():
+    try:
+        if request.form.get("confirmar_atualizacao_bom_os") != "sim":
+            raise ValueError("Confirme a atualizacao da B.O.M. das O.S. abertas.")
+        resultado = atualizar_bom_os_abertas()
+        status = (
+            f"B.O.M. vigente aplicada em {resultado['atualizadas']} de "
+            f"{resultado['abertas']} O.S. aberta(s): "
+            f"{resultado['componentes']} linha(s) de componente recalculada(s)."
+        )
+        if resultado["sem_itens"]:
+            status += f" {resultado['sem_itens']} O.S. sem item(ns) foi(ram) preservada(s)."
+        if resultado["encerradas"]:
+            status += (
+                f" {resultado['encerradas']} O.S. concluida(s), cancelada(s) ou arquivada(s) "
+                "foram preservadas."
+            )
+        status += " Estoque, empenhos, baixas e O.C. nao foram alterados."
+    except ValueError as exc:
+        status = str(exc)
+    except Exception:
+        app.logger.exception("Falha ao atualizar B.O.M. das O.S. abertas")
+        status = (
+            "Falha ao atualizar a B.O.M. das O.S. abertas. "
+            "As O.S. atualizadas durante esta tentativa foram restauradas."
+        )
+    return redirect(url_for("index", tab="gestao-os", documento_status=status))
+
+
 @app.route("/api/historico/os/<documento_id>/excluir", methods=["POST"])
 @permission_required("suprimentos.work_order.manage")
 def api_excluir_historico_os(documento_id):
@@ -4870,6 +4902,230 @@ def _assinatura_os_recalculada(documento):
         default=str,
     )
     return hashlib.sha256(serializado.encode("utf-8")).hexdigest()
+
+
+_STATUS_OS_ENCERRADOS_PARA_BOM = {
+    "concluido",
+    "concluida",
+    "cancelado",
+    "cancelada",
+    "arquivado",
+    "arquivada",
+    "encerrado",
+    "encerrada",
+}
+
+
+def _os_aberta_para_atualizacao_bom(documento):
+    if str((documento or {}).get("tipo") or "").strip().lower() != "os":
+        return False
+    status = str((documento or {}).get("status") or "emitido").strip().lower()
+    return status not in _STATUS_OS_ENCERRADOS_PARA_BOM
+
+
+def _chave_linha_composicao_bom(linha):
+    """Stable matching key used to preserve operational annotations on a BOM line.
+
+    Quantity and description are intentionally excluded: both are expected to
+    change when engineering revises the BOM or the item quantity in the O.S.
+    """
+    try:
+        level = int((linha or {}).get("level", 0) or 0)
+    except (TypeError, ValueError):
+        level = 0
+    return (
+        normalizar_codigo((linha or {}).get("item", "")),
+        normalizar_codigo((linha or {}).get("codigo", "")),
+        level,
+    )
+
+
+def _preservar_marcadores_operacionais_bom(linhas_novas, linhas_anteriores):
+    """Keep line identity/status and manual sector choices when the line remains.
+
+    A refresh must recalculate material quantities from the current BOM, but it
+    must not silently discard an existing line status or a sector manually set
+    by PCP. Components that no longer exist in the current BOM are deliberately
+    not carried forward.
+    """
+    anteriores_por_chave = {}
+    for linha in linhas_anteriores or []:
+        if isinstance(linha, dict):
+            anteriores_por_chave.setdefault(_chave_linha_composicao_bom(linha), []).append(linha)
+
+    resultado = []
+    for linha in linhas_novas or []:
+        if not isinstance(linha, dict):
+            continue
+        atualizada = dict(linha)
+        candidatas = anteriores_por_chave.get(_chave_linha_composicao_bom(atualizada), [])
+        anterior = candidatas.pop(0) if candidatas else None
+        if anterior:
+            for campo in (
+                "line_id",
+                "line_status",
+                "line_status_atualizado_por",
+                "line_status_atualizado_em",
+            ):
+                if anterior.get(campo) not in (None, ""):
+                    atualizada[campo] = anterior.get(campo)
+            if bool(anterior.get("setor_manual")):
+                atualizada["setor"] = anterior.get("setor") or atualizada.get("setor", "")
+                atualizada["setor_origem"] = anterior.get("setor_origem") or atualizada.get("setor", "")
+                atualizada["setor_manual"] = True
+        resultado.append(atualizada)
+    return resultado
+
+
+def _recalcular_composicao_os_bom_vigente(documento, componentes, catalogo, usuario):
+    """Create an updated copy of an open O.S. using the current BOM only."""
+    itens = [dict(item) for item in (documento.get("itens") or []) if isinstance(item, dict)]
+    if not itens:
+        return None
+
+    composicao = resolver_composicao_final(itens, componentes)
+    composicao = propagar_setor_preparacao(
+        enriquecer_composicao(composicao, catalogo),
+        catalogo,
+        componentes,
+    )
+    composicao = _preservar_marcadores_operacionais_bom(
+        composicao,
+        documento.get("composicao") or [],
+    )
+    composicao = _atribuir_line_ids(
+        composicao,
+        "os-comp",
+        documento.get("composicao") or [],
+        ("item", "codigo", "descricao", "qtd", "unidade", "level", "setor"),
+    )
+
+    atualizado = copy.deepcopy(documento)
+    dados = dict(atualizado.get("dados") or {})
+    dados.update({
+        "bom_atualizada_em": datetime.now().isoformat(timespec="seconds"),
+        "bom_atualizada_por": usuario,
+        "bom_componentes_recalculados": len(composicao),
+    })
+    atualizado["dados"] = dados
+    atualizado["itens"] = _atribuir_line_ids(
+        atualizado.get("itens") or [],
+        "os-item",
+        documento.get("itens") or [],
+        ("codigo", "descricao", "qtd", "unidade", "serie"),
+    )
+    atualizado["processos"] = _atribuir_line_ids_processos(
+        atualizado.get("processos") or {},
+        documento.get("processos") or {},
+    )
+    atualizado["composicao"] = composicao
+    atualizado["atualizado_por"] = usuario
+    return atualizado
+
+
+def atualizar_bom_os_abertas():
+    """Refresh all technically open O.S. against the current engineering BOM.
+
+    The operation only changes the O.S. document JSON. It never creates stock
+    movements, alters balances, changes purchase orders, or touches technically
+    completed/cancelled O.S. Every online update is verified and rolled back if
+    a document cannot be confirmed after the batch.
+    """
+    online = supabase_data.enabled()
+    documentos = (
+        supabase_data.carregar_documentos(force=True)
+        if online
+        else _carregar_historico_local()
+    )
+    os_abertas = [documento for documento in documentos if _os_aberta_para_atualizacao_bom(documento)]
+    os_encerradas = [
+        documento for documento in documentos
+        if str((documento or {}).get("tipo") or "").strip().lower() == "os"
+        and not _os_aberta_para_atualizacao_bom(documento)
+    ]
+    if not os_abertas:
+        return {
+            "atualizadas": 0,
+            "abertas": 0,
+            "encerradas": len(os_encerradas),
+            "sem_itens": 0,
+            "componentes": 0,
+        }
+
+    componentes = carregar_os_componentes(force=True)
+    catalogo = carregar_os_produtos(force=True)
+    usuario = current_username()
+    atualizacoes = []
+    sem_itens = 0
+    for documento in os_abertas:
+        atualizado = _recalcular_composicao_os_bom_vigente(documento, componentes, catalogo, usuario)
+        if atualizado is None:
+            sem_itens += 1
+            continue
+        if documento.get("id") is None:
+            raise ValueError(f"O.S. {documento.get('numero') or '-'} sem identificador para atualizar.")
+        atualizacoes.append({
+            "id": str(documento["id"]),
+            "original": copy.deepcopy(documento),
+            "atualizado": atualizado,
+        })
+
+    if online:
+        ids_atualizados = []
+        try:
+            for atualizacao in atualizacoes:
+                confirmado = supabase_data.atualizar_documento(
+                    atualizacao["id"],
+                    atualizacao["atualizado"],
+                )
+                if not confirmado:
+                    raise RuntimeError(
+                        f"O Supabase nao confirmou a atualizacao da O.S. "
+                        f"{atualizacao['atualizado'].get('numero') or '-'}.")
+                ids_atualizados.append(atualizacao["id"])
+
+            final_por_id = {
+                str(documento.get("id")): documento
+                for documento in supabase_data.carregar_documentos(force=True)
+            }
+            divergentes = [
+                atualizacao["atualizado"].get("numero") or atualizacao["id"]
+                for atualizacao in atualizacoes
+                if atualizacao["id"] not in final_por_id
+                or _assinatura_os_recalculada(final_por_id[atualizacao["id"]])
+                != _assinatura_os_recalculada(atualizacao["atualizado"])
+            ]
+            if divergentes:
+                raise RuntimeError(
+                    "A verificacao final divergiu nas O.S.: "
+                    + ", ".join(str(numero) for numero in divergentes[:10])
+                )
+        except Exception:
+            for atualizacao in reversed(atualizacoes):
+                if atualizacao["id"] not in ids_atualizados:
+                    continue
+                try:
+                    supabase_data.atualizar_documento(atualizacao["id"], atualizacao["original"])
+                except Exception:
+                    app.logger.exception(
+                        "Falha ao restaurar a O.S. %s apos refresh de B.O.M.",
+                        atualizacao["original"].get("numero"),
+                    )
+            raise
+    elif atualizacoes:
+        atualizados_por_id = {atualizacao["id"]: atualizacao["atualizado"] for atualizacao in atualizacoes}
+        salvar_historico([
+            atualizados_por_id.get(str(documento.get("id")), documento)
+            for documento in documentos
+        ])
+
+    return {
+        "atualizadas": len(atualizacoes),
+        "abertas": len(os_abertas),
+        "encerradas": len(os_encerradas),
+        "sem_itens": sem_itens,
+        "componentes": sum(len(atualizacao["atualizado"].get("composicao") or []) for atualizacao in atualizacoes),
+    }
 
 
 def recalcular_os_importadas(arquivos):
