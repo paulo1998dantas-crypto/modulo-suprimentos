@@ -1319,10 +1319,11 @@ def revalidate_session_user(session_user):
         or _clean(session_user.get("role")) != _clean(user.get("role"))
     ):
         return None
-    # Re-read the role matrix on every authenticated request. Membership and
-    # user changes also bump auth_version, while matrix-only changes become
-    # effective immediately without waiting for the short cache TTL.
-    return load_user_authorization(user.get("id"), force=True)
+    # A identidade e auth_version continuam sendo consultados a cada request:
+    # bloqueio, senha e alteração individual revogam a sessão imediatamente.
+    # A matriz de perfis é reutilizada pelo cache curto (10 s), eliminando
+    # várias chamadas REST repetidas ao abrir uma única tela operacional.
+    return load_user_authorization(user.get("id"), force=False)
 
 
 def verify_user(username, password):

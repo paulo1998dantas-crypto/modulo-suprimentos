@@ -4,7 +4,10 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: cd compras_app && gunicorn --workers 1 --threads 2 --timeout 180 --graceful-timeout 180 app:app
+    # I/O do Supabase e das integrações pode aguardar rede. Quatro threads
+    # permitem servir outras páginas enquanto uma requisição espera, sem criar
+    # outro processo pesado no plano Free.
+    startCommand: cd compras_app && gunicorn --workers 1 --threads 4 --timeout 120 --graceful-timeout 120 app:app
     envVars:
       - key: SUPRIMENTOS_CATALOG_MODE
         value: supabase
@@ -16,6 +19,12 @@ services:
         value: "0"
       - key: ERP_FEATURE_FLAG
         value: "false"
+      - key: ERP_PORTAL_SSO_ENABLED
+        value: "0"
+      - key: ERP_PORTAL_URL
+        value: https://ji-portal-operacional.onrender.com
+      - key: ERP_PORTAL_SSO_SECRET
+        sync: false
       - key: SUPRIMENTOS_SESSION_SECRET
         sync: false
       - key: ERP_STOCK_API_URL

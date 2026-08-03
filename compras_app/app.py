@@ -72,6 +72,7 @@ from gerar_os import gerar_os_docx
 from gerar_op import build_production_order_docx
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, identificar_nome_processo, normalizar_nome_processo
+from portal_sso import consume_ticket, enabled as portal_sso_enabled, normalize_next, portal_login_url, portal_logout_url
 from os_setores import (
     SETOR_EXPEDICAO,
     SETOR_FATURAMENTO_DIRETO,
@@ -257,6 +258,9 @@ def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if login_enabled() and not current_user():
+            if portal_sso_enabled():
+                target = request.full_path if request.query_string else request.path
+                return redirect(portal_login_url("SUPRIMENTOS", target))
             return redirect(url_for("login", next=request.path))
         return view(*args, **kwargs)
 
@@ -267,7 +271,7 @@ def login_required(view):
 def require_login_global():
     if not login_enabled():
         return None
-    public_endpoints = {"login", "logout", "healthz", "static"}
+    public_endpoints = {"login", "logout", "healthz", "static", "portal_sso_consume"}
     if request.endpoint in public_endpoints:
         return None
     user = current_user()
@@ -287,10 +291,16 @@ def require_login_global():
                         "ok": False,
                         "error": "Sessao expirada apos alteracao de usuario ou acesso.",
                     }), 401
+                if portal_sso_enabled():
+                    target = request.full_path if request.query_string else request.path
+                    return redirect(portal_login_url("SUPRIMENTOS", target))
                 return redirect(url_for("login", next=request.path))
             session["suprimentos_user"] = fresh_user
         return None
-    return redirect(url_for("login", next=request.full_path if request.query_string else request.path))
+    target = request.full_path if request.query_string else request.path
+    if portal_sso_enabled():
+        return redirect(portal_login_url("SUPRIMENTOS", target))
+    return redirect(url_for("login", next=target))
 
 RELEASE_BUILD_NAME = "ModuloSuprimentos"
 RELEASE_ENVIO_DIR_NAME = "ModuloSuprimentos_envio"
@@ -4022,6 +4032,8 @@ def proximo_numero_os():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if portal_sso_enabled():
+        return redirect(portal_login_url("SUPRIMENTOS", request.args.get("next") or url_for("index")))
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -4054,9 +4066,36 @@ def login():
     )
 
 
+@app.route("/_sso/consume")
+def portal_sso_consume():
+    """Exchange a short-lived Portal assertion for the local Flask session."""
+    if not portal_sso_enabled():
+        return "SSO central desativado.", 404
+    try:
+        claims = consume_ticket(request.args.get("ticket"), "SUPRIMENTOS")
+        user = supabase_data.load_user_authorization(claims["uid"], force=True)
+        if (
+            not user
+            or str(user.get("username") or "").casefold() != claims["username"].casefold()
+            or int(user.get("auth_version") or 0) != claims["auth_version"]
+        ):
+            raise ValueError("Usuario sem sessao valida para este modulo.")
+        session.clear()
+        session["suprimentos_user"] = user
+        response = redirect(normalize_next(claims.get("next"), url_for("index")))
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
+    except (ValueError, supabase_data.SupabaseDataError) as exc:
+        app.logger.warning("Falha no login centralizado: %s", exc)
+        return "Nao foi possivel validar o acesso centralizado.", 401
+
+
 @app.route("/logout")
 def logout():
     session.clear()
+    if portal_sso_enabled():
+        return redirect(portal_logout_url())
     return redirect(url_for("login"))
 
 
