@@ -29,6 +29,7 @@
     .section-title{grid-column:1/-1;margin:5px 0 -1px;padding-bottom:5px;border-bottom:1px solid var(--line);font-size:12px;color:var(--navy)}
     .modal-foot{display:flex;justify-content:space-between;gap:8px;padding:10px 14px;border-top:1px solid var(--line);background:#f8fafc}.empty{padding:32px;text-align:center;color:var(--muted)}
     .materials-summary{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:8px;margin-bottom:12px}.materials-summary>div{padding:10px;border:1px solid var(--line);border-radius:6px;background:#f8fafc}.materials-summary span{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}.materials-summary strong{display:block;margin-top:4px;font-size:19px}
+    .pool-balance{color:#075d57}.pool-candidates{margin-top:4px;max-width:360px}.pool-candidates summary{cursor:pointer;color:var(--blue);font-weight:750}.pool-candidates ul{margin:6px 0 0;padding-left:18px}.pool-candidates li{margin:3px 0;color:#475569}.pool-note{padding:8px 10px;border:1px solid #bae6d5;border-radius:5px;background:#ecfdf5;color:#075d57}.shared-form{display:grid;grid-template-columns:1fr 180px;gap:10px}.shared-form .span2{grid-column:1/-1}.shared-hint{margin:0;padding:9px;border-radius:5px;background:#f1f5f9;color:#475569}
     @media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.head{flex-direction:column}.grid{grid-template-columns:repeat(2,1fr)}.table-wrap{max-height:none}}
   </style>
 </head>
@@ -126,20 +127,37 @@
     <p class="muted">O saldo do empenho representa o que ainda não foi baixado. Movimentações antigas sem vínculo estrutural com a O.S. não são atribuídas automaticamente.</p>
     <h3>Falta expedir para esta O.S.</h3>
     <div class="table-wrap">
-      <table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Necessidade</th><th>Coberto</th><th>Falta expedir</th><th>Setor</th></tr></thead><tbody id="materials-pending-rows"></tbody></table>
+      <table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Necessidade</th><th>Coberto</th><th>Falta expedir</th><th>Saldo em fluxo</th><th>Setor</th><th>Ação</th></tr></thead><tbody id="materials-pending-rows"></tbody></table>
     </div>
+    <p class="pool-note"><strong>Saldo em fluxo</strong> é um empenho solto para produção/setor que pode atender esta necessidade. Ele é apenas informativo e não reduz a falta da O.S. automaticamente. Somente um administrador pode confirmar a baixa e o vínculo.</p>
     <p class="muted">Um empenho do produto final cobre também seus componentes B.O.M. Baixas vinculadas ao mesmo empenho não são contadas duas vezes. O.S. tecnicamente concluídas saem deste cálculo.</p>
   </div>
 </dialog>
 
+<dialog id="shared-consumption-dialog">
+  <form id="shared-consumption-form">
+    <header class="modal-head"><div><h2>Baixar do fluxo compartilhado</h2><small id="shared-consumption-subtitle"></small></div><button class="btn" type="button" onclick="sharedConsumptionDialog.close()">Fechar</button></header>
+    <div class="modal-body shared-form">
+      <label class="span2 required"><span>Empenho de origem</span><select name="movement_id" required onchange="updateSharedConsumptionHint()"></select></label>
+      <label class="required"><span>Quantidade do empenho de origem</span><input name="quantidade" type="number" min="0.001" step="0.001" required></label>
+      <label><span>Unidade de origem</span><input name="unidade" readonly></label>
+      <p id="shared-consumption-hint" class="shared-hint span2"></p>
+      <label class="span2 required"><span>Motivo / referência</span><textarea name="motivo" rows="3" required placeholder="Informe por que este saldo em fluxo deve ser consumido por esta O.S."></textarea></label>
+    </div>
+    <footer class="modal-foot"><span class="muted">A confirmação gera uma baixa real no Estoque e vincula somente esta quantidade à O.S.</span><button id="shared-consumption-submit" class="btn success" type="submit">Confirmar baixa e vínculo</button></footer>
+  </form>
+</dialog>
+
 <script>
-const state={orders:[],forecasts:[],filtered:[],active:null,catalogs:{},required:[]};
+const state={orders:[],forecasts:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null};
 const mesBase={{ mes_url|tojson }};
 const workDialog=document.getElementById('work-dialog'),form=document.getElementById('work-form');
 const materialsDialog=document.getElementById('materials-dialog');
+const sharedConsumptionDialog=document.getElementById('shared-consumption-dialog'),sharedConsumptionForm=document.getElementById('shared-consumption-form');
 const permissions={
   manage:{{ can('suprimentos.work_order.manage')|tojson }},
-  technical:{{ can('suprimentos.work_order.technical_close')|tojson }}
+  technical:{{ can('suprimentos.work_order.technical_close')|tojson }},
+  poolAdmin:{{ can('estoque.commitment.reconcile_admin')|tojson }}
 };
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
@@ -232,7 +250,51 @@ form.onsubmit=async event=>{event.preventDefault();try{await saveWork()}catch(er
 async function openMesConfiguration(){const missing=checkMissing();if(missing.length){message(`Preencha antes de parametrizar: ${missing.join(', ')}.`,true);form.querySelector('.missing')?.focus();return}const popup=window.open('about:blank','_blank');try{const workId=await saveWork(true);const target=`${mesBase.replace(/\/$/,'')}/gestao-os?work_order_id=${encodeURIComponent(workId)}`;if(popup)popup.location.href=target;else location.href=target;workDialog.close();message('O.S. salva. Defina as etapas no MES e conclua a ativação.')}catch(error){if(popup)popup.close();message(error.message,true)}}
 async function technicalClose(){const workId=form.elements.work_order_id.value;if(!workId||!confirm('Concluir tecnicamente esta O.S.? Isso não finaliza a produção e não movimenta estoque.'))return;try{await api(`/api/erp/os-management/work-orders/${workId}/technical-close`,{method:'POST',body:JSON.stringify({motivo:'Conclusão técnica registrada na Gestão de O.S. em Suprimentos.'})});await loadOrders();const row=state.orders.find(item=>item.work_order_id===workId);if(row)openWork(row.entry_id);message('Conclusão técnica registrada. O relatório do MES exibirá ARQUIVADO = SIM.')}catch(error){message(error.message,true)}}
 function qty(value){const numeric=typeof value==='number'?value:Number(String(value??'').replace(',','.'));return Number.isFinite(numeric)?new Intl.NumberFormat('pt-BR',{maximumFractionDigits:3}).format(numeric):String(value??0)}
-async function openMaterials(workId,number){try{const body=await api(`/api/erp/os-management/work-orders/${encodeURIComponent(workId)}/materials`),totals=body.totals||body.summary||{},lines=body.lines||body.materials||[],needs=body.pending_lines||[],needSummary=body.need_summary||{};document.getElementById('materials-title').textContent=`Materiais da O.S. ${number||''}`;document.getElementById('materials-subtitle').textContent=body.chassi||body.work_order?.chassi||'';const boxes=[['Empenhado',totals.quantidade_empenhada],['Baixado',totals.quantidade_baixada],['Saldo do empenho',totals.saldo_empenhado??totals.quantidade_pendente],['Itens cobertos',needSummary.covered_items],['Itens a expedir',needSummary.pending_items]];document.getElementById('materials-summary').innerHTML=boxes.map(([label,value])=>`<div><span>${esc(label)}</span><strong>${esc(qty(value))}</strong></div>`).join('');document.getElementById('materials-rows').innerHTML=lines.length?lines.map(line=>`<tr><td>${esc(line.sku_codigo||line.codigo||'—')}</td><td>${esc(line.descricao||'—')}</td><td>${esc(line.unidade||'—')}</td><td>${esc(qty(line.quantidade_empenhada))}</td><td>${esc(qty(line.quantidade_baixada))}</td><td><strong>${esc(qty(line.saldo_empenhado??line.quantidade_pendente))}</strong></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Nenhuma movimentação vinculada a esta O.S.</td></tr>';document.getElementById('materials-pending-rows').innerHTML=needs.length?needs.map(line=>`<tr><td>${esc(line.codigo||'—')}</td><td>${esc(line.descricao||'—')}</td><td>${esc(line.unidade||'—')}</td><td>${esc(qty(line.quantidade_necessaria))}</td><td>${esc(qty(line.quantidade_coberta))}</td><td><strong>${esc(qty(line.quantidade_pendente))}</strong></td><td>${esc(line.setor||'—')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Nenhuma pendência ativa: necessidade coberta ou O.S. tecnicamente concluída.</td></tr>';materialsDialog.showModal()}catch(error){message(error.message,true)}}
+function sharedCandidateId(candidate){return candidate.movement_id??candidate.id??''}
+function sharedCandidates(line){return Array.isArray(line.empenhos_compartilhados)?line.empenhos_compartilhados:[]}
+function sharedPoolCell(line){
+  const candidates=sharedCandidates(line),balance=line.saldo_fluxo_compartilhado??candidates.reduce((total,item)=>total+Number(item.quantidade_equivalente||0),0);
+  if(!candidates.length)return '<span class="muted">—</span>';
+  const items=candidates.map(item=>{const origin=item.source_codigo||item.codigo||'—',pending=item.saldo_pendente_origem??item.quantidade_pendente??0,equivalent=item.quantidade_equivalente??0,reference=item.setor||item.referencia||item.documento||'sem referência';return `<li>Empenho #${esc(sharedCandidateId(item))} · ${esc(origin)} · saldo ${esc(qty(pending))} ${esc(item.source_unidade||item.unidade||'')} · cobre ${esc(qty(equivalent))} ${esc(line.unidade||'')} · ${esc(reference)}</li>`}).join('');
+  return `<strong class="pool-balance">${esc(qty(balance))}</strong><details class="pool-candidates"><summary>${candidates.length} empenho(s) candidato(s)</summary><ul>${items}</ul></details>`;
+}
+function openSharedConsumption(needIndex){
+  if(!permissions.poolAdmin){message('Somente um administrador pode baixar um empenho do saldo em fluxo.',true);return}
+  const need=state.materials?.needs?.[needIndex],candidates=sharedCandidates(need||{});if(!need||!candidates.length)return;
+  state.sharedNeed=need;sharedConsumptionForm.reset();
+  const select=sharedConsumptionForm.elements.movement_id;
+  select.innerHTML=candidates.map(item=>`<option value="${esc(sharedCandidateId(item))}">Empenho #${esc(sharedCandidateId(item))} · ${esc(item.source_codigo||item.codigo||'—')} · saldo ${esc(qty(item.saldo_pendente_origem??item.quantidade_pendente))} ${esc(item.source_unidade||item.unidade||'')}</option>`).join('');
+  document.getElementById('shared-consumption-subtitle').textContent=`O.S. ${state.materials.number||''} · necessidade ${need.codigo||''}`;
+  updateSharedConsumptionHint();sharedConsumptionDialog.showModal();
+}
+function updateSharedConsumptionHint(){
+  const need=state.sharedNeed,candidate=sharedCandidates(need||{}).find(item=>String(sharedCandidateId(item))===String(sharedConsumptionForm.elements.movement_id.value));if(!candidate)return;
+  const available=Number(candidate.saldo_pendente_origem??candidate.quantidade_pendente??0),factor=Number(candidate.fator_cobertura||1),pendingNeed=Number(need.quantidade_pendente||0),suggested=Math.min(available,factor>0?pendingNeed/factor:available),unit=candidate.source_unidade||candidate.unidade||'';
+  const quantity=sharedConsumptionForm.elements.quantidade;quantity.max=available>0?String(available):'';quantity.value=suggested>0?String(Math.round(suggested*1000)/1000):'';sharedConsumptionForm.elements.unidade.value=unit;
+  document.getElementById('shared-consumption-hint').textContent=`Disponível no empenho: ${qty(available)} ${unit}. Cada 1 ${unit||'unidade'} cobre ${qty(factor)} ${need.unidade||'unidade'} da necessidade ${need.codigo||''}. A falta atual da O.S. é ${qty(pendingNeed)} ${need.unidade||''}.`;
+}
+sharedConsumptionForm.onsubmit=async event=>{
+  event.preventDefault();if(!permissions.poolAdmin)return;
+  const movementId=sharedConsumptionForm.elements.movement_id.value,quantity=Number(sharedConsumptionForm.elements.quantidade.value),reason=String(sharedConsumptionForm.elements.motivo.value||'').trim();
+  if(!movementId||!Number.isFinite(quantity)||quantity<=0||!reason){message('Selecione o empenho, informe uma quantidade válida e descreva o motivo.',true);return}
+  const button=document.getElementById('shared-consumption-submit');button.disabled=true;
+  try{
+    const nonce=globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    await api(`/api/erp/os-management/work-orders/${encodeURIComponent(state.materials.workId)}/materials/shared-consumption`,{method:'POST',body:JSON.stringify({movement_id:movementId,quantidade:quantity,motivo:reason,idempotency_key:`shared-consumption:${state.materials.workId}:${movementId}:${nonce}`})});
+    sharedConsumptionDialog.close();await openMaterials(state.materials.workId,state.materials.number);message('Baixa do saldo em fluxo registrada e vinculada à O.S. O saldo físico foi movimentado uma única vez.');
+  }catch(error){message(error.message,true)}finally{button.disabled=false}
+};
+async function openMaterials(workId,number){
+  try{
+    const body=await api(`/api/erp/os-management/work-orders/${encodeURIComponent(workId)}/materials`),totals=body.totals||body.summary||{},lines=body.lines||body.materials||[],needs=body.pending_lines||[],needSummary=body.need_summary||{};
+    state.materials={workId,number,needs};document.getElementById('materials-title').textContent=`Materiais da O.S. ${number||''}`;document.getElementById('materials-subtitle').textContent=body.chassi||body.work_order?.chassi||'';
+    const boxes=[['Empenhado',totals.quantidade_empenhada],['Baixado',totals.quantidade_baixada],['Saldo do empenho',totals.saldo_empenhado??totals.quantidade_pendente],['Itens cobertos',needSummary.covered_items],['Itens a expedir',needSummary.pending_items],['Empenhos em fluxo',needSummary.empenhos_compartilhados]];
+    document.getElementById('materials-summary').innerHTML=boxes.map(([label,value])=>`<div><span>${esc(label)}</span><strong>${esc(qty(value))}</strong></div>`).join('');
+    document.getElementById('materials-rows').innerHTML=lines.length?lines.map(line=>`<tr><td>${esc(line.sku_codigo||line.codigo||'—')}</td><td>${esc(line.descricao||'—')}</td><td>${esc(line.unidade||'—')}</td><td>${esc(qty(line.quantidade_empenhada))}</td><td>${esc(qty(line.quantidade_baixada))}</td><td><strong>${esc(qty(line.saldo_empenhado??line.quantidade_pendente))}</strong></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Nenhuma movimentação vinculada a esta O.S.</td></tr>';
+    document.getElementById('materials-pending-rows').innerHTML=needs.length?needs.map((line,index)=>`<tr><td>${esc(line.codigo||'—')}</td><td>${esc(line.descricao||'—')}</td><td>${esc(line.unidade||'—')}</td><td>${esc(qty(line.quantidade_necessaria))}</td><td>${esc(qty(line.quantidade_coberta))}</td><td><strong>${esc(qty(line.quantidade_pendente))}</strong></td><td>${sharedPoolCell(line)}</td><td>${esc(line.setor||'—')}</td><td>${permissions.poolAdmin&&sharedCandidates(line).length?`<button class="btn success" type="button" onclick="openSharedConsumption(${index})">Baixar do fluxo</button>`:'<span class="muted">Somente consulta</span>'}</td></tr>`).join(''):'<tr><td colspan="9" class="empty">Nenhuma pendência ativa: necessidade coberta ou O.S. tecnicamente concluída.</td></tr>';
+    if(!materialsDialog.open)materialsDialog.showModal();
+  }catch(error){message(error.message,true)}
+}
 loadOrders();
 </script>
 </body>

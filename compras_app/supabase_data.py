@@ -6,6 +6,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from werkzeug.security import check_password_hash
 
@@ -14,6 +15,7 @@ import supabase_catalog
 
 PAGE_SIZE = 1000
 CACHE_TTL_SECONDS = 10
+BUSINESS_TIMEZONE = ZoneInfo("America/Sao_Paulo")
 
 PESSOAS_TABLE = "suprimentos_pessoas"
 PROCESSOS_TABLE = "suprimentos_processos"
@@ -25,6 +27,8 @@ DOCUMENTOS_TABLE = "suprimentos_documentos"
 FORECASTS_TABLE = "suprimentos_forecasts"
 FORECAST_ITEMS_TABLE = "suprimentos_forecast_itens"
 FORECAST_REQUIREMENTS_TABLE = "suprimentos_forecast_necessidades"
+PURCHASE_ORDERS_TABLE = "erp_purchase_orders"
+PURCHASE_ORDER_LINES_TABLE = "erp_purchase_order_lines"
 SKUS_TABLE = "skus"
 ROLES_TABLE = "erp_roles"
 PERMISSIONS_TABLE = "erp_permissions"
@@ -191,6 +195,8 @@ def status():
             FORECASTS_TABLE,
             FORECAST_ITEMS_TABLE,
             FORECAST_REQUIREMENTS_TABLE,
+            PURCHASE_ORDERS_TABLE,
+            PURCHASE_ORDER_LINES_TABLE,
             USERS_TABLE,
             ROLES_TABLE,
             PERMISSIONS_TABLE,
@@ -284,6 +290,99 @@ def _numeric(value):
         return float(texto)
     except Exception:
         return 0
+
+
+def carregar_compras_transito(force=False):
+    """Return every physically pending purchase-order line from the shared ERP.
+
+    The buyer view reads the same UUID-backed order/line tables used by Estoque,
+    so this report is a live projection instead of a second purchase ledger.
+    Technical closures and cancelled orders are intentionally excluded.
+    """
+    orders = _all_rows(
+        PURCHASE_ORDERS_TABLE,
+        select=(
+            "id,numero_oc,categoria,fornecedor_nome,status,data_emissao,"
+            "data_necessidade,destino,technical_status"
+        ),
+        order="data_emissao.desc",
+        extra_query=[
+            ("status", "in.(EMITIDA,PARCIALMENTE_RECEBIDA)"),
+            # `neq` does not include NULL in PostgREST. Keep compatible legacy
+            # orders without a populated technical_status in the live queue.
+            ("or", "(technical_status.is.null,technical_status.neq.CONCLUIDA)"),
+        ],
+        cache_key="purchase_orders_transit_orders",
+        force=force,
+    )
+    order_by_id = {_clean(row.get("id")): row for row in orders if _clean(row.get("id"))}
+    if not order_by_id:
+        return []
+
+    lines = _all_rows(
+        PURCHASE_ORDER_LINES_TABLE,
+        select=(
+            "id,purchase_order_id,numero_linha,sku_codigo,descricao_original,unidade,"
+            "quantidade_pedida,quantidade_recebida,destino,data_necessidade,status"
+        ),
+        order="data_necessidade.asc,numero_linha.asc",
+        extra_query=[("status", "in.(PENDENTE,PARCIALMENTE_RECEBIDA)")],
+        cache_key="purchase_orders_transit_lines",
+        force=force,
+    )
+    result = []
+    for line in lines:
+        order = order_by_id.get(_clean(line.get("purchase_order_id")))
+        if not order:
+            continue
+        ordered = _numeric(line.get("quantidade_pedida"))
+        received = _numeric(line.get("quantidade_recebida"))
+        pending = max(ordered - received, 0)
+        if pending <= 0:
+            continue
+        due_date = line.get("data_necessidade") or order.get("data_necessidade")
+        days_until_due = None
+        transit_status = "SEM DATA"
+        try:
+            parsed_due_date = datetime.fromisoformat(_clean(due_date)[:10]).date()
+            days_until_due = (
+                parsed_due_date - datetime.now(BUSINESS_TIMEZONE).date()
+            ).days
+            if days_until_due < 0:
+                transit_status = "ATRASADA"
+            elif days_until_due == 0:
+                transit_status = "VENCE HOJE"
+            else:
+                transit_status = "A VENCER"
+        except (TypeError, ValueError):
+            pass
+        result.append({
+            "purchase_order_id": order.get("id"),
+            "purchase_order_line_id": line.get("id"),
+            "numero_oc": _clean(order.get("numero_oc")),
+            "categoria": _clean(order.get("categoria")) or "GERAL",
+            "fornecedor_nome": _clean(order.get("fornecedor_nome")),
+            "data_emissao": order.get("data_emissao"),
+            "numero_linha": int(_numeric(line.get("numero_linha")) or 0),
+            "sku_codigo": _clean(line.get("sku_codigo")),
+            "descricao_original": _clean(line.get("descricao_original")),
+            "unidade": _clean(line.get("unidade")) or "UN",
+            "quantidade_pedida": ordered,
+            "quantidade_recebida": received,
+            "quantidade_pendente": pending,
+            "data_necessidade": due_date,
+            "dias_para_remessa": days_until_due,
+            "situacao_transito": transit_status,
+            "destino": _clean(line.get("destino")) or _clean(order.get("destino")),
+            "status": _clean(line.get("status")) or _clean(order.get("status")),
+        })
+    result.sort(key=lambda row: (
+        row.get("data_necessidade") is None,
+        _clean(row.get("data_necessidade")),
+        _clean(row.get("numero_oc")),
+        row.get("numero_linha") or 0,
+    ))
+    return result
 
 
 def _date_or_none(value):

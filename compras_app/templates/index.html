@@ -2596,6 +2596,7 @@ linha.innerHTML = `
 </td>
 <td><input name="unidade[]" readonly></td>
 <td><input type="number" step="1" min="0" name="qtd[]"></td>
+<td><input type="date" name="data_necessidade[]" required></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0"></div></td>
 <td><input type="number" step="0.01" min="0" name="ipi[]"></td>
@@ -2606,6 +2607,9 @@ linha.innerHTML = `
 `;
 
 inicializarLookupsEscopo(linha);
+const dataPadrao = document.querySelector('#form-oc input[name="previsao"]');
+const dataLinha = linha.querySelector('input[name="data_necessidade[]"]');
+if (dataPadrao && dataLinha && dataPadrao.value) dataLinha.value = dataPadrao.value;
 
 }
 
@@ -2621,6 +2625,7 @@ const lineId = row.querySelector('input[name="oc_line_id[]"]');
 const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
+const dataNecessidade = row.querySelector('input[name="data_necessidade[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
 const desconto = row.querySelector('input[name="desconto[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
@@ -2632,6 +2637,7 @@ if (lineId) lineId.value = "";
 if (desc) desc.value = "";
 if (unidade) unidade.value = "";
 if (qtd) qtd.value = "";
+if (dataNecessidade) dataNecessidade.value = "";
 if (valor) valor.value = "";
 if (desconto) desconto.value = "0";
 if (ipi) ipi.value = "";
@@ -3584,6 +3590,7 @@ const lineId = row.querySelector('input[name="oc_line_id[]"]');
 const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
+const dataNecessidade = row.querySelector('input[name="data_necessidade[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
 const desconto = row.querySelector('input[name="desconto[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
@@ -3595,6 +3602,7 @@ if (lineId) lineId.value = "";
 if (desc) desc.value = "";
 if (unidade) unidade.value = "";
 if (qtd) qtd.value = "";
+if (dataNecessidade) dataNecessidade.value = "";
 if (valor) valor.value = "";
 if (desconto) desconto.value = "0";
 if (ipi) ipi.value = "";
@@ -3691,6 +3699,7 @@ const sel = row.querySelector('input[name="codigo[]"]');
 const desc = row.querySelector('input[name="descricao[]"]');
 const unidade = row.querySelector('input[name="unidade[]"]');
 const qtd = row.querySelector('input[name="qtd[]"]');
+const dataNecessidade = row.querySelector('input[name="data_necessidade[]"]');
 const valor = row.querySelector('input[name="valor[]"]');
 const desconto = row.querySelector('input[name="desconto[]"]');
 if (lineId) lineId.value = item.line_id || "";
@@ -3706,6 +3715,7 @@ desc.value = item.descricao || "";
 }
 if (unidade && item.unidade) unidade.value = item.unidade;
 if (qtd && item.qtd !== undefined) qtd.value = item.qtd;
+if (dataNecessidade) dataNecessidade.value = item.data_necessidade || ocPrefill.previsao || "";
 if (valor && item.valor !== undefined && item.valor !== "") valor.value = item.valor;
 if (desconto && item.desconto !== undefined && item.desconto !== "") desconto.value = item.desconto;
 }
@@ -4281,7 +4291,7 @@ document.getElementById("historico_oc_meta").textContent = `${doc.data_criacao |
 document.getElementById("historico_oc_dados").innerHTML = [
 ["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Categoria", dados.oc_categoria || (doc.erp_purchase_order || {}).categoria], ["Destino", dados.destino || (doc.erp_purchase_order || {}).destino], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
-document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="7">Sem itens.</td></tr>';
+document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.data_necessidade || dados.previsao || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="8">Sem itens.</td></tr>';
 const editButton = document.getElementById("historico_oc_editar");
 if (editButton) editButton.onclick = () => editarDocumentoHistoricoOC(doc);
 const modal = document.getElementById("historico_oc_modal");
@@ -4326,7 +4336,7 @@ while (tabela.rows.length > 2) tabela.deleteRow(2);
 itens.forEach((item, index) => {
 if (index > 0) adicionarLinha();
 const row = tabela.rows[index + 1];
-const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
+const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"data_necessidade[]":item.data_necessidade || dados.previsao,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
 Object.entries(valores).forEach(([name, value]) => { const input = row.querySelector(`[name="${name}"]`); if (input) input.value = value === undefined || value === null ? "" : value; });
 });
 calcularTotais();
@@ -4522,6 +4532,14 @@ calcularTotais();
 
 const formOc = document.getElementById("form-oc");
 if (formOc){
+const dataPadrao = formOc.elements.previsao;
+if (dataPadrao){
+dataPadrao.addEventListener("change", () => {
+formOc.querySelectorAll('input[name="data_necessidade[]"]').forEach((input) => {
+if (!input.value) input.value = dataPadrao.value;
+});
+});
+}
 formOc.addEventListener("submit", (event) => {
 garantirSubmissionToken("oc_submit_token");
 if (formOc.dataset.submitting === "1"){
@@ -4954,8 +4972,8 @@ salvarRascunhoOS();
 </div>
 
 <div>
-<label>Previsao</label>
-<input name="previsao" type="date">
+<label>Data padrão das remessas</label>
+<input name="previsao" type="date" title="Opcional: preenche as linhas que ainda não possuem uma data própria.">
 </div>
 
 <div>
@@ -4986,6 +5004,7 @@ salvarRascunhoOS();
 <th>Descricao</th>
 <th>Unidade</th>
 <th>Qtd</th>
+<th>Data remessa</th>
 <th>Valor Unit</th>
 <th>Desconto</th>
 <th>IPI</th>
@@ -5011,6 +5030,7 @@ salvarRascunhoOS();
 </td>
 <td><input name="unidade[]" readonly></td>
 <td><input type="number" step="1" min="0" name="qtd[]"></td>
+<td><input type="date" name="data_necessidade[]" required></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0"></div></td>
 <td><input type="number" step="0.01" min="0" name="ipi[]"></td>
@@ -5302,7 +5322,7 @@ salvarRascunhoOS();
 <div class="card-heading-row"><div><h3 id="historico_oc_title">O.C.</h3><span id="historico_oc_meta"></span></div><button type="button" class="icon-close" title="Fechar" onclick="fecharHistoricoOC()">×</button></div>
 <div id="historico_oc_dados" class="history-summary"></div>
 <h4>Itens da compra</h4>
-<div class="table-scroll"><table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th><th>Valor</th><th>Desconto</th><th>Total</th></tr></thead><tbody id="historico_oc_itens"></tbody></table></div>
+<div class="table-scroll"><table><thead><tr><th>Código</th><th>Descrição</th><th>Un.</th><th>Qtd.</th><th>Data remessa</th><th>Valor</th><th>Desconto</th><th>Total</th></tr></thead><tbody id="historico_oc_itens"></tbody></table></div>
 <div class="compact-actions history-footer"><button type="button" class="btn-secondary" onclick="fecharHistoricoOC()">Fechar</button>{% if can('suprimentos.purchase.edit') %}<button id="historico_oc_editar" type="button">Editar</button>{% endif %}</div>
 </div>
 </div>

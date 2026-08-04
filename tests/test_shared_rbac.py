@@ -282,7 +282,7 @@ class SharedRbacTests(unittest.TestCase):
             self.assertIsNone(supabase_data.revalidate_session_user(stale))
         load_auth.assert_not_called()
 
-    def test_current_session_reloads_role_matrix_without_cache(self):
+    def test_current_session_reuses_short_role_matrix_cache(self):
         session_user = {
             "id": 12,
             "username": "financeiro",
@@ -305,7 +305,7 @@ class SharedRbacTests(unittest.TestCase):
             ) as load_auth,
         ):
             self.assertIsNotNone(supabase_data.revalidate_session_user(session_user))
-        load_auth.assert_called_once_with(12, force=True)
+        load_auth.assert_called_once_with(12, force=False)
 
     def test_expired_shared_session_is_rejected_before_api_handler(self):
         stale = {
@@ -443,6 +443,83 @@ class SharedRbacTests(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         stock_request.assert_called_once_with(f"work-orders/{work_id}/materials")
+
+    def test_shared_consumption_is_blocked_without_admin_reconciliation_permission(self):
+        user = {
+            "id": 8,
+            "username": "operador",
+            "permissions": ["suprimentos.work_order.view"],
+            "auth_version": 1,
+        }
+        work_id = "11111111-1111-1111-1111-111111111111"
+        with (
+            patch.object(app_module, "login_enabled", return_value=True),
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(app_module, "shared_rbac_enabled", return_value=True),
+            patch.object(
+                app_module.supabase_data,
+                "revalidate_session_user",
+                return_value=user,
+            ),
+            patch.object(app_module, "_erp_stock_request") as stock_request,
+        ):
+            client = app_module.app.test_client()
+            with client.session_transaction() as flask_session:
+                flask_session["suprimentos_user"] = user
+            response = client.post(
+                f"/api/erp/os-management/work-orders/{work_id}/materials/shared-consumption",
+                json={"movement_id": 41, "quantidade": 2, "motivo": "Teste"},
+            )
+
+        self.assertEqual(403, response.status_code)
+        stock_request.assert_not_called()
+
+    def test_admin_reconciliation_permission_can_proxy_shared_consumption(self):
+        user = {
+            "id": 1,
+            "username": "admin",
+            "permissions": [
+                "suprimentos.work_order.view",
+                "estoque.commitment.reconcile_admin",
+            ],
+            "auth_version": 1,
+        }
+        work_id = "11111111-1111-1111-1111-111111111111"
+        payload = {
+            "movement_id": 41,
+            "quantidade": 2,
+            "motivo": "Consumo compartilhado confirmado",
+            "idempotency_key": "shared-consumption:test",
+        }
+        with (
+            patch.object(app_module, "login_enabled", return_value=True),
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(app_module, "shared_rbac_enabled", return_value=True),
+            patch.object(
+                app_module.supabase_data,
+                "revalidate_session_user",
+                return_value=user,
+            ),
+            patch.object(
+                app_module,
+                "_erp_stock_request",
+                return_value={"ok": True, "movement_id": 99},
+            ) as stock_request,
+        ):
+            client = app_module.app.test_client()
+            with client.session_transaction() as flask_session:
+                flask_session["suprimentos_user"] = user
+            response = client.post(
+                f"/api/erp/os-management/work-orders/{work_id}/materials/shared-consumption",
+                json=payload,
+            )
+
+        self.assertEqual(200, response.status_code)
+        stock_request.assert_called_once_with(
+            f"work-orders/{work_id}/materials/shared-consumption",
+            "POST",
+            payload,
+        )
 
     def test_reused_purchase_token_requires_edit_before_any_sync(self):
         user = {
@@ -671,6 +748,14 @@ class SharedRbacTests(unittest.TestCase):
         )
         self.assertIn("const editable=permissions.manage", template)
         self.assertIn("/materials`", template)
+        self.assertIn(
+            "poolAdmin:{{ can('estoque.commitment.reconcile_admin')|tojson }}",
+            template,
+        )
+        self.assertIn("saldo_fluxo_compartilhado", template)
+        self.assertIn("Baixar do fluxo", template)
+        self.assertIn("materials/shared-consumption", template)
+        self.assertIn('name="motivo"', template)
         self.assertIn(
             "{% if can('mes.dashboard.read') %}",
             template,

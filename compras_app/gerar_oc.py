@@ -138,6 +138,18 @@ def _descricao_secundaria_item(item):
     )
 
 
+def _data_remessa_item(item):
+    return _format_date(_clean(item.get("data_necessidade")))
+
+
+def _descricao_tabela_item(item):
+    descricao = _clean(item.get("descricao"))
+    data_remessa = _data_remessa_item(item)
+    if not data_remessa:
+        return descricao
+    return f"{descricao}\nREMESSA: {data_remessa}"
+
+
 def _add_descricao_paragraph(doc, label, value, bold_label=True):
     paragraph = doc.add_paragraph()
     paragraph.paragraph_format.space_after = Pt(2)
@@ -161,6 +173,9 @@ def _adicionar_descritivo_itens(doc, itens):
         _add_descricao_paragraph(doc, "PN: ", codigo)
         _add_descricao_paragraph(doc, "DESCRIÇÃO PRIMÁRIA: ", _descricao_primaria_item(item))
         _add_descricao_paragraph(doc, "DESCRIÇÃO SECUNDÁRIA: ", _descricao_secundaria_item(item))
+        data_remessa = _data_remessa_item(item)
+        if data_remessa:
+            _add_descricao_paragraph(doc, "DATA DE REMESSA: ", data_remessa)
         if idx < len(itens_validos) - 1:
             separator = doc.add_paragraph("-" * 160)
             separator.paragraph_format.space_after = Pt(4)
@@ -260,7 +275,7 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
     for idx, item in enumerate(itens):
         row_cells = template_row.cells if idx == 0 else tabela.add_row().cells
         _set_cell_text(row_cells[0], item["codigo"], template_row.cells[0])
-        _set_cell_text(row_cells[1], item["descricao"], template_row.cells[1])
+        _set_cell_text(row_cells[1], _descricao_tabela_item(item), template_row.cells[1])
         _set_cell_text(row_cells[2], item["unidade"], template_row.cells[2])
         _set_cell_text(row_cells[3], item["qtd"], template_row.cells[3])
         _set_cell_text(row_cells[4], _format_brl(item["valor"]), template_row.cells[4])

@@ -5530,6 +5530,7 @@ def gerar_oc():
     ipis = request.form.getlist("ipi[]")
     icmss = request.form.getlist("icms[]")
     cofins_list = request.form.getlist("cofins[]")
+    datas_necessidade = request.form.getlist("data_necessidade[]")
     line_ids = request.form.getlist("oc_line_id[]")
 
     produtos = carregar_produtos()
@@ -5557,6 +5558,9 @@ def gerar_oc():
         cofins_val = cofins if cofins != "" else produto_info.get("cofins")
 
         total = calcular_total_item(qtd, valor, desconto, ipi_val, icms_val, cofins_val)
+        data_necessidade_item = _erp_iso_date(
+            datas_necessidade[i] if i < len(datas_necessidade) else ""
+        ) or _erp_iso_date(request.form.get("previsao", ""))
         itens.append({
             "line_id": line_ids[i].strip() if i < len(line_ids) else "",
             "codigo": codigo_item,
@@ -5570,7 +5574,8 @@ def gerar_oc():
             "ipi": ipi_val,
             "icms": icms_val,
             "cofins": cofins_val,
-            "total": total
+            "total": total,
+            "data_necessidade": data_necessidade_item,
         })
 
     total_itens = 0
@@ -5605,6 +5610,14 @@ def gerar_oc():
         (destino_form if destino_form is not None else dados_anteriores.get("destino", ""))
         or ""
     ).strip()
+    previsao_linhas = sorted(
+        item["data_necessidade"] for item in itens if item.get("data_necessidade")
+    )
+    previsao_pedido = (
+        previsao_linhas[0]
+        if previsao_linhas
+        else _erp_iso_date(request.form.get("previsao", ""))
+    )
     dados_pedido = {
         "cnpj": fornecedor_info.get("cnpj", request.form.get("cnpj", "")),
         "bairro": fornecedor_info.get("bairro", request.form.get("bairro", "")),
@@ -5615,7 +5628,9 @@ def gerar_oc():
         "endereco": fornecedor_info.get("endereco", request.form.get("endereco", "")),
         "cep": fornecedor_info.get("cep", request.form.get("cep", "")),
         "telefone": fornecedor_info.get("telefone", request.form.get("telefone", "")),
-        "previsao": request.form.get("previsao", ""),
+        # Order-level date remains the earliest/default date for summaries.
+        # The operational promise lives on each line in ``data_necessidade``.
+        "previsao": previsao_pedido,
         "tipo_frete": request.form.get("tipo_frete", ""),
         "frete": frete_val,
         "total_itens": total_itens,
@@ -6999,7 +7014,7 @@ def exportar_dashboard():
         ws_oc_itens = wb.create_sheet("Compras Itens")
         ws_oc_itens.append(base_headers + [
             "ID Linha", "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
-            "IPI", "ICMS", "COFINS", "Total", "Status Linha", "ACAO"
+            "IPI", "ICMS", "COFINS", "Total", "Data Necessidade / Remessa", "Status Linha", "ACAO"
         ])
     if tipo_filtro in {"", "os"}:
         ws_os = wb.create_sheet("Ordens de Servico")
@@ -7071,6 +7086,7 @@ def exportar_dashboard():
                     item.get("icms", ""),
                     item.get("cofins", ""),
                     item.get("total", ""),
+                    item.get("data_necessidade", "") or dados.get("previsao", ""),
                     _linha_status(item),
                     "",
                 ])
@@ -7344,7 +7360,10 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
                 "quantidade_pedida": item.get("qtd"),
                 "valor_unitario_pedido": item.get("valor"),
                 "destino": (dados_pedido.get("destino") or "").strip(),
-                "data_necessidade": _erp_iso_date(dados_pedido.get("previsao")),
+                "data_necessidade": (
+                    _erp_iso_date(item.get("data_necessidade"))
+                    or _erp_iso_date(dados_pedido.get("previsao"))
+                ),
             }
             for item in itens
         ],
@@ -7405,6 +7424,92 @@ def erp_purchase_inspection_report():
         io.BytesIO(content),
         as_attachment=True,
         download_name=f"Compras_Bancos_e_Inspecao_{date.today().isoformat()}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+def _purchase_transit_workbook(rows):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Transito pendente"
+    headers = [
+        "O.C.", "Linha", "Fornecedor", "SKU", "Descricao", "Unidade",
+        "Qtd. pedida", "Qtd. recebida", "Qtd. pendente",
+        "Data necessidade / remessa", "Situacao do transito", "Dias para remessa",
+        "Destino", "Status",
+    ]
+    ws.append(headers)
+    for row in rows or []:
+        ws.append([
+            row.get("numero_oc", ""),
+            row.get("numero_linha", ""),
+            row.get("fornecedor_nome", ""),
+            row.get("sku_codigo", ""),
+            row.get("descricao_original", ""),
+            row.get("unidade", ""),
+            row.get("quantidade_pedida", 0),
+            row.get("quantidade_recebida", 0),
+            row.get("quantidade_pendente", 0),
+            row.get("data_necessidade", ""),
+            row.get("situacao_transito", ""),
+            row.get("dias_para_remessa", ""),
+            row.get("destino", ""),
+            row.get("status", ""),
+        ])
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = ws.dimensions
+    for cell in ws[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor="0B1C3A")
+        cell.alignment = Alignment(horizontal="center")
+    for col_idx, column_cells in enumerate(ws.columns, start=1):
+        width = max((len(str(cell.value or "")) for cell in column_cells), default=0) + 2
+        ws.column_dimensions[get_column_letter(col_idx)].width = min(max(width, 11), 50)
+    return wb
+
+
+@app.route("/api/erp/purchase-orders/transit")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.purchase.view")
+def erp_purchase_orders_transit():
+    try:
+        rows = supabase_data.carregar_compras_transito(
+            force=(request.args.get("refresh") or "").strip().lower() in {"1", "true", "sim"}
+        )
+    except Exception as exc:
+        app.logger.exception("Falha ao carregar compras em transito")
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    return jsonify({
+        "ok": True,
+        "rows": rows,
+        "metrics": {
+            "linhas": len(rows),
+            "pedidos": len({row.get("purchase_order_id") for row in rows}),
+            "quantidade_pendente": sum(float(row.get("quantidade_pendente") or 0) for row in rows),
+        },
+    })
+
+
+@app.route("/erp/relatorios/compras-transito.xlsx")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.purchase.export")
+def erp_purchase_orders_transit_report():
+    try:
+        rows = supabase_data.carregar_compras_transito(force=True)
+        wb = _purchase_transit_workbook(rows)
+        output = io.BytesIO()
+        wb.save(output)
+        wb.close()
+        output.seek(0)
+    except Exception as exc:
+        app.logger.exception("Falha ao exportar compras em transito")
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=f"Compras_Transito_Pendente_{date.today().isoformat()}.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
@@ -7806,6 +7911,32 @@ def erp_work_order_management_detail(work_id):
 def erp_work_order_materials_proxy(work_id):
     try:
         return jsonify(_erp_stock_request(f"work-orders/{work_id}/materials"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route(
+    "/api/erp/os-management/work-orders/<work_id>/materials/shared-consumption",
+    methods=["POST"],
+)
+@login_required
+@erp_feature_required
+@permission_required("estoque.commitment.reconcile_admin")
+def erp_work_order_shared_consumption_proxy(work_id):
+    """Allocate part of an unlinked commitment pool to one work order.
+
+    The Stock backend owns the transaction and the physical movement.  This
+    proxy deliberately requires the administrative reconciliation permission:
+    merely viewing the shared balance never consumes it or covers an O.S.
+    """
+    try:
+        return jsonify(
+            _erp_stock_request(
+                f"work-orders/{work_id}/materials/shared-consumption",
+                "POST",
+                request.get_json(silent=True) or {},
+            )
+        )
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
