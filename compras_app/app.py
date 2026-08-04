@@ -945,6 +945,122 @@ def vincular_documento_erp(documento, campo, entity_id):
     return documento
 
 
+def _document_work_order_id(documento):
+    """Return the direct MES UUID stored for one legacy O.S. document."""
+    if not isinstance(documento, dict):
+        return ""
+    dados = documento.get("dados") if isinstance(documento.get("dados"), dict) else {}
+    return str(
+        documento.get("erp_work_order_id") or dados.get("erp_work_order_id") or ""
+    ).strip()
+
+
+def _carregar_documentos_os_para_vinculo():
+    """Load documents from the configured source without cross-source fallback.
+
+    When Supabase is enabled, silently falling back to the local JSON could offer
+    stale test documents in a production selector.  A connectivity failure must
+    therefore fail the request instead of mixing the two sources of truth.
+    """
+    if supabase_data.enabled():
+        return supabase_data.carregar_documentos(force=True)
+    return _carregar_historico_local()
+
+
+def _os_document_summary(documento):
+    dados = documento.get("dados") if isinstance(documento.get("dados"), dict) else {}
+    work_order_id = _document_work_order_id(documento)
+    status = str(documento.get("status") or "").strip().lower()
+    active = status in {"rascunho", "emitido"}
+    return {
+        "id": str(documento.get("id") or ""),
+        "numero": str(documento.get("numero") or "").strip(),
+        "status": status,
+        "cliente": str(dados.get("cliente") or dados.get("cliente_nome") or "").strip(),
+        "chassis": str(dados.get("chassis") or dados.get("chassi") or "").strip(),
+        "proposta_numero": str(
+            dados.get("proposta_numero")
+            or dados.get("numero_proposta")
+            or dados.get("proposta")
+            or ""
+        ).strip(),
+        "data_criacao": documento.get("data_criacao"),
+        "erp_work_order_id": work_order_id or None,
+        "active": active,
+        "available": active and not bool(work_order_id),
+    }
+
+
+def _documentos_os_ativos_para_vinculo():
+    ativos = []
+    for documento in _carregar_documentos_os_para_vinculo():
+        if str(documento.get("tipo") or "").strip().lower() != "os":
+            continue
+        status = str(documento.get("status") or "").strip().lower()
+        if status not in {"rascunho", "emitido"} and not _document_work_order_id(documento):
+            continue
+        resumo = _os_document_summary(documento)
+        if resumo["id"]:
+            ativos.append(resumo)
+    return sorted(
+        ativos,
+        key=lambda item: (str(item.get("data_criacao") or ""), str(item.get("numero") or "")),
+        reverse=True,
+    )
+
+
+def _validar_documento_os_para_vinculo(documento_id, work_order_id=None):
+    """Validate one explicit document -> operational work-order association."""
+    document_id = str(documento_id or "").strip()
+    target_id = str(work_order_id or "").strip()
+    if not document_id:
+        return None
+
+    documentos = _carregar_documentos_os_para_vinculo()
+    documento = next(
+        (item for item in documentos if str(item.get("id") or "").strip() == document_id),
+        None,
+    )
+    if not documento:
+        raise ValueError("Documento de O.S. nao encontrado.")
+    if str(documento.get("tipo") or "").strip().lower() != "os":
+        raise ValueError("O documento selecionado nao e uma O.S.")
+    if str(documento.get("status") or "").strip().lower() not in {"rascunho", "emitido"}:
+        raise ValueError("Somente documentos de O.S. em rascunho ou emitidos podem ser vinculados.")
+
+    current_id = _document_work_order_id(documento)
+    if current_id and (not target_id or current_id != target_id):
+        raise ValueError("Este documento de O.S. ja esta vinculado a outra O.S. operacional.")
+
+    if target_id:
+        conflito = next(
+            (
+                item
+                for item in documentos
+                if str(item.get("id") or "").strip() != document_id
+                and _document_work_order_id(item) == target_id
+            ),
+            None,
+        )
+        if conflito:
+            raise ValueError(
+                f"A O.S. operacional ja esta vinculada ao documento {conflito.get('numero') or conflito.get('id')}."
+            )
+    return documento
+
+
+def _documento_os_id_bigint(documento_id):
+    try:
+        value = int(str(documento_id or "").strip())
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "O documento de O.S. precisa estar persistido no Supabase antes do vinculo operacional."
+        ) from exc
+    if value <= 0:
+        raise ValueError("Identificador do documento de O.S. invalido.")
+    return value
+
+
 def _agrupar_por_data(entries, tipo, campo_soma=None):
     resumo = {}
     for e in entries:
@@ -7893,6 +8009,18 @@ def erp_work_order_catalogs():
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
+
+@app.route("/api/erp/os-management/documents")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_work_order_documents():
+    try:
+        return jsonify({"ok": True, "documents": _documentos_os_ativos_para_vinculo()})
+    except Exception as exc:
+        app.logger.exception("Falha ao listar documentos de O.S. para vinculo operacional")
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
 @app.route("/api/erp/os-management/<work_id>")
 @login_required
 @erp_feature_required
@@ -7956,9 +8084,13 @@ def erp_vehicle_entry_proxy():
 @permission_required("suprimentos.work_order.manage")
 def erp_work_order_create_proxy(entry_id):
     try:
-        return jsonify(_erp_mes_request(
-            f"vehicle-entries/{entry_id}/work-orders", "POST", request.get_json(silent=True) or {}
-        )), 201
+        payload = dict(request.get_json(silent=True) or {})
+        documento_id = str(payload.pop("document_id", "") or "").strip()
+        if documento_id:
+            _validar_documento_os_para_vinculo(documento_id)
+            payload["documento_os_id"] = _documento_os_id_bigint(documento_id)
+        resultado = _erp_mes_request(f"vehicle-entries/{entry_id}/work-orders", "POST", payload)
+        return jsonify(resultado), 201
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
@@ -7968,9 +8100,13 @@ def erp_work_order_create_proxy(entry_id):
 @permission_required("suprimentos.work_order.manage")
 def erp_work_order_update_proxy(work_id):
     try:
-        return jsonify(_erp_mes_request(
-            f"work-orders/{work_id}", "PUT", request.get_json(silent=True) or {}
-        ))
+        payload = dict(request.get_json(silent=True) or {})
+        documento_id = str(payload.pop("document_id", "") or "").strip()
+        if documento_id:
+            _validar_documento_os_para_vinculo(documento_id, work_id)
+            payload["documento_os_id"] = _documento_os_id_bigint(documento_id)
+        resultado = _erp_mes_request(f"work-orders/{work_id}", "PUT", payload)
+        return jsonify(resultado)
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 

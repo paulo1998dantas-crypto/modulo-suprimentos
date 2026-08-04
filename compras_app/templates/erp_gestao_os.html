@@ -78,6 +78,8 @@
     <div class="modal-body">
       <div id="required-summary" class="required-summary">Preencha os campos obrigatórios destacados para ativar a O.S.</div>
       <div class="grid">
+        <div class="section-title"><strong>Documento de O.S. e ITEM operacional</strong></div>
+        <label class="span4" id="document-allocation-label"><span>Documento de O.S. emitido (opcional)</span><select name="document_id" id="document-select"></select><small id="document-link-hint" class="muted">Selecione o documento emitido que pertence a este ITEM/chassi. O vinculo estrutural impede associacoes duplicadas.</small></label>
         <div class="section-title"><strong>Alocação de Forecast</strong></div>
         <label class="span4" id="forecast-allocation-label"><span>Forecast confirmado aguardando chegada (opcional)</span><select name="forecast_id" id="forecast-select"></select><small class="muted">Use o Forecast como referência comercial. Os dados reais do veículo podem mudar na chegada; nenhum chassi será exigido para a alocação.</small></label>
         <div class="section-title"><strong>Dados comerciais e do cliente</strong></div>
@@ -149,7 +151,7 @@
 </dialog>
 
 <script>
-const state={orders:[],forecasts:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null};
+const state={orders:[],forecasts:[],documents:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null};
 const mesBase={{ mes_url|tojson }};
 const workDialog=document.getElementById('work-dialog'),form=document.getElementById('work-form');
 const materialsDialog=document.getElementById('materials-dialog');
@@ -173,6 +175,25 @@ function loadCatalogFields(){
   selectOptions('ar_quente',state.catalogs.sim_nao);
   const transformations=state.catalogs.transformacoes||[],el=document.getElementById('transformation-select');
   el.innerHTML='<option value="">Selecione código e transformação...</option>'+transformations.map(x=>`<option value="${esc(x.codigo)}">${esc(x.codigo)} — ${esc(x.descricao)}</option>`).join('');
+}
+function linkedDocument(row){return state.documents.find(item=>row.work_order_id&&String(item.erp_work_order_id||'')===String(row.work_order_id))||null}
+function documentLabel(document){const client=document.cliente?` - ${document.cliente}`:'',chassis=document.chassis?` - ${document.chassis}`:'';return `Documento O.S. ${document.numero||document.id}${client}${chassis}`}
+function availableDocuments(){return state.documents.filter(item=>item.available)}
+function uniqueDocumentSuggestion(row){
+  const direct=linkedDocument(row);if(direct)return {document:direct,reason:'Vinculo direto ja persistido.'};
+  const available=availableDocuments(),numbers=[row.numero_os,row.item_number].filter(Boolean).map(norm);
+  let matches=available.filter(item=>numbers.includes(norm(item.numero)));if(matches.length===1)return {document:matches[0],reason:'Sugestao automatica por numero unico de O.S./ITEM.'};
+  const chassis=norm(row.chassi);if(chassis){matches=available.filter(item=>norm(item.chassis)===chassis);if(matches.length===1)return {document:matches[0],reason:'Sugestao automatica por chassi completo unico.'}}
+  return {document:null,reason:matches.length>1?'Mais de um documento candidato foi encontrado. Selecione manualmente; nenhum vinculo foi presumido.':'Nenhum documento foi associado automaticamente. A O.S. operacional pode ser salva sem documento.'};
+}
+function loadDocumentOptions(row){
+  const select=form.elements.document_id,direct=linkedDocument(row),suggestion=uniqueDocumentSuggestion(row),selected=direct||suggestion.document;
+  const choices=direct?[direct]:availableDocuments();
+  select.innerHTML='<option value="">Sem documento de O.S. vinculado</option>'+choices.map(item=>`<option value="${esc(item.id)}">${esc(documentLabel(item))}</option>`).join('');
+  select.value=selected?.id||'';
+  const relation=direct?`Documento O.S. ${direct.numero} vinculado ao ITEM ${row.item_number} / chassi ${row.chassi}.`:suggestion.reason;
+  document.getElementById('document-link-hint').textContent=relation;
+  return direct;
 }
 function forecastLabel(forecast){
   const proposal=forecast.proposta_numero||'proposta pendente',client=forecast.cliente_nome||'cliente não informado';
@@ -205,12 +226,13 @@ function metrics(){const rows=state.orders;document.getElementById('m-total').te
 function matchesView(row,view){const status=row.status||row.entry_status;if(view==='ALL')return true;if(view==='AVAILABLE')return !row.work_order_id;if(view==='ACTION')return !row.work_order_id||['RASCUNHO','AGUARDANDO_O_S'].includes(status);if(view==='ACTIVE')return ['ATIVA','EM_PRODUÇÃO'].includes(status);return ['FINALIZADA','ENTREGUE','RETIRADA','ARQUIVADA'].includes(status)}
 function render(){
   const query=norm(document.getElementById('search').value),view=document.getElementById('view-filter').value;
-  state.filtered=state.orders.filter(row=>matchesView(row,view)&&(!query||norm([row.item_number,row.numero_os,row.chassi,row.entry_client,row.cliente_nome,row.proposta_numero,row.linha,row.transformacao].join(' ')).includes(query)));
+  state.filtered=state.orders.filter(row=>{const document=linkedDocument(row);return matchesView(row,view)&&(!query||norm([row.item_number,row.numero_os,row.chassi,row.entry_client,row.cliente_nome,row.proposta_numero,row.linha,row.transformacao,document?.numero].join(' ')).includes(query))});
   document.getElementById('empty').hidden=state.filtered.length>0;
   document.getElementById('rows').innerHTML=state.filtered.map(row=>{const total=Number(row.etapas_aplicaveis||0),done=Number(row.etapas_concluidas||0),pct=total?Math.round(done*100/total):0,status=statusOf(row);
-    return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. ${esc(row.numero_os||'não aberta')}</span></td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id?'<br><span class="available">DISPONÍVEL PARA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td>${row.work_order_id?`<button class="btn" type="button" onclick="openMaterials('${row.work_order_id}','${esc(row.numero_os||row.item_number)}')">Consultar</button>`:'<span class="muted">O.S. não aberta</span>'}</td><td><button class="btn ${permissions.manage&&!row.work_order_id?'primary':''}" type="button" onclick="openWork('${row.entry_id}')">${permissions.manage?(row.work_order_id?'Abrir':'Alocar e abrir O.S.'):'Consultar'}</button></td></tr>`}).join('');
+    const document=linkedDocument(row),documentLine=document?`<br><span class="available">DOC. O.S. ${esc(document.numero)}</span>`:'<br><span class="muted">Documento não vinculado</span>';
+    return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. operacional ${esc(row.numero_os||'não aberta')}</span>${documentLine}</td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id?'<br><span class="available">DISPONÍVEL PARA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td>${row.work_order_id?`<button class="btn" type="button" onclick="openMaterials('${row.work_order_id}','${esc(row.numero_os||row.item_number)}')">Consultar</button>`:'<span class="muted">O.S. não aberta</span>'}</td><td><button class="btn ${permissions.manage&&!row.work_order_id?'primary':''}" type="button" onclick="openWork('${row.entry_id}')">${permissions.manage?(row.work_order_id?'Abrir':'Alocar e abrir O.S.'):'Consultar'}</button></td></tr>`}).join('');
 }
-async function loadOrders(){try{message('Atualizando entradas, O.S. e Forecasts...');const [orders,catalogs,forecasts]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/forecasts')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.forecasts=forecasts.forecasts||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();metrics();render();message('')}catch(error){message(error.message,true)}}
+async function loadOrders(){try{message('Atualizando entradas, O.S., documentos e Forecasts...');const [orders,catalogs,forecasts,documents]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/forecasts'),api('/api/erp/os-management/documents')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.forecasts=forecasts.forecasts||[];state.documents=documents.documents||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();metrics();render();message('')}catch(error){message(error.message,true)}}
 function clearFilters(){document.getElementById('search').value='';document.getElementById('view-filter').value='ACTION';render()}
 function fill(name,value){const input=form.elements[name];if(!input)return;const normalized=value??'';if(input.tagName==='SELECT'&&normalized&&![...input.options].some(option=>option.value===String(normalized)))input.add(new Option(`${normalized} (legado)`,normalized));input.value=normalized}
 function transformationDescription(code){return (state.catalogs.transformacoes||[]).find(x=>x.codigo===code)?.descricao||''}
@@ -227,14 +249,16 @@ form.addEventListener('input',checkMissing);form.elements.tipo_sistema_ar.addEve
 function openWork(entryId){
   const row=state.orders.find(item=>item.entry_id===entryId);if(!row)return;state.active=row;form.reset();loadCatalogFields();
   fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
+  const directDocument=loadDocumentOptions(row);
   loadForecastOptions(row.forecast_id||'');
   ['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','cliente_nome','municipio','uf','tipo_veiculo','linha','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'].forEach(name=>fill(name,name.startsWith('data_')?onlyDate(row[name]):row[name]));
   if(!row.work_order_id){fill('cliente_nome',row.entry_client);fill('tipo_servico','TRANSFORMAÇÃO')}
   let code=row.transformacao_codigo||'';if(!code&&row.transformacao)code=(state.catalogs.transformacoes||[]).find(x=>norm(x.descricao)===norm(row.transformacao))?.codigo||'';
   const transformationSelect=document.getElementById('transformation-select');if(!code&&row.transformacao){transformationSelect.add(new Option(`${row.transformacao} (legado)`,'__LEGACY__'));transformationSelect.value='__LEGACY__'}else transformationSelect.value=code;fill('transformacao_codigo',code);fill('transformacao',row.transformacao||transformationDescription(code));
   document.getElementById('work-title').textContent=row.work_order_id?`O.S. ${row.numero_os}`:`Abrir O.S. do ITEM ${row.item_number}`;
-  document.getElementById('work-subtitle').textContent=`${row.chassi} · ${[row.marca,row.modelo,row.versao].filter(Boolean).join(' ')} · ${row.entry_client||'Cliente não informado'}`;
+  document.getElementById('work-subtitle').textContent=`ITEM ${row.item_number} · ${row.chassi} · ${[row.marca,row.modelo,row.versao].filter(Boolean).join(' ')} · ${directDocument?`Documento O.S. ${directDocument.numero}`:'documento ainda não vinculado'}`;
   const editable=permissions.manage&&(!row.status||['RASCUNHO','AGUARDANDO_O_S','ATIVA','EM_PRODUÇÃO'].includes(row.status)),active=['ATIVA','EM_PRODUÇÃO'].includes(row.status);[...form.elements].forEach(el=>{if(!['button','hidden'].includes(el.type))el.disabled=!editable});
+  form.elements.document_id.disabled=!editable||Boolean(directDocument);
   form.elements.forecast_id.disabled=!editable||Boolean(row.work_order_id);
   form.elements.data_comercial_prevista.disabled=!editable||active;
   const saveButton=document.getElementById('save-work');saveButton.hidden=!editable;saveButton.textContent=active?'Salvar alterações':'Salvar O.S. rascunho';
@@ -244,6 +268,7 @@ function openWork(entryId){
 }
 document.getElementById('transformation-select').addEventListener('change',event=>{if(event.target.value!=='__LEGACY__'){fill('transformacao_codigo',event.target.value);fill('transformacao',transformationDescription(event.target.value))}checkMissing()});
 document.getElementById('forecast-select').addEventListener('change',fillFromForecast);
+document.getElementById('document-select').addEventListener('change',event=>{const document=state.documents.find(item=>String(item.id)===String(event.target.value));document.getElementById('document-link-hint').textContent=document?`Ao salvar, o Documento O.S. ${document.numero} será vinculado ao ITEM ${state.active?.item_number||''} / chassi ${state.active?.chassi||''}.`:'A O.S. operacional será mantida sem documento vinculado.'});
 function workPayload(){const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;const workId=data.work_order_id;delete data.work_order_id;if(workId)delete data.forecast_id;const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
 async function saveWork(silent=false){const entryId=form.elements.entry_id.value,workId=form.elements.work_order_id.value,payload=workPayload(),wasActive=['ATIVA','EM_PRODUÇÃO'].includes(state.active?.status);const result=workId?await api(`/api/erp/os-management/work-orders/${workId}`,{method:'PUT',body:JSON.stringify(payload)}):await api(`/api/erp/os-management/entries/${entryId}/work-orders`,{method:'POST',body:JSON.stringify(payload)});await loadOrders();const row=state.orders.find(item=>item.entry_id===entryId);if(row)openWork(entryId);if(!silent)message(wasActive?`Alterações da O.S. ${result.numero_os||row?.numero_os||''} salvas e refletidas no MES.`:`O.S. ${result.numero_os||row?.numero_os||''} salva. Ela já aparece no MES como AG. PARAMETRIZAÇÃO.`);return result.id||workId}
 form.onsubmit=async event=>{event.preventDefault();try{await saveWork()}catch(error){message(error.message,true)}};
