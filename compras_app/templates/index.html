@@ -1371,6 +1371,13 @@ function initOsTab(){
 if (osTabInitialized){
 return;
 }
+const documentoEmEdicao = document.getElementById("os_historico_id");
+if (documentoEmEdicao && documentoEmEdicao.value){
+// A abertura foi solicitada para um documento especifico. Nunca permita que
+// o rascunho generico do navegador substitua a O.S. selecionada pelo usuario.
+osTabInitialized = true;
+return;
+}
 if (hasOsPrefill){
 aplicarPrefillOS();
 } else if (restaurarRascunhoOS()){
@@ -3925,6 +3932,13 @@ clearTimeout(osDraftSaveTimer);
 osDraftSaveTimer = setTimeout(salvarRascunhoOS, 400);
 }
 
+function cancelarAgendamentoRascunhoOS(){
+if (osDraftSaveTimer){
+clearTimeout(osDraftSaveTimer);
+osDraftSaveTimer = null;
+}
+}
+
 function limparRascunhoOS(options){
 try {
 localStorage.removeItem(osDraftStorageKey);
@@ -4018,6 +4032,12 @@ return false;
 }
 if (!osDraftTemConteudo(data)){
 limparRascunhoOS({ silencioso: true });
+return false;
+}
+if ((data.campos || {}).os_historico_id){
+// Um documento ja emitido deve sempre ser aberto pela acao Editar da Gestao
+// O.S. O rascunho local continua disponivel somente como protecao durante a
+// mesma edicao, mas nao pode decidir qual O.S. sera exibida ao abrir a aba.
 return false;
 }
 return aplicarRascunhoOS(data);
@@ -4410,6 +4430,7 @@ modal.setAttribute("aria-hidden", "true");
 }
 
 function editarDocumentoHistoricoOS(doc){
+cancelarAgendamentoRascunhoOS();
 const dados = doc.dados || {};
 const draft = {
 version: 2,
@@ -4437,6 +4458,9 @@ composicao: doc.composicao || [],
 aplicarRascunhoOS(draft);
 const historicoId = document.getElementById("os_historico_id");
 if (historicoId) historicoId.value = doc.id || "";
+// Marca a aba antes do click programatico. Isso evita que initOsTab restaure
+// um rascunho de uma O.S. anterior durante a troca de tela.
+osTabInitialized = true;
 fecharHistoricoOS();
 const tabButton = document.querySelector('[data-tab="tab-os"]');
 if (tabButton) tabButton.click();
