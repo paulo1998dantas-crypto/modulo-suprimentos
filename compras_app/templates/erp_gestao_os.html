@@ -83,7 +83,7 @@
         <div class="section-title"><strong>Alocação de Forecast</strong></div>
         <label class="span4" id="forecast-allocation-label"><span>Forecast confirmado aguardando chegada (opcional)</span><select name="forecast_id" id="forecast-select"></select><small class="muted">Use o Forecast como referência comercial. Os dados reais do veículo podem mudar na chegada; nenhum chassi será exigido para a alocação.</small></label>
         <div class="section-title"><strong>Dados comerciais e do cliente</strong></div>
-        <label class="required"><span>Tipo de serviço</span><select name="tipo_servico" data-required><option value="TRANSFORMAÇÃO">TRANSFORMAÇÃO</option><option value="PÓS-VENDA">PÓS-VENDA</option><option value="INSTALAÇÃO_DE_ACESSÓRIO">INSTALAÇÃO DE ACESSÓRIO</option><option value="RETORNO">RETORNO</option><option value="OUTRO">OUTRO</option></select></label>
+        <label class="required"><span>Tipo de serviço</span><select name="tipo_servico" data-required><option value="TRANSFORMAÇÃO">TRANSFORMAÇÃO</option><option value="PÓS-VENDA">PÓS-VENDA</option><option value="INSTALAÇÃO_DE_ACESSÓRIO">INSTALAÇÃO DE ACESSÓRIO</option><option value="RETORNO">RETORNO</option><option value="OUTRO">OUTRO</option><option value="N/A">N/A — não aplicável</option></select></label>
         <label class="required"><span>Proposta</span><input name="proposta_numero" data-required></label>
         <label class="required"><span>Data de aprovação</span><input name="data_aprovacao" type="date" data-required></label>
         <label class="required"><span>Vendedor</span><select name="vendedor" data-required></select></label>
@@ -167,14 +167,15 @@ const onlyDate=v=>v?String(v).slice(0,10):'';
 const date=v=>{if(!v)return '—';const d=new Date(`${onlyDate(v)}T12:00:00`);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('pt-BR')};
 function message(text,error=false){const box=document.getElementById('message');box.hidden=!text;box.className='message'+(error?' error':'');box.textContent=text||''}
 async function api(url,options={}){const response=await fetch(url,{headers:{'Content-Type':'application/json'},...options});let body={};try{body=await response.json()}catch{}if(!response.ok||body.ok===false)throw new Error(body.error||`Falha na operação (${response.status}).`);return body}
-function selectOptions(name,values,placeholder='Selecione...'){const el=form.elements[name];el.innerHTML=`<option value="">${placeholder}</option>`+(values||[]).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}
+function optionsWithNotApplicable(values){return [...new Set([...(values||[]),'N/A'])]}
+function selectOptions(name,values,placeholder='Selecione...'){const el=form.elements[name];el.innerHTML=`<option value="">${placeholder}</option>`+optionsWithNotApplicable(values).map(v=>`<option value="${esc(v)}">${v==='N/A'?'N/A — não aplicável':esc(v)}</option>`).join('')}
 function loadCatalogFields(){
   selectOptions('vendedor',state.catalogs.vendedores);selectOptions('mercado',state.catalogs.mercados);
   selectOptions('tipo_veiculo',state.catalogs.tipos_veiculo);selectOptions('linha',state.catalogs.linhas);
   selectOptions('ar_condicionado',state.catalogs.ar_fornecedores);selectOptions('tipo_sistema_ar',state.catalogs.ar_tipos);
   selectOptions('ar_quente',state.catalogs.sim_nao);
   const transformations=state.catalogs.transformacoes||[],el=document.getElementById('transformation-select');
-  el.innerHTML='<option value="">Selecione código e transformação...</option>'+transformations.map(x=>`<option value="${esc(x.codigo)}">${esc(x.codigo)} — ${esc(x.descricao)}</option>`).join('');
+  el.innerHTML='<option value="">Selecione código e transformação...</option>'+transformations.map(x=>`<option value="${esc(x.codigo)}">${x.codigo==='N/A'?'N/A — não aplicável':`${esc(x.codigo)} — ${esc(x.descricao)}`}</option>`).join('');
 }
 function linkedDocument(row){return state.documents.find(item=>row.work_order_id&&String(item.erp_work_order_id||'')===String(row.work_order_id))||null}
 function documentLabel(document){const client=document.cliente?` - ${document.cliente}`:'',chassis=document.chassis?` - ${document.chassis}`:'';return `Documento O.S. ${document.numero||document.id}${client}${chassis}`}
@@ -240,12 +241,12 @@ function checkMissing(){
   const box=document.getElementById('required-summary');
   if(!permissions.manage){box.classList.add('complete');box.textContent='Modo consulta: alterações e ativações estão disponíveis apenas para perfis operacionais autorizados.';return []}
   const missing=[];form.querySelectorAll('[data-required]').forEach(el=>{const value=String(el.value||'').trim();el.classList.toggle('missing',!value);if(!value)missing.push(el.closest('label')?.querySelector('span')?.textContent||el.name||'campo')});
-  const airType=form.elements.tipo_sistema_ar.value,provider=form.elements.ar_condicionado,providerRequired=!['NÃO','AR ORIGINAL','AG'].includes(airType),providerLabel=document.getElementById('air-provider-label');
+  const airType=form.elements.tipo_sistema_ar.value,provider=form.elements.ar_condicionado,providerRequired=!['NÃO','AR ORIGINAL','AG','N/A'].includes(airType),providerLabel=document.getElementById('air-provider-label');
   providerLabel.classList.toggle('required',providerRequired);provider.classList.toggle('missing',providerRequired&&!provider.value);if(providerRequired&&!provider.value)missing.push('Fornecedor do ar');
   box.classList.toggle('complete',missing.length===0);box.textContent=missing.length?`${missing.length} campo(s) obrigatório(s) pendente(s): ${missing.join(', ')}. O rascunho pode ser salvo, mas o MES não permitirá ativá-lo.`:'Todos os campos obrigatórios foram preenchidos. Falta parametrizar as etapas no MES.';
   return missing;
 }
-form.addEventListener('input',checkMissing);form.elements.tipo_sistema_ar.addEventListener('change',()=>{if(['NÃO','AR ORIGINAL','AG'].includes(form.elements.tipo_sistema_ar.value))form.elements.ar_condicionado.value='';checkMissing()});
+form.addEventListener('input',checkMissing);form.elements.tipo_sistema_ar.addEventListener('change',()=>{if(['NÃO','AR ORIGINAL','AG','N/A'].includes(form.elements.tipo_sistema_ar.value))form.elements.ar_condicionado.value='';checkMissing()});
 function openWork(entryId){
   const row=state.orders.find(item=>item.entry_id===entryId);if(!row)return;state.active=row;form.reset();loadCatalogFields();
   fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
