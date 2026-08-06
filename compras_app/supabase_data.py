@@ -1152,6 +1152,42 @@ def carregar_necessidades_forecast(forecast_id, force=False):
     )
 
 
+def carregar_necessidades_forecasts_ativos(force=False):
+    """Read the MRP projection for every active Forecast in one batch.
+
+    Forecast remains a planning-only domain.  This projection is deliberately
+    separate from physical O.S. needs: it never reserves, commits or moves
+    stock.  The PCP report can then present the two sources side by side while
+    preserving their different operational meaning.
+    """
+    forecasts = [
+        row
+        for row in carregar_forecasts(force=force)
+        if _clean(row.get("status")).upper() == "ATIVO"
+    ]
+    by_id = {_clean(row.get("id")): row for row in forecasts if _clean(row.get("id"))}
+    if not by_id:
+        return []
+
+    requirements = _all_rows(
+        FORECAST_REQUIREMENTS_TABLE,
+        select=(
+            "forecast_id,sku_codigo,descricao,unidade,quantidade_planejada,"
+            "nivel_maximo,origem,caminho_bom"
+        ),
+        order="forecast_id.asc,sku_codigo.asc",
+        cache_key="forecast_requirements_active",
+        force=force,
+    )
+    rows = []
+    for requirement in requirements:
+        forecast = by_id.get(_clean(requirement.get("forecast_id")))
+        if not forecast:
+            continue
+        rows.append({**dict(requirement), "forecast": forecast})
+    return rows
+
+
 def buscar_skus_forecast(query="", limit=30):
     term = _clean(query).upper()
     try:

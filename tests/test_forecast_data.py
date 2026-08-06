@@ -76,6 +76,27 @@ class ForecastDataTests(unittest.TestCase):
         self.assertEqual(existing, row)
         counter.assert_not_called()
 
+    def test_active_forecast_requirements_exclude_converted_and_cancelled_rows(self):
+        forecasts = [
+            {"id": "active", "codigo": "FCT-ATIVA", "status": "ATIVO"},
+            {"id": "converted", "codigo": "FCT-CONVERTIDA", "status": "CONVERTIDO"},
+            {"id": "cancelled", "codigo": "FCT-CANCELADA", "status": "CANCELADO"},
+        ]
+        requirements = [
+            {"forecast_id": "active", "sku_codigo": "SKU-1", "quantidade_planejada": 2},
+            {"forecast_id": "converted", "sku_codigo": "SKU-1", "quantidade_planejada": 9},
+            {"forecast_id": "cancelled", "sku_codigo": "SKU-2", "quantidade_planejada": 5},
+        ]
+        with (
+            patch.object(supabase_data, "carregar_forecasts", return_value=forecasts),
+            patch.object(supabase_data, "_all_rows", return_value=requirements),
+        ):
+            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True)
+
+        self.assertEqual(1, len(rows))
+        self.assertEqual("SKU-1", rows[0]["sku_codigo"])
+        self.assertEqual("FCT-ATIVA", rows[0]["forecast"]["codigo"])
+
 
 if __name__ == "__main__":
     unittest.main()

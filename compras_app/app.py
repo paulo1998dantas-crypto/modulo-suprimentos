@@ -7584,6 +7584,209 @@ def _purchase_transit_workbook(rows):
     return wb
 
 
+def _pcp_needs_number(value):
+    """Return a spreadsheet-safe quantity without changing the source data."""
+    try:
+        return float(str(value if value is not None else 0).replace(",", "."))
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _pcp_needs_date(value):
+    """Normalize an ISO date only for ordering the planning projection."""
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "+00:00")).date()
+    except ValueError:
+        try:
+            return datetime.strptime(raw[:10], "%d/%m/%Y").date()
+        except ValueError:
+            return None
+
+
+def _forecast_demand_label(forecast):
+    demand_type = str((forecast or {}).get("tipo_demanda") or "").strip().upper()
+    if demand_type == "AGUARDANDO_CHEGADA":
+        return "FORECAST CONFIRMADO — AGUARDANDO CHEGADA"
+    return "FORECAST PREDITIVO — SIMULAÇÃO"
+
+
+def _pcp_forecast_summary(requirements):
+    """Summarize active Forecast MRP without treating it as a stock reservation.
+
+    Converted Forecasts are intentionally absent from ``requirements``.  Their
+    planning demand is represented by the real O.S. after conversion, avoiding
+    double counting in the PCP report.
+    """
+    grouped = {}
+    for requirement in requirements or []:
+        forecast = requirement.get("forecast") or {}
+        demand_type = str(forecast.get("tipo_demanda") or "").strip().upper()
+        key = (
+            demand_type,
+            str(requirement.get("sku_codigo") or "").strip().upper(),
+            str(requirement.get("descricao") or "").strip(),
+            str(requirement.get("unidade") or "").strip(),
+        )
+        current = grouped.setdefault(key, {
+            "demand_type": demand_type,
+            "codigo": key[1],
+            "descricao": key[2],
+            "unidade": key[3],
+            "quantidade": 0.0,
+            "forecast_codes": set(),
+            "dates": [],
+            "bom": set(),
+        })
+        current["quantidade"] += _pcp_needs_number(requirement.get("quantidade_planejada"))
+        code = str(forecast.get("codigo") or "").strip()
+        if code:
+            current["forecast_codes"].add(code)
+        planned_date = (
+            _pcp_needs_date(forecast.get("data_entrega_prevista"))
+            or _pcp_needs_date(forecast.get("data_prevista_chegada"))
+        )
+        if planned_date:
+            current["dates"].append(planned_date)
+        current["bom"].add(
+            "B.O.M. explodida" if str(requirement.get("origem") or "").upper() == "BOM" else "SKU direto"
+        )
+    return sorted(
+        grouped.values(),
+        key=lambda row: (row["demand_type"], row["codigo"], row["descricao"]),
+    )
+
+
+def _pcp_needs_workbook(work_order_needs, forecast_requirements):
+    """Create the PCP operational needs report with O.S. and Forecast together.
+
+    It is deliberately a read-only report.  O.S. lines use the Stock module's
+    coverage calculation; Forecast lines are an MRP projection and never alter
+    balances, reservations, commitments, write-offs or movements.
+    """
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Necessidades PCP"
+    headers = [
+        "Origem", "Referência", "Classe da demanda", "Status", "Data prevista",
+        "O.S.", "ITEM", "Chassi", "Cliente", "SKU", "Descrição", "Unidade",
+        "Necessidade", "Coberto", "Falta expedir / demanda planejada",
+        "Saldo em fluxo (informativo)", "Setor", "Origem B.O.M.",
+    ]
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(headers))
+    ws.cell(1, 1, "RELATÓRIO PCP — NECESSIDADES DE O.S. E FORECAST")
+    ws.cell(1, 1).font = Font(bold=True, color="FFFFFF", size=14)
+    ws.cell(1, 1).fill = PatternFill("solid", fgColor="0B1C3A")
+    ws.cell(1, 1).alignment = Alignment(horizontal="center")
+    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=len(headers))
+    ws.cell(
+        2,
+        1,
+        "O.S. é demanda firme para expedição. Forecast é planejamento: não cria reserva, empenho, baixa ou movimentação. "
+        "Somente Forecast ATIVO entra; ao converter, a necessidade passa a ser representada pela O.S. real.",
+    )
+    ws.cell(2, 1).alignment = Alignment(wrap_text=True, vertical="center")
+    ws.cell(2, 1).fill = PatternFill("solid", fgColor="EAF4FF")
+    ws.row_dimensions[2].height = 34
+    header_row = 4
+    ws.append([])
+    ws.append(headers)
+    for cell in ws[header_row]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor="0B1C3A")
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+
+    for line in (work_order_needs or {}).get("lines", []):
+        ws.append([
+            "O.S.",
+            f"O.S. {line.get('numero_os') or ''}".strip(),
+            "DEMANDA FIRME — O.S. ABERTA",
+            line.get("status_necessidade") or "PENDENTE",
+            "",
+            line.get("numero_os") or "",
+            line.get("item_number") or "",
+            line.get("chassi") or "",
+            line.get("cliente_nome") or "",
+            line.get("codigo") or "",
+            line.get("descricao") or "",
+            line.get("unidade") or "",
+            _pcp_needs_number(line.get("quantidade_necessaria")),
+            _pcp_needs_number(line.get("quantidade_coberta")),
+            _pcp_needs_number(line.get("quantidade_pendente")),
+            _pcp_needs_number(line.get("saldo_fluxo_compartilhado")),
+            line.get("setor") or "",
+            line.get("itens_pai") or "",
+        ])
+
+    for forecast in _pcp_forecast_summary(forecast_requirements):
+        dates = forecast["dates"]
+        date_label = min(dates).isoformat() if dates else ""
+        references = ", ".join(sorted(forecast["forecast_codes"])) or "Forecast sem código"
+        ws.append([
+            "FORECAST",
+            references,
+            _forecast_demand_label({"tipo_demanda": forecast["demand_type"]}),
+            "ATIVO",
+            date_label,
+            "",
+            "",
+            "",
+            "",
+            forecast["codigo"],
+            forecast["descricao"],
+            forecast["unidade"],
+            forecast["quantidade"],
+            "",
+            forecast["quantidade"],
+            "",
+            "PLANEJAMENTO",
+            " / ".join(sorted(forecast["bom"])),
+        ])
+
+    ws.freeze_panes = "A5"
+    ws.auto_filter.ref = f"A{header_row}:{get_column_letter(len(headers))}{max(ws.max_row, header_row)}"
+    numeric_columns = {13, 14, 15, 16}
+    for row in ws.iter_rows(min_row=header_row + 1, max_row=ws.max_row):
+        for index in numeric_columns:
+            row[index - 1].number_format = "0.000"
+        row[2].alignment = Alignment(wrap_text=True, vertical="top")
+        row[10].alignment = Alignment(wrap_text=True, vertical="top")
+    for col_idx, column_cells in enumerate(ws.columns, start=1):
+        width = max((len(str(cell.value or "")) for cell in column_cells), default=0) + 2
+        ws.column_dimensions[get_column_letter(col_idx)].width = min(max(width, 11), 44)
+    return wb
+
+
+@app.route("/erp/relatorios/necessidades-pcp.xlsx")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_pcp_needs_report():
+    try:
+        work_order_needs = _erp_stock_request("work-orders/needs")
+        forecast_requirements = (
+            supabase_data.carregar_necessidades_forecasts_ativos(force=True)
+            if forecast_feature_enabled()
+            else []
+        )
+        wb = _pcp_needs_workbook(work_order_needs, forecast_requirements)
+        output = io.BytesIO()
+        wb.save(output)
+        wb.close()
+        output.seek(0)
+    except Exception as exc:
+        app.logger.exception("Falha ao exportar necessidades do PCP")
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=f"Necessidades_PCP_{date.today().isoformat()}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
 @app.route("/api/erp/purchase-orders/transit")
 @login_required
 @erp_feature_required
