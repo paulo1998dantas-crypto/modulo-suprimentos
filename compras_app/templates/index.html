@@ -1338,6 +1338,7 @@ const currentLoginScope = {{ ((current_user or {}).get('id') or (current_user or
 const osDraftStorageKey = `modulo_suprimentos_os_draft_v2:${currentLoginScope}`;
 let osDraftRestoring = false;
 let osDraftSaveTimer = null;
+let osForecastsDocumentais = [];
 
 function novoSubmissionToken(){
 if (window.crypto && typeof window.crypto.randomUUID === "function"){
@@ -1376,6 +1377,7 @@ if (documentoEmEdicao && documentoEmEdicao.value){
 // A abertura foi solicitada para um documento especifico. Nunca permita que
 // o rascunho generico do navegador substitua a O.S. selecionada pelo usuario.
 osTabInitialized = true;
+carregarForecastsDocumentoOS();
 return;
 }
 if (hasOsPrefill){
@@ -1386,6 +1388,161 @@ aplicarPrefillOS();
 preencherProcessosPadrao(conjuntoProcessoAtual());
 }
 osTabInitialized = true;
+carregarForecastsDocumentoOS();
+}
+
+function formatarQuantidadeForecastOS(value){
+const numero = parseNumber(value);
+if (Math.abs(numero - Math.round(numero)) < 0.000001){
+return String(Math.round(numero));
+}
+return numero.toLocaleString("pt-BR", { maximumFractionDigits: 3 });
+}
+
+function atualizarResumoForecastDocumentoOS(){
+const select = document.getElementById("os_forecast_selector");
+const quantidadeInput = document.getElementById("os_forecast_quantidade_input");
+const resumo = document.getElementById("os_forecast_documental_status");
+if (!select || !quantidadeInput || !resumo){
+return;
+}
+const forecast = osForecastsDocumentais.find((row) => String(row.id) === String(select.value));
+if (!forecast){
+resumo.textContent = "Selecione um Forecast confirmado para montar a O.S. com os mesmos SKUs e quantidades proporcionais.";
+quantidadeInput.max = "";
+// Ao voltar para O.S. manual, limpe uma selecao ainda nao emitida. Documentos
+// ja gravados preservam sua origem para que uma edicao nao perca auditoria.
+const historicoId = (document.getElementById("os_historico_id") || {}).value;
+if (!historicoId){
+const forecastIdInput = document.getElementById("os_forecast_id");
+const forecastQuantidadeInput = document.getElementById("os_forecast_quantidade");
+if (forecastIdInput) forecastIdInput.value = "";
+if (forecastQuantidadeInput) forecastQuantidadeInput.value = "";
+quantidadeInput.value = "";
+}
+return;
+}
+const saldo = Math.max(parseNumber(forecast.quantidade_saldo_documental), 0);
+quantidadeInput.max = String(saldo);
+if (!quantidadeInput.value || parseNumber(quantidadeInput.value) > saldo){
+quantidadeInput.value = saldo > 0 ? String(saldo) : "";
+}
+const itens = Array.isArray(forecast.itens_planejados) ? forecast.itens_planejados.length : 0;
+resumo.textContent = `${forecast.codigo || "Forecast"}: saldo documental de ${formatarQuantidadeForecastOS(saldo)} veiculo(s), ${itens} SKU(s) planejado(s). A emissao abate somente a quantidade informada.`;
+}
+
+async function carregarForecastsDocumentoOS(){
+const select = document.getElementById("os_forecast_selector");
+const resumo = document.getElementById("os_forecast_documental_status");
+if (!select){
+return;
+}
+try {
+const response = await fetch("/api/erp/forecasts", { headers: { Accept: "application/json" } });
+const payload = await response.json();
+if (!response.ok || !payload.ok){
+throw new Error(payload.error || "Nao foi possivel carregar os Forecasts.");
+}
+osForecastsDocumentais = (payload.forecasts || []).filter((forecast) => {
+return String(forecast.tipo_demanda || "").toUpperCase() === "AGUARDANDO_CHEGADA"
+&& String(forecast.status || "").toUpperCase() === "ATIVO"
+&& parseNumber(forecast.quantidade_saldo_documental) > 0;
+});
+const selectedId = (document.getElementById("os_forecast_id") || {}).value || select.value;
+select.innerHTML = '<option value="">Sem Forecast (O.S. manual)</option>';
+osForecastsDocumentais.forEach((forecast) => {
+const option = document.createElement("option");
+option.value = forecast.id;
+option.textContent = `${forecast.codigo || "Forecast"} - ${forecast.cliente_nome || "Cliente nao informado"} - saldo ${formatarQuantidadeForecastOS(forecast.quantidade_saldo_documental)}`;
+select.appendChild(option);
+});
+if (selectedId && osForecastsDocumentais.some((forecast) => String(forecast.id) === String(selectedId))){
+select.value = selectedId;
+}
+atualizarResumoForecastDocumentoOS();
+} catch (error) {
+if (resumo){
+resumo.textContent = `Forecast indisponivel nesta tela: ${error.message}`;
+resumo.classList.add("is-warning");
+}
+}
+}
+
+function preencherItensDoForecastOS(forecast, quantidade){
+const tabela = document.getElementById("tabela_os");
+const itens = Array.isArray(forecast.itens_planejados) ? forecast.itens_planejados : [];
+if (!tabela || !itens.length){
+throw new Error("O Forecast nao possui SKUs planejados. Complete o planejamento antes de converter.");
+}
+while (tabela.rows.length > 2){
+tabela.deleteRow(2);
+}
+itens.forEach((item, index) => {
+if (index > 0){
+adicionarLinhaOS();
+}
+const row = tabela.rows[index + 1];
+const codigo = String(item.sku_codigo || "").trim();
+const codigoInput = row.querySelector('input[name="os_codigo[]"]');
+const descricaoInput = row.querySelector('input[name="os_descricao[]"]');
+const quantidadeInput = row.querySelector('input[name="os_qtd[]"]');
+const unidadeInput = row.querySelector('input[name="os_unidade[]"]');
+if (codigoInput) codigoInput.value = codigo;
+if (descricaoInput) descricaoInput.value = item.descricao || "";
+if (unidadeInput) unidadeInput.value = item.unidade || "";
+if (quantidadeInput) quantidadeInput.value = String(parseNumber(item.quantidade_por_veiculo) * quantidade);
+if (codigo){
+aplicarProdutoLinhaOS(row, codigo, { semPopup: true });
+}
+if (descricaoInput && item.descricao) descricaoInput.value = item.descricao;
+if (unidadeInput && item.unidade) unidadeInput.value = item.unidade;
+atualizarFornecedorDiretoLinha(row);
+atualizarLuminariaLinhaOS(row, { semPopup: true });
+});
+osComposicaoSource = "bom";
+renderComponentes();
+aplicarProcessoAutomaticoOS({ forcar: true });
+}
+
+function aplicarForecastDocumentoOS(){
+const select = document.getElementById("os_forecast_selector");
+const quantidadeInput = document.getElementById("os_forecast_quantidade_input");
+const forecastIdInput = document.getElementById("os_forecast_id");
+const forecastQuantidadeInput = document.getElementById("os_forecast_quantidade");
+const resumo = document.getElementById("os_forecast_documental_status");
+const forecast = osForecastsDocumentais.find((row) => String(row.id) === String(select && select.value));
+if (!forecast){
+alert("Selecione um Forecast aguardando chegada.");
+return;
+}
+const quantidade = parseNumber(quantidadeInput && quantidadeInput.value);
+const saldo = parseNumber(forecast.quantidade_saldo_documental);
+if (quantidade <= 0 || quantidade > saldo + 0.000001){
+alert(`Informe uma quantidade maior que zero e ate ${formatarQuantidadeForecastOS(saldo)}.`);
+return;
+}
+if (!window.confirm(`Aplicar ${formatarQuantidadeForecastOS(quantidade)} veiculo(s) do ${forecast.codigo || "Forecast"}? Os itens atuais da O.S. serao substituidos pelos SKUs planejados.`)){
+return;
+}
+try {
+preencherItensDoForecastOS(forecast, quantidade);
+if (forecastIdInput) forecastIdInput.value = forecast.id;
+if (forecastQuantidadeInput) forecastQuantidadeInput.value = String(quantidade);
+const clienteBusca = document.querySelector('input[name="os_cliente_busca"]');
+const clienteHidden = document.querySelector('input[name="os_cliente"]');
+if (clienteBusca && forecast.cliente_nome) clienteBusca.value = forecast.cliente_nome;
+if (clienteHidden && forecast.cliente_nome) clienteHidden.value = forecast.cliente_nome;
+const inicio = document.querySelector('input[name="os_previsao_inicio"]');
+const termino = document.querySelector('input[name="os_previsao_termino"]');
+if (inicio && !inicio.value && forecast.data_prevista_chegada) inicio.value = `${String(forecast.data_prevista_chegada).slice(0, 10)}T08:00`;
+if (termino && !termino.value && forecast.data_entrega_prevista) termino.value = `${String(forecast.data_entrega_prevista).slice(0, 10)}T18:00`;
+const descricao = document.querySelector('textarea[name="os_descricao_servico"]');
+if (descricao && !descricao.value.trim()) descricao.value = `Conversao documental do Forecast ${forecast.codigo || ""}.`;
+if (resumo) resumo.textContent = `Forecast aplicado. Ao salvar fica apenas preparado; ao gerar o DOCX serao abatidos ${formatarQuantidadeForecastOS(quantidade)} veiculo(s) do saldo.`;
+salvarRascunhoOS();
+} catch (error) {
+alert(error.message || "Nao foi possivel aplicar o Forecast.");
+}
 }
 
 function parseNumber(value){
@@ -3870,6 +4027,8 @@ const campos = {};
 "os_obs",
 "os_historico_id",
 "os_submit_token",
+"os_forecast_id",
+"os_forecast_quantidade",
 ].forEach((name) => {
 const input = form.querySelector(`[name="${name}"]`);
 campos[name] = input ? input.value : "";
@@ -4010,6 +4169,7 @@ renderComposicaoRows(data.composicao || []);
 renderComponentes();
 }
 atualizarHintProcessoAutomatico(resolverProcessoAutomaticoOS());
+carregarForecastsDocumentoOS();
 const hora = data.savedAt ? new Date(data.savedAt).toLocaleString("pt-BR") : "";
 osDraftStatus(hora ? `Rascunho restaurado de ${hora}.` : "Rascunho restaurado.");
 return true;
@@ -4449,6 +4609,8 @@ os_obs_materiais: dados.obs_materiais || "",
 os_obs: dados.obs || "",
 os_historico_id: doc.id || "",
 os_submit_token: doc.submit_token || novoSubmissionToken(),
+os_forecast_id: (dados.forecast_consumo || {}).forecast_id || "",
+os_forecast_quantidade: (dados.forecast_consumo || {}).quantidade || "",
 },
 itens: doc.itens || [],
 processos: doc.processos || {},
@@ -4458,6 +4620,7 @@ composicao: doc.composicao || [],
 aplicarRascunhoOS(draft);
 const historicoId = document.getElementById("os_historico_id");
 if (historicoId) historicoId.value = doc.id || "";
+carregarForecastsDocumentoOS();
 // Marca a aba antes do click programatico. Isso evita que initOsTab restaure
 // um rascunho de uma O.S. anterior durante a troca de tela.
 osTabInitialized = true;
@@ -5507,6 +5670,8 @@ salvarRascunhoOS();
 <input type="hidden" id="os_submit_token" name="os_submit_token" value="">
 <input type="hidden" id="os_composicao_source" name="os_composicao_source" value="bom">
 <input type="hidden" id="os_composicao_json" name="os_composicao_json" value="">
+<input type="hidden" id="os_forecast_id" name="os_forecast_id" value="">
+<input type="hidden" id="os_forecast_quantidade" name="os_forecast_quantidade" value="">
 
 <div class="card">
 <h3>Rascunho da O.S</h3>
@@ -5516,6 +5681,27 @@ salvarRascunhoOS();
 </div>
 <p id="os_draft_status" style="margin:10px 0 0;font-size:12px;color:#64748b;"></p>
 <p style="margin:6px 0 0;font-size:12px;color:#64748b;">O rascunho fica salvo neste navegador. Arquivos PDF anexados precisam ser selecionados novamente ao reabrir.</p>
+</div>
+
+<div class="card" id="os_forecast_documental_card">
+<h3>Converter Forecast em O.S. documental</h3>
+<p style="margin:0 0 12px;color:#475569;">Use um Forecast <strong>Aguardando chegada</strong> para montar esta O.S. com seus SKUs, B.O.M. e quantidades proporcionais. Salvar mantém o Forecast intacto; gerar o pacote DOCX confirma o abatimento do saldo.</p>
+<div class="grid-4">
+<div>
+<label>Forecast confirmado</label>
+<select id="os_forecast_selector" onchange="atualizarResumoForecastDocumentoOS()">
+<option value="">Carregando Forecasts...</option>
+</select>
+</div>
+<div>
+<label>Quantidade de veiculos a converter</label>
+<input id="os_forecast_quantidade_input" type="number" min="0.001" step="0.001" placeholder="Ex.: 8">
+</div>
+<div style="display:flex;align-items:end;">
+<button type="button" class="btn-primary" onclick="aplicarForecastDocumentoOS()">Aplicar Forecast na O.S.</button>
+</div>
+</div>
+<p id="os_forecast_documental_status" style="margin:12px 0 0;font-size:12px;color:#64748b;">Selecione um Forecast confirmado para montar a O.S. com os mesmos SKUs e quantidades proporcionais.</p>
 </div>
 
 <div class="card">

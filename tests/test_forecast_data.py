@@ -97,6 +97,98 @@ class ForecastDataTests(unittest.TestCase):
         self.assertEqual("SKU-1", rows[0]["sku_codigo"])
         self.assertEqual("FCT-ATIVA", rows[0]["forecast"]["codigo"])
 
+    def test_documental_consumption_exposes_remaining_forecast_balance(self):
+        forecasts = [{"id": "fct-1", "quantidade_planejada": 10}]
+        consumos = [
+            {"forecast_id": "fct-1", "quantidade": 8, "status": "ATIVO"},
+            {"forecast_id": "fct-1", "quantidade": 1, "status": "CANCELADO"},
+        ]
+        with patch.object(supabase_data, "carregar_consumos_forecast_documental", return_value=consumos):
+            rows = supabase_data.enriquecer_forecasts_com_consumos(forecasts)
+
+        self.assertEqual(8, rows[0]["quantidade_consumida_documental"])
+        self.assertEqual(2, rows[0]["quantidade_saldo_documental"])
+        self.assertFalse(rows[0]["esgotado_documentalmente"])
+
+    def test_active_forecast_requirements_scale_by_documental_remaining_balance(self):
+        forecasts = [{
+            "id": "fct-1",
+            "codigo": "FCT-00001",
+            "status": "ATIVO",
+            "quantidade_planejada": 10,
+            "quantidade_saldo_documental": 2,
+        }]
+        requirements = [{
+            "forecast_id": "fct-1",
+            "sku_codigo": "SKU-1",
+            "quantidade_planejada": 20,
+        }]
+        with (
+            patch.object(supabase_data, "carregar_forecasts", return_value=forecasts),
+            patch.object(supabase_data, "_all_rows", return_value=requirements),
+        ):
+            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True)
+
+        self.assertEqual(1, len(rows))
+        self.assertEqual(4, rows[0]["quantidade_planejada"])
+        self.assertEqual(16, rows[0]["quantidade_documental_consumida"])
+
+    def test_documental_consumption_uses_idempotent_rpc_contract(self):
+        with (
+            patch.object(supabase_data, "_rpc", return_value={"id": "c-1"}) as rpc,
+            patch.object(supabase_data, "clear_cache") as clear_cache,
+        ):
+            result = supabase_data.consumir_forecast_em_os_documento(
+                "fct-1", 99, "2,5", "forecast-os-documento:99", "pcp"
+            )
+
+        self.assertEqual("c-1", result["id"])
+        rpc.assert_called_once_with(
+            "suprimentos_consumir_forecast_em_os_documento",
+            {
+                "p_forecast_id": "fct-1",
+                "p_documento_os_id": 99,
+                "p_quantidade": 2.5,
+                "p_idempotency_key": "forecast-os-documento:99",
+                "p_actor": "pcp",
+            },
+        )
+        clear_cache.assert_called_once()
+
+    def test_unconverted_forecast_deletion_uses_atomic_rpc_contract(self):
+        with (
+            patch.object(
+                supabase_data,
+                "_rpc",
+                return_value={"excluido": True, "forecast_id": "fct-1"},
+            ) as rpc,
+            patch.object(supabase_data, "clear_cache") as clear_cache,
+        ):
+            result = supabase_data.excluir_forecast_sem_historico(
+                "fct-1", "pcp", "4"
+            )
+
+        self.assertTrue(result["excluido"])
+        rpc.assert_called_once_with(
+            "suprimentos_excluir_forecast_sem_historico",
+            {
+                "p_forecast_id": "fct-1",
+                "p_expected_version": 4,
+                "p_actor": "pcp",
+            },
+        )
+        clear_cache.assert_called_once()
+
+    def test_unconfirmed_atomic_deletion_keeps_cache(self):
+        with (
+            patch.object(supabase_data, "_rpc", return_value={"excluido": False}),
+            patch.object(supabase_data, "clear_cache") as clear_cache,
+        ):
+            with self.assertRaisesRegex(supabase_data.SupabaseDataError, "nao confirmou"):
+                supabase_data.excluir_forecast_sem_historico("fct-1", "pcp")
+
+        clear_cache.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

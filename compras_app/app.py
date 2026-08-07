@@ -4445,6 +4445,13 @@ def api_excluir_historico_os(documento_id):
     if not documento or documento.get("tipo") != "os":
         return jsonify({"ok": False, "erro": "O.S nao encontrada."}), 404
     try:
+        consumo_forecast = ((documento.get("dados") or {}).get("forecast_consumo") or {})
+        if str(consumo_forecast.get("status") or "").upper() == "CONFIRMADO":
+            supabase_data.cancelar_consumo_forecast_em_os_documento(
+                documento_id,
+                current_username(),
+                "O.S. documental excluida no Suprimentos.",
+            )
         excluir_historico_documento(documento_id)
     except Exception:
         app.logger.exception("Falha ao excluir historico da O.S %s", documento_id)
@@ -4523,6 +4530,17 @@ def api_status_historico(tipo, documento_id):
             _cancel_emitted_legacy_oc_in_erp(documento, "Cancelada pelo comprador no Suprimentos.")
         if tipo == "oc" and novo_status == "concluido" and erp_feature_enabled():
             _close_emitted_legacy_oc_in_erp(documento, "Concluida tecnicamente pelo comprador no Suprimentos.")
+        if tipo == "os":
+            consumo_forecast = ((documento.get("dados") or {}).get("forecast_consumo") or {})
+            if (
+                novo_status == "cancelado"
+                and str(consumo_forecast.get("status") or "").upper() == "CONFIRMADO"
+            ):
+                supabase_data.cancelar_consumo_forecast_em_os_documento(
+                    documento_id,
+                    current_username(),
+                    "O.S. documental cancelada no Suprimentos.",
+                )
         if tipo == "os" and erp_feature_enabled():
             if novo_status == "concluido":
                 _close_linked_legacy_os_in_mes(
@@ -5961,10 +5979,58 @@ def gerar_os():
         historico_form_id = ""
         historico_existente = None
     usando_composicao_historica = composicao_source == "custom" and bool(historico_form_id)
+
+    # Um Forecast confirmado pode abastecer varias O.S. documentais. O saldo
+    # somente e abatido na emissao (nunca no rascunho) pela RPC transacional
+    # do Supabase; este bloco apenas valida e congela a referencia no documento.
+    dados_historico_anterior = (historico_existente or {}).get("dados") or {}
+    consumo_forecast_anterior = dados_historico_anterior.get("forecast_consumo") or {}
+    forecast_id = (request.form.get("os_forecast_id", "") or "").strip()
+    forecast_qtd_raw = (request.form.get("os_forecast_quantidade", "") or "").strip()
+    if not forecast_id and consumo_forecast_anterior:
+        forecast_id = str(consumo_forecast_anterior.get("forecast_id") or "").strip()
+    if not forecast_qtd_raw and consumo_forecast_anterior:
+        forecast_qtd_raw = str(consumo_forecast_anterior.get("quantidade") or "").strip()
+    forecast = None
+    forecast_quantidade = 0
+    if forecast_id:
+        if not supabase_data.enabled():
+            return "A conversao documental de Forecast requer o Supabase configurado.", 400
+        try:
+            forecast_quantidade = _parse_numero_form(forecast_qtd_raw, 0)
+        except Exception:
+            forecast_quantidade = 0
+        if forecast_quantidade <= 0:
+            return "Informe a quantidade do Forecast a converter nesta O.S.", 400
+        try:
+            forecast = supabase_data.obter_forecast(forecast_id)
+        except Exception:
+            app.logger.exception("Falha ao consultar Forecast %s para emissao da O.S.", forecast_id)
+            return "Nao foi possivel consultar o Forecast selecionado.", 502
+        if not forecast:
+            return "Forecast selecionado nao foi encontrado.", 404
+        if str(forecast.get("tipo_demanda") or "").upper() != "AGUARDANDO_CHEGADA":
+            return "Somente Forecasts aguardando chegada podem gerar O.S. documental.", 400
+        mesmo_consumo_historico = (
+            str(consumo_forecast_anterior.get("forecast_id") or "") == str(forecast_id)
+            and abs(_parse_numero_form(consumo_forecast_anterior.get("quantidade"), 0) - forecast_quantidade) <= 0.000001
+        )
+        if not mesmo_consumo_historico:
+            if str(forecast.get("status") or "").upper() != "ATIVO":
+                return "O Forecast selecionado nao esta ativo para conversao.", 409
+            saldo_forecast = _parse_numero_form(forecast.get("quantidade_saldo_documental"), 0)
+            if forecast_quantidade > saldo_forecast + 0.000001:
+                return (
+                    "Quantidade acima do saldo do Forecast. "
+                    f"Saldo disponivel: {_formatar_qtd_saida(saldo_forecast)}.",
+                    409,
+                )
     cliente_selecionado = _limpar_valor_busca(
         request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
     )
     cliente = _resolver_nome_cliente_os(cliente_selecionado)
+    if forecast and str(forecast.get("cliente_nome") or "").strip():
+        cliente = str(forecast.get("cliente_nome") or "").strip()
     os_produtos = carregar_os_produtos()
     produtos_catalogo = carregar_produtos()
     bom_dir = get_bom_dir()
@@ -5990,6 +6056,30 @@ def gerar_os():
     luminarias_qtd_linha = request.form.getlist("os_luminaria_qtd[]")
     popup_itens_linha = request.form.getlist("os_popup_itens[]")
     line_ids = request.form.getlist("os_line_id[]")
+    aplicar_itens_do_forecast = bool(
+        forecast
+        and not (
+            historico_existente
+            and str(consumo_forecast_anterior.get("status") or "").upper() == "CONFIRMADO"
+        )
+    )
+    if aplicar_itens_do_forecast:
+        itens_forecast = forecast.get("itens_planejados") or []
+        if not itens_forecast:
+            return "O Forecast nao possui SKUs planejados. Complete o Forecast antes de gerar a O.S.", 400
+        codigos = [str(item.get("sku_codigo") or "").strip() for item in itens_forecast]
+        qtds = [
+            str(_parse_numero_form(item.get("quantidade_por_veiculo"), 0) * forecast_quantidade)
+            for item in itens_forecast
+        ]
+        series = [""] * len(codigos)
+        unidades = [str(item.get("unidade") or "").strip() for item in itens_forecast]
+        descricoes = [str(item.get("descricao") or "").strip() for item in itens_forecast]
+        fornecedores_linha = [""] * len(codigos)
+        luminarias_linha = [""] * len(codigos)
+        luminarias_qtd_linha = [""] * len(codigos)
+        popup_itens_linha = ["[]"] * len(codigos)
+        line_ids = [""] * len(codigos)
     luminarias_extra = []
     popup_itens_extra = []
     regras_popup_por_gatilho = {}
@@ -6140,6 +6230,34 @@ def gerar_os():
         "obs": request.form.get("os_obs", ""),
         "processo_conjunto": conjunto_processo,
     }
+    if forecast:
+        # A data do Forecast e' uma sugestao operacional: ela preenche a O.S.
+        # documental quando o PCP ainda nao informou uma data mais precisa.
+        # Nunca convertemos aqui Forecast em veiculo, reserva, empenho ou saldo
+        # fisico; este vinculo existe apenas para a emissao documental da O.S.
+        data_chegada = str(
+            forecast.get("data_prevista_chegada")
+            or forecast.get("data_confirmacao")
+            or ""
+        ).strip()[:10]
+        data_entrega = str(forecast.get("data_entrega_prevista") or "").strip()[:10]
+        if not dados["previsao_inicio"] and re.fullmatch(r"\d{4}-\d{2}-\d{2}", data_chegada):
+            dados["previsao_inicio"] = f"{data_chegada}T08:00"
+        if not dados["previsao_termino"] and re.fullmatch(r"\d{4}-\d{2}-\d{2}", data_entrega):
+            dados["previsao_termino"] = f"{data_entrega}T18:00"
+        if not dados["descricao_servico"]:
+            dados["descricao_servico"] = (
+                f"Conversao documental do Forecast {forecast.get('codigo') or forecast_id}."
+            )
+        dados["forecast_consumo"] = {
+            "forecast_id": str(forecast.get("id") or forecast_id),
+            "codigo": str(forecast.get("codigo") or "").strip(),
+            "quantidade": forecast_quantidade,
+            "unidade": str(forecast.get("unidade") or "VEICULO").strip() or "VEICULO",
+            "quantidade_planejada": _parse_numero_form(forecast.get("quantidade_planejada"), 0),
+            "saldo_antes": _parse_numero_form(forecast.get("quantidade_saldo_documental"), 0),
+            "status": "PREPARADO",
+        }
 
     processos_final = {nome: [] for nome in PROCESSOS_ORDEM}
     algum_processo_informado = False
@@ -6321,7 +6439,7 @@ def gerar_os():
     )
 
     chassi_nome = (dados.get("chassis", "") or "").strip()
-    registrar_historico(
+    documento_emitido = registrar_historico(
         "os",
         numero_os,
         dados_historico,
@@ -6333,6 +6451,56 @@ def gerar_os():
         status="emitido",
         submit_token=submit_token,
     )
+    if forecast:
+        # A RPC realiza lock da linha do Forecast e torna retentativas do mesmo
+        # documento idempotentes. Se outra emissao consumiu o saldo entre a
+        # abertura da tela e este instante, a O.S. volta ao estado anterior.
+        try:
+            consumo = supabase_data.consumir_forecast_em_os_documento(
+                forecast.get("id") or forecast_id,
+                documento_emitido.get("id"),
+                forecast_quantidade,
+                f"forecast-os-documento:{documento_emitido.get('id')}",
+                current_username(),
+            )
+            dados_historico["forecast_consumo"].update({
+                "status": "CONFIRMADO",
+                "consumo_id": consumo.get("id"),
+                "saldo_depois": consumo.get("quantidade_saldo"),
+                "idempotente": bool(consumo.get("idempotente")),
+            })
+            documento_emitido = registrar_historico(
+                "os",
+                numero_os,
+                dados_historico,
+                itens=itens,
+                processos=processos_final,
+                componentes=componentes,
+                composicao=composicao_enriquecida,
+                documento_id=documento_emitido.get("id"),
+                status="emitido",
+                submit_token=submit_token,
+            )
+        except Exception as exc:
+            app.logger.exception(
+                "Falha ao consumir Forecast %s na emissao da O.S. documental %s",
+                forecast_id,
+                documento_emitido.get("id"),
+            )
+            try:
+                if historico_existente:
+                    supabase_data.atualizar_documento(historico_existente.get("id"), historico_existente)
+                else:
+                    excluir_historico_documento(documento_emitido.get("id"))
+            except Exception:
+                app.logger.exception("Falha ao restaurar O.S. apos recusa do Forecast")
+            for path in [*arquivos_docx, arquivo_requisicao_materiais]:
+                try:
+                    shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+                except Exception:
+                    pass
+            mensagem = str(exc).strip() or "Nao foi possivel abater o saldo do Forecast."
+            return f"O.S. nao foi emitida: {mensagem}", 409
     limpar_importacao(_user_scoped_file(OS_IMPORT_FILE))
 
     arquivos_saida = [
@@ -8101,6 +8269,31 @@ def erp_forecasts_cancel_api(forecast_id):
             forecast_id, current, current_username(), current.get("version")
         )
         return jsonify({"ok": True, "forecast": forecast})
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.route("/api/erp/forecasts/<forecast_id>", methods=["DELETE"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_forecasts_delete_api(forecast_id):
+    """Exclude only a planning scenario that has never been converted.
+
+    Forecasts with a vehicle/O.S. conversion or a documentary O.S. consumption
+    must be cancelled instead.  That distinction avoids deleting the source of
+    an emitted document and its audit trail.
+    """
+    if not forecast_feature_enabled():
+        return jsonify({"ok": False, "error": "Forecast desativado pela feature flag."}), 404
+    try:
+        body = request.get_json(silent=True) or {}
+        result = supabase_data.excluir_forecast_sem_historico(
+            forecast_id,
+            current_username(),
+            body.get("version"),
+        )
+        return jsonify({"ok": True, "result": result})
     except Exception as exc:
         return _forecast_error_response(exc)
 

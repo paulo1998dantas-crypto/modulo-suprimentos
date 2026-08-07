@@ -682,6 +682,28 @@ def gerar_os_docx(
         doc.add_paragraph("")
         doc.add_paragraph(f"OBS FINAL: {dados.get('obs')}")
 
+    forecast_consumo = dados.get("forecast_consumo") or {}
+    if forecast_consumo.get("codigo"):
+        quantidade = forecast_consumo.get("quantidade", "")
+        saldo_depois = forecast_consumo.get("saldo_depois")
+        if saldo_depois is None:
+            try:
+                saldo_depois = max(
+                    float(forecast_consumo.get("saldo_antes")) - float(quantidade),
+                    0,
+                )
+            except (TypeError, ValueError):
+                saldo_depois = None
+        texto_forecast = (
+            f"FORECAST DE ORIGEM: {forecast_consumo.get('codigo')} "
+            f"| QUANTIDADE CONVERTIDA NESTA O.S.: {quantidade} "
+            f"{forecast_consumo.get('unidade') or 'VEICULO'}"
+        )
+        if saldo_depois is not None:
+            texto_forecast += f" | SALDO APOS EMISSAO: {saldo_depois}"
+        doc.add_paragraph("")
+        doc.add_paragraph(texto_forecast)
+
     if refs.get("layout") is not None and refs["layout"] < len(doc.tables):
         tabela_layout = doc.tables[refs["layout"]]
         _limpar_layout(tabela_layout)

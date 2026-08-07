@@ -42,6 +42,26 @@ class ForecastRouteTests(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.get_json()["metrics"]["quantidade_planejada"])
 
+    def test_forecast_delete_uses_protected_atomic_operation(self):
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(app_module, "can", return_value=True),
+            patch.object(
+                app_module.supabase_data,
+                "excluir_forecast_sem_historico",
+                return_value={"excluido": True, "forecast_id": "fct-1"},
+            ) as delete_forecast,
+        ):
+            response = self.client.delete(
+                "/api/erp/forecasts/fct-1",
+                json={"version": 4},
+            )
+
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.get_json()["result"]["excluido"])
+        delete_forecast.assert_called_once_with("fct-1", "local", 4)
+
 
 if __name__ == "__main__":
     unittest.main()

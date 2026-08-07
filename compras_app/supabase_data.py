@@ -27,6 +27,7 @@ DOCUMENTOS_TABLE = "suprimentos_documentos"
 FORECASTS_TABLE = "suprimentos_forecasts"
 FORECAST_ITEMS_TABLE = "suprimentos_forecast_itens"
 FORECAST_REQUIREMENTS_TABLE = "suprimentos_forecast_necessidades"
+FORECAST_DOCUMENT_CONSUMPTIONS_TABLE = "suprimentos_forecast_consumos_os"
 PURCHASE_ORDERS_TABLE = "erp_purchase_orders"
 PURCHASE_ORDER_LINES_TABLE = "erp_purchase_order_lines"
 SKUS_TABLE = "skus"
@@ -195,6 +196,7 @@ def status():
             FORECASTS_TABLE,
             FORECAST_ITEMS_TABLE,
             FORECAST_REQUIREMENTS_TABLE,
+            FORECAST_DOCUMENT_CONSUMPTIONS_TABLE,
             PURCHASE_ORDERS_TABLE,
             PURCHASE_ORDER_LINES_TABLE,
             USERS_TABLE,
@@ -1087,6 +1089,70 @@ def normalizar_forecast(forecast, actor=""):
     }
 
 
+def _consumption_table_is_unavailable(exc):
+    """Keep read-only Forecast pages compatible until the additive migration runs.
+
+    Consumption itself never silently falls back: an issuance that tries to
+    consume a Forecast still receives the database error and cannot overbook.
+    This guard only avoids taking down the existing Forecast listing during a
+    rolling deploy where the application starts before its migration.
+    """
+    message = _clean(exc).lower()
+    return (
+        FORECAST_DOCUMENT_CONSUMPTIONS_TABLE.lower() in message
+        and any(marker in message for marker in (
+            "does not exist",
+            "could not find the table",
+            "schema cache",
+            "undefined table",
+        ))
+    )
+
+
+def carregar_consumos_forecast_documental(force=False):
+    try:
+        return _all_rows(
+            FORECAST_DOCUMENT_CONSUMPTIONS_TABLE,
+            select=(
+                "id,forecast_id,documento_os_id,quantidade,status,"
+                "criado_por,cancelado_por,motivo_cancelamento,created_at,cancelled_at"
+            ),
+            order="created_at.desc",
+            cache_key="forecast_document_consumptions",
+            force=force,
+        )
+    except SupabaseDataError as exc:
+        if _consumption_table_is_unavailable(exc):
+            return []
+        raise
+
+
+def enriquecer_forecasts_com_consumos(forecasts, force=False):
+    """Attach the documentally consumed and remaining volume to Forecast rows."""
+    consumos = carregar_consumos_forecast_documental(force=force)
+    ativos_por_forecast = {}
+    detalhes_por_forecast = {}
+    for consumo in consumos:
+        forecast_id = _clean(consumo.get("forecast_id"))
+        if not forecast_id:
+            continue
+        detalhes_por_forecast.setdefault(forecast_id, []).append(consumo)
+        if _clean(consumo.get("status")).upper() == "ATIVO":
+            ativos_por_forecast[forecast_id] = (
+                ativos_por_forecast.get(forecast_id, 0) + _numeric(consumo.get("quantidade"))
+            )
+    for forecast in forecasts or []:
+        forecast_id = _clean(forecast.get("id"))
+        planejada = max(_numeric(forecast.get("quantidade_planejada")), 0)
+        consumida = max(ativos_por_forecast.get(forecast_id, 0), 0)
+        saldo = max(planejada - consumida, 0)
+        forecast["quantidade_consumida_documental"] = consumida
+        forecast["quantidade_saldo_documental"] = saldo
+        forecast["esgotado_documentalmente"] = planejada > 0 and saldo <= 0.000001
+        forecast["consumos_documentais"] = detalhes_por_forecast.get(forecast_id, [])
+    return forecasts
+
+
 def obter_forecast(forecast_id):
     rows = _request(
         "GET",
@@ -1097,7 +1163,7 @@ def obter_forecast(forecast_id):
         return None
     forecast = rows[0]
     forecast["itens_planejados"] = carregar_itens_forecast(forecast.get("id"), force=True)
-    return forecast
+    return enriquecer_forecasts_com_consumos([forecast], force=True)[0]
 
 
 def carregar_forecasts(force=False):
@@ -1121,7 +1187,7 @@ def carregar_forecasts(force=False):
         grouped.setdefault(item.get("forecast_id"), []).append(item)
     for forecast in forecasts:
         forecast["itens_planejados"] = grouped.get(forecast.get("id"), [])
-    return forecasts
+    return enriquecer_forecasts_com_consumos(forecasts, force=force)
 
 
 def carregar_itens_forecast(forecast_id, force=False):
@@ -1184,8 +1250,50 @@ def carregar_necessidades_forecasts_ativos(force=False):
         forecast = by_id.get(_clean(requirement.get("forecast_id")))
         if not forecast:
             continue
-        rows.append({**dict(requirement), "forecast": forecast})
+        quantidade_planejada = _numeric(forecast.get("quantidade_planejada"))
+        quantidade_saldo = _numeric(forecast.get("quantidade_saldo_documental"))
+        # Forecasts criados antes da migration ainda sao compativeis: sem
+        # consumo documentado, todo o planejamento continua entrando no MRP.
+        fator_saldo = (
+            max(quantidade_saldo, 0) / quantidade_planejada
+            if quantidade_planejada > 0
+            else 1
+        )
+        if fator_saldo <= 0.000001:
+            continue
+        linha = {**dict(requirement), "forecast": forecast}
+        linha["quantidade_planejada"] = _numeric(requirement.get("quantidade_planejada")) * fator_saldo
+        linha["quantidade_documental_consumida"] = _numeric(requirement.get("quantidade_planejada")) * (1 - fator_saldo)
+        rows.append(linha)
     return rows
+
+
+def consumir_forecast_em_os_documento(forecast_id, documento_os_id, quantidade, idempotency_key, actor=""):
+    result = _rpc(
+        "suprimentos_consumir_forecast_em_os_documento",
+        {
+            "p_forecast_id": _clean(forecast_id),
+            "p_documento_os_id": int(documento_os_id),
+            "p_quantidade": _forecast_quantity(quantidade),
+            "p_idempotency_key": _clean(idempotency_key),
+            "p_actor": _clean(actor),
+        },
+    )
+    clear_cache()
+    return result
+
+
+def cancelar_consumo_forecast_em_os_documento(documento_os_id, actor="", motivo=""):
+    result = _rpc(
+        "suprimentos_cancelar_consumo_forecast_em_os_documento",
+        {
+            "p_documento_os_id": int(documento_os_id),
+            "p_actor": _clean(actor),
+            "p_motivo": _clean(motivo),
+        },
+    )
+    clear_cache()
+    return result
 
 
 def buscar_skus_forecast(query="", limit=30):
@@ -1254,6 +1362,32 @@ def atualizar_forecast(forecast_id, forecast, actor, expected_version=None):
     clear_cache()
     saved["itens_planejados"] = carregar_itens_forecast(saved.get("id"), force=True)
     return saved
+
+
+def excluir_forecast_sem_historico(forecast_id, actor, expected_version=None):
+    """Remove somente um Forecast que ainda nao teve conversao operacional.
+
+    A regra e executada no PostgreSQL junto com a exclusao das linhas e das
+    necessidades.  Nao existe fallback REST proposital: fazer tres deletes no
+    cliente poderia deixar o Forecast incompleto se outro usuario o
+    convertesse entre uma chamada e outra.
+    """
+    result = _rpc(
+        "suprimentos_excluir_forecast_sem_historico",
+        {
+            "p_forecast_id": _clean(forecast_id),
+            "p_expected_version": (
+                int(expected_version)
+                if expected_version not in (None, "")
+                else None
+            ),
+            "p_actor": _clean(actor),
+        },
+    )
+    if not isinstance(result, dict) or not result.get("excluido"):
+        raise SupabaseDataError("O Supabase nao confirmou a exclusao do Forecast.")
+    clear_cache()
+    return result
 
 
 def _load_user_record(*, user_id=None, username=None, include_password=False):
