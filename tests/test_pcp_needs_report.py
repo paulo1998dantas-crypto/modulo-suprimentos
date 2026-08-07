@@ -39,6 +39,7 @@ class PcpNeedsReportTests(unittest.TestCase):
                 "setor": "PREPARAÇÃO",
                 "itens_pai": "CJ-001",
                 "status_necessidade": "PENDENTE",
+                "data_entrega_os": "2026-08-15",
             }],
             "summary": {"work_orders": 1},
         }
@@ -104,6 +105,7 @@ class PcpNeedsReportTests(unittest.TestCase):
             if row[0] == "FORECAST" and "PREDITIVO" in row[2]
         )
         self.assertEqual("3100", str(os_row[5]))
+        self.assertEqual("2026-08-15", str(os_row[4]))
         self.assertEqual(3, os_row[14])
         self.assertEqual(4, confirmed_forecast[14])
         self.assertEqual(2, predictive_forecast[14])
@@ -114,6 +116,7 @@ class PcpNeedsReportTests(unittest.TestCase):
     def test_management_screen_exposes_the_pcp_needs_export(self):
         template = (APP_DIR / "templates" / "erp_gestao_os.html").read_text(encoding="utf-8")
         self.assertIn("/erp/relatorios/necessidades-pcp.xlsx", template)
+        self.assertIn("Entrega O.S.", template)
         with (
             patch.object(app_module, "login_enabled", return_value=False),
             patch.object(app_module, "erp_feature_enabled", return_value=True),

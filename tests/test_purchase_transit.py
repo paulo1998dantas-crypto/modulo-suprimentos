@@ -116,7 +116,8 @@ class PurchaseTransitTests(unittest.TestCase):
             ["2026-08-10", "2026-09-15"],
             [item["data_necessidade"] for item in saved_items],
         )
-        self.assertEqual("2026-08-10", register.call_args.args[2]["previsao"])
+        # A data oficial do cabeçalho é a última remessa prevista do pedido.
+        self.assertEqual("2026-09-15", register.call_args.args[2]["previsao"])
 
     def test_erp_sync_publishes_each_line_remittance_date(self):
         items = [
@@ -154,7 +155,7 @@ class PurchaseTransitTests(unittest.TestCase):
                 "codigo": "SKU-1",
                 "descricao": "Item 1",
                 "unidade": "UN",
-                "qtd": 1,
+                "qtd": 5.0,
                 "valor": 10,
                 "desconto": 0,
                 "total": 10,
@@ -165,17 +166,28 @@ class PurchaseTransitTests(unittest.TestCase):
         )
         try:
             document = Document(path)
-            text = "\n".join(
-                cell.text
+            product_table = next(
+                table
                 for table in document.tables
-                for row in table.rows
-                for cell in row.cells
+                if any(
+                    "DATA DE REMESSA" in " ".join(cell.text.split()).upper()
+                    for cell in table.rows[0].cells
+                )
             )
-            self.assertIn("REMESSA: 15/09/2026", text)
+            headers = [" ".join(cell.text.split()).upper() for cell in product_table.rows[0].cells]
+            remittance_column = headers.index("DATA DE REMESSA")
+            body = product_table.rows[1].cells
+            self.assertEqual("Item 1", " ".join(body[1].text.split()))
+            self.assertEqual("5", body[3].text.strip())
+            self.assertEqual("15/09/2026", body[remittance_column].text.strip())
         finally:
             generated = Path(path)
             generated.unlink(missing_ok=True)
             generated.parent.rmdir()
+
+    def test_document_quantity_format_removes_only_trailing_zeroes(self):
+        self.assertEqual("5", gerar_oc._format_quantity(5.0))
+        self.assertEqual("2,5", gerar_oc._format_quantity("2,50"))
 
     def test_transit_api_and_export_share_the_same_projection(self):
         rows = [{

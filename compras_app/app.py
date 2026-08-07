@@ -5730,7 +5730,7 @@ def gerar_oc():
         item["data_necessidade"] for item in itens if item.get("data_necessidade")
     )
     previsao_pedido = (
-        previsao_linhas[0]
+        previsao_linhas[-1]
         if previsao_linhas
         else _erp_iso_date(request.form.get("previsao", ""))
     )
@@ -5744,8 +5744,9 @@ def gerar_oc():
         "endereco": fornecedor_info.get("endereco", request.form.get("endereco", "")),
         "cep": fornecedor_info.get("cep", request.form.get("cep", "")),
         "telefone": fornecedor_info.get("telefone", request.form.get("telefone", "")),
-        # Order-level date remains the earliest/default date for summaries.
         # The operational promise lives on each line in ``data_necessidade``.
+        # The header date is the final planned remittance, which is the
+        # official delivery date for the purchase order as a whole.
         "previsao": previsao_pedido,
         "tipo_frete": request.form.get("tipo_frete", ""),
         "frete": frete_val,
@@ -7704,7 +7705,7 @@ def _pcp_needs_workbook(work_order_needs, forecast_requirements):
             f"O.S. {line.get('numero_os') or ''}".strip(),
             "DEMANDA FIRME — O.S. ABERTA",
             line.get("status_necessidade") or "PENDENTE",
-            "",
+            line.get("data_entrega_os") or "",
             line.get("numero_os") or "",
             line.get("item_number") or "",
             line.get("chassi") or "",

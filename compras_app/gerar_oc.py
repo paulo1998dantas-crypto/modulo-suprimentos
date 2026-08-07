@@ -1,12 +1,13 @@
 import os
 import json
 import tempfile
+from decimal import Decimal, InvalidOperation
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Pt
+from docx.shared import Inches, Pt
 from datetime import datetime
 from composicao import expandir_composicao_itens, normalizar_componentes
 from config import TEMPLATE_WORD, TEMPLATE_OS, OS_COMPONENTES_FILE
@@ -79,12 +80,12 @@ def _format_date(texto):
     if texto == "":
         return ""
 
-    try:
-        if "-" in texto:
-            data = datetime.strptime(texto, "%Y-%m-%d")
-            return data.strftime("%d/%m/%Y")
-    except ValueError:
-        pass
+    formatos = ("%Y-%m-%d", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%d/%m/%Y")
+    for formato in formatos:
+        try:
+            return datetime.strptime(texto, formato).strftime("%d/%m/%Y")
+        except ValueError:
+            continue
 
     return texto
 
@@ -142,12 +143,32 @@ def _data_remessa_item(item):
     return _format_date(_clean(item.get("data_necessidade")))
 
 
-def _descricao_tabela_item(item):
-    descricao = _clean(item.get("descricao"))
-    data_remessa = _data_remessa_item(item)
-    if not data_remessa:
-        return descricao
-    return f"{descricao}\nREMESSA: {data_remessa}"
+def _format_quantity(value):
+    """Format quantities without trailing decimal zeroes in operational docs.
+
+    Quantities remain numeric in the application and ERP payload. This is
+    presentation-only: ``5.0`` becomes ``5`` while ``2.5`` remains ``2,5``.
+    """
+    if value is None:
+        return ""
+    raw = str(value).strip()
+    if not raw:
+        return ""
+
+    try:
+        normalized = raw.replace(" ", "")
+        if "," in normalized:
+            normalized = normalized.replace(".", "").replace(",", ".")
+        number = Decimal(normalized)
+    except (InvalidOperation, ValueError):
+        return raw
+
+    if not number.is_finite():
+        return raw
+    formatted = format(number, "f")
+    if "." in formatted:
+        formatted = formatted.rstrip("0").rstrip(".")
+    return formatted.replace(".", ",")
 
 
 def _add_descricao_paragraph(doc, label, value, bold_label=True):
@@ -272,15 +293,50 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
         cell.text = "" if texto is None else str(texto)
         _apply_cell_style(template_cell, cell)
 
+    # The remittance date belongs to the purchase line. Older documents
+    # appended it to the description, which made both fields hard to scan.
+    # Keep this dynamic so the existing template stays compatible while every
+    # newly generated O.C. gets a dedicated date cell for each line.
+    header_cells = tabela.rows[0].cells
+    remittance_column = next(
+        (
+            index
+            for index, cell in enumerate(header_cells)
+            if any(token in (cell.text or "").upper() for token in ("REMESSA", "NECESSIDADE"))
+        ),
+        None,
+    )
+    if remittance_column is None:
+        header_template = header_cells[-1]
+        body_template = template_row.cells[-1]
+        # Keep the full DD/MM/YYYY value on one line for an operational read.
+        tabela.add_column(Inches(1.10))
+        remittance_column = len(tabela.rows[0].cells) - 1
+        _set_cell_text(
+            tabela.rows[0].cells[remittance_column],
+            "Data de\nremessa",
+            header_template,
+        )
+        _set_cell_text(
+            template_row.cells[remittance_column],
+            "",
+            body_template,
+        )
+
     for idx, item in enumerate(itens):
         row_cells = template_row.cells if idx == 0 else tabela.add_row().cells
         _set_cell_text(row_cells[0], item["codigo"], template_row.cells[0])
-        _set_cell_text(row_cells[1], _descricao_tabela_item(item), template_row.cells[1])
+        _set_cell_text(row_cells[1], _clean(item.get("descricao")), template_row.cells[1])
         _set_cell_text(row_cells[2], item["unidade"], template_row.cells[2])
-        _set_cell_text(row_cells[3], item["qtd"], template_row.cells[3])
+        _set_cell_text(row_cells[3], _format_quantity(item.get("qtd")), template_row.cells[3])
         _set_cell_text(row_cells[4], _format_brl(item["valor"]), template_row.cells[4])
         _set_cell_text(row_cells[5], _format_brl(item["desconto"]), template_row.cells[5])
         _set_cell_text(row_cells[6], _format_brl(item["total"]), template_row.cells[6])
+        _set_cell_text(
+            row_cells[remittance_column],
+            _data_remessa_item(item),
+            template_row.cells[remittance_column],
+        )
 
     # Composicao de materiais (B.O.M) usando a tabela do template, se existir
     componentes = normalizar_componentes(componentes) if componentes is not None else _carregar_componentes_local()
