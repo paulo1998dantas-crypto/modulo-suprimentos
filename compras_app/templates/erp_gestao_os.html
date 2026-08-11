@@ -75,38 +75,48 @@
 <dialog id="work-dialog">
   <form id="work-form" novalidate>
     <input name="entry_id" type="hidden"><input name="work_order_id" type="hidden"><input name="transformacao_codigo" type="hidden"><input name="transformacao" type="hidden">
+    <datalist id="not-applicable-option"><option value="N/A"></option></datalist>
     <header class="modal-head"><div><h2 id="work-title">Abrir O.S.</h2><small id="work-subtitle"></small></div><button class="btn" type="button" onclick="workDialog.close()">Fechar</button></header>
     <div class="modal-body">
-      <div id="required-summary" class="required-summary">Preencha os campos obrigatórios destacados para ativar a O.S.</div>
+      <div id="required-summary" class="required-summary">Somente o tipo de serviço é estruturalmente obrigatório. Os demais campos podem ficar vazios ou receber N/A.</div>
       <div class="grid">
+        <div class="section-title"><strong>Dados físicos da entrada</strong><span class="muted"> Podem ser corrigidos após a chegada; toda alteração fica auditada.</span></div>
+        <label class="span2"><span>Chassi completo</span><input name="entry_chassi" maxlength="40"></label>
+        <label><span>Marca</span><select name="entry_marca"></select></label>
+        <label><span>Modelo</span><select name="entry_modelo"></select></label>
+        <label class="span2"><span>Versão</span><select name="entry_versao"></select></label>
+        <label><span>Avarias?</span><select name="entry_avarias"><option value="NÃO">NÃO</option><option value="SIM">SIM</option><option value="N/A">N/A</option></select></label>
+        <label><span>Cliente da entrada</span><input name="entry_cliente_nome" list="not-applicable-option"></label>
+        <label class="span4"><span>Observações da chegada</span><input name="entry_observacoes" list="not-applicable-option"></label>
+        <div class="span4 actions"><button id="save-entry" class="btn" type="button" onclick="saveEntryData()">Salvar correção da entrada</button></div>
         <div class="section-title"><strong>Documento de O.S. e ITEM operacional</strong></div>
         <label class="span4" id="document-allocation-label"><span>Documento de O.S. emitido (opcional)</span><select name="document_id" id="document-select"></select><small id="document-link-hint" class="muted">Selecione o documento emitido que pertence a este ITEM/chassi. O vinculo estrutural impede associacoes duplicadas.</small></label>
         <div class="section-title"><strong>Alocação de Forecast</strong></div>
         <label class="span4" id="forecast-allocation-label"><span>Forecast confirmado aguardando chegada (opcional)</span><select name="forecast_id" id="forecast-select"></select><small class="muted">Use o Forecast como referência comercial. Os dados reais do veículo podem mudar na chegada; nenhum chassi será exigido para a alocação.</small></label>
         <div class="section-title"><strong>Dados comerciais e do cliente</strong></div>
         <label class="required"><span>Tipo de serviço</span><select name="tipo_servico" data-required><option value="TRANSFORMAÇÃO">TRANSFORMAÇÃO</option><option value="PÓS-VENDA">PÓS-VENDA</option><option value="INSTALAÇÃO_DE_ACESSÓRIO">INSTALAÇÃO DE ACESSÓRIO</option><option value="RETORNO">RETORNO</option><option value="OUTRO">OUTRO</option><option value="N/A">N/A — não aplicável</option></select></label>
-        <label class="required"><span>Proposta</span><input name="proposta_numero" data-required></label>
-        <label class="required"><span>Data de aprovação</span><input name="data_aprovacao" type="date" data-required></label>
-        <label class="required"><span>Vendedor</span><select name="vendedor" data-required></select></label>
-        <label class="required"><span>Mercado</span><select name="mercado" data-required></select></label>
-        <label class="span2 required"><span>Cliente</span><input name="cliente_nome" data-required></label>
-        <label class="required"><span>Município</span><input name="municipio" data-required></label>
-        <label class="required"><span>UF</span><input name="uf" maxlength="2" data-required></label>
+        <label><span>Proposta</span><input name="proposta_numero" list="not-applicable-option"></label>
+        <label><span>Data de aprovação</span><input name="data_aprovacao" type="date"></label>
+        <label><span>Vendedor</span><select name="vendedor"></select></label>
+        <label><span>Mercado</span><select name="mercado"></select></label>
+        <label class="span2"><span>Cliente</span><input name="cliente_nome" list="not-applicable-option"></label>
+        <label><span>Município</span><input name="municipio" list="not-applicable-option"></label>
+        <label><span>UF</span><input name="uf" maxlength="3" list="not-applicable-option"></label>
 
         <div class="section-title"><strong>Configuração do veículo e transformação</strong></div>
-        <label class="required"><span>Tipo de veículo</span><select name="tipo_veiculo" data-required></select></label>
-        <label class="required"><span>Linha</span><select name="linha" data-required></select></label>
-        <label class="span2 required"><span>Transformação</span><select id="transformation-select" data-required></select></label>
-        <label>Código do banco<input name="codigo_banco"></label><label>Conjunto de bancos<input name="conjunto_bancos"></label><label>Acessibilidade<input name="acessibilidade"></label><label>Lotação<input name="lotacao"></label>
+        <label><span>Tipo de veículo</span><select name="tipo_veiculo"></select></label>
+        <label><span>Linha</span><select name="linha"></select></label>
+        <label class="span2"><span>Transformação</span><select id="transformation-select"></select></label>
+        <label><span>Código do banco</span><input id="bank-code" name="codigo_banco" list="bank-options" autocomplete="off" placeholder="Digite código ou N/A"><datalist id="bank-options"></datalist></label><label class="span2"><span>Conjunto de bancos</span><input id="bank-description" name="conjunto_bancos" readonly placeholder="Preenchido pelo código ativo"></label><label><span>Acessibilidade</span><input name="acessibilidade" list="not-applicable-option"></label><label><span>Lotação</span><input name="lotacao" list="not-applicable-option"></label>
 
         <div class="section-title"><strong>Climatização e complementos</strong></div>
         <label id="air-provider-label"><span>Fornecedor do ar</span><select name="ar_condicionado"></select></label>
-        <label class="span2 required"><span>Tipo de sistema de ar</span><select name="tipo_sistema_ar" data-required></select></label>
-        <label class="required"><span>Ar quente?</span><select name="ar_quente" data-required></select></label>
-        <label class="span2">Acessório<input name="acessorio"></label><label class="span2">Plotagem<input name="plotagem"></label>
+        <label class="span2"><span>Tipo de sistema de ar</span><select name="tipo_sistema_ar"></select></label>
+        <label><span>Ar quente?</span><select name="ar_quente"></select></label>
+        <label class="span2">Acessório<input name="acessorio" list="not-applicable-option"></label><label class="span2">Plotagem<input name="plotagem" list="not-applicable-option"></label>
 
         <div class="section-title"><strong>Programação inicial</strong></div>
-        <label class="span2 required"><span>Data inicial de entrega</span><input name="data_comercial_prevista" type="date" data-required></label>
+        <label class="span2"><span>Data inicial de entrega</span><input name="data_comercial_prevista" type="date"></label>
         <div class="span2 muted">Esta é a primeira data acordada. Alterações futuras, após a ativação, serão registradas no MES como reprogramações.</div>
       </div>
     </div>
@@ -152,7 +162,7 @@
 </dialog>
 
 <script>
-const state={orders:[],forecasts:[],documents:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null};
+const state={orders:[],forecasts:[],documents:[],banks:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null};
 const mesBase={{ mes_url|tojson }};
 const workDialog=document.getElementById('work-dialog'),form=document.getElementById('work-form');
 const materialsDialog=document.getElementById('materials-dialog');
@@ -175,8 +185,18 @@ function loadCatalogFields(){
   selectOptions('tipo_veiculo',state.catalogs.tipos_veiculo);selectOptions('linha',state.catalogs.linhas);
   selectOptions('ar_condicionado',state.catalogs.ar_fornecedores);selectOptions('tipo_sistema_ar',state.catalogs.ar_tipos);
   selectOptions('ar_quente',state.catalogs.sim_nao);
+  selectOptions('entry_marca',state.catalogs.marcas);selectOptions('entry_modelo',state.catalogs.modelos);selectOptions('entry_versao',state.catalogs.versoes);
   const transformations=state.catalogs.transformacoes||[],el=document.getElementById('transformation-select');
   el.innerHTML='<option value="">Selecione código e transformação...</option>'+transformations.map(x=>`<option value="${esc(x.codigo)}">${x.codigo==='N/A'?'N/A — não aplicável':`${esc(x.codigo)} — ${esc(x.descricao)}`}</option>`).join('');
+}
+function renderBankOptions(){document.getElementById('bank-options').innerHTML='<option value="N/A"></option>'+state.banks.map(item=>`<option value="${esc(item.codigo)}">${esc(item.descricao)}</option>`).join('')}
+function bankByCode(code){const normalized=norm(code);return state.banks.find(item=>norm(item.codigo)===normalized)||null}
+function syncBankDescription(keepLegacy=false){
+  const code=String(form.elements.codigo_banco.value||'').trim(),description=form.elements.conjunto_bancos;
+  if(!code){description.value='';return}
+  if(norm(code)==='N/A'){description.value='N/A';return}
+  const bank=bankByCode(code);if(bank){form.elements.codigo_banco.value=bank.codigo;description.value=bank.descricao;return}
+  if(!keepLegacy)description.value='';
 }
 function linkedDocument(row){return state.documents.find(item=>row.work_order_id&&String(item.erp_work_order_id||'')===String(row.work_order_id))||null}
 function documentLabel(document){const client=document.cliente?` - ${document.cliente}`:'',chassis=document.chassis?` - ${document.chassis}`:'';return `Documento O.S. ${document.numero||document.id}${client}${chassis}`}
@@ -234,7 +254,7 @@ function render(){
     const document=linkedDocument(row),documentLine=document?`<br><span class="available">DOC. O.S. ${esc(document.numero)}</span>`:'<br><span class="muted">Documento não vinculado</span>';
     return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. operacional ${esc(row.numero_os||'não aberta')}</span>${documentLine}</td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id?'<br><span class="available">DISPONÍVEL PARA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td>${row.work_order_id?`<button class="btn" type="button" onclick="openMaterials('${row.work_order_id}','${esc(row.numero_os||row.item_number)}')">Consultar</button>`:'<span class="muted">O.S. não aberta</span>'}</td><td><button class="btn ${permissions.manage&&!row.work_order_id?'primary':''}" type="button" onclick="openWork('${row.entry_id}')">${permissions.manage?(row.work_order_id?'Abrir':'Alocar e abrir O.S.'):'Consultar'}</button></td></tr>`}).join('');
 }
-async function loadOrders(){try{message('Atualizando entradas, O.S., documentos e Forecasts...');const [orders,catalogs,forecasts,documents]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/forecasts'),api('/api/erp/os-management/documents')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.forecasts=forecasts.forecasts||[];state.documents=documents.documents||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();metrics();render();message('')}catch(error){message(error.message,true)}}
+async function loadOrders(){try{message('Atualizando entradas, O.S., documentos, bancos e Forecasts...');const [orders,catalogs,forecasts,documents,banks]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/forecasts'),api('/api/erp/os-management/documents'),api('/api/erp/os-management/banks?limit=200')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.forecasts=forecasts.forecasts||[];state.documents=documents.documents||[];state.banks=banks.banks||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();renderBankOptions();metrics();render();message('')}catch(error){message(error.message,true)}}
 function clearFilters(){document.getElementById('search').value='';document.getElementById('view-filter').value='ACTION';render()}
 function fill(name,value){const input=form.elements[name];if(!input)return;const normalized=value??'';if(input.tagName==='SELECT'&&normalized&&![...input.options].some(option=>option.value===String(normalized)))input.add(new Option(`${normalized} (legado)`,normalized));input.value=normalized}
 function transformationDescription(code){return (state.catalogs.transformacoes||[]).find(x=>x.codigo===code)?.descricao||''}
@@ -242,18 +262,19 @@ function checkMissing(){
   const box=document.getElementById('required-summary');
   if(!permissions.manage){box.classList.add('complete');box.textContent='Modo consulta: alterações e ativações estão disponíveis apenas para perfis operacionais autorizados.';return []}
   const missing=[];form.querySelectorAll('[data-required]').forEach(el=>{const value=String(el.value||'').trim();el.classList.toggle('missing',!value);if(!value)missing.push(el.closest('label')?.querySelector('span')?.textContent||el.name||'campo')});
-  const airType=form.elements.tipo_sistema_ar.value,provider=form.elements.ar_condicionado,providerRequired=!['NÃO','AR ORIGINAL','AG','N/A'].includes(airType),providerLabel=document.getElementById('air-provider-label');
+  const airType=form.elements.tipo_sistema_ar.value,provider=form.elements.ar_condicionado,providerRequired=Boolean(airType)&&!['NÃO','AR ORIGINAL','AG','N/A'].includes(airType),providerLabel=document.getElementById('air-provider-label');
   providerLabel.classList.toggle('required',providerRequired);provider.classList.toggle('missing',providerRequired&&!provider.value);if(providerRequired&&!provider.value)missing.push('Fornecedor do ar');
-  box.classList.toggle('complete',missing.length===0);box.textContent=missing.length?`${missing.length} campo(s) obrigatório(s) pendente(s): ${missing.join(', ')}. O rascunho pode ser salvo, mas o MES não permitirá ativá-lo.`:'Todos os campos obrigatórios foram preenchidos. Falta parametrizar as etapas no MES.';
+  box.classList.toggle('complete',missing.length===0);box.textContent=missing.length?`${missing.length} campo estrutural pendente: ${missing.join(', ')}. Os demais campos podem ficar vazios ou receber N/A.`:'Tipo de serviço definido. Os demais campos são opcionais; falta parametrizar as etapas no MES.';
   return missing;
 }
 form.addEventListener('input',checkMissing);form.elements.tipo_sistema_ar.addEventListener('change',()=>{if(['NÃO','AR ORIGINAL','AG','N/A'].includes(form.elements.tipo_sistema_ar.value))form.elements.ar_condicionado.value='';checkMissing()});
 function openWork(entryId){
   const row=state.orders.find(item=>item.entry_id===entryId);if(!row)return;state.active=row;form.reset();loadCatalogFields();
   fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
+  fill('entry_chassi',row.chassi);fill('entry_marca',row.marca);fill('entry_modelo',row.modelo);fill('entry_versao',row.versao);fill('entry_avarias',row.avarias||'NÃO');fill('entry_cliente_nome',row.entry_client);fill('entry_observacoes',row.entry_notes);
   const directDocument=loadDocumentOptions(row);
   loadForecastOptions(row.forecast_id||'');
-  ['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','cliente_nome','municipio','uf','tipo_veiculo','linha','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'].forEach(name=>fill(name,name.startsWith('data_')?onlyDate(row[name]):row[name]));
+  ['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','cliente_nome','municipio','uf','tipo_veiculo','linha','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'].forEach(name=>fill(name,name.startsWith('data_')?onlyDate(row[name]):row[name]));syncBankDescription(true);
   if(!row.work_order_id){fill('cliente_nome',row.entry_client);fill('tipo_servico','TRANSFORMAÇÃO')}
   let code=row.transformacao_codigo||'';if(!code&&row.transformacao)code=(state.catalogs.transformacoes||[]).find(x=>norm(x.descricao)===norm(row.transformacao))?.codigo||'';
   const transformationSelect=document.getElementById('transformation-select');if(!code&&row.transformacao){transformationSelect.add(new Option(`${row.transformacao} (legado)`,'__LEGACY__'));transformationSelect.value='__LEGACY__'}else transformationSelect.value=code;fill('transformacao_codigo',code);fill('transformacao',row.transformacao||transformationDescription(code));
@@ -264,14 +285,23 @@ function openWork(entryId){
   form.elements.forecast_id.disabled=!editable||Boolean(row.work_order_id);
   form.elements.data_comercial_prevista.disabled=!editable||active;
   const saveButton=document.getElementById('save-work');saveButton.hidden=!editable;saveButton.textContent=active?'Salvar alterações':'Salvar O.S. rascunho';
+  const saveEntryButton=document.getElementById('save-entry');saveEntryButton.hidden=!editable;saveEntryButton.disabled=!editable;
   document.getElementById('activate-button').hidden=!(permissions.manage&&row.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(row.status));
   const technicalButton=document.getElementById('technical-close-button');technicalButton.hidden=!(permissions.technical&&row.work_order_id);technicalButton.disabled=row.technical_status==='CONCLUIDA'||row.status==='CANCELADA';technicalButton.textContent=row.technical_status==='CONCLUIDA'?'Técnica concluída':'Conclusão técnica';
   checkMissing();if(!workDialog.open)workDialog.showModal();
 }
 document.getElementById('transformation-select').addEventListener('change',event=>{if(event.target.value!=='__LEGACY__'){fill('transformacao_codigo',event.target.value);fill('transformacao',transformationDescription(event.target.value))}checkMissing()});
+document.getElementById('bank-code').addEventListener('input',()=>syncBankDescription(false));
+document.getElementById('bank-code').addEventListener('change',()=>syncBankDescription(false));
 document.getElementById('forecast-select').addEventListener('change',fillFromForecast);
 document.getElementById('document-select').addEventListener('change',event=>{const document=state.documents.find(item=>String(item.id)===String(event.target.value));document.getElementById('document-link-hint').textContent=document?`Ao salvar, o Documento O.S. ${document.numero} será vinculado ao ITEM ${state.active?.item_number||''} / chassi ${state.active?.chassi||''}.`:'A O.S. operacional será mantida sem documento vinculado.'});
-function workPayload(){const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;const workId=data.work_order_id;delete data.work_order_id;if(workId)delete data.forecast_id;const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
+function workPayload(){const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;const workId=data.work_order_id;delete data.work_order_id;Object.keys(data).filter(key=>key.startsWith('entry_')).forEach(key=>delete data[key]);if(workId)delete data.forecast_id;const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}const bankCode=String(data.codigo_banco||'').trim();if(bankCode&&norm(bankCode)!=='N/A'){const bank=bankByCode(bankCode),legacyUnchanged=norm(bankCode)===norm(state.active?.codigo_banco);if(!bank&&!legacyUnchanged)throw new Error('Selecione um código de banco ativo da lista do Cadastro.');if(bank){data.codigo_banco=bank.codigo;data.conjunto_bancos=bank.descricao}}Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
+async function saveEntryData(){
+  const entryId=form.elements.entry_id.value;if(!entryId||!permissions.manage)return;
+  const payload={chassi:form.elements.entry_chassi.value,marca:form.elements.entry_marca.value,modelo:form.elements.entry_modelo.value,versao:form.elements.entry_versao.value,avarias:form.elements.entry_avarias.value,cliente_nome:form.elements.entry_cliente_nome.value,observacoes:form.elements.entry_observacoes.value};
+  const button=document.getElementById('save-entry');button.disabled=true;
+  try{await api(`/api/erp/os-management/entries/${encodeURIComponent(entryId)}`,{method:'PUT',body:JSON.stringify(payload)});await loadOrders();if(state.orders.some(item=>item.entry_id===entryId))openWork(entryId);message('Dados físicos da entrada atualizados e auditados. O novo veículo já aparece no MES e na Gestão de O.S.')}catch(error){message(error.message,true)}finally{button.disabled=false}
+}
 async function saveWork(silent=false){const entryId=form.elements.entry_id.value,workId=form.elements.work_order_id.value,payload=workPayload(),wasActive=['ATIVA','EM_PRODUÇÃO'].includes(state.active?.status);const result=workId?await api(`/api/erp/os-management/work-orders/${workId}`,{method:'PUT',body:JSON.stringify(payload)}):await api(`/api/erp/os-management/entries/${entryId}/work-orders`,{method:'POST',body:JSON.stringify(payload)});await loadOrders();const row=state.orders.find(item=>item.entry_id===entryId);if(row)openWork(entryId);if(!silent)message(wasActive?`Alterações da O.S. ${result.numero_os||row?.numero_os||''} salvas e refletidas no MES.`:`O.S. ${result.numero_os||row?.numero_os||''} salva. Ela já aparece no MES como AG. PARAMETRIZAÇÃO.`);return result.id||workId}
 form.onsubmit=async event=>{event.preventDefault();try{await saveWork()}catch(error){message(error.message,true)}};
 async function openMesConfiguration(){const missing=checkMissing();if(missing.length){message(`Preencha antes de parametrizar: ${missing.join(', ')}.`,true);form.querySelector('.missing')?.focus();return}const popup=window.open('about:blank','_blank');try{const workId=await saveWork(true);const target=`${mesBase.replace(/\/$/,'')}/gestao-os?work_order_id=${encodeURIComponent(workId)}`;if(popup)popup.location.href=target;else location.href=target;workDialog.close();message('O.S. salva. Defina as etapas no MES e conclua a ativação.')}catch(error){if(popup)popup.close();message(error.message,true)}}

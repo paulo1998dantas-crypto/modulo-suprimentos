@@ -144,6 +144,54 @@ def registration_by_sku(sku):
     }
 
 
+def active_bank_sets(query="", limit=100):
+    """Return active bank-set master data used by O.S. allocation.
+
+    The Cadastro module remains the source of truth.  Keeping this query
+    narrow avoids loading the complete product catalogue merely to populate a
+    searchable field in Suprimentos.
+    """
+    if not configured():
+        raise SupabaseCatalogError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
+    try:
+        safe_limit = max(1, min(int(limit or 100), 200))
+    except (TypeError, ValueError) as exc:
+        raise SupabaseCatalogError("Limite de consulta invalido.") from exc
+    normalized_query = _clean(query)
+    params = [
+        ("select", "sku,descricao_primaria,unidade"),
+        ("category_key", "eq.cat_20_bco"),
+        ("ativo", "is.true"),
+        ("order", "sku.asc"),
+        ("limit", str(safe_limit)),
+    ]
+    if normalized_query:
+        escaped = normalized_query.replace("%", "\\%").replace(",", "\\,")
+        params.append(("or", f"(sku.ilike.*{escaped}*,descricao_primaria.ilike.*{escaped}*)"))
+    request = urllib.request.Request(
+        f"{_supabase_url()}/rest/v1/{REGISTRATIONS_TABLE}?{urllib.parse.urlencode(params)}",
+        headers=_headers(),
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            rows = json.loads(response.read().decode("utf-8") or "[]")
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise SupabaseCatalogError(f"Erro Supabase {exc.code}: {body}") from exc
+    except urllib.error.URLError as exc:
+        raise SupabaseCatalogError(f"Nao foi possivel conectar ao Supabase: {exc}") from exc
+    return [
+        {
+            "codigo": _clean(row.get("sku")),
+            "descricao": _clean(row.get("descricao_primaria")),
+            "unidade": _clean(row.get("unidade")),
+        }
+        for row in rows
+        if _clean(row.get("sku"))
+    ]
+
+
 def _all_rows():
     rows = []
     offset = 0

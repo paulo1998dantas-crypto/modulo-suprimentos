@@ -8407,6 +8407,20 @@ def erp_work_order_catalogs():
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+@app.route("/api/erp/os-management/banks")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_work_order_bank_catalog():
+    try:
+        banks = supabase_catalog.active_bank_sets(
+            request.args.get("q", ""), request.args.get("limit", 100)
+        )
+        return jsonify({"ok": True, "banks": banks})
+    except supabase_catalog.SupabaseCatalogError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 @app.route("/api/erp/os-management/documents")
 @login_required
 @erp_feature_required
@@ -8472,6 +8486,23 @@ def erp_work_order_shared_consumption_proxy(work_id):
 def erp_vehicle_entry_proxy():
     try:
         return jsonify(_erp_mes_request("vehicle-entries", "POST", request.get_json(silent=True) or {})), 201
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/erp/os-management/entries/<entry_id>", methods=["PUT"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_vehicle_entry_update_proxy(entry_id):
+    try:
+        return jsonify(
+            _erp_mes_request(
+                f"vehicle-entries/{entry_id}",
+                "PUT",
+                request.get_json(silent=True) or {},
+            )
+        )
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
