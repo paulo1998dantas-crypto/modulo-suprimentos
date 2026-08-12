@@ -148,6 +148,16 @@ class WorkOrderDocumentLinkTests(unittest.TestCase):
             mes_request.call_args.args[2],
         )
 
+    def test_pending_mes_configuration_is_presented_as_emitted_os(self):
+        template = (APP_DIR / "templates" / "erp_gestao_os.html").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("function isMesConfigurationPending(row)", template)
+        self.assertIn("if(isMesConfigurationPending(row))return 'EMITIDA'", template)
+        self.assertIn("MES: AG. PARAMETRIZAÇÃO", template)
+        self.assertIn("Salvar O.S. emitida", template)
+
 
 if __name__ == "__main__":
     unittest.main()
