@@ -3741,6 +3741,8 @@ if (!form){
 return;
 }
 form.reset();
+const documentStatus = document.getElementById("oc_document_status");
+if (documentStatus) documentStatus.value = "rascunho";
 
 const tabela = document.getElementById("tabela_itens");
 if (tabela){
@@ -4500,6 +4502,7 @@ const erpOC = doc.erp_purchase_order || {};
 document.getElementById("oc_historico_id").value = doc.id || "";
 document.getElementById("oc_numero").value = doc.numero || "";
 document.getElementById("oc_submit_token").value = doc.submit_token || novoSubmissionToken();
+document.getElementById("oc_document_status").value = String(doc.status || "rascunho").toLowerCase();
 const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep","previsao","tipo_frete","frete","forma_pagamento","prazo","vencimento","obs","oc_categoria","destino"];
 campos.forEach((name) => {
 const input = form.elements[name];
@@ -4719,6 +4722,26 @@ calcularTotais();
 
 const formOc = document.getElementById("form-oc");
 if (formOc){
+const operationalToday = () => {
+const parts = new Intl.DateTimeFormat("en-CA", {
+timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit"
+}).formatToParts(new Date()).reduce((result, part) => {
+if (part.type !== "literal") result[part.type] = part.value;
+return result;
+}, {});
+return `${parts.year}-${parts.month}-${parts.day}`;
+};
+const validatePurchaseRemittanceDates = () => {
+const submitStatus = String(formOc.elements.oc_document_status?.value || "rascunho").toLowerCase();
+if (submitStatus !== "rascunho") return true;
+const today = operationalToday();
+const overdue = Array.from(formOc.querySelectorAll('input[name="data_necessidade[]"]')).map((input, index) => ({ input, index, value: input.value })).filter(line => line.value && line.value < today);
+if (!overdue.length) return true;
+const lines = overdue.map(line => `linha ${line.index + 1}: ${line.value}`).join("; ");
+window.alert(`A O.C. não pode ser emitida com data de remessa retroativa. Corrija ${lines}. A data mínima é ${today}.`);
+overdue[0].input.focus();
+return false;
+};
 const dataPadrao = formOc.elements.previsao;
 if (dataPadrao){
 dataPadrao.addEventListener("change", () => {
@@ -4728,6 +4751,11 @@ if (!input.value) input.value = dataPadrao.value;
 });
 }
 formOc.addEventListener("submit", (event) => {
+const savingDraft = event.submitter?.name === "acao" && event.submitter?.value === "salvar";
+if (!savingDraft && !validatePurchaseRemittanceDates()){
+event.preventDefault();
+return;
+}
 garantirSubmissionToken("oc_submit_token");
 if (formOc.dataset.submitting === "1"){
 event.preventDefault();
@@ -5097,6 +5125,7 @@ salvarRascunhoOS();
 <input type="hidden" id="oc_historico_id" name="oc_historico_id" value="">
 <input type="hidden" id="oc_numero" name="oc_numero" value="">
 <input type="hidden" id="oc_submit_token" name="oc_submit_token" value="">
+<input type="hidden" id="oc_document_status" value="rascunho">
 
 <div class="card">
 

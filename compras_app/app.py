@@ -21,6 +21,7 @@ import threading
 import unicodedata
 import uuid
 from datetime import date, timedelta, datetime
+from zoneinfo import ZoneInfo
 import tempfile
 import zipfile
 from openpyxl import Workbook
@@ -100,6 +101,14 @@ from processos_transformacao import (
 )
 import supabase_catalog
 import supabase_data
+
+
+OPERATIONAL_TIMEZONE = ZoneInfo("America/Sao_Paulo")
+
+
+def _operational_today():
+    """Return today's date in the plant's operational timezone."""
+    return datetime.now(OPERATIONAL_TIMEZONE).date()
 
 
 def _load_local_env():
@@ -5715,6 +5724,34 @@ def gerar_oc():
     total_itens = 0
     for item in itens:
         total_itens += item["total"]
+
+    # A rascunho can be prepared in advance, but a new O.C. cannot be
+    # emitted with a remittance date already in the past.  This protects the
+    # receiving queue and purchase-transit report from being born overdue.
+    # Existing emitted documents remain editable/reprintable for historical
+    # correction without retroactively blocking their original dates.
+    existing_status = str((historico_existente or {}).get("status") or "rascunho").strip().lower()
+    is_initial_emission = not historico_existente or existing_status == "rascunho"
+    if acao != "salvar" and is_initial_emission:
+        operational_today = _operational_today()
+        retroactive_lines = [
+            (index + 1, item.get("codigo") or "sem código", item["data_necessidade"])
+            for index, item in enumerate(itens)
+            if item.get("data_necessidade")
+            and date.fromisoformat(item["data_necessidade"]) < operational_today
+        ]
+        if retroactive_lines:
+            lines_message = "; ".join(
+                f"linha {line} ({code}): {due_date}" for line, code, due_date in retroactive_lines
+            )
+            return redirect(url_for(
+                "index",
+                tab="oc",
+                documento_status=(
+                    "A O.C. não foi emitida: corrija as datas de remessa retroativas "
+                    f"({lines_message}). A data mínima para emissão é {operational_today.isoformat()}."
+                ),
+            ))
 
     frete_raw = request.form.get("frete", "")
     frete_val = 0

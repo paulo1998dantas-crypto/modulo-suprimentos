@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from pathlib import Path
+from urllib.parse import unquote_plus
 from unittest.mock import patch
 
 from docx import Document
@@ -118,6 +119,63 @@ class PurchaseTransitTests(unittest.TestCase):
         )
         # A data oficial do cabeçalho é a última remessa prevista do pedido.
         self.assertEqual("2026-09-15", register.call_args.args[2]["previsao"])
+
+    def test_new_purchase_with_retroactive_remittance_is_not_emitted(self):
+        yesterday = (app_module._operational_today() - app_module.timedelta(days=1)).isoformat()
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "registrar_historico") as register,
+            patch.object(app_module, "gerar_word") as generate,
+        ):
+            response = self.client.post("/gerar_oc", data={
+                "fornecedor": "Fornecedor",
+                "codigo[]": ["SKU-1"],
+                "descricao[]": ["Item 1"],
+                "unidade[]": ["UN"],
+                "qtd[]": ["2"],
+                "data_necessidade[]": [yesterday],
+                "valor[]": ["10"],
+                "desconto[]": ["0"],
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        self.assertIn("datas de remessa retroativas", unquote_plus(response.headers["Location"]))
+        register.assert_not_called()
+        generate.assert_not_called()
+
+    def test_purchase_draft_may_keep_retroactive_date_until_emission(self):
+        yesterday = (app_module._operational_today() - app_module.timedelta(days=1)).isoformat()
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "proximo_numero_oc", return_value=2801),
+            patch.object(app_module, "registrar_historico") as register,
+            patch.object(app_module, "gerar_word") as generate,
+        ):
+            response = self.client.post("/gerar_oc", data={
+                "acao": "salvar",
+                "oc_submit_token": "retroactive-draft",
+                "fornecedor": "Fornecedor",
+                "codigo[]": ["SKU-1"],
+                "descricao[]": ["Item 1"],
+                "unidade[]": ["UN"],
+                "qtd[]": ["2"],
+                "data_necessidade[]": [yesterday],
+                "valor[]": ["10"],
+                "desconto[]": ["0"],
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        register.assert_called_once()
+        generate.assert_not_called()
 
     def test_erp_sync_publishes_each_line_remittance_date(self):
         items = [
