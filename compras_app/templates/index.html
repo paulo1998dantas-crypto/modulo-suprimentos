@@ -4491,6 +4491,37 @@ modal.classList.remove("open");
 modal.setAttribute("aria-hidden", "true");
 }
 
+function normalizarDataParaInput(value){
+const raw = String(value === undefined || value === null ? "" : value).trim();
+if (!raw) return "";
+let match = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/);
+let year;
+let month;
+let day;
+if (match){
+year = Number(match[1]);
+month = Number(match[2]);
+day = Number(match[3]);
+} else {
+match = raw.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+if (!match) return "";
+day = Number(match[1]);
+month = Number(match[2]);
+year = Number(match[3]);
+}
+if (year < 1900 || month < 1 || month > 12 || day < 1 || day > 31) return "";
+const candidate = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+const parsed = new Date(`${candidate}T12:00:00`);
+if (Number.isNaN(parsed.getTime()) || parsed.getFullYear() !== year || parsed.getMonth() + 1 !== month || parsed.getDate() !== day) return "";
+return candidate;
+}
+
+function preencherCampoOC(input, value){
+if (!input) return;
+const safeValue = value === undefined || value === null ? "" : value;
+input.value = input.type === "date" ? normalizarDataParaInput(safeValue) : safeValue;
+}
+
 function editarDocumentoHistoricoOC(doc){
 const tabButton = document.querySelector('[data-tab="tab-oc"]');
 const tabOC = document.getElementById("tab-oc");
@@ -4506,7 +4537,7 @@ document.getElementById("oc_document_status").value = String(doc.status || "rasc
 const campos = ["razao_social","cnpj","email","telefone","endereco","bairro","cidade","uf","cep","previsao","tipo_frete","frete","forma_pagamento","prazo","vencimento","obs","oc_categoria","destino"];
 campos.forEach((name) => {
 const input = form.elements[name];
-if (input) input.value = dados[name] === undefined || dados[name] === null ? "" : dados[name];
+ preencherCampoOC(input, dados[name]);
 });
 if (form.elements.oc_categoria) form.elements.oc_categoria.value = dados.oc_categoria || erpOC.categoria || "GERAL";
 if (form.elements.destino) form.elements.destino.value = dados.destino || erpOC.destino || "";
@@ -4520,7 +4551,7 @@ itens.forEach((item, index) => {
 if (index > 0) adicionarLinha();
 const row = tabela.rows[index + 1];
 const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"data_necessidade[]":item.data_necessidade || dados.previsao,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
-Object.entries(valores).forEach(([name, value]) => { const input = row.querySelector(`[name="${name}"]`); if (input) input.value = value === undefined || value === null ? "" : value; });
+Object.entries(valores).forEach(([name, value]) => { preencherCampoOC(row.querySelector(`[name="${name}"]`), value); });
 });
 calcularTotais();
 fecharHistoricoOC();
