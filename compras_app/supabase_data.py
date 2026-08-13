@@ -975,6 +975,28 @@ def obter_layout(layout_id):
     return rows[0] if rows else None
 
 
+def listar_layouts(limit=250):
+    """Retorna o catálogo de layouts disponíveis para emissão de O.S.
+
+    O catálogo é compartilhado com a Gestão de Layout do Módulo Cadastro.
+    A O.S. guarda somente a referência UUID do arquivo escolhido; portanto,
+    consultar esta lista não cria cópias de PDFs no Storage.
+    """
+    try:
+        safe_limit = max(1, min(int(limit or 250), 1000))
+    except (TypeError, ValueError):
+        safe_limit = 250
+    return _request(
+        "GET",
+        LAYOUTS_TABLE,
+        query=[
+            ("select", "id,nome_original,nome_exibicao,mime_type,tamanho_bytes,criado_por,created_at,updated_at"),
+            ("order", "nome_exibicao.asc,created_at.desc"),
+            ("limit", str(safe_limit)),
+        ],
+    ) or []
+
+
 def salvar_layout_pdf(content, nome_original, mime_type="application/pdf", criado_por=""):
     arquivo = bytes(content or b"")
     if not arquivo:

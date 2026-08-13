@@ -4505,6 +4505,18 @@ def api_visualizar_layout_os(layout_id):
     )
 
 
+@app.route("/api/layouts")
+@permission_required("suprimentos.work_order.view")
+def api_listar_layouts_os():
+    """Expõe apenas os metadados do catálogo de layouts para a tela de O.S."""
+    if not supabase_data.enabled():
+        return jsonify({"ok": False, "erro": "Os layouts ficam disponíveis somente no modo Supabase."}), 404
+    try:
+        return jsonify({"ok": True, "layouts": supabase_data.listar_layouts()})
+    except supabase_data.SupabaseDataError as exc:
+        return jsonify({"ok": False, "erro": str(exc)}), 502
+
+
 @app.route("/atualizar_bom_os_abertas", methods=["POST"])
 @permission_required("suprimentos.work_order.manage")
 def atualizar_bom_os_abertas_route():
@@ -6561,6 +6573,7 @@ def gerar_os():
     numero_os = numero_manual or str((historico_existente or {}).get("numero") or "").strip() or proximo_numero_os()
 
     layout_pdf = request.files.get("os_layout_pdf")
+    layout_catalogo_id = request.form.get("os_layout_arquivo_id", "").strip()
     composicao_importada = _parse_os_composition_form(request.form)
 
     if composicao_source == "custom":
@@ -6632,7 +6645,7 @@ def gerar_os():
     layout_bytes = b""
     layout_nome = ""
     layout_mime_type = "application/pdf"
-    layout_arquivo_id = (historico_existente or {}).get("layout_arquivo_id") or ""
+    layout_arquivo_id = layout_catalogo_id or (historico_existente or {}).get("layout_arquivo_id") or ""
     if layout_pdf and layout_pdf.filename:
         try:
             layout_pdf.stream.seek(0)

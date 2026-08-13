@@ -3872,6 +3872,10 @@ return;
 }
 form.reset();
 form.dataset.layoutArquivoId = "";
+const layoutId = document.getElementById("os_layout_arquivo_id");
+const layoutCatalogo = document.getElementById("os_layout_catalogo");
+if (layoutId) layoutId.value = "";
+if (layoutCatalogo) layoutCatalogo.value = "";
 atualizarEstadoPreviewLayoutOS();
 
 const tabelaOS = document.getElementById("tabela_os");
@@ -4870,6 +4874,9 @@ const historicoId = document.getElementById("os_historico_id");
 if (historicoId) historicoId.value = doc.id || "";
 const formOs = document.getElementById("form-os");
 if (formOs) formOs.dataset.layoutArquivoId = doc.layout_arquivo_id || "";
+const layoutId = document.getElementById("os_layout_arquivo_id");
+if (layoutId) layoutId.value = doc.layout_arquivo_id || "";
+carregarCatalogoLayoutsOS(doc.layout_arquivo_id || "");
 atualizarEstadoPreviewLayoutOS();
 carregarForecastsDocumentoOS();
 // Marca a aba antes do click programatico. Isso evita que initOsTab restaure
@@ -4885,6 +4892,60 @@ salvarRascunhoOS();
 
 let osLayoutBlobUrl = "";
 
+function obterLayoutCatalogoSelecionadoOS(){
+const selector = document.getElementById("os_layout_catalogo");
+return selector ? String(selector.value || "").trim() : "";
+}
+
+function sincronizarLayoutCatalogoOS(){
+const form = document.getElementById("form-os");
+const hidden = document.getElementById("os_layout_arquivo_id");
+const selector = document.getElementById("os_layout_catalogo");
+if (!form || !hidden || !selector) return;
+const layoutId = obterLayoutCatalogoSelecionadoOS();
+if (layoutId){
+hidden.value = layoutId;
+form.dataset.layoutArquivoId = layoutId;
+} else if (form.dataset.layoutArquivoId){
+// Limpar a seleção não remove silenciosamente o layout já vinculado à O.S.
+// O documento continua usando a referência existente até que outro layout seja escolhido.
+hidden.value = form.dataset.layoutArquivoId;
+} else {
+hidden.value = "";
+}
+atualizarEstadoPreviewLayoutOS();
+}
+
+async function carregarCatalogoLayoutsOS(layoutSelecionado = ""){
+const selector = document.getElementById("os_layout_catalogo");
+if (!selector || selector.dataset.loading === "1") return;
+selector.dataset.loading = "1";
+const selecionado = String(layoutSelecionado || selector.value || "").trim();
+selector.disabled = true;
+try {
+const response = await fetch("/api/layouts", { headers: { Accept: "application/json" } });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível carregar os layouts cadastrados.");
+selector.innerHTML = '<option value="">Selecione um layout do catálogo...</option>';
+(payload.layouts || []).forEach((layout) => {
+const option = document.createElement("option");
+option.value = String(layout.id || "");
+const nome = layout.nome_exibicao || layout.nome_original || "Layout sem nome";
+const tamanho = Number(layout.tamanho_bytes || 0);
+const tamanhoTexto = tamanho ? ` · ${(tamanho / 1024 / 1024).toFixed(tamanho >= 1024 * 1024 ? 1 : 2)} ${tamanho >= 1024 * 1024 ? "MB" : "KB"}` : "";
+option.textContent = `${nome}${tamanhoTexto}`;
+selector.appendChild(option);
+});
+if (selecionado && [...selector.options].some((option) => option.value === selecionado)) selector.value = selecionado;
+} catch (error) {
+selector.innerHTML = '<option value="">Catálogo indisponível</option>';
+console.warn(error);
+} finally {
+selector.disabled = false;
+delete selector.dataset.loading;
+sincronizarLayoutCatalogoOS();
+}
+
 function obterLayoutSelecionadoOS(){
 const input = document.getElementById("os_layout_pdf");
 return input && input.files && input.files.length ? input.files[0] : null;
@@ -4896,14 +4957,17 @@ const button = document.getElementById("os_layout_preview_button");
 const status = document.getElementById("os_layout_status");
 if (!form || !button || !status) return;
 const arquivo = obterLayoutSelecionadoOS();
-const layoutExistente = String(form.dataset.layoutArquivoId || "").trim();
+const layoutCatalogo = obterLayoutCatalogoSelecionadoOS();
+const layoutExistente = layoutCatalogo || String(form.dataset.layoutArquivoId || "").trim();
 button.hidden = !(arquivo || layoutExistente);
 if (arquivo){
 status.textContent = `Layout selecionado: ${arquivo.name}. Confira antes de emitir ou salvar a O.S.`;
 } else if (layoutExistente){
-status.textContent = "Esta O.S. já possui um layout salvo. Confira antes de reemitir o documento.";
+status.textContent = layoutCatalogo
+? "Layout do catálogo selecionado. Confira antes de emitir ou salvar a O.S."
+: "Esta O.S. já possui um layout salvo. Confira antes de reemitir o documento.";
 } else {
-status.textContent = "Selecione um PDF para conferir o layout antes de emitir a O.S.";
+status.textContent = "Selecione um layout do catálogo ou um PDF da rede para conferir antes de emitir a O.S.";
 }
 }
 
@@ -4928,7 +4992,8 @@ liberarPreviewLayoutOS();
 function abrirPreviewLayoutOS(){
 const form = document.getElementById("form-os");
 const arquivo = obterLayoutSelecionadoOS();
-const layoutExistente = form ? String(form.dataset.layoutArquivoId || "").trim() : "";
+const layoutCatalogo = obterLayoutCatalogoSelecionadoOS();
+const layoutExistente = layoutCatalogo || (form ? String(form.dataset.layoutArquivoId || "").trim() : "");
 let origem = "";
 let titulo = "";
 
@@ -4944,7 +5009,7 @@ origem = osLayoutBlobUrl;
 titulo = arquivo.name;
 } else if (layoutExistente){
 origem = `/api/layouts/${encodeURIComponent(layoutExistente)}/arquivo`;
-titulo = "Layout já salvo nesta O.S.";
+titulo = layoutCatalogo ? "Layout selecionado do catálogo" : "Layout já salvo nesta O.S.";
 } else {
 alert("Selecione um layout PDF primeiro.");
 return;
@@ -4964,16 +5029,22 @@ window.open(origem, "_blank", "noopener");
 
 function inicializarPreviewLayoutOS(){
 const input = document.getElementById("os_layout_pdf");
+const selector = document.getElementById("os_layout_catalogo");
 const modal = document.getElementById("os_layout_preview_modal");
 if (input && input.dataset.previewBound !== "1"){
 input.dataset.previewBound = "1";
 input.addEventListener("change", atualizarEstadoPreviewLayoutOS);
+}
+if (selector && selector.dataset.previewBound !== "1"){
+selector.dataset.previewBound = "1";
+selector.addEventListener("change", sincronizarLayoutCatalogoOS);
 }
 if (modal && modal.dataset.previewBound !== "1"){
 modal.dataset.previewBound = "1";
 modal.addEventListener("close", liberarPreviewLayoutOS);
 }
 atualizarEstadoPreviewLayoutOS();
+carregarCatalogoLayoutsOS();
 }
 
 async function editarHistoricoOS(id){
@@ -6314,12 +6385,19 @@ salvarRascunhoOS();
 <div class="card-heading-row">
 <div>
 <h3>Layout (PDF)</h3>
-<p id="os_layout_status" class="composition-status">Selecione um PDF para conferir o layout antes de emitir a O.S.</p>
+<p id="os_layout_status" class="composition-status">Seleciona um layout do catálogo ou envie um PDF da rede para conferir antes de emitir a O.S.</p>
 </div>
 <div class="compact-actions">
 <button type="button" id="os_layout_preview_button" class="btn-secondary" hidden onclick="abrirPreviewLayoutOS()">Visualizar layout</button>
 </div>
 </div>
+<input id="os_layout_arquivo_id" type="hidden" name="os_layout_arquivo_id" value="">
+<label for="os_layout_catalogo">Layouts cadastrados</label>
+<select id="os_layout_catalogo" aria-describedby="os_layout_status">
+<option value="">Carregando catálogo de layouts...</option>
+</select>
+<p class="composition-status">Escolha um layout cadastrado, clique em <strong>Visualizar layout</strong> para conferir o PDF e só então salve ou emita a O.S.</p>
+<label for="os_layout_pdf">Ou enviar PDF da rede</label>
 <input id="os_layout_pdf" type="file" name="os_layout_pdf" accept=".pdf">
 </div>
 
