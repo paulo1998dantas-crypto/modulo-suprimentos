@@ -127,6 +127,7 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual(layouts, response.json["layouts"])
 
     def test_layout_catalog_query_uses_metadata_only(self):
+        supabase_data.clear_cache()
         with patch.object(supabase_data, "_request", return_value=[]) as request_mock:
             self.assertEqual([], supabase_data.listar_layouts())
 
@@ -136,6 +137,16 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual("layout_arquivos", table)
         self.assertIn(("select", "id,nome_original,nome_exibicao,mime_type,tamanho_bytes,criado_por,created_at,updated_at"), query)
         self.assertNotIn(("select", "storage_path"), query)
+        self.assertEqual(8, request_mock.call_args.kwargs["timeout"])
+
+    def test_layout_catalog_is_cached_briefly(self):
+        supabase_data.clear_cache()
+        rows = [{"id": "d468c8aa-7cab-4b8d-84cf-0d5aef6c0f82", "nome_exibicao": "layout.pdf"}]
+        with patch.object(supabase_data, "_request", return_value=rows) as request_mock:
+            self.assertEqual(rows, supabase_data.listar_layouts())
+            self.assertEqual(rows, supabase_data.listar_layouts())
+
+        self.assertEqual(1, request_mock.call_count)
 
     def test_quantity_parser_preserves_decimal_points_from_os_documents(self):
         self.assertEqual("1", app_module._normalizar_qtd("1.0"))

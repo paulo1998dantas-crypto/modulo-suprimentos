@@ -4918,12 +4918,19 @@ atualizarEstadoPreviewLayoutOS();
 
 async function carregarCatalogoLayoutsOS(layoutSelecionado = ""){
 const selector = document.getElementById("os_layout_catalogo");
+const status = document.getElementById("os_layout_status");
 if (!selector || selector.dataset.loading === "1") return;
 selector.dataset.loading = "1";
 const selecionado = String(layoutSelecionado || selector.value || "").trim();
 selector.disabled = true;
+if (status) status.textContent = "Carregando layouts cadastrados...";
+const controller = new AbortController();
+const fetchTimeout = window.setTimeout(() => controller.abort(), 10000);
 try {
-const response = await fetch("/api/layouts", { headers: { Accept: "application/json" } });
+const response = await fetch("/api/layouts", {
+headers: { Accept: "application/json" },
+signal: controller.signal,
+});
 const payload = await response.json().catch(() => ({}));
 if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível carregar os layouts cadastrados.");
 selector.innerHTML = '<option value="">Selecione um layout do catálogo...</option>';
@@ -4939,8 +4946,10 @@ selector.appendChild(option);
 if (selecionado && [...selector.options].some((option) => option.value === selecionado)) selector.value = selecionado;
 } catch (error) {
 selector.innerHTML = '<option value="">Catálogo indisponível</option>';
+if (status) status.textContent = "O catálogo não respondeu em tempo hábil. Clique em Atualizar catálogo ou use o PDF da rede.";
 console.warn(error);
 } finally {
+window.clearTimeout(fetchTimeout);
 selector.disabled = false;
 delete selector.dataset.loading;
 sincronizarLayoutCatalogoOS();
@@ -6389,6 +6398,7 @@ salvarRascunhoOS();
 </div>
 <div class="compact-actions">
 <button type="button" id="os_layout_preview_button" class="btn-secondary" hidden onclick="abrirPreviewLayoutOS()">Visualizar layout</button>
+<button type="button" id="os_layout_catalogo_refresh" class="btn-secondary" onclick="carregarCatalogoLayoutsOS()">Atualizar catálogo</button>
 </div>
 </div>
 <input id="os_layout_arquivo_id" type="hidden" name="os_layout_arquivo_id" value="">

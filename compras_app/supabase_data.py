@@ -18,6 +18,10 @@ import supabase_catalog
 
 PAGE_SIZE = 1000
 CACHE_TTL_SECONDS = 10
+# O catálogo de layouts muda pouco e é consultado sempre que a tela de O.S.
+# abre. Mantemos somente seus metadados em memória para não repetir uma leitura
+# remota do Supabase a cada edição/emissão de O.S.
+LAYOUT_CATALOG_CACHE_TTL_SECONDS = 60
 BUSINESS_TIMEZONE = ZoneInfo("America/Sao_Paulo")
 
 PESSOAS_TABLE = "suprimentos_pessoas"
@@ -232,7 +236,7 @@ def _headers(prefer=""):
     return headers
 
 
-def _request(method, table, query=None, payload=None, prefer=""):
+def _request(method, table, query=None, payload=None, prefer="", timeout=30):
     if not configured():
         raise SupabaseDataError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
     query_string = urllib.parse.urlencode(query or [])
@@ -244,7 +248,7 @@ def _request(method, table, query=None, payload=None, prefer=""):
         data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     request = urllib.request.Request(url, data=data, headers=_headers(prefer), method=method)
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
             body = response.read().decode("utf-8")
             return json.loads(body) if body else None
     except urllib.error.HTTPError as exc:
@@ -986,7 +990,15 @@ def listar_layouts(limit=250):
         safe_limit = max(1, min(int(limit or 250), 1000))
     except (TypeError, ValueError):
         safe_limit = 250
-    return _request(
+    cache_key = f"layout_catalog:{safe_limit}"
+    now = time.time()
+    cached = _cache.get(cache_key)
+    if cached and now - cached["loaded_at"] < LAYOUT_CATALOG_CACHE_TTL_SECONDS:
+        return cached["rows"]
+
+    # Não deixe a abertura do formulário de O.S. depender de uma conexão lenta
+    # com o Supabase por até o timeout padrão de 30 segundos.
+    rows = _request(
         "GET",
         LAYOUTS_TABLE,
         query=[
@@ -994,7 +1006,10 @@ def listar_layouts(limit=250):
             ("order", "nome_exibicao.asc,created_at.desc"),
             ("limit", str(safe_limit)),
         ],
+        timeout=8,
     ) or []
+    _cache[cache_key] = {"loaded_at": now, "rows": rows}
+    return rows
 
 
 def salvar_layout_pdf(content, nome_original, mime_type="application/pdf", criado_por=""):
@@ -1046,6 +1061,7 @@ def salvar_layout_pdf(content, nome_original, mime_type="application/pdf", criad
         ) or []
     if not rows:
         raise SupabaseDataError("Nao foi possivel registrar o layout no catalogo.")
+    clear_cache()
     return rows[0]
 
 
