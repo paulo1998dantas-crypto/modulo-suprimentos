@@ -3523,29 +3523,6 @@ renderComposicaoRows(rows);
 agendarSalvarRascunhoOS();
 }
 
-const explosoesManuaisPendentes = new WeakMap();
-
-function agendarExplosaoManualNaComposicao(input){
-if (!input){
-return;
-}
-const codigo = extrairCodigo(input.value, osProdutos);
-if (!codigo){
-return;
-}
-const anterior = explosoesManuaisPendentes.get(input);
-if (anterior){
-window.clearTimeout(anterior);
-}
-// Leitores de código de barras e colagens disparam somente "input". Aguarda
-// um instante para não redesenhar a linha enquanto o código ainda está sendo digitado.
-const timer = window.setTimeout(() => {
-explosoesManuaisPendentes.delete(input);
-aplicarItemManualNaComposicao(input);
-}, 180);
-explosoesManuaisPendentes.set(input, timer);
-}
-
 function renderComposicaoRows(rows){
 const tbody = document.getElementById("tabela_componentes_body");
 if (!tbody){
@@ -3558,8 +3535,8 @@ const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.set
 const setorManual = comp.setor_manual ? "1" : "0";
 row.innerHTML = `
 <td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_line_id[]" value="${escapeHtmlOS(comp.line_id || "")}"><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"></td>
-<td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código" oninput="agendarExplosaoManualNaComposicao(this)" onblur="aplicarItemManualNaComposicao(this)" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); aplicarItemManualNaComposicao(this); }"></td>
-<td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição" oninput="agendarExplosaoManualNaComposicao(this)" onblur="aplicarItemManualNaComposicao(this)" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); aplicarItemManualNaComposicao(this); }"></td>
+<td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código" onblur="aplicarItemManualNaComposicao(this)"></td>
+<td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição" onblur="aplicarItemManualNaComposicao(this)"></td>
 <td><input name="os_comp_unidade[]" value="${escapeHtmlOS(comp.unidade || "")}" placeholder="Un."></td>
 <td><input name="os_comp_qtd[]" value="${escapeHtmlOS(comp.qtd || "")}" inputmode="decimal"></td>
 <td><select name="os_comp_setor[]"><option value="EXPEDICAO"${setor === "EXPEDICAO" ? " selected" : ""}>Expedição</option><option value="PREPARACAO"${setor === "PREPARACAO" ? " selected" : ""}>Preparação</option><option value="F.D"${setor === "F.D" ? " selected" : ""}>Faturamento direto</option></select><input type="hidden" name="os_comp_setor_manual[]" value="${setorManual}"></td>
@@ -4777,7 +4754,10 @@ const statusSelecionado = String(status.value || "").toLowerCase();
 let visiveis = 0;
 document.querySelectorAll(`#${tipo}_history_table tbody tr[data-history-search]`).forEach((row) => {
 const correspondeBusca = !termo || normalizarBusca(row.dataset.historySearch || "").includes(termo);
-const correspondeStatus = !statusSelecionado || String(row.dataset.historyStatus || "emitido").toLowerCase() === statusSelecionado;
+const correspondeStatus = !statusSelecionado
+|| (statusSelecionado === "concluido"
+? String(row.dataset.historyTechnical || "").toLowerCase() === "concluido"
+: String(row.dataset.historyStatus || "emitido").toLowerCase() === statusSelecionado);
 row.hidden = !(correspondeBusca && correspondeStatus);
 if (!row.hidden){
 visiveis += 1;
@@ -5085,10 +5065,6 @@ marcarComposicaoCustom();
 }
 });
 composicaoBody.addEventListener("change", (event) => {
-if (event.target && ["os_comp_codigo[]", "os_comp_descricao[]"].includes(event.target.name)){
-aplicarItemManualNaComposicao(event.target);
-return;
-}
 if (event.target && event.target.name === "os_comp_setor[]"){
 const manual = event.target.closest("tr").querySelector('[name="os_comp_setor_manual[]"]');
 if (manual) manual.value = "1";
@@ -5612,7 +5588,8 @@ salvarRascunhoOS();
 {% set dados = doc.dados or {} %}
 {% set erp_oc = doc.erp_purchase_order or {} %}
 {% set status_oc = erp_oc.status or doc.status or 'emitido' %}
-<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ status_oc)|lower }}" data-history-status="{{ status_oc }}" data-history-date="{{ doc.data_criacao or '' }}">
+{% set conclusao_tecnica_oc = erp_oc.technical_status == 'CONCLUIDA' or (doc.status or '')|lower == 'concluido' %}
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.fornecedor or '') ~ ' ' ~ (dados.cnpj or '') ~ ' ' ~ status_oc)|lower }}" data-history-status="{{ status_oc }}" data-history-technical="{{ 'concluido' if conclusao_tecnica_oc else '' }}" data-history-date="{{ doc.data_criacao or '' }}">
 <td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.fornecedor or dados.razao_social or "-" }}</td><td>R$ {{ '%.2f'|format((dados.total_pedido or 0)|float)|replace('.', ',') }}</td><td><span class="status-badge {{ status_oc|lower }}">{{ status_oc|replace('_', ' ') }}</span>{% if erp_oc %}<span class="integration-detail">Técnica: {{ 'CONCLUÍDA' if erp_oc.technical_status == 'CONCLUIDA' else 'ABERTA' }} · Financeira: {{ 'CONCLUÍDA' if erp_oc.financial_status == 'CONCLUIDA' else 'PENDENTE' }}</span>{% endif %}</td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
 <td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOC('{{ doc.id }}')">Abrir</button>{% if can('suprimentos.purchase.edit') %}<button type="button" onclick="editarHistoricoOC('{{ doc.id }}')">Editar</button>{% endif %}{% if can('suprimentos.purchase.technical_close') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','concluido','Concluir tecnicamente esta compra? Esta ação não movimenta estoque.')">Conclusão técnica</button>{% endif %}{% if can('suprimentos.purchase.cancel') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('oc','{{ doc.id }}','cancelado','Cancelar esta compra?')">Cancelar</button>{% endif %}{% if can('suprimentos.purchase.edit') and (doc.status or 'emitido') == 'rascunho' %}<button type="button" class="btn-danger" onclick="excluirHistoricoOC('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
