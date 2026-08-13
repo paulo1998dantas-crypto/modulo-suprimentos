@@ -195,16 +195,22 @@ def expandir_composicao_manual(linhas, componentes):
 
         linha_raiz = not item_pai or item_pai == codigo
         if linha_raiz and codigo and quantidade and codigo in componentes_norm:
+            raiz = normalizar_linha_composicao(
+                origem,
+                item=codigo,
+                level=level,
+            )
             filhos = expandir_composicao_item(
                 codigo,
                 quantidade,
                 componentes_norm,
-                start_level=level,
+                start_level=level + 1,
             )
             if origem.get("setor_manual") and origem.get("setor"):
                 for filho in filhos:
                     filho["setor"] = origem["setor"]
                     filho["setor_manual"] = True
+            resultado.append(raiz)
             resultado.extend(filhos)
             continue
 

@@ -3506,10 +3506,15 @@ const componentes = linhaManualRaiz ? expandComposicao(codigo, quantidade) : [];
 if (componentes.length){
 const filhos = componentes.map((filho) => ({
 ...filho,
+item: codigo,
+level: Number(linhaManual.level || 0) + 1 + Number(filho.level || 0),
 setor: linhaManual.setor_manual ? linhaManual.setor : "",
 setor_manual: Boolean(linhaManual.setor_manual),
 }));
-rows.splice(indice, 1, ...filhos);
+// Mantém o conjunto/item principal como linha de referência e exibe sua
+// composição logo abaixo. Assim a inclusão manual segue o mesmo padrão
+// visual dos itens já montados pela O.S.
+rows.splice(indice, 1, linhaManual, ...filhos);
 } else {
 rows.splice(indice, 1, linhaManual);
 }
