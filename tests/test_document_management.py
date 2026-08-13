@@ -22,6 +22,61 @@ import supabase_data
 
 
 class DocumentManagementTests(unittest.TestCase):
+    def test_reissue_preserves_direct_billing_supplier_from_history(self):
+        previous_document = {
+            "itens": [
+                {"codigo": "10100001", "fornecedor": "INSTALL TECH"},
+            ],
+            "composicao": [
+                {
+                    "item": "10100001",
+                    "codigo": "10100001",
+                    "descricao": "FATURAMENTO DIRETO - INSTALACAO",
+                    "fornecedor": "INSTALL TECH",
+                    "tipo_requisicao": "FATURAMENTO DIRETO",
+                    "setor": "F.D",
+                },
+            ],
+        }
+
+        suppliers = app_module._fornecedores_faturamento_direto_historicos(previous_document)
+        composition = app_module._preservar_fornecedor_faturamento_direto(
+            [
+                {
+                    "item": "10100001",
+                    "codigo": "10100001",
+                    "descricao": "FATURAMENTO DIRETO - INSTALACAO",
+                    "tipo_requisicao": "FATURAMENTO DIRETO",
+                    "setor": "F.D",
+                    "fornecedor": "",
+                }
+            ],
+            [{"codigo": "10100001", "fornecedor": ""}],
+            suppliers,
+        )
+
+        self.assertEqual("INSTALL TECH", composition[0]["fornecedor"])
+
+    def test_manual_composition_parser_preserves_supplier(self):
+        with app_module.app.test_request_context(
+            "/gerar_os",
+            method="POST",
+            data={
+                "os_comp_item[]": "10100001",
+                "os_comp_codigo[]": "10100001",
+                "os_comp_descricao[]": "FATURAMENTO DIRETO - INSTALACAO",
+                "os_comp_unidade[]": "un",
+                "os_comp_qtd[]": "1",
+                "os_comp_level[]": "0",
+                "os_comp_setor[]": "F.D",
+                "os_comp_setor_manual[]": "0",
+                "os_comp_fornecedor[]": "INSTALL TECH",
+            },
+        ):
+            composition = app_module._parse_os_composition_form(app_module.request.form)
+
+        self.assertEqual("INSTALL TECH", composition[0]["fornecedor"])
+
     def test_document_normalization_preserves_layout_reference(self):
         document = supabase_data.normalizar_documento({
             "tipo": "os",

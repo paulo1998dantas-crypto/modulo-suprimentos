@@ -1727,6 +1727,70 @@ def _fornecedor_faturamento_direto(descricao, categoria, fornecedor_informado=""
     return fornecedor_informado or fornecedor_cadastro
 
 
+def _fornecedores_faturamento_direto_historicos(documento):
+    """Recupera fornecedores já confirmados em uma O.S. para reemissões.
+
+    O fornecedor de faturamento direto é uma decisão operacional da O.S. e
+    pode não existir no cadastro do SKU. Por isso, ao reabrir uma O.S., a
+    informação gravada no item ou na composição anterior tem prioridade como
+    fallback sobre qualquer dado genérico do catálogo.
+    """
+    fornecedores = {}
+    documento = documento or {}
+    for item in documento.get("itens", []) or []:
+        codigo = normalizar_codigo(item.get("codigo", ""))
+        fornecedor = str(item.get("fornecedor", "") or "").strip()
+        if codigo and fornecedor:
+            fornecedores[codigo] = fornecedor
+
+    for linha in documento.get("composicao", []) or []:
+        fornecedor = str(linha.get("fornecedor", "") or "").strip()
+        if not fornecedor:
+            continue
+        tipo = str(linha.get("tipo_requisicao", "") or "").strip().upper()
+        setor = str(linha.get("setor", "") or "").strip().upper()
+        descricao = linha.get("descricao", "") or ""
+        if not (
+            tipo == TIPO_REQUISICAO_FATURAMENTO_DIRETO
+            or setor == SETOR_FATURAMENTO_DIRETO
+            or _eh_faturamento_direto(descricao)
+        ):
+            continue
+        for codigo in (
+            normalizar_codigo(linha.get("item", "")),
+            normalizar_codigo(linha.get("codigo", "")),
+        ):
+            if codigo:
+                fornecedores.setdefault(codigo, fornecedor)
+    return fornecedores
+
+
+def _preservar_fornecedor_faturamento_direto(composicao, itens, fornecedores_historicos=None):
+    """Reaplica o fornecedor operacional às linhas de faturamento direto."""
+    fornecedores = dict(fornecedores_historicos or {})
+    for item in itens or []:
+        codigo = normalizar_codigo(item.get("codigo", ""))
+        fornecedor = str(item.get("fornecedor", "") or "").strip()
+        if codigo and fornecedor:
+            fornecedores[codigo] = fornecedor
+
+    resultado = []
+    for linha_original in composicao or []:
+        linha = dict(linha_original or {})
+        tipo = str(linha.get("tipo_requisicao", "") or "").strip().upper()
+        setor = str(linha.get("setor", "") or "").strip().upper()
+        if tipo == TIPO_REQUISICAO_FATURAMENTO_DIRETO or setor == SETOR_FATURAMENTO_DIRETO:
+            fornecedor = (
+                str(linha.get("fornecedor", "") or "").strip()
+                or fornecedores.get(normalizar_codigo(linha.get("item", "")), "")
+                or fornecedores.get(normalizar_codigo(linha.get("codigo", "")), "")
+            )
+            if fornecedor:
+                linha["fornecedor"] = fornecedor
+        resultado.append(linha)
+    return resultado
+
+
 def _resolve_output_path(path):
     dir_path = os.path.dirname(path)
     try:
@@ -5977,6 +6041,7 @@ def _parse_os_composition_form(form):
         comp_levels = form.getlist("os_comp_level[]")
         comp_setores = form.getlist("os_comp_setor[]")
         comp_setores_manuais = form.getlist("os_comp_setor_manual[]")
+        comp_fornecedores = form.getlist("os_comp_fornecedor[]")
         comp_line_ids = form.getlist("os_comp_line_id[]")
         source_rows = []
         for idx in range(len(comp_codigos)):
@@ -5991,6 +6056,7 @@ def _parse_os_composition_form(form):
                     "level": comp_levels[idx] if idx < len(comp_levels) else 0,
                     "setor": comp_setores[idx] if idx < len(comp_setores) else "",
                     "setor_manual": comp_setores_manuais[idx] if idx < len(comp_setores_manuais) else False,
+                    "fornecedor": comp_fornecedores[idx] if idx < len(comp_fornecedores) else "",
                 }
             )
 
@@ -6024,6 +6090,9 @@ def _parse_os_composition_form(form):
         if setor in {SETOR_EXPEDICAO, SETOR_PREPARACAO, SETOR_FATURAMENTO_DIRETO}:
             linha["setor"] = setor
             linha["setor_manual"] = setor_manual
+        fornecedor = str(raw_row.get("fornecedor", "") or "").strip()
+        if fornecedor:
+            linha["fornecedor"] = fornecedor
         composicao.append(linha)
     return composicao
 
@@ -6040,6 +6109,7 @@ def gerar_os():
     if historico_form_id and (not historico_existente or historico_existente.get("tipo") != "os"):
         historico_form_id = ""
         historico_existente = None
+    fornecedores_fd_historicos = _fornecedores_faturamento_direto_historicos(historico_existente)
     usando_composicao_historica = composicao_source == "custom" and bool(historico_form_id)
 
     # Um Forecast confirmado pode abastecer varias O.S. documentais. O saldo
@@ -6167,7 +6237,7 @@ def gerar_os():
             fornecedor_final = _fornecedor_faturamento_direto(
                 descricao_final,
                 categoria_final,
-                fornecedor_linha,
+                fornecedor_linha or fornecedores_fd_historicos.get(codigo_item, ""),
                 item_info.get("fornecedor", ""),
             )
         itens.append(
@@ -6379,6 +6449,11 @@ def gerar_os():
         enriquecer_composicao(composicao_final, os_produtos),
         os_produtos,
         componentes,
+    )
+    composicao_enriquecida = _preservar_fornecedor_faturamento_direto(
+        composicao_enriquecida,
+        itens,
+        fornecedores_fd_historicos,
     )
     pendencias_faturamento_direto = filtrar_linhas_faturamento_direto(composicao_enriquecida)
     pendencias_expedicao = filtrar_linhas_setor(composicao_enriquecida, SETOR_EXPEDICAO)

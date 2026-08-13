@@ -3578,7 +3578,7 @@ const row = document.createElement("tr");
 const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.setor : destinoAutomaticoComposicao(comp);
 const setorManual = comp.setor_manual ? "1" : "0";
 row.innerHTML = `
-<td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_line_id[]" value="${escapeHtmlOS(comp.line_id || "")}"><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"></td>
+<td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_line_id[]" value="${escapeHtmlOS(comp.line_id || "")}"><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"><input type="hidden" name="os_comp_fornecedor[]" value="${escapeHtmlOS(comp.fornecedor || "")}"></td>
 <td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código" onblur="aplicarItemManualNaComposicao(this)"></td>
 <td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição" onblur="aplicarItemManualNaComposicao(this)"></td>
 <td><input name="os_comp_unidade[]" value="${escapeHtmlOS(comp.unidade || "")}" placeholder="Un."></td>
@@ -3600,6 +3600,7 @@ descricao: (row.querySelector('[name="os_comp_descricao[]"]') || {}).value || ""
 unidade: (row.querySelector('[name="os_comp_unidade[]"]') || {}).value || "",
 qtd: (row.querySelector('[name="os_comp_qtd[]"]') || {}).value || "",
 level: Number((row.querySelector('[name="os_comp_level[]"]') || {}).value || 0),
+fornecedor: (row.querySelector('[name="os_comp_fornecedor[]"]') || {}).value || "",
 setor: (row.querySelector('[name="os_comp_setor[]"]') || {}).value || "EXPEDICAO",
 setor_manual: ((row.querySelector('[name="os_comp_setor_manual[]"]') || {}).value || "0") === "1",
 }));
