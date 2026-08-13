@@ -31,6 +31,27 @@ class DocumentManagementTests(unittest.TestCase):
 
         self.assertEqual("d468c8aa-7cab-4b8d-84cf-0d5aef6c0f82", document["layout_arquivo_id"])
 
+    def test_os_layout_preview_streams_the_saved_pdf_inline(self):
+        layout_id = "d468c8aa-7cab-4b8d-84cf-0d5aef6c0f82"
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module.supabase_data, "enabled", return_value=True),
+            patch.object(
+                app_module.supabase_data,
+                "baixar_layout_pdf",
+                return_value=(
+                    b"%PDF-1.4\nlayout",
+                    {"nome_exibicao": "layout-teste.pdf", "mime_type": "application/pdf"},
+                ),
+            ),
+        ):
+            response = app_module.app.test_client().get(f"/api/layouts/{layout_id}/arquivo")
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("application/pdf", response.mimetype)
+        self.assertIn("inline", response.headers.get("Content-Disposition", ""))
+        self.assertEqual(b"%PDF-1.4\nlayout", response.data)
+
     def test_quantity_parser_preserves_decimal_points_from_os_documents(self):
         self.assertEqual("1", app_module._normalizar_qtd("1.0"))
         self.assertEqual("2", app_module._normalizar_qtd("2.0"))

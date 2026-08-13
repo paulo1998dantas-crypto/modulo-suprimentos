@@ -4419,6 +4419,28 @@ def api_historico_os(documento_id):
     return jsonify({"ok": True, "documento": documento})
 
 
+@app.route("/api/layouts/<layout_id>/arquivo")
+@permission_required("suprimentos.work_order.view")
+def api_visualizar_layout_os(layout_id):
+    """Entrega o PDF de layout já vinculado a uma O.S. para conferência inline."""
+    if not supabase_data.enabled():
+        return jsonify({"ok": False, "erro": "Os layouts ficam disponíveis somente no modo Supabase."}), 404
+
+    try:
+        conteudo, layout = supabase_data.baixar_layout_pdf(layout_id)
+    except (ValueError, supabase_data.SupabaseDataError) as exc:
+        return jsonify({"ok": False, "erro": str(exc)}), 404
+
+    nome = layout.get("nome_exibicao") or layout.get("nome_original") or "layout-os.pdf"
+    return send_file(
+        io.BytesIO(conteudo),
+        mimetype=layout.get("mime_type") or "application/pdf",
+        as_attachment=False,
+        download_name=nome,
+        max_age=0,
+    )
+
+
 @app.route("/atualizar_bom_os_abertas", methods=["POST"])
 @permission_required("suprimentos.work_order.manage")
 def atualizar_bom_os_abertas_route():

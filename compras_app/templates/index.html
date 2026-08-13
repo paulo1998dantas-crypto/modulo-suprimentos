@@ -966,6 +966,50 @@ width:100%;
 height:38px;
 }
 
+.layout-preview-modal{
+width:min(1200px, 96vw);
+height:min(88vh, 960px);
+padding:0;
+border:1px solid #cbd5e1;
+border-radius:8px;
+box-shadow:0 28px 70px rgba(15,23,42,.42);
+overflow:hidden;
+}
+
+.layout-preview-modal::backdrop{
+background:rgba(15,23,42,.58);
+}
+
+.layout-preview-header{
+min-height:58px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:16px;
+padding:12px 16px;
+background:#0b1c3a;
+color:#fff;
+}
+
+.layout-preview-header h3{
+margin:0;
+font-size:16px;
+}
+
+.layout-preview-header p{
+margin:3px 0 0;
+font-size:12px;
+color:#dbeafe;
+}
+
+.layout-preview-frame{
+display:block;
+width:100%;
+height:calc(100% - 58px);
+border:0;
+background:#e2e8f0;
+}
+
 .tabela-os td:nth-child(2) input{
 text-align:center;
 font-weight:700;
@@ -3714,6 +3758,8 @@ if (!form){
 return;
 }
 form.reset();
+form.dataset.layoutArquivoId = "";
+atualizarEstadoPreviewLayoutOS();
 
 const tabelaOS = document.getElementById("tabela_os");
 if (tabelaOS){
@@ -4702,6 +4748,9 @@ composicao: doc.composicao || [],
 aplicarRascunhoOS(draft);
 const historicoId = document.getElementById("os_historico_id");
 if (historicoId) historicoId.value = doc.id || "";
+const formOs = document.getElementById("form-os");
+if (formOs) formOs.dataset.layoutArquivoId = doc.layout_arquivo_id || "";
+atualizarEstadoPreviewLayoutOS();
 carregarForecastsDocumentoOS();
 // Marca a aba antes do click programatico. Isso evita que initOsTab restaure
 // um rascunho de uma O.S. anterior durante a troca de tela.
@@ -4712,6 +4761,99 @@ if (tabButton) tabButton.click();
 osDraftStatus(`Editando a O.S. ${doc.numero}. Ao gerar, este mesmo registro será atualizado.`);
 document.getElementById("form-os").scrollIntoView({ behavior: "smooth", block: "start" });
 salvarRascunhoOS();
+}
+
+let osLayoutBlobUrl = "";
+
+function obterLayoutSelecionadoOS(){
+const input = document.getElementById("os_layout_pdf");
+return input && input.files && input.files.length ? input.files[0] : null;
+}
+
+function atualizarEstadoPreviewLayoutOS(){
+const form = document.getElementById("form-os");
+const button = document.getElementById("os_layout_preview_button");
+const status = document.getElementById("os_layout_status");
+if (!form || !button || !status) return;
+const arquivo = obterLayoutSelecionadoOS();
+const layoutExistente = String(form.dataset.layoutArquivoId || "").trim();
+button.hidden = !(arquivo || layoutExistente);
+if (arquivo){
+status.textContent = `Layout selecionado: ${arquivo.name}. Confira antes de emitir ou salvar a O.S.`;
+} else if (layoutExistente){
+status.textContent = "Esta O.S. já possui um layout salvo. Confira antes de reemitir o documento.";
+} else {
+status.textContent = "Selecione um PDF para conferir o layout antes de emitir a O.S.";
+}
+}
+
+function liberarPreviewLayoutOS(){
+const frame = document.getElementById("os_layout_preview_frame");
+if (frame) frame.src = "about:blank";
+if (osLayoutBlobUrl){
+URL.revokeObjectURL(osLayoutBlobUrl);
+osLayoutBlobUrl = "";
+}
+}
+
+function fecharPreviewLayoutOS(){
+const modal = document.getElementById("os_layout_preview_modal");
+if (modal && typeof modal.close === "function" && modal.open){
+modal.close();
+} else {
+liberarPreviewLayoutOS();
+}
+}
+
+function abrirPreviewLayoutOS(){
+const form = document.getElementById("form-os");
+const arquivo = obterLayoutSelecionadoOS();
+const layoutExistente = form ? String(form.dataset.layoutArquivoId || "").trim() : "";
+let origem = "";
+let titulo = "";
+
+if (arquivo){
+const pdfSelecionado = arquivo.type === "application/pdf" || /\.pdf$/i.test(arquivo.name || "");
+if (!pdfSelecionado){
+alert("Selecione um arquivo PDF para visualizar o layout.");
+return;
+}
+liberarPreviewLayoutOS();
+osLayoutBlobUrl = URL.createObjectURL(arquivo);
+origem = osLayoutBlobUrl;
+titulo = arquivo.name;
+} else if (layoutExistente){
+origem = `/api/layouts/${encodeURIComponent(layoutExistente)}/arquivo`;
+titulo = "Layout já salvo nesta O.S.";
+} else {
+alert("Selecione um layout PDF primeiro.");
+return;
+}
+
+const modal = document.getElementById("os_layout_preview_modal");
+const frame = document.getElementById("os_layout_preview_frame");
+const tituloEl = document.getElementById("os_layout_preview_title");
+if (tituloEl) tituloEl.textContent = titulo;
+if (frame) frame.src = origem;
+if (modal && typeof modal.showModal === "function"){
+modal.showModal();
+return;
+}
+window.open(origem, "_blank", "noopener");
+}
+
+function inicializarPreviewLayoutOS(){
+const input = document.getElementById("os_layout_pdf");
+const modal = document.getElementById("os_layout_preview_modal");
+if (input && input.dataset.previewBound !== "1"){
+input.dataset.previewBound = "1";
+input.addEventListener("change", atualizarEstadoPreviewLayoutOS);
+}
+if (modal && modal.dataset.previewBound !== "1"){
+modal.dataset.previewBound = "1";
+modal.addEventListener("close", liberarPreviewLayoutOS);
+}
+atualizarEstadoPreviewLayoutOS();
 }
 
 async function editarHistoricoOS(id){
@@ -5128,6 +5270,7 @@ calcularTotais();
 aplicarPrefillOC();
 }
 if (document.getElementById("form-os")){
+inicializarPreviewLayoutOS();
 renderComponentes();
 }
 if (initialTarget === "tab-os"){
@@ -5785,6 +5928,17 @@ salvarRascunhoOS();
 <input type="hidden" id="os_forecast_id" name="os_forecast_id" value="">
 <input type="hidden" id="os_forecast_quantidade" name="os_forecast_quantidade" value="">
 
+<dialog id="os_layout_preview_modal" class="layout-preview-modal" aria-labelledby="os_layout_preview_title">
+<div class="layout-preview-header">
+<div>
+<h3>Conferência do layout</h3>
+<p id="os_layout_preview_title">Layout da O.S.</p>
+</div>
+<button type="button" class="btn-secondary" onclick="fecharPreviewLayoutOS()">Fechar</button>
+</div>
+<iframe id="os_layout_preview_frame" class="layout-preview-frame" title="Pré-visualização do layout da O.S."></iframe>
+</dialog>
+
 <div class="card">
 <h3>Rascunho da O.S</h3>
 <div class="dashboard-actions os-actions">
@@ -6038,8 +6192,16 @@ salvarRascunhoOS();
 </div>
 
 <div class="card">
+<div class="card-heading-row">
+<div>
 <h3>Layout (PDF)</h3>
-<input type="file" name="os_layout_pdf" accept=".pdf">
+<p id="os_layout_status" class="composition-status">Selecione um PDF para conferir o layout antes de emitir a O.S.</p>
+</div>
+<div class="compact-actions">
+<button type="button" id="os_layout_preview_button" class="btn-secondary" hidden onclick="abrirPreviewLayoutOS()">Visualizar layout</button>
+</div>
+</div>
+<input id="os_layout_pdf" type="file" name="os_layout_pdf" accept=".pdf">
 </div>
 
 <div class="card">
