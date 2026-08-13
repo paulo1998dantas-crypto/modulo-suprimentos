@@ -173,8 +173,9 @@ def expandir_composicao_manual(linhas, componentes):
     A tela de O.S. permite adicionar materiais além dos itens originalmente
     selecionados. Quando esse material é um conjunto, ele deve seguir a mesma
     regra de explosão da B.O.M. dos itens principais. Apenas linhas-raiz
-    (``item`` vazio) são expandidas aqui: as linhas-filhas já gravadas por uma
-    explosão anterior permanecem intactas e não são duplicadas.
+    (``item`` vazio ou igual ao próprio ``codigo``) são expandidas aqui: as
+    linhas-filhas já gravadas por uma explosão anterior permanecem intactas e
+    não são duplicadas.
     """
     componentes_norm = normalizar_componentes(componentes)
     resultado = []
@@ -192,7 +193,8 @@ def expandir_composicao_manual(linhas, componentes):
         if not quantidade and origem.get("qtd", origem.get("quantidade", "")) in ("", None):
             quantidade = 1.0
 
-        if not item_pai and codigo and quantidade and codigo in componentes_norm:
+        linha_raiz = not item_pai or item_pai == codigo
+        if linha_raiz and codigo and quantidade and codigo in componentes_norm:
             filhos = expandir_composicao_item(
                 codigo,
                 quantidade,
