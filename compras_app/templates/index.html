@@ -3475,6 +3475,47 @@ sincronizarFonteComposicao();
 agendarSalvarRascunhoOS();
 }
 
+function aplicarItemManualNaComposicao(input){
+const row = input ? input.closest("tr") : null;
+if (!row){
+return;
+}
+const codigo = extrairCodigo(input.value, osProdutos);
+if (!codigo){
+return;
+}
+const rows = coletarComposicaoTabela();
+const indice = Array.from(document.querySelectorAll("#tabela_componentes_body tr")).indexOf(row);
+if (indice < 0){
+return;
+}
+const linhaAtual = rows[indice] || {};
+const produto = getProdutoInfo(osProdutos, codigo) || {};
+const quantidade = parseNumber(linhaAtual.qtd) || 1;
+const linhaManual = {
+...linhaAtual,
+item: normalizarCodigoOS(linhaAtual.item) || codigo,
+codigo,
+descricao: produto.descricao || produto.nome || linhaAtual.descricao || "",
+unidade: produto.unidade || linhaAtual.unidade || "",
+qtd: quantidade,
+};
+const componentes = expandComposicao(codigo, quantidade);
+if (componentes.length){
+const filhos = componentes.map((filho) => ({
+...filho,
+setor: linhaManual.setor_manual ? linhaManual.setor : "",
+setor_manual: Boolean(linhaManual.setor_manual),
+}));
+rows.splice(indice, 1, ...filhos);
+} else {
+rows.splice(indice, 1, linhaManual);
+}
+osComposicaoSource = "custom";
+renderComposicaoRows(rows);
+agendarSalvarRascunhoOS();
+}
+
 function renderComposicaoRows(rows){
 const tbody = document.getElementById("tabela_componentes_body");
 if (!tbody){
@@ -5014,6 +5055,10 @@ marcarComposicaoCustom();
 }
 });
 composicaoBody.addEventListener("change", (event) => {
+if (event.target && ["os_comp_codigo[]", "os_comp_descricao[]"].includes(event.target.name)){
+aplicarItemManualNaComposicao(event.target);
+return;
+}
 if (event.target && event.target.name === "os_comp_setor[]"){
 const manual = event.target.closest("tr").querySelector('[name="os_comp_setor_manual[]"]');
 if (manual) manual.value = "1";
