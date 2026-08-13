@@ -167,6 +167,57 @@ def expandir_composicao_referenciada(linhas, componentes):
     return resultado
 
 
+def expandir_composicao_manual(linhas, componentes):
+    """Normaliza uma composição editada manualmente e expande itens-raiz com B.O.M.
+
+    A tela de O.S. permite adicionar materiais além dos itens originalmente
+    selecionados. Quando esse material é um conjunto, ele deve seguir a mesma
+    regra de explosão da B.O.M. dos itens principais. Apenas linhas-raiz
+    (``item`` vazio) são expandidas aqui: as linhas-filhas já gravadas por uma
+    explosão anterior permanecem intactas e não são duplicadas.
+    """
+    componentes_norm = normalizar_componentes(componentes)
+    resultado = []
+
+    for linha in linhas or []:
+        origem = dict(linha or {})
+        codigo = normalizar_codigo(origem.get("codigo", ""))
+        item_pai = normalizar_codigo(origem.get("item", ""))
+        try:
+            level = int(origem.get("level", 0) or 0)
+        except (TypeError, ValueError):
+            level = 0
+
+        quantidade = parse_quantidade(origem.get("qtd", origem.get("quantidade", "")))
+        if not quantidade and origem.get("qtd", origem.get("quantidade", "")) in ("", None):
+            quantidade = 1.0
+
+        if not item_pai and codigo and quantidade and codigo in componentes_norm:
+            filhos = expandir_composicao_item(
+                codigo,
+                quantidade,
+                componentes_norm,
+                start_level=level,
+            )
+            if origem.get("setor_manual") and origem.get("setor"):
+                for filho in filhos:
+                    filho["setor"] = origem["setor"]
+                    filho["setor_manual"] = True
+            resultado.extend(filhos)
+            continue
+
+        # Itens sem B.O.M. continuam sendo linhas normais de composição.
+        resultado.append(
+            normalizar_linha_composicao(
+                origem,
+                item=item_pai or codigo,
+                level=level,
+            )
+        )
+
+    return resultado
+
+
 def resolver_composicao_final(itens, componentes, composicao_importada=None):
     componentes_norm = normalizar_componentes(componentes)
     linhas = expandir_composicao_itens(itens, componentes_norm)

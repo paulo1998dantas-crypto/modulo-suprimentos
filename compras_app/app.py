@@ -63,6 +63,7 @@ from config import (
 )
 from calculos import calcular_total_item
 from composicao import (
+    expandir_composicao_manual,
     expandir_composicao_referenciada,
     normalizar_codigo,
     normalizar_componentes,
@@ -6328,7 +6329,7 @@ def gerar_os():
     composicao_importada = _parse_os_composition_form(request.form)
 
     if composicao_source == "custom":
-        composicao_final = composicao_importada
+        composicao_final = expandir_composicao_manual(composicao_importada, componentes)
     else:
         composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
     extras_composicao = (
