@@ -5175,10 +5175,9 @@ def _chave_linha_composicao_bom(linha):
 def _preservar_marcadores_operacionais_bom(linhas_novas, linhas_anteriores):
     """Keep line identity/status and manual sector choices when the line remains.
 
-    A refresh must recalculate material quantities from the current BOM, but it
-    must not silently discard an existing line status or a sector manually set
-    by PCP. Components that no longer exist in the current BOM are deliberately
-    not carried forward.
+    A refresh recalculates quantities and technical descriptions from the
+    current B.O.M.  Operational annotations belong to the O.S. itself, so they
+    must survive whenever the same material line still exists.
     """
     anteriores_por_chave = {}
     for linha in linhas_anteriores or []:
@@ -5205,17 +5204,154 @@ def _preservar_marcadores_operacionais_bom(linhas_novas, linhas_anteriores):
                 atualizada["setor"] = anterior.get("setor") or atualizada.get("setor", "")
                 atualizada["setor_origem"] = anterior.get("setor_origem") or atualizada.get("setor", "")
                 atualizada["setor_manual"] = True
+            if anterior.get("fornecedor") not in (None, ""):
+                atualizada["fornecedor"] = anterior.get("fornecedor")
         resultado.append(atualizada)
     return resultado
 
 
+def _codigos_itens_principais_os(documento):
+    return {
+        normalizar_codigo(item.get("codigo", ""))
+        for item in (documento or {}).get("itens", []) or []
+        if isinstance(item, dict) and normalizar_codigo(item.get("codigo", ""))
+    }
+
+
+def _linhas_raiz_manuais_os(documento):
+    """Return the manually added material roots of an O.S.
+
+    The composition editor stores a manually added set/item as its own root
+    (``item == codigo``).  This is intentionally different from the O.S.
+    header items, whose components are only children of the selected item.
+    Keeping these roots lets a global refresh update *their* B.O.M. without
+    replacing the composition selected by PCP.
+    """
+    principais = _codigos_itens_principais_os(documento)
+    resultado = []
+    vistos = set()
+    for linha in (documento or {}).get("composicao", []) or []:
+        if not isinstance(linha, dict):
+            continue
+        codigo = normalizar_codigo(linha.get("codigo", ""))
+        item_pai = normalizar_codigo(linha.get("item", ""))
+        if not codigo or codigo in principais or item_pai != codigo:
+            continue
+        try:
+            level = int(linha.get("level", 0) or 0)
+        except (TypeError, ValueError):
+            level = 0
+        chave = (codigo, str(linha.get("qtd", "")), level)
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        resultado.append(dict(linha))
+    return resultado
+
+
+def _linha_pertence_a_raiz_composicao(linha, linhas, raizes):
+    """Whether a legacy composition line is under one of ``raizes``.
+
+    The relation is represented by ``item`` (parent code).  Old documents may
+    have repeated components in different trees; considering any valid parent
+    path avoids retaining old children after their manual root is recalculated.
+    """
+    if not raizes or not isinstance(linha, dict):
+        return False
+    por_codigo = {}
+    for candidata in linhas or []:
+        if not isinstance(candidata, dict):
+            continue
+        codigo = normalizar_codigo(candidata.get("codigo", ""))
+        pai = normalizar_codigo(candidata.get("item", ""))
+        if codigo and pai:
+            por_codigo.setdefault(codigo, set()).add(pai)
+
+    pendentes = [normalizar_codigo(linha.get("item", ""))]
+    vistos = set()
+    while pendentes:
+        atual = pendentes.pop()
+        if not atual or atual in vistos:
+            continue
+        vistos.add(atual)
+        if atual in raizes:
+            return True
+        pendentes.extend(por_codigo.get(atual, set()))
+    return normalizar_codigo(linha.get("codigo", "")) in raizes
+
+
+def _mesclar_composicao_atualizada_os(documento, composicao_bom, componentes):
+    """Refresh B.O.M. descendants while retaining manually added O.S. roots.
+
+    ``REFRESH B.O.M. abertas`` is not the same operation as the explicit
+    ``Recarregar B.O.M.`` action in the editor.  The former updates engineering
+    data under the items already chosen by PCP; it never replaces manual roots
+    such as a coating/conjunto added directly to the composition.
+    """
+    anteriores = [dict(linha) for linha in (documento.get("composicao") or []) if isinstance(linha, dict)]
+    raizes_manuais = _linhas_raiz_manuais_os(documento)
+    composicao_manual = expandir_composicao_manual(raizes_manuais, componentes)
+
+    # Documents created before popup choices were persisted in ``itens`` may
+    # already contain a direct contextual line under an O.S. item.  Treat it
+    # as an explicit choice, retain it, and refresh its descendants too.  This
+    # prevents an engineering refresh from deleting a valid popup/luminaria
+    # selection only because the older document did not keep the form value.
+    principais = _codigos_itens_principais_os(documento)
+    chaves_bom = {_chave_linha_composicao_bom(linha) for linha in composicao_bom}
+    raizes_contextuais = []
+    vistas_contextuais = set()
+    for linha in anteriores:
+        codigo = normalizar_codigo(linha.get("codigo", ""))
+        item_pai = normalizar_codigo(linha.get("item", ""))
+        try:
+            level = int(linha.get("level", 0) or 0)
+        except (TypeError, ValueError):
+            level = 0
+        if (
+            not codigo
+            or codigo == item_pai
+            or item_pai not in principais
+            or level != 0
+            or _chave_linha_composicao_bom(linha) in chaves_bom
+        ):
+            continue
+        chave = (item_pai, codigo, str(linha.get("qtd", "")))
+        if chave in vistas_contextuais:
+            continue
+        vistas_contextuais.add(chave)
+        raizes_contextuais.append(dict(linha))
+
+    composicao_contextual = expandir_composicao_referenciada(raizes_contextuais, componentes)
+    novas = [*composicao_bom, *composicao_manual, *composicao_contextual]
+
+    # Do not carry children of roots just recalculated above: a removed B.O.M.
+    # component must disappear, while manually added roots receive their new
+    # descendants.  Lines outside either tree are historical/custom rows and
+    # remain visible rather than being silently lost.
+    raizes_recalculadas = principais | {
+        normalizar_codigo(linha.get("codigo", "")) for linha in raizes_manuais
+    }
+    chaves_novas = {_chave_linha_composicao_bom(linha) for linha in novas}
+    for anterior in anteriores:
+        chave = _chave_linha_composicao_bom(anterior)
+        if chave in chaves_novas:
+            continue
+        if _linha_pertence_a_raiz_composicao(anterior, anteriores, raizes_recalculadas):
+            continue
+        novas.append(anterior)
+        chaves_novas.add(chave)
+    return novas
+
+
 def _recalcular_composicao_os_bom_vigente(documento, componentes, catalogo, usuario):
-    """Create an updated copy of an open O.S. using the current BOM only."""
+    """Update B.O.M. descendants of an open O.S. without resetting its choices."""
     itens = [dict(item) for item in (documento.get("itens") or []) if isinstance(item, dict)]
     if not itens:
         return None
 
     composicao = resolver_composicao_final(itens, componentes)
+    composicao = _mesclar_composicao_atualizada_os(documento, composicao, componentes)
     composicao = propagar_setor_preparacao(
         enriquecer_composicao(composicao, catalogo),
         catalogo,
@@ -6251,6 +6387,11 @@ def gerar_os():
                 "grupo": item_info.get("grupo", "") or "",
                 "categoria": categoria_final,
                 "fornecedor": fornecedor_final,
+                # Preserve form choices on the item itself.  They are needed
+                # when this O.S. is edited/reissued or refreshed later.
+                "luminaria": normalizar_codigo(luminarias_linha[idx]) if idx < len(luminarias_linha) else "",
+                "luminaria_qtd": str(luminarias_qtd_linha[idx]).strip() if idx < len(luminarias_qtd_linha) else "",
+                "popup": popup_itens_linha[idx] if idx < len(popup_itens_linha) else "[]",
                 "valor": 0,
                 "total": calcular_total_item(qtd, 0, 0),
             }

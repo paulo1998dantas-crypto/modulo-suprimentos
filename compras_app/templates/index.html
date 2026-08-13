@@ -2000,7 +2000,7 @@ selecoes,
 [...atual.caminhoCodigos, codigoNorm],
 );
 osPopupRegraFila.unshift(...filaFilha);
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 abrirProximoPopupItemOS();
 };
@@ -2097,7 +2097,7 @@ return;
 input.value = valor;
 qtdHidden.value = naoAplicavel ? "0" : String(Math.max(1, Math.round(qtd)));
 modal.classList.remove("is-open");
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 okBtn.removeEventListener("click", onOk);
 cancelBtn.removeEventListener("click", onCancel);
@@ -3265,8 +3265,7 @@ if (!linhaArrastada){
 return;
 }
 event.preventDefault();
-osComposicaoSource = "bom";
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 });
 
@@ -3334,13 +3333,13 @@ if (luminaria) luminaria.value = "";
 if (luminariaQtd) luminariaQtd.value = "";
 salvarSelecoesPopupItem(row, []);
 atualizarFornecedorDiretoLinha(row);
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 agendarSalvarRascunhoOS();
 return;
 }
 tabela.deleteRow(row.rowIndex);
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 agendarSalvarRascunhoOS();
 }
@@ -3391,8 +3390,7 @@ atualizarLuminariaLinhaOS(row, { semPopup });
 if (!produtoRequerLuminariaOS(produto, codigo)){
 iniciarPopupsItemOS(row, codigo, { semPopup });
 }
-osComposicaoSource = "bom";
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 agendarSalvarRascunhoOS();
 }
@@ -3419,8 +3417,7 @@ if (luminariaQtd) luminariaQtd.value = "";
 salvarSelecoesPopupItem(row, []);
 atualizarFornecedorDiretoLinha(row);
 atualizarLuminariaLinhaOS(row, { semPopup: true });
-osComposicaoSource = "bom";
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 }
 return;
@@ -3449,8 +3446,7 @@ if (luminaria) luminaria.value = "";
 if (luminariaQtd) luminariaQtd.value = "";
 atualizarFornecedorDiretoLinha(row);
 atualizarLuminariaLinhaOS(row, { semPopup: true });
-osComposicaoSource = "bom";
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 aplicarProcessoAutomaticoOS({ forcar: true });
 }
 return;
@@ -3465,6 +3461,119 @@ return;
 }
 const rowsBom = coletarComposicaoBom();
 renderComposicaoRows(rowsBom);
+}
+
+function chaveComposicaoOS(linha){
+return [
+normalizarCodigoOS((linha || {}).item || ""),
+normalizarCodigoOS((linha || {}).codigo || ""),
+Number((linha || {}).level || 0),
+].join("|");
+}
+
+function codigosItensPrincipaisOS(){
+return new Set(Array.from(document.querySelectorAll("#tabela_os tr")).slice(1).map((row) => {
+const input = row.querySelector('input[name="os_codigo[]"]');
+return input ? normalizarCodigoOS(input.value) : "";
+}).filter(Boolean));
+}
+
+function raizesManuaisComposicaoOS(linhas, itensPrincipais){
+const vistos = new Set();
+return (linhas || []).filter((linha) => {
+const codigo = normalizarCodigoOS(linha.codigo || "");
+const item = normalizarCodigoOS(linha.item || "");
+if (!codigo || codigo !== item || itensPrincipais.has(codigo)){
+return false;
+}
+const chave = `${codigo}|${linha.qtd || ""}|${Number(linha.level || 0)}`;
+if (vistos.has(chave)){
+return false;
+}
+vistos.add(chave);
+return true;
+});
+}
+
+function linhaPertenceARaizComposicaoOS(linha, linhas, raizes){
+if (!raizes.size || !linha){
+return false;
+}
+const pais = new Map();
+(linhas || []).forEach((candidata) => {
+const codigo = normalizarCodigoOS(candidata.codigo || "");
+const item = normalizarCodigoOS(candidata.item || "");
+if (codigo && item){
+if (!pais.has(codigo)) pais.set(codigo, new Set());
+pais.get(codigo).add(item);
+}
+});
+const pendentes = [normalizarCodigoOS(linha.item || "")];
+const vistos = new Set();
+while (pendentes.length){
+const atual = pendentes.pop();
+if (!atual || vistos.has(atual)) continue;
+vistos.add(atual);
+if (raizes.has(atual)) return true;
+(pais.get(atual) || new Set()).forEach((pai) => pendentes.push(pai));
+}
+return raizes.has(normalizarCodigoOS(linha.codigo || ""));
+}
+
+function preservarMarcadoresComposicaoOS(novas, anteriores){
+const porChave = new Map();
+(anteriores || []).forEach((linha) => {
+const chave = chaveComposicaoOS(linha);
+if (!porChave.has(chave)) porChave.set(chave, []);
+porChave.get(chave).push(linha);
+});
+return (novas || []).map((linha) => {
+const atualizada = { ...linha };
+const candidatas = porChave.get(chaveComposicaoOS(linha)) || [];
+const anterior = candidatas.shift();
+if (!anterior) return atualizada;
+["line_id", "line_status", "line_status_atualizado_por", "line_status_atualizado_em", "fornecedor"].forEach((campo) => {
+if (anterior[campo] !== undefined && anterior[campo] !== null && anterior[campo] !== ""){
+atualizada[campo] = anterior[campo];
+}
+});
+if (anterior.setor_manual){
+atualizada.setor = anterior.setor || atualizada.setor;
+atualizada.setor_manual = true;
+}
+return atualizada;
+});
+}
+
+function atualizarComposicaoAposAlteracaoItensOS(){
+if (osComposicaoSource !== "custom"){
+renderComponentes();
+return;
+}
+const anteriores = coletarComposicaoTabela();
+const itensPrincipais = codigosItensPrincipaisOS();
+const raizesManuais = raizesManuaisComposicaoOS(anteriores, itensPrincipais);
+const novas = [...coletarComposicaoBom()];
+const chaves = new Set(novas.map(chaveComposicaoOS));
+raizesManuais.forEach((raiz) => {
+expandirComposicaoImportada([raiz]).forEach((linha) => {
+const chave = chaveComposicaoOS(linha);
+if (!chaves.has(chave)){
+novas.push(linha);
+chaves.add(chave);
+}
+});
+});
+const raizesRecalculadas = new Set([...itensPrincipais, ...raizesManuais.map((linha) => normalizarCodigoOS(linha.codigo || ""))]);
+anteriores.forEach((linha) => {
+const chave = chaveComposicaoOS(linha);
+if (chaves.has(chave) || linhaPertenceARaizComposicaoOS(linha, anteriores, raizesRecalculadas)){
+return;
+}
+novas.push(linha);
+chaves.add(chave);
+});
+renderComposicaoRows(preservarMarcadoresComposicaoOS(novas, anteriores));
 }
 
 function escapeHtmlOS(valor){
@@ -3639,6 +3748,9 @@ marcarComposicaoCustom();
 }
 
 function restaurarComposicaoBom(){
+if (osComposicaoSource === "custom" && coletarComposicaoTabela().length && !window.confirm("Recarregar a B.O.M. padrão? As inclusões e ajustes manuais da composição atual serão substituídos pela composição dos itens principais.")){
+return;
+}
 osComposicaoSource = "bom";
 renderComponentes();
 agendarSalvarRascunhoOS();
@@ -3778,6 +3890,7 @@ const unidade = row.querySelector('input[name="os_unidade[]"]');
 const fornecedor = row.querySelector('input[name="os_fornecedor_item[]"]');
 const luminaria = row.querySelector('input[name="os_luminaria[]"]');
 const luminariaQtd = row.querySelector('input[name="os_luminaria_qtd[]"]');
+const popup = row.querySelector('input[name="os_popup_itens[]"]');
 if (select) select.value = "";
 if (lineId) lineId.value = "";
 if (desc) desc.value = "";
@@ -4059,6 +4172,7 @@ if (fornecedor && item.fornecedor) fornecedor.value = item.fornecedor;
 if (luminaria && item.luminaria) luminaria.value = item.luminaria;
 if (luminaria && item.luminaria_codigo) luminaria.value = item.luminaria_codigo;
 if (luminariaQtd && item.luminaria_qtd !== undefined) luminariaQtd.value = item.luminaria_qtd;
+if (popup) popup.value = item.popup || item.popup_itens || "[]";
 atualizarFornecedorDiretoLinha(row);
 atualizarLuminariaLinhaOS(row, { semPopup: true });
 }
@@ -4073,8 +4187,13 @@ atualizarHintProcessoAutomatico(resolverProcessoAutomaticoOS());
 } else {
 aplicarProcessoAutomaticoOS({ forcar: true });
 }
-osComposicaoSource = "bom";
+const composicaoPersistida = Array.isArray(osPrefill.composicao) ? osPrefill.composicao : [];
+osComposicaoSource = composicaoPersistida.length ? "custom" : "bom";
+if (osComposicaoSource === "custom"){
+renderComposicaoRows(composicaoPersistida);
+} else {
 renderComponentes();
+}
 aplicarProcessoAutomaticoOS();
 }
 
@@ -5015,8 +5134,7 @@ preencherOSDescricao(e.target);
 });
 tabelaOs.addEventListener("input", (e) => {
 if (e.target && e.target.name === "os_qtd[]"){
-osComposicaoSource = "bom";
-renderComponentes();
+atualizarComposicaoAposAlteracaoItensOS();
 }
 });
 }
@@ -5785,7 +5903,7 @@ salvarRascunhoOS();
 {% if can('suprimentos.production_order.view') %}<a class="btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>{% endif %}
 {% if can('suprimentos.work_order.view') %}<a class="btn" href="/erp/forecast">FORECAST</a>{% endif %}
 {% if can('suprimentos.work_order.manage') %}
-<form method="POST" action="/atualizar_bom_os_abertas" onsubmit="return confirm('Atualizar a B.O.M. de todas as O.S. abertas? A composição de materiais sera recriada pela B.O.M. vigente; componentes manuais que nao existirem mais na B.O.M. serao retirados. Itens, processos, status e O.S. concluidas/canceladas serao preservados. Esta acao nao movimenta estoque, empenhos, baixas ou O.C.');">
+<form method="POST" action="/atualizar_bom_os_abertas" onsubmit="return confirm('Atualizar a B.O.M. de todas as O.S. abertas? O sistema manterá os itens principais, inclusões manuais, escolhas de pop-up, setores e status; atualizará somente os componentes abaixo desses itens conforme a B.O.M. vigente. Para substituir toda a composição pela B.O.M. padrão, use Recarregar B.O.M. dentro da edição da O.S. Esta ação não movimenta estoque, empenhos, baixas ou O.C.');">
 <input type="hidden" name="confirmar_atualizacao_bom_os" value="sim">
 <button type="submit" class="btn-secondary">↻ REFRESH B.O.M. abertas</button>
 </form>

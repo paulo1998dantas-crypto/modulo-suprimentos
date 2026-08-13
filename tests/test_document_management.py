@@ -1090,6 +1090,43 @@ class DocumentManagementTests(unittest.TestCase):
                 "setor": "PREPARACAO",
                 "setor_manual": True,
                 "line_status": "pendente",
+            }, {
+                # Material included manually by PCP.  A refresh must update
+                # its own B.O.M. rather than reset the O.S. to ROOT-1 only.
+                "line_id": "os-comp-manual-root",
+                "item": "MANUAL-ROOT",
+                "codigo": "MANUAL-ROOT",
+                "descricao": "Revestimento escolhido manualmente",
+                "qtd": 1,
+                "unidade": "cj",
+                "level": 0,
+                "line_status": "nao_aplicavel",
+            }, {
+                "line_id": "os-comp-manual-old",
+                "item": "MANUAL-ROOT",
+                "codigo": "MANUAL-OLD",
+                "descricao": "Componente antigo manual",
+                "qtd": 1,
+                "unidade": "pc",
+                "level": 1,
+            }, {
+                # Legacy popup choice: old documents had this contextual
+                # material only in the composition, not in the item payload.
+                "line_id": "os-comp-popup-root",
+                "item": "ROOT-1",
+                "codigo": "POPUP-ROOT",
+                "descricao": "Opcao de popup mantida",
+                "qtd": 1,
+                "unidade": "pc",
+                "level": 0,
+            }, {
+                "line_id": "os-comp-popup-old",
+                "item": "POPUP-ROOT",
+                "codigo": "POPUP-OLD",
+                "descricao": "Componente antigo do popup",
+                "qtd": 1,
+                "unidade": "pc",
+                "level": 1,
             }],
         }
         closed_order = {
@@ -1120,10 +1157,16 @@ class DocumentManagementTests(unittest.TestCase):
             patch.object(app_module.supabase_data, "atualizar_documento", side_effect=update_document) as update,
             patch.object(app_module, "carregar_os_componentes", return_value={
                 "ROOT-1": [{"codigo": "COMP-1", "descricao": "Componente novo", "unidade": "pc", "quantidade": 3}],
+                "MANUAL-ROOT": [{"codigo": "MANUAL-NEW", "descricao": "Componente novo manual", "unidade": "pc", "quantidade": 4}],
+                "POPUP-ROOT": [{"codigo": "POPUP-NEW", "descricao": "Componente novo do popup", "unidade": "pc", "quantidade": 5}],
             }) as components,
             patch.object(app_module, "carregar_os_produtos", return_value={
                 "ROOT-1": {"codigo": "ROOT-1", "descricao": "Conjunto", "unidade": "pc"},
                 "COMP-1": {"codigo": "COMP-1", "descricao": "Componente novo", "unidade": "pc"},
+                "MANUAL-ROOT": {"codigo": "MANUAL-ROOT", "descricao": "Revestimento escolhido manualmente", "unidade": "cj"},
+                "MANUAL-NEW": {"codigo": "MANUAL-NEW", "descricao": "Componente novo manual", "unidade": "pc"},
+                "POPUP-ROOT": {"codigo": "POPUP-ROOT", "descricao": "Opcao de popup mantida", "unidade": "pc"},
+                "POPUP-NEW": {"codigo": "POPUP-NEW", "descricao": "Componente novo do popup", "unidade": "pc"},
             }) as catalog,
             patch.object(app_module, "current_username", return_value="pcp"),
         ):
@@ -1141,6 +1184,15 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual("pendente", refreshed["composicao"][0]["line_status"])
         self.assertEqual("PREPARACAO", refreshed["composicao"][0]["setor"])
         self.assertTrue(refreshed["composicao"][0]["setor_manual"])
+        manual_root = next(linha for linha in refreshed["composicao"] if linha["codigo"] == "MANUAL-ROOT")
+        manual_child = next(linha for linha in refreshed["composicao"] if linha["codigo"] == "MANUAL-NEW")
+        self.assertEqual("nao_aplicavel", manual_root["line_status"])
+        self.assertEqual(4, manual_child["qtd"])
+        self.assertNotIn("MANUAL-OLD", [linha["codigo"] for linha in refreshed["composicao"]])
+        self.assertIn("POPUP-ROOT", [linha["codigo"] for linha in refreshed["composicao"]])
+        popup_child = next(linha for linha in refreshed["composicao"] if linha["codigo"] == "POPUP-NEW")
+        self.assertEqual(5, popup_child["qtd"])
+        self.assertNotIn("POPUP-OLD", [linha["codigo"] for linha in refreshed["composicao"]])
         self.assertEqual("anterior", refreshed["componentes"]["snapshot"])
         self.assertEqual("manter", refreshed["dados"]["observacao"])
         self.assertEqual("pcp", refreshed["dados"]["bom_atualizada_por"])
