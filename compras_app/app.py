@@ -792,6 +792,7 @@ def registrar_historico(
     documento_id=None,
     status="emitido",
     submit_token="",
+    layout_arquivo_id="",
 ):
     existente = obter_historico_documento(documento_id) if documento_id else None
     usuario = current_username()
@@ -818,6 +819,7 @@ def registrar_historico(
         "atualizado_por": usuario,
         "erp_purchase_order_id": (existente or {}).get("erp_purchase_order_id") or None,
         "erp_work_order_id": (existente or {}).get("erp_work_order_id") or None,
+        "layout_arquivo_id": layout_arquivo_id or (existente or {}).get("layout_arquivo_id") or None,
         "dados": dados or {},
         "itens": itens,
         "processos": processos,
@@ -6390,20 +6392,39 @@ def gerar_os():
     }
     modos_pacote = ["completa", "expedicao", "preparacao"]
     layout_bytes = b""
+    layout_nome = ""
+    layout_mime_type = "application/pdf"
+    layout_arquivo_id = (historico_existente or {}).get("layout_arquivo_id") or ""
     if layout_pdf and layout_pdf.filename:
         try:
             layout_pdf.stream.seek(0)
         except Exception:
             pass
         layout_bytes = layout_pdf.read() or b""
+        layout_nome = layout_pdf.filename
+        layout_mime_type = layout_pdf.content_type or "application/pdf"
+        if layout_bytes and supabase_data.enabled():
+            layout_salvo = supabase_data.salvar_layout_pdf(
+                layout_bytes,
+                layout_nome,
+                layout_mime_type,
+                current_username(),
+            )
+            layout_arquivo_id = layout_salvo.get("id") or layout_arquivo_id
+            layout_nome = layout_salvo.get("nome_exibicao") or layout_nome
+            layout_mime_type = layout_salvo.get("mime_type") or layout_mime_type
+    elif layout_arquivo_id and supabase_data.enabled():
+        layout_bytes, layout_salvo = supabase_data.baixar_layout_pdf(layout_arquivo_id)
+        layout_nome = layout_salvo.get("nome_exibicao") or layout_salvo.get("nome_original") or "layout.pdf"
+        layout_mime_type = layout_salvo.get("mime_type") or "application/pdf"
 
     def _criar_layout_clone():
         if not layout_bytes:
             return None
         return FileStorage(
             stream=io.BytesIO(layout_bytes),
-            filename=layout_pdf.filename,
-            content_type=layout_pdf.content_type,
+            filename=layout_nome or "layout.pdf",
+            content_type=layout_mime_type,
         )
 
     dados_historico = dict(dados)
@@ -6423,6 +6444,7 @@ def gerar_os():
             documento_id=historico_form_id or None,
             status=status_documento,
             submit_token=submit_token,
+            layout_arquivo_id=layout_arquivo_id,
         )
         limpar_importacao(_user_scoped_file(OS_IMPORT_FILE))
         return redirect(url_for("index", tab="dashboard", documento_status="O.S. salva sem impressao."))
@@ -6488,6 +6510,7 @@ def gerar_os():
         documento_id=historico_form_id or None,
         status="emitido",
         submit_token=submit_token,
+        layout_arquivo_id=layout_arquivo_id,
     )
     if forecast:
         # A RPC realiza lock da linha do Forecast e torna retentativas do mesmo
@@ -6518,6 +6541,7 @@ def gerar_os():
                 documento_id=documento_emitido.get("id"),
                 status="emitido",
                 submit_token=submit_token,
+                layout_arquivo_id=layout_arquivo_id,
             )
         except Exception as exc:
             app.logger.exception(

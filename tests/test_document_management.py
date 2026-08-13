@@ -22,6 +22,15 @@ import supabase_data
 
 
 class DocumentManagementTests(unittest.TestCase):
+    def test_document_normalization_preserves_layout_reference(self):
+        document = supabase_data.normalizar_documento({
+            "tipo": "os",
+            "numero": "3119",
+            "layout_arquivo_id": "d468c8aa-7cab-4b8d-84cf-0d5aef6c0f82",
+        })
+
+        self.assertEqual("d468c8aa-7cab-4b8d-84cf-0d5aef6c0f82", document["layout_arquivo_id"])
+
     def test_quantity_parser_preserves_decimal_points_from_os_documents(self):
         self.assertEqual("1", app_module._normalizar_qtd("1.0"))
         self.assertEqual("2", app_module._normalizar_qtd("2.0"))

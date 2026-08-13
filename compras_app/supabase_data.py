@@ -2,9 +2,12 @@ import json
 import os
 import time
 import unicodedata
+import hashlib
+import json
 import urllib.error
 import urllib.parse
 import urllib.request
+import uuid
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -24,6 +27,8 @@ RELACOES_TABLE = "suprimentos_relacoes_processo_item"
 BOM_COMPONENTS_TABLE = "cadastro_bom_componentes"
 USERS_TABLE = "users"
 DOCUMENTOS_TABLE = "suprimentos_documentos"
+LAYOUTS_TABLE = "layout_arquivos"
+LAYOUTS_BUCKET = "os-layouts"
 FORECASTS_TABLE = "suprimentos_forecasts"
 FORECAST_ITEMS_TABLE = "suprimentos_forecast_itens"
 FORECAST_REQUIREMENTS_TABLE = "suprimentos_forecast_necessidades"
@@ -193,6 +198,7 @@ def status():
             RELACOES_TABLE,
             BOM_COMPONENTS_TABLE,
             DOCUMENTOS_TABLE,
+            LAYOUTS_TABLE,
             FORECASTS_TABLE,
             FORECAST_ITEMS_TABLE,
             FORECAST_REQUIREMENTS_TABLE,
@@ -696,6 +702,7 @@ def normalizar_documento(documento):
             "atualizado_por",
             "erp_purchase_order_id",
             "erp_work_order_id",
+            "layout_arquivo_id",
         )
         if key in source
     }
@@ -708,6 +715,7 @@ def normalizar_documento(documento):
     row["atualizado_por"] = _clean(row.get("atualizado_por"))
     row["erp_purchase_order_id"] = _clean(row.get("erp_purchase_order_id")) or None
     row["erp_work_order_id"] = _clean(row.get("erp_work_order_id")) or None
+    row["layout_arquivo_id"] = _clean(row.get("layout_arquivo_id")) or None
     for key in ("dados", "itens", "processos", "componentes", "composicao"):
         value = row.get(key)
         if value is None:
@@ -743,6 +751,7 @@ def documento_to_legacy(row):
         "atualizado_por": _clean(row.get("atualizado_por")),
         "erp_purchase_order_id": _clean(row.get("erp_purchase_order_id")),
         "erp_work_order_id": _clean(row.get("erp_work_order_id")),
+        "layout_arquivo_id": _clean(row.get("layout_arquivo_id")),
         "updated_at": _clean(row.get("updated_at")),
         "dados": row.get("dados") or {},
         "itens": row.get("itens") or [],
@@ -806,7 +815,7 @@ def obter_documento(documento_id):
         "GET",
         DOCUMENTOS_TABLE,
         query=[
-            ("select", "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,dados,itens,processos,componentes,composicao"),
+            ("select", "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,layout_arquivo_id,dados,itens,processos,componentes,composicao"),
             ("id", f"eq.{documento_id}"),
             ("limit", "1"),
         ],
@@ -874,7 +883,7 @@ def excluir_documentos(documento_ids):
 def carregar_documentos(force=False, limit=None):
     rows = _all_rows(
         DOCUMENTOS_TABLE,
-        select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,dados,itens,processos,componentes,composicao",
+        select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,layout_arquivo_id,dados,itens,processos,componentes,composicao",
         order="data_criacao.desc,created_at.desc",
         cache_key="documentos",
         force=force,
@@ -934,6 +943,97 @@ def _rpc(name, payload=None):
         raise SupabaseDataError(f"Erro Supabase {exc.code}: {body}") from exc
     except urllib.error.URLError as exc:
         raise SupabaseDataError(f"Nao foi possivel conectar ao Supabase: {exc}") from exc
+
+
+def _storage_request(method, path, data=None, content_type="application/pdf"):
+    if not configured():
+        raise SupabaseDataError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
+    encoded_path = "/".join(urllib.parse.quote(str(part), safe="") for part in str(path or "").split("/"))
+    url = f"{_supabase_url()}/storage/v1/object/{LAYOUTS_BUCKET}/{encoded_path}"
+    headers = _headers()
+    headers["Content-Type"] = content_type or "application/pdf"
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return response.read()
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise SupabaseDataError(f"Erro Storage {exc.code}: {body}") from exc
+    except urllib.error.URLError as exc:
+        raise SupabaseDataError(f"Nao foi possivel conectar ao Storage: {exc}") from exc
+
+
+def obter_layout(layout_id):
+    ident = _clean(layout_id)
+    if not ident:
+        return None
+    rows = _request(
+        "GET",
+        LAYOUTS_TABLE,
+        query=[("select", "id,sha256,storage_bucket,storage_path,nome_original,nome_exibicao,mime_type,tamanho_bytes,criado_por,created_at,updated_at"), ("id", f"eq.{ident}"), ("limit", "1")],
+    ) or []
+    return rows[0] if rows else None
+
+
+def salvar_layout_pdf(content, nome_original, mime_type="application/pdf", criado_por=""):
+    arquivo = bytes(content or b"")
+    if not arquivo:
+        raise SupabaseDataError("O arquivo de layout esta vazio.")
+    if len(arquivo) > 10 * 1024 * 1024:
+        raise SupabaseDataError("O layout ultrapassa o limite de 10 MB.")
+    if not arquivo.lstrip().startswith(b"%PDF"):
+        raise SupabaseDataError("O layout precisa ser um arquivo PDF valido.")
+    digest = hashlib.sha256(arquivo).hexdigest()
+    existentes = _request(
+        "GET",
+        LAYOUTS_TABLE,
+        query=[("select", "id,sha256,storage_bucket,storage_path,nome_original,nome_exibicao,mime_type,tamanho_bytes,criado_por,created_at,updated_at"), ("sha256", f"eq.{digest}"), ("limit", "1")],
+    ) or []
+    if existentes:
+        return existentes[0]
+
+    storage_path = f"layouts/{digest}.pdf"
+    try:
+        _storage_request("POST", storage_path, data=arquivo, content_type="application/pdf")
+    except SupabaseDataError as exc:
+        # O caminho determinístico pode ter sido criado por outra emissão com o
+        # mesmo conteúdo. A tabela, com SHA único, confirma o reaproveitamento.
+        if "409" not in str(exc) and "already exists" not in str(exc).lower():
+            raise
+
+    payload = {
+        "id": str(uuid.uuid4()),
+        "sha256": digest,
+        "storage_bucket": LAYOUTS_BUCKET,
+        "storage_path": storage_path,
+        "nome_original": _clean(nome_original) or "layout.pdf",
+        "nome_exibicao": _clean(nome_original) or "layout.pdf",
+        "mime_type": "application/pdf",
+        "tamanho_bytes": len(arquivo),
+        "criado_por": _clean(criado_por) or None,
+    }
+    try:
+        rows = _request("POST", LAYOUTS_TABLE, payload=payload, prefer="return=representation") or []
+    except SupabaseDataError as exc:
+        if "duplicate key" not in str(exc).lower():
+            raise
+        rows = _request(
+            "GET",
+            LAYOUTS_TABLE,
+            query=[("select", "id,sha256,storage_bucket,storage_path,nome_original,nome_exibicao,mime_type,tamanho_bytes,criado_por,created_at,updated_at"), ("sha256", f"eq.{digest}"), ("limit", "1")],
+        ) or []
+    if not rows:
+        raise SupabaseDataError("Nao foi possivel registrar o layout no catalogo.")
+    return rows[0]
+
+
+def baixar_layout_pdf(layout_id):
+    layout = obter_layout(layout_id)
+    if not layout:
+        raise SupabaseDataError("Layout da O.S. nao encontrado.")
+    if _clean(layout.get("storage_bucket")) != LAYOUTS_BUCKET:
+        raise SupabaseDataError("Bucket de layout nao reconhecido.")
+    return _storage_request("GET", layout.get("storage_path"), content_type=layout.get("mime_type") or "application/pdf"), layout
 
 
 def proximo_numero_forecast():

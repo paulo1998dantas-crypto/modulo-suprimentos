@@ -3492,6 +3492,8 @@ return;
 const linhaAtual = rows[indice] || {};
 const produto = getProdutoInfo(osProdutos, codigo) || {};
 const quantidade = parseNumber(linhaAtual.qtd) || 1;
+const itemPai = normalizarCodigoOS(linhaAtual.item);
+const linhaManualRaiz = !itemPai || itemPai === codigo;
 const linhaManual = {
 ...linhaAtual,
 item: normalizarCodigoOS(linhaAtual.item) || codigo,
@@ -3500,7 +3502,7 @@ descricao: produto.descricao || produto.nome || linhaAtual.descricao || "",
 unidade: produto.unidade || linhaAtual.unidade || "",
 qtd: quantidade,
 };
-const componentes = expandComposicao(codigo, quantidade);
+const componentes = linhaManualRaiz ? expandComposicao(codigo, quantidade) : [];
 if (componentes.length){
 const filhos = componentes.map((filho) => ({
 ...filho,
@@ -3516,6 +3518,29 @@ renderComposicaoRows(rows);
 agendarSalvarRascunhoOS();
 }
 
+const explosoesManuaisPendentes = new WeakMap();
+
+function agendarExplosaoManualNaComposicao(input){
+if (!input){
+return;
+}
+const codigo = extrairCodigo(input.value, osProdutos);
+if (!codigo){
+return;
+}
+const anterior = explosoesManuaisPendentes.get(input);
+if (anterior){
+window.clearTimeout(anterior);
+}
+// Leitores de código de barras e colagens disparam somente "input". Aguarda
+// um instante para não redesenhar a linha enquanto o código ainda está sendo digitado.
+const timer = window.setTimeout(() => {
+explosoesManuaisPendentes.delete(input);
+aplicarItemManualNaComposicao(input);
+}, 180);
+explosoesManuaisPendentes.set(input, timer);
+}
+
 function renderComposicaoRows(rows){
 const tbody = document.getElementById("tabela_componentes_body");
 if (!tbody){
@@ -3528,8 +3553,8 @@ const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.set
 const setorManual = comp.setor_manual ? "1" : "0";
 row.innerHTML = `
 <td class="comp-parent-cell"><span>${escapeHtmlOS(comp.item || "-")}</span><input type="hidden" name="os_comp_line_id[]" value="${escapeHtmlOS(comp.line_id || "")}"><input type="hidden" name="os_comp_item[]" value="${escapeHtmlOS(comp.item || "")}"><input type="hidden" name="os_comp_level[]" value="${Number(comp.level || 0)}"></td>
-<td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código"></td>
-<td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição"></td>
+<td><input name="os_comp_codigo[]" value="${escapeHtmlOS(comp.codigo || "")}" placeholder="Código" oninput="agendarExplosaoManualNaComposicao(this)" onblur="aplicarItemManualNaComposicao(this)" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); aplicarItemManualNaComposicao(this); }"></td>
+<td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição" oninput="agendarExplosaoManualNaComposicao(this)" onblur="aplicarItemManualNaComposicao(this)" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); aplicarItemManualNaComposicao(this); }"></td>
 <td><input name="os_comp_unidade[]" value="${escapeHtmlOS(comp.unidade || "")}" placeholder="Un."></td>
 <td><input name="os_comp_qtd[]" value="${escapeHtmlOS(comp.qtd || "")}" inputmode="decimal"></td>
 <td><select name="os_comp_setor[]"><option value="EXPEDICAO"${setor === "EXPEDICAO" ? " selected" : ""}>Expedição</option><option value="PREPARACAO"${setor === "PREPARACAO" ? " selected" : ""}>Preparação</option><option value="F.D"${setor === "F.D" ? " selected" : ""}>Faturamento direto</option></select><input type="hidden" name="os_comp_setor_manual[]" value="${setorManual}"></td>
