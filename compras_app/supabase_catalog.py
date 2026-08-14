@@ -145,11 +145,12 @@ def registration_by_sku(sku):
 
 
 def active_bank_sets(query="", limit=100):
-    """Return active bank-set master data used by O.S. allocation.
+    """Return active unitary banks and bank sets used by O.S. allocation.
 
     The Cadastro module remains the source of truth.  Keeping this query
     narrow avoids loading the complete product catalogue merely to populate a
-    searchable field in Suprimentos.
+    searchable field in Suprimentos.  The historical function name is kept to
+    avoid breaking existing callers.
     """
     if not configured():
         raise SupabaseCatalogError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
@@ -161,12 +162,11 @@ def active_bank_sets(query="", limit=100):
     params = [
         ("select", "sku,descricao_primaria,unidade"),
         # ``bancos`` e a chave canonica depois da unificacao das antigas
-        # categorias 20 - BCO e 20 - CJ/BCO. Mantemos a chave legada durante a
-        # transicao para que um cadastro ainda nao normalizado nao desapareca
-        # da alocacao da O.S. O prefixo 30 restringe a consulta aos conjuntos,
-        # sem oferecer bancos unitarios (grupo 10) no mesmo campo.
+        # categorias 20 - BCO e 20 - CJ/BCO. Ela contem tanto bancos unitarios
+        # (grupo 10) quanto conjuntos (grupo 30). Mantemos a chave legada
+        # durante a transicao para que um cadastro ainda nao normalizado nao
+        # desapareca da alocacao da O.S.
         ("category_key", "in.(bancos,cat_20_bco)"),
-        ("sku", "like.30*"),
         ("ativo", "is.true"),
         ("order", "sku.asc"),
         ("limit", str(safe_limit)),
