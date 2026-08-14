@@ -155,7 +155,10 @@ def active_bank_sets(query="", limit=100):
     if not configured():
         raise SupabaseCatalogError("Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.")
     try:
-        safe_limit = max(1, min(int(limit or 100), 200))
+        # O catalogo unificado de Bancos ja ultrapassa 200 registros. O limite
+        # maior continua seguro porque a consulta traz apenas tres colunas e
+        # somente cadastros ativos da categoria.
+        safe_limit = max(1, min(int(limit or 100), 1000))
     except (TypeError, ValueError) as exc:
         raise SupabaseCatalogError("Limite de consulta invalido.") from exc
     normalized_query = _clean(query)
@@ -194,7 +197,10 @@ def active_bank_sets(query="", limit=100):
             "unidade": _clean(row.get("unidade")),
         }
         for row in rows
-        if _clean(row.get("sku"))
+        # A categoria Bancos atende bancos unitarios (10) e conjuntos (30).
+        # Outros grupos eventualmente classificados nela nao pertencem ao
+        # campo de banco da O.S.
+        if _clean(row.get("sku"))[:2] in {"10", "30"}
     ]
 
 

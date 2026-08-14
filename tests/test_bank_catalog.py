@@ -18,6 +18,7 @@ class BankCatalogTests(unittest.TestCase):
         response = MagicMock()
         response.__enter__.return_value.read.return_value = json.dumps([
             {"sku": "10200033", "descricao_primaria": "BCO UNITARIO TESTE", "unidade": "pc"},
+            {"sku": "20200001", "descricao_primaria": "PROCESSO FORA DO CATALOGO", "unidade": "pc"},
             {"sku": "30200049", "descricao_primaria": "CJ BANCOS TESTE", "unidade": "cj"},
         ]).encode("utf-8")
         environment = {
