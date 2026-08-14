@@ -35,7 +35,8 @@ class BankCatalogTests(unittest.TestCase):
             rows,
         )
         url = urlopen.call_args.args[0].full_url
-        self.assertIn("category_key=eq.cat_20_bco", url)
+        self.assertIn("category_key=in.%28bancos%2Ccat_20_bco%29", url)
+        self.assertIn("sku=like.30%2A", url)
         self.assertIn("ativo=is.true", url)
         self.assertIn("select=sku%2Cdescricao_primaria%2Cunidade", url)
 

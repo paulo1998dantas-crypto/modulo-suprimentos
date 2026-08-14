@@ -160,7 +160,13 @@ def active_bank_sets(query="", limit=100):
     normalized_query = _clean(query)
     params = [
         ("select", "sku,descricao_primaria,unidade"),
-        ("category_key", "eq.cat_20_bco"),
+        # ``bancos`` e a chave canonica depois da unificacao das antigas
+        # categorias 20 - BCO e 20 - CJ/BCO. Mantemos a chave legada durante a
+        # transicao para que um cadastro ainda nao normalizado nao desapareca
+        # da alocacao da O.S. O prefixo 30 restringe a consulta aos conjuntos,
+        # sem oferecer bancos unitarios (grupo 10) no mesmo campo.
+        ("category_key", "in.(bancos,cat_20_bco)"),
+        ("sku", "like.30*"),
         ("ativo", "is.true"),
         ("order", "sku.asc"),
         ("limit", str(safe_limit)),
