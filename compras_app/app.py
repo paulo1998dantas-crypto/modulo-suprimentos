@@ -10,6 +10,7 @@ import json
 import io
 import os
 import urllib.error
+import urllib.parse
 import urllib.request
 import logging
 import tempfile
@@ -6018,6 +6019,45 @@ def gerar_oc():
         (destino_form if destino_form is not None else dados_anteriores.get("destino", ""))
         or ""
     ).strip()
+    allocation_mode = str(
+        request.form.get("allocation_mode")
+        or dados_anteriores.get("allocation_mode")
+        or ""
+    ).strip().upper()
+    allocation_work_order_id = str(
+        request.form.get("allocation_work_order_id")
+        or dados_anteriores.get("allocation_work_order_id")
+        or ""
+    ).strip()
+    allocation_reference = str(
+        request.form.get("allocation_reference")
+        or dados_anteriores.get("allocation_reference")
+        or ""
+    ).strip()
+    if allocation_mode not in {"ESTOQUE", "WORK_ORDER", "AG_CHEGADA"}:
+        return redirect(url_for(
+            "index", tab="oc",
+            documento_status="Selecione obrigatoriamente o destino da O.C.: O.S., ESTOQUE ou AG CHEGADA.",
+        ))
+    if allocation_mode == "WORK_ORDER" and not allocation_work_order_id:
+        return redirect(url_for(
+            "index", tab="oc",
+            documento_status="Selecione uma O.S. ativa ou em produção para vincular a compra.",
+        ))
+    if allocation_mode == "ESTOQUE":
+        allocation_work_order_id = ""
+        allocation_reference = "ESTOQUE"
+    elif allocation_mode == "AG_CHEGADA":
+        allocation_work_order_id = ""
+        allocation_reference = allocation_reference or destino_oc
+        if not allocation_reference:
+            return redirect(url_for(
+                "index", tab="oc",
+                documento_status=(
+                    "Para AG CHEGADA, informe no campo O.S. uma referência de chassi, "
+                    "proposta ou futura O.S. para permitir o vínculo automático."
+                ),
+            ))
     previsao_linhas = sorted(
         item["data_necessidade"] for item in itens if item.get("data_necessidade")
     )
@@ -6050,6 +6090,9 @@ def gerar_oc():
         "obs": request.form.get("obs", ""),
         "oc_categoria": categoria_oc,
         "destino": destino_oc,
+        "allocation_mode": allocation_mode,
+        "allocation_work_order_id": allocation_work_order_id,
+        "allocation_reference": allocation_reference,
     }
 
     numero_oc = (
@@ -7947,6 +7990,9 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
         "data_emissao": _erp_iso_date((historico or {}).get("data_criacao")) or date.today().isoformat(),
         "data_necessidade": _erp_iso_date(dados_pedido.get("previsao")),
         "destino": (dados_pedido.get("destino") or "").strip(),
+        "allocation_mode": (dados_pedido.get("allocation_mode") or "ESTOQUE").strip().upper(),
+        "work_order_id": (dados_pedido.get("allocation_work_order_id") or "").strip() or None,
+        "allocation_reference": (dados_pedido.get("allocation_reference") or "").strip(),
         "frete": dados_pedido.get("frete", 0),
         "observacoes": dados_pedido.get("obs", ""),
         "idempotency_key": f"suprimentos-oc:{history_id}",
@@ -7967,6 +8013,25 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
         ],
     }
     return _erp_stock_request("purchase-orders/legacy-sync", "POST", payload)
+
+
+@app.route("/api/erp/work-order-options")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.purchase.view")
+def erp_work_order_options_proxy():
+    query = (request.args.get("q") or "").strip()
+    try:
+        limit = min(max(int(request.args.get("limit") or 30), 1), 100)
+    except (TypeError, ValueError):
+        limit = 30
+    try:
+        suffix = urllib.parse.urlencode({"q": query, "limit": limit})
+        response = _erp_mes_request(f"work-order-options?{suffix}")
+        return jsonify({"ok": True, "options": response.get("options") or []})
+    except Exception as exc:
+        app.logger.exception("Falha ao consultar O.S. ativas para alocação da compra")
+        return jsonify({"ok": False, "error": str(exc)}), 400
 
 
 def _cancel_emitted_legacy_oc_in_erp(historico, motivo):

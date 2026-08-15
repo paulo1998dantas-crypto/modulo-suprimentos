@@ -99,6 +99,7 @@ class PurchaseTransitTests(unittest.TestCase):
                 "acao": "salvar",
                 "oc_submit_token": "dates-by-line",
                 "fornecedor": "Fornecedor",
+                "allocation_mode": "ESTOQUE",
                 "previsao": "2026-08-10",
                 "codigo[]": ["SKU-1", "SKU-2"],
                 "descricao[]": ["Item 1", "Item 2"],
@@ -132,6 +133,7 @@ class PurchaseTransitTests(unittest.TestCase):
         ):
             response = self.client.post("/gerar_oc", data={
                 "fornecedor": "Fornecedor",
+                "allocation_mode": "ESTOQUE",
                 "codigo[]": ["SKU-1"],
                 "descricao[]": ["Item 1"],
                 "unidade[]": ["UN"],
@@ -163,6 +165,7 @@ class PurchaseTransitTests(unittest.TestCase):
                 "acao": "salvar",
                 "oc_submit_token": "retroactive-draft",
                 "fornecedor": "Fornecedor",
+                "allocation_mode": "ESTOQUE",
                 "codigo[]": ["SKU-1"],
                 "descricao[]": ["Item 1"],
                 "unidade[]": ["UN"],
@@ -177,6 +180,60 @@ class PurchaseTransitTests(unittest.TestCase):
         register.assert_called_once()
         generate.assert_not_called()
 
+    def test_purchase_requires_explicit_operational_allocation(self):
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "registrar_historico") as register,
+            patch.object(app_module, "gerar_word") as generate,
+        ):
+            response = self.client.post("/gerar_oc", data={
+                "acao": "salvar",
+                "fornecedor": "Fornecedor",
+                "codigo[]": ["SKU-1"],
+                "descricao[]": ["Item 1"],
+                "unidade[]": ["UN"],
+                "qtd[]": ["1"],
+                "valor[]": ["10"],
+                "desconto[]": ["0"],
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        self.assertIn(
+            "Selecione+obrigatoriamente+o+destino+da+O.C.",
+            response.headers["Location"],
+        )
+        register.assert_not_called()
+        generate.assert_not_called()
+
+    def test_ag_chegada_requires_future_vehicle_reference(self):
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "registrar_historico") as register,
+        ):
+            response = self.client.post("/gerar_oc", data={
+                "acao": "salvar",
+                "fornecedor": "Fornecedor",
+                "allocation_mode": "AG_CHEGADA",
+                "codigo[]": ["SKU-1"],
+                "descricao[]": ["Item 1"],
+                "unidade[]": ["UN"],
+                "qtd[]": ["1"],
+                "valor[]": ["10"],
+                "desconto[]": ["0"],
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        self.assertIn("Para+AG+CHEGADA", response.headers["Location"])
+        register.assert_not_called()
+
     def test_erp_sync_publishes_each_line_remittance_date(self):
         items = [
             {"codigo": "SKU-1", "descricao": "Item 1", "unidade": "UN", "qtd": 1, "valor": 10, "data_necessidade": "2026-08-10"},
@@ -188,7 +245,12 @@ class PurchaseTransitTests(unittest.TestCase):
         ):
             app_module._sync_emitted_legacy_oc_to_erp(
                 {"id": "doc-1", "data_criacao": "2026-08-03"},
-                {"previsao": "2026-08-10", "destino": "ESTOQUE"},
+                {
+                    "previsao": "2026-08-10",
+                    "destino": "Cliente futuro - chassi TA008976",
+                    "allocation_mode": "AG_CHEGADA",
+                    "allocation_reference": "PROPOSTA 1213.1 / CHASSI TA008976",
+                },
                 items,
                 "2801",
                 "Fornecedor",
@@ -198,6 +260,12 @@ class PurchaseTransitTests(unittest.TestCase):
         self.assertEqual(
             ["2026-08-10", "2026-09-15"],
             [line["data_necessidade"] for line in payload["lines"]],
+        )
+        self.assertEqual("AG_CHEGADA", payload["allocation_mode"])
+        self.assertIsNone(payload["work_order_id"])
+        self.assertEqual(
+            "PROPOSTA 1213.1 / CHASSI TA008976",
+            payload["allocation_reference"],
         )
 
     def test_emitted_purchase_document_shows_remittance_date_on_each_line(self):

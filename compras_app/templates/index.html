@@ -472,6 +472,29 @@ display:block;
 z-index:61;
 }
 
+.oc-allocation-grid{
+display:grid;
+grid-template-columns:minmax(280px, 1fr) minmax(280px, 1fr);
+gap:16px;
+align-items:end;
+}
+
+.oc-allocation-help{
+display:block;
+margin-top:6px;
+color:#64748b;
+font-size:12px;
+line-height:1.35;
+}
+
+.oc-allocation-reference[hidden]{
+display:none;
+}
+
+@media (max-width: 820px){
+.oc-allocation-grid{grid-template-columns:1fr;}
+}
+
 .lookup-option{
 width:100%;
 border:none;
@@ -3953,6 +3976,7 @@ if (!form){
 return;
 }
 form.reset();
+definirAlocacaoOC("", "", "", "");
 const documentStatus = document.getElementById("oc_document_status");
 if (documentStatus) documentStatus.value = "rascunho";
 
@@ -4198,7 +4222,88 @@ renderComposicaoRows(composicaoPersistida);
 } else {
 renderComponentes();
 }
+
 aplicarProcessoAutomaticoOS();
+}
+
+let ocAllocationTimer = null;
+
+function definirAlocacaoOC(mode, workOrderId, label, reference){
+const form = document.getElementById("form-oc");
+if (!form) return;
+const normalizedMode = String(mode || "").toUpperCase();
+const modeInput = form.elements.allocation_mode;
+const workInput = form.elements.allocation_work_order_id;
+const displayInput = document.getElementById("oc-allocation-search");
+const referenceInput = form.elements.allocation_reference;
+const referenceWrap = document.getElementById("oc-allocation-reference-wrap");
+if (modeInput) modeInput.value = normalizedMode;
+if (workInput) workInput.value = normalizedMode === "WORK_ORDER" ? String(workOrderId || "") : "";
+if (displayInput) displayInput.value = String(label || "");
+if (referenceInput){
+referenceInput.value = normalizedMode === "AG_CHEGADA" ? String(reference || "") : (normalizedMode === "ESTOQUE" ? "ESTOQUE" : String(label || ""));
+}
+if (referenceWrap) referenceWrap.hidden = normalizedMode !== "AG_CHEGADA";
+fecharLookupMenu(document.getElementById("oc-allocation-menu"));
+}
+
+function renderizarOpcoesAlocacaoOC(options){
+const menu = document.getElementById("oc-allocation-menu");
+if (!menu) return;
+menu.innerHTML = "";
+const fixed = [
+{ mode:"ESTOQUE", label:"ESTOQUE", secondary:"Compra destinada ao saldo geral" },
+{ mode:"AG_CHEGADA", label:"AG CHEGADA", secondary:"Vínculo automático futuro por O.S., proposta ou chassi" },
+];
+fixed.concat((options || []).map((item) => ({
+mode:"WORK_ORDER",
+work_order_id:item.work_order_id,
+label:item.label || `O.S. ${item.numero_os || ""}`,
+secondary:[item.veiculo, item.chassi_exibicao].filter(Boolean).join(" · "),
+}))).forEach((item) => {
+const button = document.createElement("button");
+button.type = "button";
+button.className = "lookup-option";
+button.innerHTML = `<span class="lookup-primary">${escapeHtmlOS(item.label)}</span>${item.secondary ? `<span class="lookup-secondary">${escapeHtmlOS(item.secondary)}</span>` : ""}`;
+button.addEventListener("mousedown", (event) => {
+event.preventDefault();
+const destination = document.querySelector('#form-oc input[name="destino"]');
+definirAlocacaoOC(item.mode, item.work_order_id || "", item.label, item.mode === "AG_CHEGADA" ? (destination?.value || "") : item.label);
+if (item.mode === "AG_CHEGADA") document.querySelector('#form-oc input[name="allocation_reference"]')?.focus();
+});
+menu.appendChild(button);
+});
+menu.classList.add("open");
+menu.closest(".lookup-field")?.classList.add("has-open");
+}
+
+async function carregarOpcoesAlocacaoOC(query){
+try {
+const response = await fetch(`/api/erp/work-order-options?q=${encodeURIComponent(query || "")}&limit=40`, { headers:{"Accept":"application/json"} });
+const payload = await response.json().catch(() => ({}));
+if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível consultar as O.S. ativas.");
+renderizarOpcoesAlocacaoOC(payload.options || []);
+} catch (error) {
+renderizarOpcoesAlocacaoOC([]);
+console.warn(error.message);
+}
+}
+
+function inicializarAlocacaoOC(){
+const input = document.getElementById("oc-allocation-search");
+if (!input || input.dataset.ready === "1") return;
+input.dataset.ready = "1";
+input.addEventListener("focus", () => carregarOpcoesAlocacaoOC(input.value));
+input.addEventListener("input", () => {
+const form = document.getElementById("form-oc");
+if (form){
+form.elements.allocation_mode.value = "";
+form.elements.allocation_work_order_id.value = "";
+}
+clearTimeout(ocAllocationTimer);
+ocAllocationTimer = setTimeout(() => carregarOpcoesAlocacaoOC(input.value), 220);
+});
+input.addEventListener("blur", () => setTimeout(() => fecharLookupMenu(document.getElementById("oc-allocation-menu")), 160));
 }
 
 function osDraftStatus(texto, tipo){
@@ -4689,7 +4794,7 @@ const dados = doc.dados || {};
 document.getElementById("historico_oc_title").textContent = `O.C. ${doc.numero || ""}`;
 document.getElementById("historico_oc_meta").textContent = `${doc.data_criacao || "-"} · ${doc.status || "emitido"}`;
 document.getElementById("historico_oc_dados").innerHTML = [
-["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Categoria", dados.oc_categoria || (doc.erp_purchase_order || {}).categoria], ["Destino", dados.destino || (doc.erp_purchase_order || {}).destino], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
+["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Categoria", dados.oc_categoria || (doc.erp_purchase_order || {}).categoria], ["Destino", dados.destino || (doc.erp_purchase_order || {}).destino], ["O.S. / alocação", dados.allocation_reference || (doc.erp_purchase_order || {}).allocation_reference || (dados.allocation_mode === "ESTOQUE" ? "ESTOQUE" : "-")], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
 document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.data_necessidade || dados.previsao || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="8">Sem itens.</td></tr>';
 const editButton = document.getElementById("historico_oc_editar");
@@ -4759,6 +4864,10 @@ const input = form.elements[name];
 });
 if (form.elements.oc_categoria) form.elements.oc_categoria.value = dados.oc_categoria || erpOC.categoria || "GERAL";
 if (form.elements.destino) form.elements.destino.value = dados.destino || erpOC.destino || "";
+const allocationMode = String(dados.allocation_mode || erpOC.allocation_mode || "ESTOQUE").toUpperCase();
+const allocationWorkOrderId = dados.allocation_work_order_id || erpOC.work_order_id || "";
+const allocationReference = dados.allocation_reference || erpOC.allocation_reference || (allocationMode === "ESTOQUE" ? "ESTOQUE" : "");
+definirAlocacaoOC(allocationMode, allocationWorkOrderId, allocationReference, allocationReference);
 const fornecedor = dados.fornecedor || dados.razao_social || "";
 if (form.elements.fornecedor) form.elements.fornecedor.value = fornecedor;
 if (form.elements.fornecedor_busca) form.elements.fornecedor_busca.value = fornecedor;
@@ -5177,6 +5286,23 @@ if (!input.value) input.value = dataPadrao.value;
 }
 formOc.addEventListener("submit", (event) => {
 const savingDraft = event.submitter?.name === "acao" && event.submitter?.value === "salvar";
+const allocationMode = String(formOc.elements.allocation_mode?.value || "").toUpperCase();
+if (!["ESTOQUE", "WORK_ORDER", "AG_CHEGADA"].includes(allocationMode)){
+event.preventDefault();
+window.alert("Selecione obrigatoriamente O.S., ESTOQUE ou AG CHEGADA.");
+document.getElementById("oc-allocation-search")?.focus();
+return;
+}
+if (allocationMode === "AG_CHEGADA"){
+const reference = String(formOc.elements.allocation_reference?.value || formOc.elements.destino?.value || "").trim();
+if (!reference){
+event.preventDefault();
+window.alert("Informe uma referência de O.S., proposta ou chassi para o vínculo futuro.");
+formOc.elements.allocation_reference?.focus();
+return;
+}
+formOc.elements.allocation_reference.value = reference;
+}
 if (!savingDraft && !validatePurchaseRemittanceDates()){
 event.preventDefault();
 return;
@@ -5468,6 +5594,7 @@ cadastroActions.style.display = initialTarget === "tab-cadastro" ? "flex" : "non
 if (document.getElementById("form-oc")){
 calcularTotais();
 aplicarPrefillOC();
+inicializarAlocacaoOC();
 }
 if (document.getElementById("form-os")){
 inicializarPreviewLayoutOS();
@@ -5627,7 +5754,25 @@ salvarRascunhoOS();
 
 <div>
 <label>Destino</label>
-<input name="destino" placeholder="Estoque, O.S., cliente ou setor">
+<input name="destino" placeholder="Estoque, cliente, setor, chassi ou proposta">
+</div>
+
+<div class="oc-allocation-grid" style="grid-column:1 / -1;">
+<div>
+<label for="oc-allocation-search">O.S. / alocação obrigatória</label>
+<input type="hidden" name="allocation_mode" value="">
+<input type="hidden" name="allocation_work_order_id" value="">
+<div class="lookup-field">
+<input id="oc-allocation-search" autocomplete="off" placeholder="Busque O.S., ITEM, chassi ou escolha ESTOQUE / AG CHEGADA">
+<div id="oc-allocation-menu" class="lookup-menu"></div>
+</div>
+<span class="oc-allocation-help">Apenas O.S. ativas/em produção aparecem. AG CHEGADA será conciliada automaticamente pela futura O.S., proposta ou chassi.</span>
+</div>
+<div id="oc-allocation-reference-wrap" class="oc-allocation-reference" hidden>
+<label>Referência para vínculo futuro</label>
+<input name="allocation_reference" placeholder="Ex.: CHASSI TA008976, PROPOSTA 1213.1 ou futura O.S.">
+<span class="oc-allocation-help">Aceita chassi completo ou os 8 últimos caracteres; maiúsculas, espaços e pontuação não interferem.</span>
+</div>
 </div>
 
 </div>
