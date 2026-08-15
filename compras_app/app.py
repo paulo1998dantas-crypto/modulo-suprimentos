@@ -8429,10 +8429,13 @@ def erp_purchase_order_financial_detail_proxy(order_id):
 @erp_feature_required
 @permission_required("suprimentos.work_order.view")
 def erp_work_order_management_screen():
+    requested_view = str(request.args.get("view") or "ACTION").strip().upper()
+    initial_view = requested_view if requested_view in {"ACTION", "AVAILABLE", "ACTIVE", "DONE", "ALL"} else "ACTION"
     return render_template(
         "erp_gestao_os.html",
         mes_url=os.environ.get("ERP_MES_PUBLIC_URL") or os.environ.get("ERP_MES_API_URL", "http://127.0.0.1:8010"),
         current_user=current_user(),
+        initial_view=initial_view,
     )
 
 
