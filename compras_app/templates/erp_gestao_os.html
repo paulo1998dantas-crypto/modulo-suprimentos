@@ -109,6 +109,7 @@
         <label><span>Linha</span><select name="linha"></select></label>
         <label class="span2"><span>Transformação</span><select id="transformation-select"></select></label>
         <label><span>Código do banco</span><input id="bank-code" name="codigo_banco" list="bank-options" autocomplete="off" placeholder="Digite código ou N/A"><datalist id="bank-options"></datalist></label><label class="span2"><span>Conjunto de bancos</span><input id="bank-description" name="conjunto_bancos" readonly placeholder="Preenchido pelo código ativo"></label><label><span>Acessibilidade</span><input name="acessibilidade" list="not-applicable-option"></label><label><span>Lotação</span><input name="lotacao" list="not-applicable-option"></label>
+        <label id="bank-correction-reason-label" class="span4" hidden><span>Motivo da correção do banco</span><input id="bank-correction-reason" name="bank_correction_reason" disabled placeholder="Explique por que o código está sendo corrigido após o encerramento"></label>
 
         <div class="section-title"><strong>Climatização e complementos</strong></div>
         <label id="air-provider-label"><span>Fornecedor do ar</span><select name="ar_condicionado"></select></label>
@@ -125,6 +126,7 @@
       <div class="actions">
         <button id="activate-button" class="btn success" type="button" onclick="openMesConfiguration()" hidden>Salvar e parametrizar no MES</button>
         <button id="technical-close-button" class="btn" type="button" onclick="technicalClose()" hidden>Conclusão técnica</button>
+        <button id="correct-bank-button" class="btn" type="button" onclick="handleBankCorrection()" hidden>Corrigir código do banco</button>
       </div>
       <button id="save-work" class="btn primary" type="submit">Salvar O.S. rascunho</button>
     </footer>
@@ -163,7 +165,7 @@
 </dialog>
 
 <script>
-const state={orders:[],forecasts:[],documents:[],banks:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null,creatingRevision:false,replacementSourceId:null};
+const state={orders:[],forecasts:[],documents:[],banks:[],filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null,creatingRevision:false,replacementSourceId:null,bankCorrectionMode:false};
 const mesBase={{ mes_url|tojson }};
 const workDialog=document.getElementById('work-dialog'),form=document.getElementById('work-form');
 const materialsDialog=document.getElementById('materials-dialog');
@@ -280,7 +282,7 @@ function openWork(entryId,createRevision=false){
   state.creatingRevision=Boolean(createRevision);state.replacementSourceId=createRevision?source.work_order_id:null;
   const workFields=['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','cliente_nome','municipio','uf','tipo_veiculo','linha','transformacao_codigo','transformacao','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'];
   const row=createRevision?{...source,...Object.fromEntries(workFields.map(name=>[name,null])),work_order_id:null,numero_os:String(source.item_number),status:null,technical_status:'ABERTA',forecast_id:null,stage_configuration_status:'PENDENTE'}:source;
-  state.active=row;form.reset();loadCatalogFields();
+  state.active=row;state.bankCorrectionMode=false;form.reset();loadCatalogFields();
   fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
   fill('entry_chassi',row.chassi);fill('entry_marca',row.marca);fill('entry_modelo',row.modelo);fill('entry_versao',row.versao);fill('entry_avarias',row.avarias||'NÃO');fill('entry_cliente_nome',row.entry_client);fill('entry_observacoes',row.entry_notes);
   const directDocument=loadDocumentOptions(row);
@@ -299,6 +301,8 @@ function openWork(entryId,createRevision=false){
   const saveEntryButton=document.getElementById('save-entry');saveEntryButton.hidden=!editable;saveEntryButton.disabled=!editable;
   document.getElementById('activate-button').hidden=!(permissions.manage&&row.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(row.status));
   const technicalButton=document.getElementById('technical-close-button');technicalButton.hidden=!(permissions.technical&&row.work_order_id);technicalButton.disabled=row.technical_status==='CONCLUIDA'||row.status==='CANCELADA';technicalButton.textContent=row.technical_status==='CONCLUIDA'?'Técnica concluída':'Conclusão técnica';
+  const bankCorrectionButton=document.getElementById('correct-bank-button'),bankReasonLabel=document.getElementById('bank-correction-reason-label'),bankReason=document.getElementById('bank-correction-reason');
+  bankReasonLabel.hidden=true;bankReason.disabled=true;bankCorrectionButton.hidden=!(permissions.manage&&row.work_order_id&&!editable);bankCorrectionButton.disabled=false;bankCorrectionButton.textContent='Corrigir código do banco';
   checkMissing();if(!workDialog.open)workDialog.showModal();
 }
 document.getElementById('transformation-select').addEventListener('change',event=>{if(event.target.value!=='__LEGACY__'){fill('transformacao_codigo',event.target.value);fill('transformacao',transformationDescription(event.target.value))}checkMissing()});
@@ -314,6 +318,18 @@ async function saveEntryData(){
   try{await api(`/api/erp/os-management/entries/${encodeURIComponent(entryId)}`,{method:'PUT',body:JSON.stringify(payload)});await loadOrders();if(state.orders.some(item=>item.entry_id===entryId))openWork(entryId);message('Dados físicos da entrada atualizados e auditados. O novo veículo já aparece no MES e na Gestão de O.S.')}catch(error){message(error.message,true)}finally{button.disabled=false}
 }
 async function saveWork(silent=false){const entryId=form.elements.entry_id.value,workId=form.elements.work_order_id.value,payload=workPayload(),wasActive=['ATIVA','EM_PRODUÇÃO'].includes(state.active?.status),wasRevision=state.creatingRevision;const result=workId?await api(`/api/erp/os-management/work-orders/${workId}`,{method:'PUT',body:JSON.stringify(payload)}):await api(`/api/erp/os-management/entries/${entryId}/work-orders`,{method:'POST',body:JSON.stringify(payload)});state.creatingRevision=false;state.replacementSourceId=null;await loadOrders();const row=state.orders.find(item=>item.entry_id===entryId);if(row)openWork(entryId);if(!silent)message(wasRevision?`Nova revisão da O.S. ${result.numero_os||row?.numero_os||''} emitida no mesmo ITEM. A cancelada foi preservada no histórico.`:(wasActive?`Alterações da O.S. ${result.numero_os||row?.numero_os||''} salvas e refletidas no MES.`:`O.S. ${result.numero_os||row?.numero_os||''} emitida e salva. A parametrização das etapas pode ser feita depois no MES.`));return result.id||workId}
+async function handleBankCorrection(){
+  const button=document.getElementById('correct-bank-button'),reasonLabel=document.getElementById('bank-correction-reason-label'),reason=document.getElementById('bank-correction-reason');
+  if(!state.bankCorrectionMode){
+    state.bankCorrectionMode=true;form.elements.codigo_banco.disabled=false;form.elements.conjunto_bancos.disabled=false;reasonLabel.hidden=false;reason.disabled=false;button.textContent='Salvar correção do banco';form.elements.codigo_banco.focus();message('Selecione o banco correto, informe o motivo e confirme. Os demais dados e o status da O.S. permanecerão inalterados.');return;
+  }
+  const workId=form.elements.work_order_id.value,code=String(form.elements.codigo_banco.value||'').trim(),why=String(reason.value||'').trim();if(!workId)return;
+  let description='N/A';if(norm(code)!=='N/A'){const bank=bankByCode(code);if(!bank){message('Selecione um código de banco ativo da lista do Cadastro.',true);form.elements.codigo_banco.focus();return}description=bank.descricao;form.elements.codigo_banco.value=bank.codigo;form.elements.conjunto_bancos.value=description}
+  if(!why){message('Informe o motivo da correção do código do banco.',true);reason.focus();return}
+  if(!confirm(`Confirmar a correção do banco da O.S. ${state.active?.numero_os||''} para ${code}? O status da O.S. não será alterado.`))return;
+  button.disabled=true;
+  try{const result=await api(`/api/erp/os-management/work-orders/${workId}/bank`,{method:'PATCH',body:JSON.stringify({codigo_banco:code,conjunto_bancos:description,motivo:why})});const entryId=form.elements.entry_id.value;await loadOrders();const row=state.orders.find(item=>item.work_order_id===workId)||state.orders.find(item=>item.entry_id===entryId);if(row)openWork(row.entry_id);message(result.replayed?'O código do banco já estava correto. Nenhuma alteração foi necessária.':`Código do banco da O.S. ${result.numero_os||state.active?.numero_os||''} corrigido e auditado. A O.S. permaneceu ${String(result.status||'').replaceAll('_',' ')}.`)}catch(error){message(error.message,true);button.disabled=false}
+}
 form.onsubmit=async event=>{event.preventDefault();try{await saveWork()}catch(error){message(error.message,true)}};
 async function openMesConfiguration(){const missing=checkMissing();if(missing.length){message(`Preencha antes de parametrizar: ${missing.join(', ')}.`,true);form.querySelector('.missing')?.focus();return}const popup=window.open('about:blank','_blank');try{const workId=await saveWork(true);const target=`${mesBase.replace(/\/$/,'')}/gestao-os?work_order_id=${encodeURIComponent(workId)}`;if(popup)popup.location.href=target;else location.href=target;workDialog.close();message('O.S. salva. Defina as etapas no MES e conclua a ativação.')}catch(error){if(popup)popup.close();message(error.message,true)}}
 async function technicalClose(){const workId=form.elements.work_order_id.value;if(!workId||!confirm('Concluir tecnicamente esta O.S.? Isso não finaliza a produção e não movimenta estoque.'))return;try{await api(`/api/erp/os-management/work-orders/${workId}/technical-close`,{method:'POST',body:JSON.stringify({motivo:'Conclusão técnica registrada na Gestão de O.S. em Suprimentos.'})});await loadOrders();const row=state.orders.find(item=>item.work_order_id===workId);if(row)openWork(row.entry_id);message('Conclusão técnica registrada. O relatório do MES exibirá ARQUIVADO = SIM.')}catch(error){message(error.message,true)}}

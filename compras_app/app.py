@@ -8919,6 +8919,41 @@ def erp_work_order_update_proxy(work_id):
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
+@app.route("/api/erp/os-management/work-orders/<work_id>/bank", methods=["PATCH"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_work_order_bank_correction_proxy(work_id):
+    try:
+        payload = dict(request.get_json(silent=True) or {})
+        code = str(payload.get("codigo_banco") or "").strip()
+        reason = str(payload.get("motivo") or payload.get("reason") or "").strip()
+        if not code:
+            raise ValueError("Informe o código do banco ou N/A.")
+        if not reason:
+            raise ValueError("Informe o motivo da correção do código do banco.")
+        if code.upper() == "N/A":
+            payload["codigo_banco"] = "N/A"
+            payload["conjunto_bancos"] = "N/A"
+        else:
+            matches = supabase_catalog.active_bank_sets(code, 100)
+            bank = next(
+                (
+                    item for item in matches
+                    if str(item.get("codigo") or "").strip().upper() == code.upper()
+                ),
+                None,
+            )
+            if not bank:
+                raise ValueError("Selecione um código de banco ativo do Cadastro.")
+            payload["codigo_banco"] = str(bank["codigo"]).strip()
+            payload["conjunto_bancos"] = str(bank["descricao"]).strip()
+        return jsonify(
+            _erp_mes_request(f"work-orders/{work_id}/bank", "PATCH", payload)
+        )
+    except (ValueError, supabase_catalog.SupabaseCatalogError) as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
 @app.route("/api/erp/os-management/work-orders/<work_id>/activate", methods=["POST"])
 @login_required
 @erp_feature_required
