@@ -85,7 +85,8 @@
         <label class="span2"><span>Chassi completo</span><input name="entry_chassi" maxlength="40"></label>
         <label><span>Marca</span><select name="entry_marca"></select></label>
         <label><span>Modelo</span><select name="entry_modelo"></select></label>
-        <label class="span2"><span>Versão</span><select name="entry_versao"></select></label>
+        <label><span>Versão</span><select name="entry_versao"></select></label>
+        <label><span>Modelo Veicular</span><select name="entry_modelo_veicular"><option value="">Não informado</option><option value="PACK">PACK</option><option value="STANDART">STANDART</option><option value="ORIGINAL">ORIGINAL</option></select></label>
         <label><span>Avarias?</span><select name="entry_avarias"><option value="NÃO">NÃO</option><option value="SIM">SIM</option><option value="N/A">N/A</option></select></label>
         <label><span>Cliente da entrada</span><input name="entry_cliente_nome" list="not-applicable-option"></label>
         <label class="span4"><span>Observações da chegada</span><input name="entry_observacoes" list="not-applicable-option"></label>
@@ -284,7 +285,7 @@ function openWork(entryId,createRevision=false){
   const row=createRevision?{...source,...Object.fromEntries(workFields.map(name=>[name,null])),work_order_id:null,numero_os:String(source.item_number),status:null,technical_status:'ABERTA',forecast_id:null,stage_configuration_status:'PENDENTE'}:source;
   state.active=row;state.bankCorrectionMode=false;form.reset();loadCatalogFields();
   fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
-  fill('entry_chassi',row.chassi);fill('entry_marca',row.marca);fill('entry_modelo',row.modelo);fill('entry_versao',row.versao);fill('entry_avarias',row.avarias||'NÃO');fill('entry_cliente_nome',row.entry_client);fill('entry_observacoes',row.entry_notes);
+  fill('entry_chassi',row.chassi);fill('entry_marca',row.marca);fill('entry_modelo',row.modelo);fill('entry_versao',row.versao);fill('entry_modelo_veicular',row.modelo_veicular);fill('entry_avarias',row.avarias||'NÃO');fill('entry_cliente_nome',row.entry_client);fill('entry_observacoes',row.entry_notes);
   const directDocument=loadDocumentOptions(row);
   loadForecastOptions(row.forecast_id||'');
   ['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','cliente_nome','municipio','uf','tipo_veiculo','linha','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'].forEach(name=>fill(name,name.startsWith('data_')?onlyDate(row[name]):row[name]));syncBankDescription(true);
@@ -313,7 +314,7 @@ document.getElementById('document-select').addEventListener('change',event=>{con
 function workPayload(){const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;const workId=data.work_order_id;delete data.work_order_id;Object.keys(data).filter(key=>key.startsWith('entry_')).forEach(key=>delete data[key]);if(workId)delete data.forecast_id;if(state.creatingRevision){data.create_replacement=true;data.supersedes_work_order_id=state.replacementSourceId}const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}const bankCode=String(data.codigo_banco||'').trim();if(bankCode&&norm(bankCode)!=='N/A'){const bank=bankByCode(bankCode),legacyUnchanged=norm(bankCode)===norm(state.active?.codigo_banco);if(!bank&&!legacyUnchanged)throw new Error('Selecione um código de banco ativo da lista do Cadastro.');if(bank){data.codigo_banco=bank.codigo;data.conjunto_bancos=bank.descricao}}Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
 async function saveEntryData(){
   const entryId=form.elements.entry_id.value;if(!entryId||!permissions.manage)return;
-  const payload={chassi:form.elements.entry_chassi.value,marca:form.elements.entry_marca.value,modelo:form.elements.entry_modelo.value,versao:form.elements.entry_versao.value,avarias:form.elements.entry_avarias.value,cliente_nome:form.elements.entry_cliente_nome.value,observacoes:form.elements.entry_observacoes.value};
+  const payload={chassi:form.elements.entry_chassi.value,marca:form.elements.entry_marca.value,modelo:form.elements.entry_modelo.value,versao:form.elements.entry_versao.value,modelo_veicular:form.elements.entry_modelo_veicular.value,avarias:form.elements.entry_avarias.value,cliente_nome:form.elements.entry_cliente_nome.value,observacoes:form.elements.entry_observacoes.value};
   const button=document.getElementById('save-entry');button.disabled=true;
   try{await api(`/api/erp/os-management/entries/${encodeURIComponent(entryId)}`,{method:'PUT',body:JSON.stringify(payload)});await loadOrders();if(state.orders.some(item=>item.entry_id===entryId))openWork(entryId);message('Dados físicos da entrada atualizados e auditados. O novo veículo já aparece no MES e na Gestão de O.S.')}catch(error){message(error.message,true)}finally{button.disabled=false}
 }
