@@ -19,6 +19,16 @@ class WorkOrderInitialViewContractTest(unittest.TestCase):
         self.assertIn("initial_view == 'ACTIVE'", template)
         self.assertIn("value='{{ initial_view }}'", template)
 
+    def test_main_save_persists_entry_before_work_order_without_reopening_dialog(self):
+        template = TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn("async function persistEntry()", template)
+        self.assertIn("await persistEntry();const result=workId?await api", template)
+        save_entry = template.split("async function saveEntryData(){", 1)[1].split(
+            "async function saveWork", 1
+        )[0]
+        self.assertNotIn("await loadOrders()", save_entry)
+        self.assertNotIn("openWork(entryId)", save_entry)
+
 
 if __name__ == "__main__":
     unittest.main()
