@@ -29,6 +29,13 @@ class WorkOrderInitialViewContractTest(unittest.TestCase):
         self.assertNotIn("await loadOrders()", save_entry)
         self.assertNotIn("openWork(entryId)", save_entry)
 
+    def test_client_is_edited_only_in_vehicle_entry(self):
+        template = TEMPLATE.read_text(encoding="utf-8")
+        self.assertEqual(1, template.count('name="entry_cliente_nome"'))
+        self.assertNotIn('name="cliente_nome"', template)
+        self.assertIn("delete data.cliente_nome", template)
+        self.assertIn("O cliente é definido exclusivamente nos dados da entrada", template)
+
 
 if __name__ == "__main__":
     unittest.main()
