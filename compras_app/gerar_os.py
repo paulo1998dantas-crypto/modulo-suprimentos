@@ -12,7 +12,7 @@ from docx.oxml.ns import qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches
 
-from composicao import resolver_composicao_final
+from composicao import normalizar_componentes, resolver_composicao_final
 from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 
@@ -274,6 +274,31 @@ def _preencher_tabela_componentes(tabela, composicao):
         _set_cell_text(row[3], comp.get("unidade", ""))
         for cell in row:
             _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
+
+
+def _resumir_composicao_os_completa(composicao, componentes):
+    """Mantém conjuntos aninhados como uma única linha na O.S. completa."""
+    codigos_com_bom = set(normalizar_componentes(componentes))
+    resultado = []
+    nivel_conjunto = None
+
+    for comp in composicao or []:
+        try:
+            level = int(comp.get("level", 0) or 0)
+        except (TypeError, ValueError):
+            level = 0
+
+        if nivel_conjunto is not None:
+            if level > nivel_conjunto:
+                continue
+            nivel_conjunto = None
+
+        resultado.append(comp)
+        codigo = str(comp.get("codigo", "") or "").split(" - ", 1)[0].strip()
+        if codigo in codigos_com_bom:
+            nivel_conjunto = level
+
+    return resultado
 
 
 def _preencher_tabela_processo(tabela, linhas):
@@ -618,7 +643,12 @@ def gerar_os_docx(
         processos_exibicao = {nome: [] for nome in processos.keys()}
 
     if not ocultar_composicao and refs.get("composicao") is not None:
-        _preencher_tabela_componentes(doc.tables[refs["composicao"]], composicao_final)
+        composicao_exibicao = (
+            _resumir_composicao_os_completa(composicao_final, componentes)
+            if modo == "completa"
+            else composicao_final
+        )
+        _preencher_tabela_componentes(doc.tables[refs["composicao"]], composicao_exibicao)
 
     if ocultar_composicao and refs.get("composicao") is not None:
         _remover_tabela(doc, doc.tables[refs["composicao"]])
