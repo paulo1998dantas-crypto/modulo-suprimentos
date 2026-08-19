@@ -189,6 +189,27 @@ class ForecastDataTests(unittest.TestCase):
 
         clear_cache.assert_not_called()
 
+    def test_protected_forecast_deletion_returns_business_error(self):
+        database_error = supabase_data.SupabaseDataError(
+            'Erro Supabase 500: {"code":"55000","message":"Este Forecast ja foi convertido em entrada/O.S. e nao pode ser excluido."}'
+        )
+        with (
+            patch.object(supabase_data, "_rpc", side_effect=database_error),
+            patch.object(supabase_data, "clear_cache") as clear_cache,
+        ):
+            with self.assertRaisesRegex(ValueError, "ja foi convertido"):
+                supabase_data.excluir_forecast_sem_historico("fct-1", "pcp")
+
+        clear_cache.assert_not_called()
+
+    def test_forecast_deletion_infrastructure_error_is_not_exposed_as_business_error(self):
+        database_error = supabase_data.SupabaseDataError(
+            'Erro Supabase 404: {"code":"PGRST202","message":"Could not find the function"}'
+        )
+        with patch.object(supabase_data, "_rpc", side_effect=database_error):
+            with self.assertRaises(supabase_data.SupabaseDataError):
+                supabase_data.excluir_forecast_sem_historico("fct-1", "pcp")
+
 
 if __name__ == "__main__":
     unittest.main()

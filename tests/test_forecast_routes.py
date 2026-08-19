@@ -62,6 +62,24 @@ class ForecastRouteTests(unittest.TestCase):
         self.assertTrue(response.get_json()["result"]["excluido"])
         delete_forecast.assert_called_once_with("fct-1", "local", 4)
 
+    def test_forecast_delete_exposes_protected_history_rule(self):
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(app_module, "can", return_value=True),
+            patch.object(
+                app_module.supabase_data,
+                "excluir_forecast_sem_historico",
+                side_effect=ValueError(
+                    "Este Forecast ja foi convertido em entrada/O.S. e nao pode ser excluido."
+                ),
+            ),
+        ):
+            response = self.client.delete("/api/erp/forecasts/fct-1", json={"version": 4})
+
+        self.assertEqual(400, response.status_code)
+        self.assertIn("ja foi convertido", response.get_json()["error"])
+
 
 if __name__ == "__main__":
     unittest.main()

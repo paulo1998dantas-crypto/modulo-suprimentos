@@ -53,6 +53,21 @@ class SupabaseDataError(RuntimeError):
     pass
 
 
+def _supabase_error_message(exc):
+    """Extract the PostgreSQL/PostgREST message without exposing transport details."""
+    raw = str(exc or "")
+    payload_start = raw.find("{")
+    if payload_start < 0:
+        return ""
+    try:
+        payload = json.loads(raw[payload_start:])
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return ""
+    if not isinstance(payload, dict):
+        return ""
+    return _clean(payload.get("message"))
+
+
 ROLE_PERMISSION_FALLBACKS = {
     "OPERADOR": {
         "estoque.inspection.receive",
@@ -1510,18 +1525,30 @@ def excluir_forecast_sem_historico(forecast_id, actor, expected_version=None):
     cliente poderia deixar o Forecast incompleto se outro usuario o
     convertesse entre uma chamada e outra.
     """
-    result = _rpc(
-        "suprimentos_excluir_forecast_sem_historico",
-        {
-            "p_forecast_id": _clean(forecast_id),
-            "p_expected_version": (
-                int(expected_version)
-                if expected_version not in (None, "")
-                else None
-            ),
-            "p_actor": _clean(actor),
-        },
-    )
+    try:
+        result = _rpc(
+            "suprimentos_excluir_forecast_sem_historico",
+            {
+                "p_forecast_id": _clean(forecast_id),
+                "p_expected_version": (
+                    int(expected_version)
+                    if expected_version not in (None, "")
+                    else None
+                ),
+                "p_actor": _clean(actor),
+            },
+        )
+    except SupabaseDataError as exc:
+        message = _supabase_error_message(exc)
+        business_prefixes = (
+            "Forecast nao encontrado",
+            "O Forecast foi alterado por outro usuario",
+            "Este Forecast ja foi convertido",
+            "Este Forecast ja possui O.S. documental vinculada",
+        )
+        if message and message.startswith(business_prefixes):
+            raise ValueError(message) from exc
+        raise
     if not isinstance(result, dict) or not result.get("excluido"):
         raise SupabaseDataError("O Supabase nao confirmou a exclusao do Forecast.")
     clear_cache()
