@@ -8954,6 +8954,51 @@ def erp_work_order_bank_correction_proxy(work_id):
     except (ValueError, supabase_catalog.SupabaseCatalogError) as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
+
+@app.route(
+    "/api/erp/os-management/work-orders/<work_id>/historical-correction",
+    methods=["PATCH"],
+)
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_work_order_historical_correction_proxy(work_id):
+    try:
+        payload = dict(request.get_json(silent=True) or {})
+        reason = str(payload.get("motivo") or payload.get("reason") or "").strip()
+        if not reason:
+            raise ValueError("Informe o motivo da correção histórica da O.S.")
+        work_payload = dict(payload.get("work_order") or {})
+        original_code = str(payload.pop("original_codigo_banco", "") or "").strip()
+        code = str(work_payload.get("codigo_banco") or "").strip()
+        if code and code.upper() != original_code.upper():
+            if code.upper() == "N/A":
+                work_payload["codigo_banco"] = "N/A"
+                work_payload["conjunto_bancos"] = "N/A"
+            else:
+                matches = supabase_catalog.active_bank_sets(code, 100)
+                bank = next(
+                    (
+                        item for item in matches
+                        if str(item.get("codigo") or "").strip().upper() == code.upper()
+                    ),
+                    None,
+                )
+                if not bank:
+                    raise ValueError("Selecione um código de banco ativo do Cadastro.")
+                work_payload["codigo_banco"] = str(bank["codigo"]).strip()
+                work_payload["conjunto_bancos"] = str(bank["descricao"]).strip()
+        payload["work_order"] = work_payload
+        return jsonify(
+            _erp_mes_request(
+                f"work-orders/{work_id}/historical-correction",
+                "PATCH",
+                payload,
+            )
+        )
+    except (ValueError, supabase_catalog.SupabaseCatalogError) as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
 @app.route("/api/erp/os-management/work-orders/<work_id>/activate", methods=["POST"])
 @login_required
 @erp_feature_required

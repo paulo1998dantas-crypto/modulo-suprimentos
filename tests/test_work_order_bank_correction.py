@@ -21,15 +21,28 @@ class WorkOrderBankCorrectionContractTests(unittest.TestCase):
             source,
         )
 
-    def test_closed_order_ui_edits_only_bank_and_requires_reason(self):
+    def test_backend_proxies_the_audited_historical_correction(self):
+        source = APP.read_text(encoding="utf-8")
+        self.assertIn(
+            '"/api/erp/os-management/work-orders/<work_id>/historical-correction"',
+            source,
+        )
+        self.assertIn('@permission_required("suprimentos.work_order.manage")', source)
+        self.assertIn("Informe o motivo da correção histórica da O.S.", source)
+        self.assertIn(
+            'f"work-orders/{work_id}/historical-correction"',
+            source,
+        )
+
+    def test_closed_order_ui_enables_historical_fields_and_requires_reason(self):
         template = TEMPLATE.read_text(encoding="utf-8")
-        self.assertIn('id="correct-bank-button"', template)
-        self.assertIn('id="bank-correction-reason"', template)
+        self.assertIn('id="correct-historical-button"', template)
+        self.assertIn('id="historical-correction-reason"', template)
         self.assertIn("!editable", template)
-        self.assertIn("form.elements.codigo_banco.disabled=false", template)
-        self.assertIn("form.elements.conjunto_bancos.disabled=false", template)
-        self.assertIn("motivo:why", template)
-        self.assertIn("O status da O.S. não será alterado", template)
+        self.assertIn("historicalEntryPayload()", template)
+        self.assertIn("status, etapas, apontamentos, finalização, entrega", template.lower())
+        self.assertIn("work_order:work,entry,motivo:why", template)
+        self.assertIn("/historical-correction", template)
 
 
 if __name__ == "__main__":
