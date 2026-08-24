@@ -87,6 +87,7 @@ from os_setores import (
     construir_itens_os_expedicao,
     construir_itens_os_preparacao,
     construir_itens_os_setor,
+    eh_faturamento_direto,
     enriquecer_composicao,
     filtrar_linhas_faturamento_direto,
     filtrar_linhas_preparacao,
@@ -1696,10 +1697,7 @@ def _parse_numero_form(valor, default=0.0):
 
 
 def _eh_faturamento_direto(descricao):
-    texto = _corrigir_mojibake(descricao)
-    texto = unicodedata.normalize("NFKD", str(texto or "").strip().upper())
-    texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
-    return texto.startswith("FATURAMENTO DIRETO")
+    return eh_faturamento_direto(_corrigir_mojibake(descricao))
 
 
 def _categoria_ar_condicionado(categoria):

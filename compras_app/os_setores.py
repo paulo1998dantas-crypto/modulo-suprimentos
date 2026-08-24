@@ -1,3 +1,4 @@
+import re
 import unicodedata
 
 from composicao import normalizar_codigo, parse_quantidade
@@ -20,6 +21,19 @@ def normalizar_texto(valor):
     texto = unicodedata.normalize("NFKD", texto)
     texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
     return " ".join(texto.replace("_", " ").split())
+
+
+def eh_faturamento_direto(*valores):
+    """Reconhece o conceito por nome completo ou pela sigla operacional F.D."""
+    for valor in valores:
+        tokens = re.findall(r"[A-Z0-9]+", normalizar_texto(valor))
+        for indice, token in enumerate(tokens):
+            proximo = tokens[indice + 1] if indice + 1 < len(tokens) else ""
+            if (token, proximo) in {("FATURAMENTO", "DIRETO"), ("F", "D")}:
+                return True
+            if token == "FD":
+                return True
+    return False
 
 
 def _eh_cj_teto(codigo, grupo, descricao):
@@ -58,12 +72,15 @@ def classificar_item(item_info):
 
 
 def classificar_tipo_requisicao(item_info, descricao=""):
-    referencia = normalizar_texto(
-        descricao
-        or (item_info or {}).get("descricao", "")
-        or ""
-    )
-    if "FATURAMENTO DIRETO" in referencia:
+    item_info = item_info or {}
+    if eh_faturamento_direto(
+        descricao,
+        item_info.get("descricao", ""),
+        item_info.get("categoria", ""),
+        item_info.get("grupo", ""),
+        item_info.get("tipo_requisicao", ""),
+        item_info.get("setor", ""),
+    ):
         return TIPO_REQUISICAO_FATURAMENTO_DIRETO
     return TIPO_REQUISICAO_MATERIAL
 

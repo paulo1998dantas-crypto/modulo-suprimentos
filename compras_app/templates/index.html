@@ -1639,9 +1639,24 @@ const componentes = codigoNorm ? osComponentes[codigoNorm] : null;
 return Array.isArray(componentes) && componentes.length ? componentes : null;
 }
 
+function isTextoFaturamentoDiretoOS(valor){
+const tokens = normalizarBusca(valor).match(/[a-z0-9]+/g) || [];
+for (let indice = 0; indice < tokens.length; indice += 1){
+const atual = tokens[indice];
+const proximo = tokens[indice + 1] || "";
+if ((atual === "faturamento" && proximo === "direto") || (atual === "f" && proximo === "d") || atual === "fd"){
+return true;
+}
+}
+return false;
+}
+
 function isFaturamentoDiretoOS(produto){
-const descricao = normalizarBusca((produto && (produto.descricao || produto.nome)) || "");
-return descricao.startsWith("faturamento direto");
+if (!produto){
+return false;
+}
+return [produto.descricao, produto.nome, produto.categoria, produto.grupo, produto.tipo_requisicao, produto.setor]
+.some(isTextoFaturamentoDiretoOS);
 }
 
 function isCategoriaArCondicionadoOS(produto){
@@ -3615,7 +3630,13 @@ const categoria = normalizarBusca(comp.categoria || produto.categoria || "");
 const grupo = normalizarBusca(comp.grupo || produto.grupo || "");
 const referencia = `${categoria} ${grupo} ${descricao}`;
 const ppOuCj = ["20", "30"].includes(codigo.slice(0, 2)) || grupo.includes("produto em processo") || grupo.includes("conjunto") || grupo.includes("kit");
-if (referencia.includes("faturamento direto")){
+if (isFaturamentoDiretoOS({
+descricao: comp.descricao || produto.descricao || produto.nome || "",
+categoria: comp.categoria || produto.categoria || "",
+grupo: comp.grupo || produto.grupo || "",
+tipo_requisicao: comp.tipo_requisicao || produto.tipo_requisicao || "",
+setor: comp.setor || produto.setor || ""
+})){
 return "F.D";
 }
 if (referencia.includes("trilho") || referencia.includes("reforco") || referencia.includes("isolamento")){

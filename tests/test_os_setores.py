@@ -5,7 +5,12 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "compras_app"))
 
 from os_setores import (
+    SETOR_FATURAMENTO_DIRETO,
+    TIPO_REQUISICAO_FATURAMENTO_DIRETO,
+    classificar_tipo_requisicao,
+    eh_faturamento_direto,
     enriquecer_composicao,
+    filtrar_linhas_faturamento_direto,
     filtrar_linhas_preparacao,
     linhas_layout_preparacao,
     propagar_setor_preparacao,
@@ -13,6 +18,57 @@ from os_setores import (
 
 
 class PreparacaoFilterTests(unittest.TestCase):
+    def test_faturamento_direto_aceita_nome_completo_e_sigla(self):
+        casos_validos = (
+            "FATURAMENTO DIRETO - AR CONDICIONADO - CLIM",
+            "F.D. AR CONDICIONADO - GE",
+            "f d - ar quente",
+            "ACESSORIO FD CAMERA",
+        )
+        for descricao in casos_validos:
+            with self.subTest(descricao=descricao):
+                self.assertTrue(eh_faturamento_direto(descricao))
+                self.assertEqual(
+                    TIPO_REQUISICAO_FATURAMENTO_DIRETO,
+                    classificar_tipo_requisicao({"descricao": descricao}),
+                )
+
+        self.assertFalse(eh_faturamento_direto("PERFIL DOBRADO PARA ACABAMENTO"))
+
+    def test_faturamento_direto_fd_vai_para_requisicao_por_fornecedor(self):
+        linhas = enriquecer_composicao(
+            [
+                {
+                    "item": "40340049",
+                    "codigo": "10100001",
+                    "descricao": "F.D. AR CONDICIONADO COMPLEMENTO SALAO - CLIM",
+                    "qtd": 1,
+                },
+                {
+                    "item": "40340049",
+                    "codigo": "10100002",
+                    "descricao": "F.D. AR CONDICIONADO COMPLEMENTO SALAO - GE",
+                    "qtd": 1,
+                },
+            ],
+            {
+                "10100001": {
+                    "descricao": "F.D. AR CONDICIONADO COMPLEMENTO SALAO - CLIM",
+                    "categoria": "10 - AR CONDICIONADO",
+                    "fornecedor": "CLIM",
+                },
+                "10100002": {
+                    "descricao": "F.D. AR CONDICIONADO COMPLEMENTO SALAO - GE",
+                    "categoria": "10 - AR CONDICIONADO",
+                    "fornecedor": "GE",
+                },
+            },
+        )
+
+        faturamento = filtrar_linhas_faturamento_direto(linhas)
+        self.assertEqual(["10100001", "10100002"], [linha["codigo"] for linha in faturamento])
+        self.assertTrue(all(linha["setor"] == SETOR_FATURAMENTO_DIRETO for linha in faturamento))
+
     def test_preparacao_restringe_a_trilho_piso_reforco_e_cj_bancos(self):
         catalogo = {
             "30240032": {

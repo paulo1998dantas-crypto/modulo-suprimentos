@@ -22,6 +22,29 @@ import supabase_data
 
 
 class DocumentManagementTests(unittest.TestCase):
+    def test_direct_billing_aliases_are_recognized_without_false_positive(self):
+        self.assertTrue(app_module._eh_faturamento_direto("FATURAMENTO DIRETO - INSTALACAO"))
+        self.assertTrue(app_module._eh_faturamento_direto("F.D. AR CONDICIONADO - CLIM"))
+        self.assertTrue(app_module._eh_faturamento_direto("ACESSORIO FD CAMERA"))
+        self.assertFalse(app_module._eh_faturamento_direto("PERFIL DOBRADO PARA ACABAMENTO"))
+
+    def test_direct_billing_alias_preserves_climauto_and_grupo_euro_routing(self):
+        categoria = "10 - AR CONDICIONADO"
+        self.assertEqual(
+            "CLIM",
+            app_module._fornecedor_faturamento_direto(
+                "F.D. AR CONDICIONADO COMPLEMENTO SALAO - CLIMAUTO",
+                categoria,
+            ),
+        )
+        self.assertEqual(
+            "GE",
+            app_module._fornecedor_faturamento_direto(
+                "F.D. AR CONDICIONADO COMPLEMENTO SALAO - GRUPO EURO",
+                categoria,
+            ),
+        )
+
     def test_reissue_preserves_direct_billing_supplier_from_history(self):
         previous_document = {
             "itens": [
