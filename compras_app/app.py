@@ -8800,6 +8800,80 @@ def erp_work_order_bank_catalog():
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+def _split_work_order_bank_codes(value):
+    """Split the canonical multi-bank field without splitting descriptions such as E/S/J."""
+    raw = str(value or "").strip()
+    if not raw:
+        return []
+    parts = re.split(r"\s+/\s+|[;\r\n]+", raw)
+    result = []
+    seen = set()
+    for part in parts:
+        code = str(part or "").strip()
+        normalized = code.upper()
+        if code and normalized not in seen:
+            result.append(code)
+            seen.add(normalized)
+    return result
+
+
+def _normalize_work_order_banks(
+    payload, *, original_code="", original_description=""
+):
+    """Validate all selected banks and rebuild their descriptions from Cadastro."""
+    # Partial API clients that do not send the bank field must not clear or
+    # rewrite the current relationship.
+    if "codigo_banco" not in payload:
+        return payload
+    codes = _split_work_order_bank_codes(payload.get("codigo_banco"))
+    if not codes:
+        payload["codigo_banco"] = ""
+        payload["conjunto_bancos"] = ""
+        return payload
+
+    has_not_applicable = any(code.upper() == "N/A" for code in codes)
+    if has_not_applicable:
+        if len(codes) != 1:
+            raise ValueError("N/A não pode ser combinado com códigos de bancos.")
+        payload["codigo_banco"] = "N/A"
+        payload["conjunto_bancos"] = "N/A"
+        return payload
+
+    catalog = supabase_catalog.active_bank_sets("", 1000)
+    by_code = {
+        str(item.get("codigo") or "").strip().upper(): item
+        for item in catalog
+        if str(item.get("codigo") or "").strip()
+    }
+    missing = [code for code in codes if code.upper() not in by_code]
+    canonical_code = " / ".join(codes)
+    unchanged_legacy = (
+        missing
+        and str(original_code or "").strip()
+        and canonical_code.upper() == str(original_code or "").strip().upper()
+    )
+    if missing and not unchanged_legacy:
+        raise ValueError(
+            "Selecione apenas códigos de bancos ativos do Cadastro. "
+            f"Não localizado(s): {', '.join(missing)}."
+        )
+    if unchanged_legacy:
+        payload["codigo_banco"] = str(original_code).strip()
+        payload["conjunto_bancos"] = str(
+            payload.get("conjunto_bancos") or original_description or ""
+        ).strip()
+        return payload
+
+    selected = [by_code[code.upper()] for code in codes]
+    payload["codigo_banco"] = " / ".join(
+        str(item.get("codigo") or "").strip() for item in selected
+    )
+    payload["conjunto_bancos"] = " / ".join(
+        str(item.get("descricao") or "").strip() for item in selected
+    )
+    return payload
+
+
 @app.route("/api/erp/os-management/documents")
 @login_required
 @erp_feature_required
@@ -8892,13 +8966,14 @@ def erp_vehicle_entry_update_proxy(entry_id):
 def erp_work_order_create_proxy(entry_id):
     try:
         payload = dict(request.get_json(silent=True) or {})
+        _normalize_work_order_banks(payload)
         documento_id = str(payload.pop("document_id", "") or "").strip()
         if documento_id:
             _validar_documento_os_para_vinculo(documento_id)
             payload["documento_os_id"] = _documento_os_id_bigint(documento_id)
         resultado = _erp_mes_request(f"vehicle-entries/{entry_id}/work-orders", "POST", payload)
         return jsonify(resultado), 201
-    except ValueError as exc:
+    except (ValueError, supabase_catalog.SupabaseCatalogError) as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 @app.route("/api/erp/os-management/work-orders/<work_id>", methods=["PUT"])
@@ -8908,13 +8983,22 @@ def erp_work_order_create_proxy(entry_id):
 def erp_work_order_update_proxy(work_id):
     try:
         payload = dict(request.get_json(silent=True) or {})
+        original_code = str(payload.pop("original_codigo_banco", "") or "").strip()
+        original_description = str(
+            payload.pop("original_conjunto_bancos", "") or ""
+        ).strip()
+        _normalize_work_order_banks(
+            payload,
+            original_code=original_code,
+            original_description=original_description,
+        )
         documento_id = str(payload.pop("document_id", "") or "").strip()
         if documento_id:
             _validar_documento_os_para_vinculo(documento_id, work_id)
             payload["documento_os_id"] = _documento_os_id_bigint(documento_id)
         resultado = _erp_mes_request(f"work-orders/{work_id}", "PUT", payload)
         return jsonify(resultado)
-    except ValueError as exc:
+    except (ValueError, supabase_catalog.SupabaseCatalogError) as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 @app.route("/api/erp/os-management/work-orders/<work_id>/bank", methods=["PATCH"])
@@ -8930,22 +9014,7 @@ def erp_work_order_bank_correction_proxy(work_id):
             raise ValueError("Informe o código do banco ou N/A.")
         if not reason:
             raise ValueError("Informe o motivo da correção do código do banco.")
-        if code.upper() == "N/A":
-            payload["codigo_banco"] = "N/A"
-            payload["conjunto_bancos"] = "N/A"
-        else:
-            matches = supabase_catalog.active_bank_sets(code, 100)
-            bank = next(
-                (
-                    item for item in matches
-                    if str(item.get("codigo") or "").strip().upper() == code.upper()
-                ),
-                None,
-            )
-            if not bank:
-                raise ValueError("Selecione um código de banco ativo do Cadastro.")
-            payload["codigo_banco"] = str(bank["codigo"]).strip()
-            payload["conjunto_bancos"] = str(bank["descricao"]).strip()
+        _normalize_work_order_banks(payload)
         return jsonify(
             _erp_mes_request(f"work-orders/{work_id}/bank", "PATCH", payload)
         )
@@ -8968,24 +9037,16 @@ def erp_work_order_historical_correction_proxy(work_id):
             raise ValueError("Informe o motivo da correção histórica da O.S.")
         work_payload = dict(payload.get("work_order") or {})
         original_code = str(payload.pop("original_codigo_banco", "") or "").strip()
+        original_description = str(
+            payload.pop("original_conjunto_bancos", "") or ""
+        ).strip()
         code = str(work_payload.get("codigo_banco") or "").strip()
-        if code and code.upper() != original_code.upper():
-            if code.upper() == "N/A":
-                work_payload["codigo_banco"] = "N/A"
-                work_payload["conjunto_bancos"] = "N/A"
-            else:
-                matches = supabase_catalog.active_bank_sets(code, 100)
-                bank = next(
-                    (
-                        item for item in matches
-                        if str(item.get("codigo") or "").strip().upper() == code.upper()
-                    ),
-                    None,
-                )
-                if not bank:
-                    raise ValueError("Selecione um código de banco ativo do Cadastro.")
-                work_payload["codigo_banco"] = str(bank["codigo"]).strip()
-                work_payload["conjunto_bancos"] = str(bank["descricao"]).strip()
+        if code:
+            _normalize_work_order_banks(
+                work_payload,
+                original_code=original_code,
+                original_description=original_description,
+            )
         payload["work_order"] = work_payload
         return jsonify(
             _erp_mes_request(
