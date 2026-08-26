@@ -16,6 +16,7 @@ from app import (  # noqa: E402
     POPUP_ITEM_NAO_APLICAVEL,
     SuprimentosRequest,
     _parse_os_composition_form,
+    _realinhar_valores_linha_por_codigo,
     _resolver_nome_cliente_os,
     _resolver_selecoes_popup_item,
     app,
@@ -24,6 +25,46 @@ from flask import request  # noqa: E402
 
 
 class OsRequestPayloadTests(unittest.TestCase):
+    def test_forecast_realigns_related_item_selections_by_sku(self):
+        selecao_40340025 = json.dumps(
+            [{"regra_id": "regra-25", "codigo": "30140032", "qtd": 1}]
+        )
+
+        realinhados = _realinhar_valores_linha_por_codigo(
+            ["99999999", "40340025"],
+            ["[]", selecao_40340025],
+            ["40340025", "88888888"],
+            "[]",
+        )
+
+        self.assertEqual(selecao_40340025, realinhados[0])
+        self.assertEqual("[]", realinhados[1])
+        resolvidas, erro = _resolver_selecoes_popup_item(
+            "40340025",
+            json.loads(realinhados[0]),
+            {
+                "40340025": [
+                    {
+                        "id": "regra-25",
+                        "gatilho": "40340025",
+                        "opcoes": ["30140032", "30140034"],
+                    }
+                ]
+            },
+        )
+        self.assertEqual("", erro)
+        self.assertEqual("30140032", resolvidas[0]["codigo"])
+
+    def test_forecast_realigns_repeated_skus_in_original_order(self):
+        realinhados = _realinhar_valores_linha_por_codigo(
+            ["40340025", "40340025"],
+            ["primeira", "segunda"],
+            ["40340025", "40340025", "40340025"],
+            "vazio",
+        )
+
+        self.assertEqual(["primeira", "segunda", "vazio"], realinhados)
+
     def test_resolves_customer_key_to_name_before_generating_documents(self):
         clientes = {
             "12.345.678/0001-90": {

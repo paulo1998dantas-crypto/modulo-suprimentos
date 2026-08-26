@@ -1582,6 +1582,23 @@ def _resolver_selecoes_popup_item(codigo_raiz, selecoes, regras_por_gatilho, com
     return resolvidas, erro
 
 
+def _realinhar_valores_linha_por_codigo(codigos_origem, valores_origem, codigos_destino, padrao=""):
+    """Preserva dados auxiliares das linhas quando o Forecast recompõe os itens."""
+    valores_por_codigo = {}
+    for indice, codigo in enumerate(codigos_origem or []):
+        codigo_normalizado = normalizar_codigo(codigo)
+        if not codigo_normalizado:
+            continue
+        valor = valores_origem[indice] if indice < len(valores_origem or []) else padrao
+        valores_por_codigo.setdefault(codigo_normalizado, []).append(valor)
+
+    realinhados = []
+    for codigo in codigos_destino or []:
+        fila = valores_por_codigo.get(normalizar_codigo(codigo)) or []
+        realinhados.append(fila.pop(0) if fila else padrao)
+    return realinhados
+
+
 def carregar_os_processos():
     if supabase_data.enabled():
         try:
@@ -6388,6 +6405,11 @@ def gerar_os():
         itens_forecast = forecast.get("itens_planejados") or []
         if not itens_forecast:
             return "O Forecast nao possui SKUs planejados. Complete o Forecast antes de gerar a O.S.", 400
+        codigos_enviados = list(codigos)
+        fornecedores_enviados = list(fornecedores_linha)
+        luminarias_enviadas = list(luminarias_linha)
+        luminarias_qtd_enviadas = list(luminarias_qtd_linha)
+        popup_itens_enviados = list(popup_itens_linha)
         codigos = [str(item.get("sku_codigo") or "").strip() for item in itens_forecast]
         qtds = [
             str(_parse_numero_form(item.get("quantidade_por_veiculo"), 0) * forecast_quantidade)
@@ -6396,10 +6418,22 @@ def gerar_os():
         series = [""] * len(codigos)
         unidades = [str(item.get("unidade") or "").strip() for item in itens_forecast]
         descricoes = [str(item.get("descricao") or "").strip() for item in itens_forecast]
-        fornecedores_linha = [""] * len(codigos)
-        luminarias_linha = [""] * len(codigos)
-        luminarias_qtd_linha = [""] * len(codigos)
-        popup_itens_linha = ["[]"] * len(codigos)
+        # Os SKUs e as quantidades continuam vindo do Forecast (fonte de verdade),
+        # mas escolhas feitas pelo usuario nos popups pertencem a cada SKU. Antes
+        # esta etapa zerava essas escolhas e o backend recusava a O.S. mesmo depois
+        # de o usuario selecionar corretamente o item relacionado.
+        fornecedores_linha = _realinhar_valores_linha_por_codigo(
+            codigos_enviados, fornecedores_enviados, codigos, ""
+        )
+        luminarias_linha = _realinhar_valores_linha_por_codigo(
+            codigos_enviados, luminarias_enviadas, codigos, ""
+        )
+        luminarias_qtd_linha = _realinhar_valores_linha_por_codigo(
+            codigos_enviados, luminarias_qtd_enviadas, codigos, ""
+        )
+        popup_itens_linha = _realinhar_valores_linha_por_codigo(
+            codigos_enviados, popup_itens_enviados, codigos, "[]"
+        )
         line_ids = [""] * len(codigos)
     luminarias_extra = []
     popup_itens_extra = []
