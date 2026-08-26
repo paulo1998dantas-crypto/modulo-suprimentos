@@ -1449,12 +1449,12 @@ def cancelar_consumo_forecast_em_os_documento(documento_os_id, actor="", motivo=
     return result
 
 
-def buscar_skus_forecast(query="", limit=30):
+def buscar_skus_forecast(query="", limit=100):
     term = _clean(query).upper()
     try:
         bounded_limit = max(1, min(int(limit), 100))
     except (TypeError, ValueError):
-        bounded_limit = 30
+        bounded_limit = 100
     filters = [("select", "id,sku,descricao,unidade"), ("active", "is.true"), ("order", "sku.asc"), ("limit", str(bounded_limit))]
     if term:
         safe = term.replace("%", "").replace(",", " ")

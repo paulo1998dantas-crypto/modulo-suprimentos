@@ -12,6 +12,22 @@ import supabase_data  # noqa: E402
 
 
 class ForecastDataTests(unittest.TestCase):
+    def test_sku_search_uses_full_forecast_catalog_limit(self):
+        with patch.object(supabase_data, "_request", return_value=[]) as request:
+            supabase_data.buscar_skus_forecast("302000")
+
+        request.assert_called_once_with(
+            "GET",
+            supabase_data.SKUS_TABLE,
+            query=[
+                ("select", "id,sku,descricao,unidade"),
+                ("active", "is.true"),
+                ("order", "sku.asc"),
+                ("limit", "100"),
+                ("or", "(sku.ilike.*302000*,descricao.ilike.*302000*)"),
+            ],
+        )
+
     def test_simulation_is_accepted_without_proposal(self):
         row = supabase_data.normalizar_forecast({
             "tipo_demanda": "PREVISÃO DE DEMANDA",

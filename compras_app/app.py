@@ -8583,7 +8583,7 @@ def erp_forecast_skus_api():
         return jsonify({
             "ok": True,
             "skus": supabase_data.buscar_skus_forecast(
-                request.args.get("q", ""), request.args.get("limit", 30)
+                request.args.get("q", ""), request.args.get("limit", 100)
             ),
         })
     except Exception as exc:
