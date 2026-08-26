@@ -15,6 +15,64 @@ def parse_quantidade(valor):
         return 0.0
 
 
+def consolidar_componentes_por_codigo(linhas, estrategia="max"):
+    """Mantém uma única linha por SKU sem perder a necessidade calculada.
+
+    ``somar`` é usado na explosão normal de raízes independentes. ``max`` é
+    usado ao mesclar uma composição já existente com inclusões manuais: nesse
+    caso a mesma subárvore pode estar presente duas vezes e não deve ser
+    contabilizada novamente.
+    """
+    resultado = []
+    indice_por_codigo = {}
+    for original in linhas or []:
+        linha = dict(original or {})
+        codigo = normalizar_codigo(linha.get("codigo", ""))
+        linha["codigo"] = codigo
+        if not codigo or codigo not in indice_por_codigo:
+            if codigo:
+                indice_por_codigo[codigo] = len(resultado)
+            resultado.append(linha)
+            continue
+
+        atual = resultado[indice_por_codigo[codigo]]
+        qtd_atual = parse_quantidade(atual.get("qtd", atual.get("quantidade", 0)))
+        qtd_nova = parse_quantidade(linha.get("qtd", linha.get("quantidade", 0)))
+        qtd_final = qtd_atual + qtd_nova if estrategia == "somar" else max(qtd_atual, qtd_nova)
+        if qtd_final or atual.get("qtd", atual.get("quantidade", "")) not in ("", None):
+            atual["qtd"] = qtd_final
+
+        for campo in ("descricao", "unidade", "grupo", "categoria", "fornecedor", "tipo_requisicao"):
+            if atual.get(campo, "") in ("", None) and linha.get(campo, "") not in ("", None):
+                atual[campo] = linha.get(campo)
+        try:
+            atual["level"] = min(int(atual.get("level", 0) or 0), int(linha.get("level", 0) or 0))
+        except (TypeError, ValueError):
+            pass
+        if linha.get("setor_manual") and linha.get("setor"):
+            atual["setor"] = linha.get("setor")
+            atual["setor_manual"] = True
+    return resultado
+
+
+def _codigo_alcancavel_por_bom(codigo_raiz, codigo_alvo, componentes, visitados=None):
+    raiz = normalizar_codigo(codigo_raiz)
+    alvo = normalizar_codigo(codigo_alvo)
+    if not raiz or not alvo or raiz == alvo:
+        return False
+    visitados = set(visitados or ())
+    if raiz in visitados:
+        return False
+    visitados.add(raiz)
+    for comp in componentes.get(raiz, []) or []:
+        codigo = normalizar_codigo(comp.get("codigo", ""))
+        if codigo == alvo:
+            return True
+        if codigo and _codigo_alcancavel_por_bom(codigo, alvo, componentes, visitados):
+            return True
+    return False
+
+
 def normalizar_componentes(componentes):
     normalizados = {}
     for item_codigo, comps in (componentes or {}).items():
@@ -95,9 +153,44 @@ def expandir_composicao_item(codigo_item, quantidade, componentes, start_level=0
 
 
 def expandir_composicao_itens(itens, componentes, incluir_itens_sem_bom=True):
+    itens_consolidados = []
+    indice_por_codigo = {}
+    for original in itens or []:
+        item = dict(original or {})
+        codigo = normalizar_codigo(item.get("codigo", ""))
+        if not codigo:
+            continue
+        if codigo not in indice_por_codigo:
+            indice_por_codigo[codigo] = len(itens_consolidados)
+            item["codigo"] = codigo
+            itens_consolidados.append(item)
+            continue
+        existente = itens_consolidados[indice_por_codigo[codigo]]
+        existente["qtd"] = (
+            parse_quantidade(existente.get("qtd", existente.get("quantidade", 0)))
+            + parse_quantidade(item.get("qtd", item.get("quantidade", 0)))
+        )
+
+    codigos_raiz = [normalizar_codigo(item.get("codigo", "")) for item in itens_consolidados]
+    redundantes = set()
+    for indice, codigo in enumerate(codigos_raiz):
+        for outro_indice, outro in enumerate(codigos_raiz):
+            if indice == outro_indice:
+                continue
+            if not _codigo_alcancavel_por_bom(outro, codigo, componentes):
+                continue
+            # Em um ciclo de B.O.M. preserva a primeira raiz, evitando eliminar
+            # todas as árvores por um cadastro de engenharia inconsistente.
+            if _codigo_alcancavel_por_bom(codigo, outro, componentes) and indice < outro_indice:
+                continue
+            redundantes.add(codigo)
+            break
+
     linhas = []
-    for item in itens:
+    for item in itens_consolidados:
         codigo_item = normalizar_codigo(item.get("codigo", ""))
+        if codigo_item in redundantes:
+            continue
         if codigo_item and componentes.get(codigo_item):
             if _descricao_contem_cj_trilho(item):
                 linhas.append(
@@ -117,7 +210,7 @@ def expandir_composicao_itens(itens, componentes, incluir_itens_sem_bom=True):
             )
         elif codigo_item and incluir_itens_sem_bom:
             linhas.append(_linha_item_sem_bom(item))
-    return linhas
+    return consolidar_componentes_por_codigo(linhas, estrategia="somar")
 
 
 def expandir_composicao_referenciada(linhas, componentes):
@@ -164,6 +257,47 @@ def expandir_composicao_referenciada(linhas, componentes):
         if codigo and qtd and codigo in componentes:
             visitar(codigo, qtd, level + 1, {codigo})
 
+    return consolidar_componentes_por_codigo(resultado, estrategia="somar")
+
+
+def mesclar_raizes_adicionais(linhas_base, raizes_adicionais, componentes):
+    """Inclui seleções extras sem reexplodir uma raiz já coberta pela B.O.M.
+
+    Uma luminária, conjunto ou item de popup que já aparece na árvore principal
+    não cria uma segunda necessidade. Quando a raiz é realmente independente,
+    componentes compartilhados são mantidos em uma única linha e têm suas
+    quantidades somadas.
+    """
+    resultado = consolidar_componentes_por_codigo(linhas_base, estrategia="max")
+    existentes = {
+        normalizar_codigo(linha.get("codigo", ""))
+        for linha in resultado
+        if normalizar_codigo(linha.get("codigo", ""))
+    }
+    raizes_por_codigo = {}
+    ordem = []
+    for original in raizes_adicionais or []:
+        raiz = dict(original or {})
+        codigo = normalizar_codigo(raiz.get("codigo", ""))
+        if not codigo or codigo in existentes:
+            continue
+        raiz["codigo"] = codigo
+        if codigo not in raizes_por_codigo:
+            raizes_por_codigo[codigo] = raiz
+            ordem.append(codigo)
+            continue
+        atual = raizes_por_codigo[codigo]
+        atual["qtd"] = (
+            parse_quantidade(atual.get("qtd", atual.get("quantidade", 0)))
+            + parse_quantidade(raiz.get("qtd", raiz.get("quantidade", 0)))
+        )
+
+    for codigo in ordem:
+        expandidas = expandir_composicao_referenciada([raizes_por_codigo[codigo]], componentes)
+        resultado = consolidar_componentes_por_codigo(
+            [*resultado, *expandidas],
+            estrategia="somar",
+        )
     return resultado
 
 
@@ -223,7 +357,7 @@ def expandir_composicao_manual(linhas, componentes):
             )
         )
 
-    return resultado
+    return consolidar_componentes_por_codigo(resultado, estrategia="max")
 
 
 def resolver_composicao_final(itens, componentes, composicao_importada=None):

@@ -64,8 +64,10 @@ from config import (
 )
 from calculos import calcular_total_item
 from composicao import (
+    consolidar_componentes_por_codigo,
     expandir_composicao_manual,
     expandir_composicao_referenciada,
+    mesclar_raizes_adicionais,
     normalizar_codigo,
     normalizar_componentes,
     parse_quantidade,
@@ -5042,16 +5044,7 @@ def _montar_os_reconciliada(fonte, referencia, contexto):
     processos_final = mesclar_processos_modelo(processos, conjuntos)
 
     composicao_final = resolver_composicao_final(itens, componentes)
-    extras_composicao = expandir_composicao_referenciada(extras_unicos, componentes)
-    chaves_composicao = {
-        (normalizar_codigo(linha.get("item", "")), normalizar_codigo(linha.get("codigo", "")))
-        for linha in composicao_final
-    }
-    for linha in extras_composicao:
-        chave = (normalizar_codigo(linha.get("item", "")), normalizar_codigo(linha.get("codigo", "")))
-        if chave not in chaves_composicao:
-            composicao_final.append(linha)
-            chaves_composicao.add(chave)
+    composicao_final = mesclar_raizes_adicionais(composicao_final, extras_unicos, componentes)
     composicao_final = propagar_setor_preparacao(
         enriquecer_composicao(composicao_final, os_produtos),
         os_produtos,
@@ -5369,7 +5362,7 @@ def _mesclar_composicao_atualizada_os(documento, composicao_bom, componentes):
             continue
         novas.append(anterior)
         chaves_novas.add(chave)
-    return novas
+    return consolidar_componentes_por_codigo(novas, estrategia="max")
 
 
 def _recalcular_composicao_os_bom_vigente(documento, componentes, catalogo, usuario):
@@ -6655,25 +6648,12 @@ def gerar_os():
         composicao_final = expandir_composicao_manual(composicao_importada, componentes)
     else:
         composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
-    extras_composicao = (
-        []
-        if composicao_source == "custom"
-        else expandir_composicao_referenciada(
+    if composicao_source != "custom":
+        composicao_final = mesclar_raizes_adicionais(
+            composicao_final,
             [*luminarias_extra, *popup_itens_extra],
             componentes,
         )
-    )
-    if extras_composicao:
-        existentes = {
-            (normalizar_codigo(linha.get("item", "")), normalizar_codigo(linha.get("codigo", "")))
-            for linha in composicao_final
-        }
-        for extra in extras_composicao:
-            chave = (normalizar_codigo(extra.get("item", "")), normalizar_codigo(extra.get("codigo", "")))
-            if chave in existentes:
-                continue
-            composicao_final.append(extra)
-            existentes.add(chave)
     composicao_enriquecida = propagar_setor_preparacao(
         enriquecer_composicao(composicao_final, os_produtos),
         os_produtos,

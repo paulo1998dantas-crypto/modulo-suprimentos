@@ -2467,15 +2467,65 @@ function expandComposicao(codigoItem, quantidade){
   return rows;
 }
 
-function coletarComposicaoBom(){
-const rows = [];
-function adicionarRelacionadoComBom(base){
-if (!base.codigo || rows.some((linha) => linha.item === base.item && linha.codigo === base.codigo)){
+function codigoAlcancavelNaBomOS(codigoRaiz, codigoAlvo, visitados){
+const raiz = normalizarCodigoOS(codigoRaiz);
+const alvo = normalizarCodigoOS(codigoAlvo);
+if (!raiz || !alvo || raiz === alvo){
+return false;
+}
+const vistos = new Set(visitados || []);
+if (vistos.has(raiz)){
+return false;
+}
+vistos.add(raiz);
+return (componentesItemOS(raiz) || []).some((comp) => {
+const codigo = normalizarCodigoOS(comp.codigo || "");
+return codigo === alvo || (codigo && codigoAlcancavelNaBomOS(codigo, alvo, vistos));
+});
+}
+
+function consolidarComposicaoPorCodigoOS(rows, estrategia){
+const resultado = [];
+const indicePorCodigo = new Map();
+(rows || []).forEach((original) => {
+const linha = { ...(original || {}) };
+const codigo = normalizarCodigoOS(linha.codigo || "");
+linha.codigo = codigo;
+if (!codigo || !indicePorCodigo.has(codigo)){
+if (codigo) indicePorCodigo.set(codigo, resultado.length);
+resultado.push(linha);
 return;
 }
-rows.push(...expandirComposicaoImportada([base]));
+const atual = resultado[indicePorCodigo.get(codigo)];
+const qtdAtual = parseNumber(atual.qtd);
+const qtdNova = parseNumber(linha.qtd);
+atual.qtd = estrategia === "somar" ? qtdAtual + qtdNova : Math.max(qtdAtual, qtdNova);
+["descricao", "unidade", "grupo", "categoria", "fornecedor", "tipo_requisicao"].forEach((campo) => {
+if (!atual[campo] && linha[campo]) atual[campo] = linha[campo];
+});
+atual.level = Math.min(Number(atual.level || 0), Number(linha.level || 0));
+if (linha.setor_manual && linha.setor){
+atual.setor = linha.setor;
+atual.setor_manual = true;
+}
+});
+return resultado;
+}
+
+function coletarComposicaoBom(){
+let rows = [];
+function adicionarRelacionadoComBom(base){
+const codigo = normalizarCodigoOS(base.codigo || "");
+if (!codigo || rows.some((linha) => normalizarCodigoOS(linha.codigo || "") === codigo)){
+return;
+}
+rows = consolidarComposicaoPorCodigoOS(
+[...rows, ...expandirComposicaoImportada([base])],
+"somar",
+);
 }
 const linhas = document.querySelectorAll("#tabela_os tr");
+const itens = [];
 linhas.forEach((row, index) => {
 if (index === 0){
 return;
@@ -2487,6 +2537,33 @@ const qtdItem = quantidadeOSValor(qtdInput);
 if (!codigoItem){
 return;
 }
+itens.push({ row, codigo: codigoItem, qtd: qtdItem });
+});
+const itensConsolidados = [];
+const indiceItem = new Map();
+itens.forEach((item) => {
+if (!indiceItem.has(item.codigo)){
+indiceItem.set(item.codigo, itensConsolidados.length);
+itensConsolidados.push({ ...item });
+return;
+}
+const existente = itensConsolidados[indiceItem.get(item.codigo)];
+existente.qtd = parseNumber(existente.qtd) + parseNumber(item.qtd);
+});
+const codigosRaiz = itensConsolidados.map((item) => item.codigo);
+const redundantes = new Set();
+codigosRaiz.forEach((codigo, indice) => {
+codigosRaiz.some((outro, outroIndice) => {
+if (indice === outroIndice || !codigoAlcancavelNaBomOS(outro, codigo)) return false;
+if (codigoAlcancavelNaBomOS(codigo, outro) && indice < outroIndice) return false;
+redundantes.add(codigo);
+return true;
+});
+});
+itensConsolidados.forEach((item) => {
+const codigoItem = item.codigo;
+const qtdItem = item.qtd;
+if (redundantes.has(codigoItem)) return;
 const componentes = componentesItemOS(codigoItem);
 if (componentes){
 rows.push(...expandComposicao(codigoItem, qtdItem));
@@ -2501,11 +2578,16 @@ qtd: qtdItem,
 level: 0,
 });
 }
+});
+rows = consolidarComposicaoPorCodigoOS(rows, "somar");
+itens.forEach((item) => {
+const row = item.row;
+const codigoItem = item.codigo;
 const luminariaInput = row.querySelector('input[name="os_luminaria[]"]');
 const luminariaQtdInput = row.querySelector('input[name="os_luminaria_qtd[]"]');
 const luminariaCodigo = luminariaInput ? normalizarCodigoOS(luminariaInput.value) : "";
 const luminariaQtd = luminariaCodigo ? quantidadeOSValor(luminariaQtdInput) : 0;
-if (luminariaCodigo && luminariaQtd && !rows.some((linha) => linha.item === codigoItem && linha.codigo === luminariaCodigo)){
+if (luminariaCodigo && luminariaQtd){
 const luminariaProduto = getProdutoInfo(produtos, luminariaCodigo) || getProdutoInfo(osProdutos, luminariaCodigo) || {};
 adicionarRelacionadoComBom({
 item: codigoItem,
@@ -2518,7 +2600,7 @@ level: 0,
 }
 lerSelecoesPopupItem(row).forEach((selecao) => {
 const codigoRelacionado = normalizarCodigoOS(selecao.codigo);
-if (!codigoRelacionado || codigoRelacionado === OS_POPUP_NAO_APLICAVEL || rows.some((linha) => linha.item === codigoItem && linha.codigo === codigoRelacionado)){
+if (!codigoRelacionado || codigoRelacionado === OS_POPUP_NAO_APLICAVEL){
 return;
 }
 const itemRelacionado = getProdutoInfo(produtos, codigoRelacionado) || getProdutoInfo(osProdutos, codigoRelacionado) || {};
@@ -2532,7 +2614,7 @@ level: 0,
 });
 });
 });
-return rows;
+return consolidarComposicaoPorCodigoOS(rows, "max");
 }
 
 function expandirComposicaoImportada(rows){
@@ -3726,7 +3808,7 @@ if (!tbody){
 return;
 }
 tbody.innerHTML = "";
-(rows || []).forEach((comp) => {
+consolidarComposicaoPorCodigoOS(rows, "max").forEach((comp) => {
 const row = document.createElement("tr");
 const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.setor : destinoAutomaticoComposicao(comp);
 const setorManual = comp.setor_manual ? "1" : "0";
