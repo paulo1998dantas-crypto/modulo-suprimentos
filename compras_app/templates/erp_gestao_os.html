@@ -93,9 +93,7 @@
         <label class="span4"><span>Observações da chegada</span><input name="entry_observacoes" list="not-applicable-option"></label>
         <div class="span4 actions"><button id="save-entry" class="btn" type="button" onclick="saveEntryData()">Salvar correção da entrada</button></div>
         <div class="section-title"><strong>Documento de O.S. e ITEM operacional</strong></div>
-        <label class="span4" id="document-allocation-label"><span>Documento de O.S. emitido (opcional)</span><select name="document_id" id="document-select"></select><small id="document-link-hint" class="muted">Selecione o documento emitido que pertence a este ITEM/chassi. O vinculo estrutural impede associacoes duplicadas.</small></label>
-        <div class="section-title"><strong>Alocação de Forecast</strong></div>
-        <label class="span4" id="forecast-allocation-label"><span>Forecast confirmado aguardando chegada (opcional)</span><select name="forecast_id" id="forecast-select"></select><small class="muted">Use o Forecast como referência comercial. Os dados reais do veículo podem mudar na chegada; nenhum chassi será exigido para a alocação.</small></label>
+        <label class="span4" id="document-allocation-label"><span>Documento de O.S. emitido (opcional)</span><select name="document_id" id="document-select"></select><small id="document-link-hint" class="muted">Selecione o documento emitido que pertence a este ITEM/chassi. O Forecast já foi abatido na emissão do DOCX e não será consumido novamente nesta alocação.</small></label>
         <div class="section-title"><strong>Dados comerciais da O.S.</strong><small class="muted">O cliente é definido exclusivamente nos dados da entrada do veículo.</small></div>
         <label class="required"><span>Tipo de serviço</span><select name="tipo_servico" data-required><option value="TRANSFORMAÇÃO">TRANSFORMAÇÃO</option><option value="PÓS-VENDA">PÓS-VENDA</option><option value="INSTALAÇÃO_DE_ACESSÓRIO">INSTALAÇÃO DE ACESSÓRIO</option><option value="RETORNO">RETORNO</option><option value="OUTRO">OUTRO</option><option value="N/A">N/A — não aplicável</option></select></label>
         <label><span>Proposta</span><input name="proposta_numero" list="not-applicable-option"></label>
@@ -166,7 +164,7 @@
 </dialog>
 
 <script>
-const state={orders:[],forecasts:[],documents:[],banks:[],selectedBanks:[],bankOriginal:{code:'',description:''},bankPickerEditable:false,filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null,creatingRevision:false,replacementSourceId:null,historicalCorrectionMode:false};
+const state={orders:[],documents:[],banks:[],selectedBanks:[],bankOriginal:{code:'',description:''},bankPickerEditable:false,filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null,creatingRevision:false,replacementSourceId:null,historicalCorrectionMode:false};
 const mesBase={{ mes_url|tojson }};
 const workDialog=document.getElementById('work-dialog'),form=document.getElementById('work-form');
 const materialsDialog=document.getElementById('materials-dialog');
@@ -242,32 +240,6 @@ function loadDocumentOptions(row){
   document.getElementById('document-link-hint').textContent=relation;
   return direct;
 }
-function forecastLabel(forecast){
-  const proposal=forecast.proposta_numero||'proposta pendente',client=forecast.cliente_nome||'cliente não informado';
-  const delivery=forecast.data_entrega_prevista?` · entrega ${date(forecast.data_entrega_prevista)}`:'';
-  return `${forecast.codigo||'FORECAST'} · ${proposal} · ${client}${delivery}`;
-}
-function loadForecastOptions(selected=''){
-  const select=form.elements.forecast_id,current=selected||select.value||'';
-  const available=state.forecasts.filter(item=>item.status==='ATIVO'&&item.tipo_demanda==='AGUARDANDO_CHEGADA');
-  const linked=state.forecasts.find(item=>String(item.id)===String(current));
-  const choices=linked&&!available.some(item=>String(item.id)===String(linked.id))?[linked,...available]:available;
-  select.innerHTML='<option value="">Sem Forecast — abrir O.S. diretamente</option>'+choices.map(item=>`<option value="${esc(item.id)}">${esc(forecastLabel(item))}</option>`).join('');
-  select.value=current;
-}
-function fillFromForecast(){
-  if(state.active?.work_order_id)return;
-  const forecast=state.forecasts.find(item=>String(item.id)===String(form.elements.forecast_id.value));
-  if(!forecast)return;
-  const suggested={proposta_numero:forecast.proposta_numero,data_aprovacao:forecast.data_confirmacao,vendedor:forecast.vendedor,mercado:forecast.mercado,tipo_servico:forecast.tipo_servico,tipo_veiculo:forecast.tipo_veiculo,linha:forecast.linha,data_comercial_prevista:forecast.data_entrega_prevista};
-  Object.entries(suggested).forEach(([name,value])=>{if(!String(form.elements[name]?.value||'').trim())fill(name,name.startsWith('data_')?onlyDate(value):value)});
-  if(!form.elements.transformacao_codigo.value&&forecast.transformacao_codigo){
-    document.getElementById('transformation-select').value=forecast.transformacao_codigo;
-    fill('transformacao_codigo',forecast.transformacao_codigo);
-    fill('transformacao',forecast.transformacao||transformationDescription(forecast.transformacao_codigo));
-  }
-  checkMissing();
-}
 function isMesConfigurationPending(row){return Boolean(row.work_order_id)&&['RASCUNHO','AGUARDANDO_O_S'].includes(row.status)&&row.stage_configuration_status==='PENDENTE'}
 function statusOf(row){if(isMesConfigurationPending(row))return 'EMITIDA';return row.status||row.entry_status||'AGUARDANDO_O_S'}
 function metrics(){const rows=state.orders;document.getElementById('m-total').textContent=rows.length;document.getElementById('m-waiting').textContent=rows.filter(x=>!x.work_order_id).length;document.getElementById('m-draft').textContent=rows.filter(x=>x.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(x.status)&&x.stage_configuration_status==='PENDENTE').length;document.getElementById('m-active').textContent=rows.filter(x=>['ATIVA','EM_PRODUÇÃO'].includes(x.status)).length;document.getElementById('m-done').textContent=rows.filter(x=>['FINALIZADA','ENTREGUE','RETIRADA'].includes(x.status)).length}
@@ -284,7 +256,7 @@ function render(){
       : `<button class="btn ${permissions.manage&&!row.work_order_id?'primary':''}" type="button" onclick="openWork('${row.entry_id}')">${permissions.manage?(row.work_order_id?'Abrir':'Alocar e abrir O.S.'):'Consultar'}</button>`;
     return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. operacional ${esc(row.numero_os||'não aberta')}${revisionLabel}</span>${documentLine}</td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id||row.can_create_replacement?'<br><span class="available">DISPONÍVEL PARA NOVA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${isMesConfigurationPending(row)?'<br><span class="muted">MES: AG. PARAMETRIZAÇÃO</span>':''}${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td>${row.work_order_id?`<button class="btn" type="button" onclick="openMaterials('${row.work_order_id}','${esc(row.numero_os||row.item_number)}')">Consultar</button>`:'<span class="muted">O.S. não aberta</span>'}</td><td>${actions}</td></tr>`}).join('');
 }
-async function loadOrders(){try{message('Atualizando entradas, O.S., documentos, bancos e Forecasts...');const [orders,catalogs,forecasts,documents,banks]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/forecasts'),api('/api/erp/os-management/documents'),api('/api/erp/os-management/banks?limit=1000')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.forecasts=forecasts.forecasts||[];state.documents=documents.documents||[];state.banks=banks.banks||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();renderBankOptions();metrics();render();message('')}catch(error){message(error.message,true)}}
+async function loadOrders(){try{message('Atualizando entradas, O.S., documentos e bancos...');const [orders,catalogs,documents,banks]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/os-management/documents'),api('/api/erp/os-management/banks?limit=1000')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.documents=documents.documents||[];state.banks=banks.banks||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();renderBankOptions();metrics();render();message('')}catch(error){message(error.message,true)}}
 function clearFilters(){document.getElementById('search').value='';document.getElementById('view-filter').value='{{ initial_view }}';render()}
 function fill(name,value){const input=form.elements[name];if(!input)return;const normalized=value??'';if(input.tagName==='SELECT'&&normalized&&![...input.options].some(option=>option.value===String(normalized)))input.add(new Option(`${normalized} (legado)`,normalized));input.value=normalized}
 function transformationDescription(code){return (state.catalogs.transformacoes||[]).find(x=>x.codigo===code)?.descricao||''}
@@ -303,12 +275,11 @@ function openWork(entryId,createRevision=false){
   if(createRevision&&(!permissions.manage||!source.can_create_replacement)){message('Somente uma O.S. cancelada e corrente pode receber uma nova revisão.',true);return}
   state.creatingRevision=Boolean(createRevision);state.replacementSourceId=createRevision?source.work_order_id:null;
   const workFields=['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','municipio','uf','tipo_veiculo','linha','transformacao_codigo','transformacao','codigo_banco','conjunto_bancos','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'];
-  const row=createRevision?{...source,...Object.fromEntries(workFields.map(name=>[name,null])),work_order_id:null,numero_os:String(source.item_number),status:null,technical_status:'ABERTA',forecast_id:null,stage_configuration_status:'PENDENTE'}:source;
+  const row=createRevision?{...source,...Object.fromEntries(workFields.map(name=>[name,null])),work_order_id:null,numero_os:String(source.item_number),status:null,technical_status:'ABERTA',stage_configuration_status:'PENDENTE'}:source;
   state.active=row;state.historicalCorrectionMode=false;form.reset();loadCatalogFields();
   fill('entry_id',row.entry_id);fill('work_order_id',row.work_order_id);
   fill('entry_chassi',row.chassi);fill('entry_marca',row.marca);fill('entry_modelo',row.modelo);fill('entry_versao',row.versao);fill('entry_modelo_veicular',row.modelo_veicular);fill('entry_avarias',row.avarias||'NÃO');fill('entry_cliente_nome',row.entry_client);fill('entry_observacoes',row.entry_notes);
   const directDocument=loadDocumentOptions(row);
-  loadForecastOptions(row.forecast_id||'');
   ['tipo_servico','proposta_numero','data_aprovacao','vendedor','mercado','municipio','uf','tipo_veiculo','linha','acessibilidade','lotacao','ar_condicionado','tipo_sistema_ar','ar_quente','acessorio','plotagem','data_comercial_prevista'].forEach(name=>fill(name,name.startsWith('data_')?onlyDate(row[name]):row[name]));loadSelectedBanks(row.codigo_banco,row.conjunto_bancos);
   if(!row.work_order_id)fill('tipo_servico','TRANSFORMAÇÃO')
   let code=row.transformacao_codigo||'';if(!code&&row.transformacao)code=(state.catalogs.transformacoes||[]).find(x=>norm(x.descricao)===norm(row.transformacao))?.codigo||'';
@@ -318,7 +289,6 @@ function openWork(entryId,createRevision=false){
   const editable=permissions.manage&&(!row.status||['RASCUNHO','AGUARDANDO_O_S','ATIVA','EM_PRODUÇÃO'].includes(row.status)),active=['ATIVA','EM_PRODUÇÃO'].includes(row.status);[...form.elements].forEach(el=>{if(!['button','hidden'].includes(el.type))el.disabled=!editable});
   setBankPickerEditable(editable);
   form.elements.document_id.disabled=!editable||Boolean(directDocument);
-  form.elements.forecast_id.disabled=!editable||Boolean(row.work_order_id);
   form.elements.data_comercial_prevista.disabled=!editable||active;
   const saveButton=document.getElementById('save-work');saveButton.hidden=!editable;saveButton.textContent=createRevision?'Emitir nova O.S. no mesmo ITEM':(active?'Salvar alterações':'Salvar O.S. emitida');
   const saveEntryButton=document.getElementById('save-entry');saveEntryButton.hidden=!editable;saveEntryButton.disabled=!editable;
@@ -331,9 +301,8 @@ function openWork(entryId,createRevision=false){
 document.getElementById('transformation-select').addEventListener('change',event=>{if(event.target.value!=='__LEGACY__'){fill('transformacao_codigo',event.target.value);fill('transformacao',transformationDescription(event.target.value))}checkMissing()});
 document.getElementById('bank-add').addEventListener('click',addSelectedBank);
 document.getElementById('bank-search').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();addSelectedBank()}});
-document.getElementById('forecast-select').addEventListener('change',fillFromForecast);
 document.getElementById('document-select').addEventListener('change',event=>{const document=state.documents.find(item=>String(item.id)===String(event.target.value));document.getElementById('document-link-hint').textContent=document?`Ao salvar, o Documento O.S. ${document.numero} será vinculado ao ITEM ${state.active?.item_number||''} / chassi ${state.active?.chassi||''}.`:'A O.S. operacional será mantida sem documento vinculado.'});
-function workPayload(){syncBankFields();const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;delete data.cliente_nome;delete data.historical_correction_reason;const workId=data.work_order_id;delete data.work_order_id;Object.keys(data).filter(key=>key.startsWith('entry_')).forEach(key=>delete data[key]);if(workId){delete data.forecast_id;data.original_codigo_banco=state.bankOriginal.code;data.original_conjunto_bancos=state.bankOriginal.description}if(state.creatingRevision){data.create_replacement=true;data.supersedes_work_order_id=state.replacementSourceId}const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}const bankCode=String(data.codigo_banco||'').trim(),legacyChanged=state.selectedBanks.some(item=>item.legacy)&&norm(bankCode)!==norm(state.bankOriginal.code);if(legacyChanged)throw new Error('Remova o código legado não localizado ou restaure a seleção original antes de salvar.');Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
+function workPayload(){syncBankFields();const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;delete data.cliente_nome;delete data.historical_correction_reason;delete data.forecast_id;const workId=data.work_order_id;delete data.work_order_id;Object.keys(data).filter(key=>key.startsWith('entry_')).forEach(key=>delete data[key]);if(workId){data.original_codigo_banco=state.bankOriginal.code;data.original_conjunto_bancos=state.bankOriginal.description}if(state.creatingRevision){data.create_replacement=true;data.supersedes_work_order_id=state.replacementSourceId}const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}const bankCode=String(data.codigo_banco||'').trim(),legacyChanged=state.selectedBanks.some(item=>item.legacy)&&norm(bankCode)!==norm(state.bankOriginal.code);if(legacyChanged)throw new Error('Remova o código legado não localizado ou restaure a seleção original antes de salvar.');Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
 function entryPayload(){return {chassi:form.elements.entry_chassi.value,marca:form.elements.entry_marca.value,modelo:form.elements.entry_modelo.value,versao:form.elements.entry_versao.value,modelo_veicular:form.elements.entry_modelo_veicular.value,avarias:form.elements.entry_avarias.value,cliente_nome:form.elements.entry_cliente_nome.value,observacoes:form.elements.entry_observacoes.value}}
 function historicalEntryPayload(){
   const values=entryPayload(),current={chassi:state.active?.chassi,marca:state.active?.marca,modelo:state.active?.modelo,versao:state.active?.versao,modelo_veicular:state.active?.modelo_veicular,avarias:state.active?.avarias,cliente_nome:state.active?.entry_client,observacoes:state.active?.entry_notes},changed={};
@@ -357,8 +326,8 @@ async function handleHistoricalCorrection(){
   const button=document.getElementById('correct-historical-button'),reasonLabel=document.getElementById('historical-correction-reason-label'),reason=document.getElementById('historical-correction-reason');
   if(!state.historicalCorrectionMode){
     state.historicalCorrectionMode=true;
-    [...form.elements].forEach(el=>{if(!['button','hidden'].includes(el.type)&&!['document_id','forecast_id'].includes(el.name))el.disabled=false});
-    setBankPickerEditable(true);form.elements.document_id.disabled=true;form.elements.forecast_id.disabled=true;
+    [...form.elements].forEach(el=>{if(!['button','hidden'].includes(el.type)&&el.name!=='document_id')el.disabled=false});
+    setBankPickerEditable(true);form.elements.document_id.disabled=true;
     reasonLabel.hidden=false;reason.disabled=false;button.textContent='Salvar correção histórica';form.elements.tipo_servico.focus();
     message('Corrija os dados necessários e informe o motivo. Status, etapas, apontamentos, finalização, entrega e vínculos permanecerão inalterados.');return;
   }

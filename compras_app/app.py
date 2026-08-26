@@ -9000,6 +9000,9 @@ def erp_vehicle_entry_update_proxy(entry_id):
 def erp_work_order_create_proxy(entry_id):
     try:
         payload = dict(request.get_json(silent=True) or {})
+        # Forecast is consumed exclusively by successful documentary O.S.
+        # emission. Allocation in MES must never decrement it again.
+        payload.pop("forecast_id", None)
         _normalize_work_order_banks(payload)
         documento_id = str(payload.pop("document_id", "") or "").strip()
         if documento_id:

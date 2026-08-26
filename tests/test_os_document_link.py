@@ -88,6 +88,25 @@ class WorkOrderDocumentLinkTests(unittest.TestCase):
             mes_request.call_args.args[2],
         )
 
+    def test_create_never_forwards_forecast_consumption_to_mes(self):
+        rows = [self.document()]
+        with (
+            patch.object(app_module, "_carregar_documentos_os_para_vinculo", return_value=rows),
+            patch.object(
+                app_module,
+                "_erp_mes_request",
+                return_value={"ok": True, "id": "work-1", "numero_os": "3096"},
+            ) as mes_request,
+        ):
+            response = self.client.post(
+                "/api/erp/os-management/entries/entry-1/work-orders",
+                json={"document_id": "101", "forecast_id": "forecast-legacy"},
+            )
+
+        self.assertEqual(201, response.status_code)
+        self.assertNotIn("forecast_id", mes_request.call_args.args[2])
+        self.assertEqual(101, mes_request.call_args.args[2]["documento_os_id"])
+
     def test_create_rejects_document_already_linked_to_another_work_order(self):
         rows = [
             self.document(
