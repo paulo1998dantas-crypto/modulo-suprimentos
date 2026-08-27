@@ -8517,7 +8517,17 @@ def erp_work_order_management_screen():
 
 
 def _forecast_metrics(forecasts):
-    active = [item for item in forecasts if item.get("status") == "ATIVO"]
+    def remaining_quantity(item):
+        remaining = item.get("quantidade_saldo_documental")
+        if remaining is None:
+            remaining = item.get("quantidade_planejada")
+        return float(remaining or 0)
+
+    active = [
+        item for item in forecasts
+        if item.get("status") == "ATIVO"
+        and remaining_quantity(item) > 0.000001
+    ]
     planned_items = [
         line for forecast in active
         for line in (forecast.get("itens_planejados") or [])
@@ -8525,8 +8535,17 @@ def _forecast_metrics(forecasts):
     return {
         "aguardando_chegada": sum(1 for item in active if item.get("tipo_demanda") == "AGUARDANDO_CHEGADA"),
         "previsao_demanda": sum(1 for item in active if item.get("tipo_demanda") == "PREVISAO_DEMANDA"),
-        "convertidos": sum(1 for item in forecasts if item.get("status") == "CONVERTIDO"),
-        "quantidade_planejada": sum(float(item.get("quantidade_planejada") or 0) for item in active),
+        "convertidos": sum(
+            1 for item in forecasts
+            if item.get("status_exibicao") == "CONVERTIDO"
+        ),
+        "quantidade_planejada": sum(
+            remaining_quantity(item) for item in active
+        ),
+        "quantidade_consumida_documental": sum(
+            float(item.get("quantidade_consumida_documental") or 0)
+            for item in forecasts
+        ),
         "skus_planejados": len(planned_items),
     }
 

@@ -29,6 +29,9 @@ class ForecastRouteTests(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertIn(b"FORECAST", response.data)
         self.assertIn(b"Aguardando chegada", response.data)
+        self.assertIn(b"Saldo ativo de Forecast", response.data)
+        self.assertIn(b"CONVERTIDO EM O.S.", response.data)
+        self.assertIn(b"O volume convertido", response.data)
 
     def test_forecast_list_returns_metrics(self):
         rows = [{"status": "ATIVO", "tipo_demanda": "PREVISAO_DEMANDA", "quantidade_planejada": 2}]

@@ -1280,16 +1280,49 @@ def carregar_consumos_forecast_documental(force=False):
         raise
 
 
+def _resumos_documentos_consumo_forecast(consumos):
+    """Resolve the O.S. numbers without loading the complete document payloads."""
+    documento_ids = sorted({
+        int(consumo.get("documento_os_id"))
+        for consumo in (consumos or [])
+        if str(consumo.get("documento_os_id") or "").strip().isdigit()
+    })
+    if not documento_ids:
+        return {}
+    resumos = {}
+    for offset in range(0, len(documento_ids), 100):
+        chunk = documento_ids[offset:offset + 100]
+        rows = _request(
+            "GET",
+            DOCUMENTOS_TABLE,
+            query=[
+                ("select", "id,numero,status,tipo"),
+                ("id", f"in.({','.join(str(value) for value in chunk)})"),
+            ],
+        ) or []
+        for row in rows:
+            resumos[str(row.get("id"))] = {
+                "documento_os_id": row.get("id"),
+                "numero_os": _clean(row.get("numero")),
+                "status_os": _clean(row.get("status")),
+                "tipo_documento": _clean(row.get("tipo")),
+            }
+    return resumos
+
+
 def enriquecer_forecasts_com_consumos(forecasts, force=False):
     """Attach the documentally consumed and remaining volume to Forecast rows."""
     consumos = carregar_consumos_forecast_documental(force=force)
+    documentos = _resumos_documentos_consumo_forecast(consumos)
     ativos_por_forecast = {}
     detalhes_por_forecast = {}
     for consumo in consumos:
         forecast_id = _clean(consumo.get("forecast_id"))
         if not forecast_id:
             continue
-        detalhes_por_forecast.setdefault(forecast_id, []).append(consumo)
+        detalhe = dict(consumo)
+        detalhe.update(documentos.get(_clean(consumo.get("documento_os_id")), {}))
+        detalhes_por_forecast.setdefault(forecast_id, []).append(detalhe)
         if _clean(consumo.get("status")).upper() == "ATIVO":
             ativos_por_forecast[forecast_id] = (
                 ativos_por_forecast.get(forecast_id, 0) + _numeric(consumo.get("quantidade"))
@@ -1303,6 +1336,19 @@ def enriquecer_forecasts_com_consumos(forecasts, force=False):
         forecast["quantidade_saldo_documental"] = saldo
         forecast["esgotado_documentalmente"] = planejada > 0 and saldo <= 0.000001
         forecast["consumos_documentais"] = detalhes_por_forecast.get(forecast_id, [])
+        forecast["documentos_os_consumidos"] = [
+            detalhe
+            for detalhe in forecast["consumos_documentais"]
+            if _clean(detalhe.get("status")).upper() == "ATIVO"
+        ]
+        status = _clean(forecast.get("status")).upper() or "ATIVO"
+        if status == "ATIVO" and consumida > 0.000001:
+            status = (
+                "CONVERTIDO"
+                if forecast["esgotado_documentalmente"]
+                else "PARCIALMENTE_CONVERTIDO"
+            )
+        forecast["status_exibicao"] = status
     return forecasts
 
 

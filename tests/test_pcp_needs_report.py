@@ -21,6 +21,37 @@ class PcpNeedsReportTests(unittest.TestCase):
         app_module.app.config.update(TESTING=True)
         self.client = app_module.app.test_client()
 
+    def test_forecast_metrics_separate_converted_volume_from_active_balance(self):
+        forecasts = [
+            {
+                "status": "ATIVO",
+                "status_exibicao": "CONVERTIDO",
+                "tipo_demanda": "AGUARDANDO_CHEGADA",
+                "quantidade_planejada": 1,
+                "quantidade_consumida_documental": 1,
+                "quantidade_saldo_documental": 0,
+                "itens_planejados": [{"sku_codigo": "SKU-CONVERTIDO"}],
+            },
+            {
+                "status": "ATIVO",
+                "status_exibicao": "PARCIALMENTE_CONVERTIDO",
+                "tipo_demanda": "PREVISAO_DEMANDA",
+                "quantidade_planejada": 3,
+                "quantidade_consumida_documental": 1,
+                "quantidade_saldo_documental": 2,
+                "itens_planejados": [{"sku_codigo": "SKU-ATIVO"}],
+            },
+        ]
+
+        metrics = app_module._forecast_metrics(forecasts)
+
+        self.assertEqual(0, metrics["aguardando_chegada"])
+        self.assertEqual(1, metrics["previsao_demanda"])
+        self.assertEqual(1, metrics["convertidos"])
+        self.assertEqual(2, metrics["quantidade_planejada"])
+        self.assertEqual(2, metrics["quantidade_consumida_documental"])
+        self.assertEqual(1, metrics["skus_planejados"])
+
     def test_report_combines_open_os_needs_and_active_forecast_in_one_table(self):
         stock_projection = {
             "ok": True,

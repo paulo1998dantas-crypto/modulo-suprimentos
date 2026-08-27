@@ -114,7 +114,7 @@ class ForecastDataTests(unittest.TestCase):
         self.assertEqual("FCT-ATIVA", rows[0]["forecast"]["codigo"])
 
     def test_documental_consumption_exposes_remaining_forecast_balance(self):
-        forecasts = [{"id": "fct-1", "quantidade_planejada": 10}]
+        forecasts = [{"id": "fct-1", "status": "ATIVO", "quantidade_planejada": 10}]
         consumos = [
             {"forecast_id": "fct-1", "quantidade": 8, "status": "ATIVO"},
             {"forecast_id": "fct-1", "quantidade": 1, "status": "CANCELADO"},
@@ -125,6 +125,39 @@ class ForecastDataTests(unittest.TestCase):
         self.assertEqual(8, rows[0]["quantidade_consumida_documental"])
         self.assertEqual(2, rows[0]["quantidade_saldo_documental"])
         self.assertFalse(rows[0]["esgotado_documentalmente"])
+        self.assertEqual("PARCIALMENTE_CONVERTIDO", rows[0]["status_exibicao"])
+
+    def test_fully_consumed_forecast_is_presented_as_converted_with_linked_os(self):
+        forecasts = [{"id": "fct-13", "status": "ATIVO", "quantidade_planejada": 1}]
+        consumos = [{
+            "forecast_id": "fct-13",
+            "documento_os_id": 356,
+            "quantidade": 1,
+            "status": "ATIVO",
+        }]
+        with (
+            patch.object(
+                supabase_data,
+                "carregar_consumos_forecast_documental",
+                return_value=consumos,
+            ),
+            patch.object(
+                supabase_data,
+                "_request",
+                return_value=[{"id": 356, "numero": "3164", "status": "emitido", "tipo": "os"}],
+            ) as request,
+        ):
+            rows = supabase_data.enriquecer_forecasts_com_consumos(forecasts)
+
+        self.assertEqual(0, rows[0]["quantidade_saldo_documental"])
+        self.assertTrue(rows[0]["esgotado_documentalmente"])
+        self.assertEqual("CONVERTIDO", rows[0]["status_exibicao"])
+        self.assertEqual("3164", rows[0]["documentos_os_consumidos"][0]["numero_os"])
+        request.assert_called_once_with(
+            "GET",
+            supabase_data.DOCUMENTOS_TABLE,
+            query=[("select", "id,numero,status,tipo"), ("id", "in.(356)")],
+        )
 
     def test_active_forecast_requirements_scale_by_documental_remaining_balance(self):
         forecasts = [{
@@ -148,6 +181,27 @@ class ForecastDataTests(unittest.TestCase):
         self.assertEqual(1, len(rows))
         self.assertEqual(4, rows[0]["quantidade_planejada"])
         self.assertEqual(16, rows[0]["quantidade_documental_consumida"])
+
+    def test_fully_consumed_active_forecast_does_not_duplicate_mrp_need(self):
+        forecasts = [{
+            "id": "fct-13",
+            "codigo": "FCT-00013",
+            "status": "ATIVO",
+            "quantidade_planejada": 1,
+            "quantidade_saldo_documental": 0,
+        }]
+        requirements = [{
+            "forecast_id": "fct-13",
+            "sku_codigo": "SKU-1",
+            "quantidade_planejada": 4,
+        }]
+        with (
+            patch.object(supabase_data, "carregar_forecasts", return_value=forecasts),
+            patch.object(supabase_data, "_all_rows", return_value=requirements),
+        ):
+            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True)
+
+        self.assertEqual([], rows)
 
     def test_documental_consumption_uses_idempotent_rpc_contract(self):
         with (
