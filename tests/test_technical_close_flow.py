@@ -50,6 +50,19 @@ class TechnicalCloseFlowTests(unittest.TestCase):
         self.assertEqual("CONFIRM_NEGATIVE_STOCK", response.json["code"])
         write.assert_not_called()
 
+    def test_legacy_success_keeps_document_status_as_operational(self):
+        document = {"id": 1, "tipo": "os", "numero": "3100", "dados": {}, "status": "emitido"}
+        result = {"ok": True, "status": "ENTREGUE", "technical_status": "CONCLUIDA"}
+        with (app_module.app.test_request_context("/", method="POST", json={"status": "concluido"}),
+              patch.object(app_module, "obter_historico_documento", return_value=document),
+              patch.object(app_module, "erp_feature_enabled", return_value=True),
+              patch.object(app_module, "_close_linked_legacy_os_in_mes", return_value=result),
+              patch.object(app_module, "atualizar_status_historico_documento") as write):
+            response = inspect.unwrap(app_module.api_status_historico)("os", "1")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("emitido", response.get_json()["documento"]["status"])
+        write.assert_not_called()
+
     def test_legacy_forwards_explicit_confirmation(self):
         with (patch.object(app_module, "_resolve_linked_legacy_os_work_id", return_value="work-id"),
               patch.object(app_module, "_erp_mes_request", return_value={"ok": True}) as send):

@@ -4681,7 +4681,16 @@ def api_status_historico(tipo, documento_id):
                     documento,
                     "Conclusão técnica reaberta em Suprimentos.",
                 )
-        atualizado = atualizar_status_historico_documento(documento_id, payload.get("status"))
+        # When MES is enabled, an O.S. technical close is not a documental
+        # or operational close.  Keep the legacy document status intact so
+        # cards, exports and the production history continue to show the
+        # real status (FINALIZADA/ENTREGUE/etc.).
+        technical_only_os = tipo == "os" and novo_status == "concluido" and erp_feature_enabled()
+        atualizado = (
+            obter_historico_documento(documento_id)
+            if technical_only_os
+            else atualizar_status_historico_documento(documento_id, payload.get("status"))
+        )
     except ErpMesRequestError as exc:
         return jsonify(exc.payload), exc.status_code
     except ValueError as exc:
