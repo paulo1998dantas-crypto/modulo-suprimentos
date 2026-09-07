@@ -163,6 +163,7 @@
   </form>
 </dialog>
 
+<script src="/static/technical_close.js?v=20260907"></script>
 <script>
 const state={orders:[],documents:[],banks:[],selectedBanks:[],bankOriginal:{code:'',description:''},bankPickerEditable:false,filtered:[],active:null,catalogs:{},required:[],materials:null,sharedNeed:null,creatingRevision:false,replacementSourceId:null,historicalCorrectionMode:false};
 const mesBase={{ mes_url|tojson }};
@@ -341,7 +342,18 @@ async function handleHistoricalCorrection(){
 }
 form.onsubmit=async event=>{event.preventDefault();try{await saveWork()}catch(error){message(error.message,true)}};
 async function openMesConfiguration(){const missing=checkMissing();if(missing.length){message(`Preencha antes de parametrizar: ${missing.join(', ')}.`,true);form.querySelector('.missing')?.focus();return}const popup=window.open('about:blank','_blank');try{const workId=await saveWork(true);const target=`${mesBase.replace(/\/$/,'')}/gestao-os?work_order_id=${encodeURIComponent(workId)}`;if(popup)popup.location.href=target;else location.href=target;workDialog.close();message('O.S. salva. Defina as etapas no MES e conclua a ativação.')}catch(error){if(popup)popup.close();message(error.message,true)}}
-async function technicalClose(){const workId=form.elements.work_order_id.value;if(!workId||!confirm('Concluir tecnicamente esta O.S.? Isso não finaliza a produção e não movimenta estoque.'))return;try{await api(`/api/erp/os-management/work-orders/${workId}/technical-close`,{method:'POST',body:JSON.stringify({motivo:'Conclusão técnica registrada na Gestão de O.S. em Suprimentos.'})});await loadOrders();const row=state.orders.find(item=>item.work_order_id===workId);if(row)openWork(row.entry_id);message('Conclusão técnica registrada. O relatório do MES exibirá ARQUIVADO = SIM.')}catch(error){message(error.message,true)}}
+async function technicalClose(){
+  const workId=form.elements.work_order_id.value,button=document.getElementById('technical-close-button');
+  if(!workId||button.disabled||!confirm('Concluir tecnicamente esta O.S.? Serão baixados os empenhos vinculados e consumidos os saldos candidatos conforme a necessidade. As pendências restantes serão encerradas e sairão dos relatórios.'))return;
+  button.disabled=true;
+  try{
+    const result=await concluirOSComMateriais(`/api/erp/os-management/work-orders/${workId}/technical-close`,{motivo:'Conclusão técnica registrada na Gestão de O.S. em Suprimentos.'});
+    if(!result)return;
+    await loadOrders();const row=state.orders.find(item=>item.work_order_id===workId);if(row)openWork(row.entry_id);
+    const summary=result.auto_baixas||{};
+    message(result.replayed?'Esta O.S. já estava concluída tecnicamente. Nenhuma baixa foi repetida.':`O.S. concluída tecnicamente. ${summary.empenhos_vinculados_baixados||0} empenho(s) vinculado(s) baixado(s), ${summary.candidatos_consumidos||0} candidato(s) consumido(s) e ${(summary.pendencias_encerradas||[]).length} pendência(s) encerrada(s).`);
+  }catch(error){message(error.message,true)}finally{button.disabled=state.orders.find(item=>item.work_order_id===workId)?.technical_status==='CONCLUIDA'}
+}
 function qty(value){const numeric=typeof value==='number'?value:Number(String(value??'').replace(',','.'));return Number.isFinite(numeric)?new Intl.NumberFormat('pt-BR',{maximumFractionDigits:3}).format(numeric):String(value??0)}
 function sharedCandidateId(candidate){return candidate.movement_id??candidate.id??''}
 function sharedCandidates(line){return Array.isArray(line.empenhos_compartilhados)?line.empenhos_compartilhados:[]}

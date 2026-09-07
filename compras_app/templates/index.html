@@ -5005,6 +5005,12 @@ window.location.href = "/?tab=gestao-oc";
 async function alterarStatusDocumento(tipo, id, status, mensagem){
 if (mensagem && !confirm(mensagem)) return;
 try {
+if (tipo === 'os' && status === 'concluido') {
+const result = await concluirOSComMateriais(`/api/historico/os/${encodeURIComponent(id)}/status`, {status});
+if (!result) return;
+window.location.href = '/?tab=gestao-os';
+return;
+}
 const response = await fetch(`/api/historico/${encodeURIComponent(tipo)}/${encodeURIComponent(id)}/status`, { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
 const payload = await response.json().catch(() => ({}));
 if (!response.ok || !payload.ok) throw new Error(payload.erro || "Não foi possível atualizar o status.");
@@ -5724,6 +5730,7 @@ salvarRascunhoOS();
 
 </script>
 
+<script src="/static/technical_close.js?v=20260907"></script>
 <script src="/static/dashboard.js" defer></script>
 
 </head>
@@ -6267,7 +6274,7 @@ salvarRascunhoOS();
 {% set percentual = ((etapas_concluidas * 100 / etapas_total)|round|int) if etapas_total else 0 %}
 <tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ status_os)|lower }}" data-history-status="{{ status_os }}" data-history-date="{{ doc.data_criacao or '' }}">
 <td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ status_os|lower }}">{{ status_os|replace('_', ' ') }}</span>{% if mes_os %}<span class="integration-detail">Atualizado pelo MES</span>{% endif %}</td><td><strong>{{ percentual }}%</strong><div class="os-progress"><span style="width:{{ percentual }}%"></span></div><span class="integration-detail">{{ etapas_concluidas }}/{{ etapas_total }} etapas</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
-<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir documento</button>{% if can('suprimentos.work_order.manage') %}<button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar documento</button>{% endif %}{% if can('suprimentos.work_order.technical_close') and (doc.status or 'emitido') != 'concluido' %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Encerrar tecnicamente esta O.S.? Isso não finaliza a produção nem movimenta estoque.')">Conclusão técnica</button>{% endif %}{% if mes_os %}<a class="btn btn-secondary" href="/erp/gestao-os">Abrir gestão MES</a>{% elif can('suprimentos.work_order.manage') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
+<td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir documento</button>{% if can('suprimentos.work_order.manage') %}<button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar documento</button>{% endif %}{% if can('suprimentos.work_order.technical_close') and (doc.status or 'emitido') != 'concluido' %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Concluir tecnicamente esta O.S.? Serão baixados os empenhos vinculados, consumidos os candidatos necessários e encerradas as pendências restantes.')">Conclusão técnica</button>{% endif %}{% if mes_os %}<a class="btn btn-secondary" href="/erp/gestao-os">Abrir gestão MES</a>{% elif can('suprimentos.work_order.manage') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
 {% else %}
 <tr><td colspan="10">Nenhuma O.S. registrada ainda.</td></tr>

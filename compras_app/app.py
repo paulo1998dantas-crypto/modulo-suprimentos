@@ -4674,6 +4674,7 @@ def api_status_historico(tipo, documento_id):
                 _close_linked_legacy_os_in_mes(
                     documento,
                     "Concluída tecnicamente pelo PCP em Suprimentos.",
+                    confirmation=payload,
                 )
             elif str(documento.get("status") or "").lower() == "concluido":
                 _reopen_linked_legacy_os_in_mes(
@@ -4681,6 +4682,8 @@ def api_status_historico(tipo, documento_id):
                     "Conclusão técnica reaberta em Suprimentos.",
                 )
         atualizado = atualizar_status_historico_documento(documento_id, payload.get("status"))
+    except ErpMesRequestError as exc:
+        return jsonify(exc.payload), exc.status_code
     except ValueError as exc:
         return jsonify({"ok": False, "erro": str(exc)}), 400
     except Exception:
@@ -7876,6 +7879,13 @@ def _erp_stock_binary_request(path):
         raise ValueError(f"Estoque indisponível: {exc.reason}") from exc
 
 
+class ErpMesRequestError(ValueError):
+    def __init__(self, payload, status_code):
+        super().__init__(payload.get("error") or payload.get("erro") or "Falha no MES.")
+        self.payload = {**payload, "ok": False, "error": str(self), "erro": str(self)}
+        self.status_code = status_code
+
+
 def _erp_mes_request(path, method="GET", payload=None):
     base = os.environ.get("ERP_MES_API_URL", "").rstrip("/")
     token = os.environ.get("ERP_BACKEND_TOKEN", "")
@@ -7898,8 +7908,15 @@ def _erp_mes_request(path, method="GET", payload=None):
         with urllib.request.urlopen(req, timeout=timeout_seconds) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
-        data = json.loads(exc.read().decode("utf-8") or "{}")
-        raise ValueError(data.get("error") or "Falha no MES.")
+        try:
+            data = json.loads(exc.read().decode("utf-8") or "{}")
+        except (ValueError, UnicodeError):
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
+        if not data:
+            data = {"error": f"O MES respondeu HTTP {exc.code}. Consulte o estado da O.S. antes de tentar novamente."}
+        raise ErpMesRequestError(data, exc.code) from exc
     except TimeoutError as exc:
         raise ValueError(
             f"O MES demorou mais de {timeout_seconds} segundos para responder. "
@@ -7944,7 +7961,7 @@ def _resolve_linked_legacy_os_work_id(documento):
     return work_id
 
 
-def _close_linked_legacy_os_in_mes(documento, motivo):
+def _close_linked_legacy_os_in_mes(documento, motivo, confirmation=None):
     work_id = _resolve_linked_legacy_os_work_id(documento)
     if not work_id:
         # Documentos antigos sem uma O.S. MES correspondente continuam
@@ -7953,7 +7970,9 @@ def _close_linked_legacy_os_in_mes(documento, motivo):
     return _erp_mes_request(
         f"work-orders/{work_id}/technical-close",
         "POST",
-        {"motivo": str(motivo or "")},
+        {"motivo": str(motivo or ""),
+         "confirm_negative_stock": (confirmation or {}).get("confirm_negative_stock") is True,
+         "confirmation_token": (confirmation or {}).get("confirmation_token")},
     )
 
 
@@ -9115,6 +9134,8 @@ def erp_work_order_technical_close_proxy(work_id):
             "POST",
             request.get_json(silent=True) or {},
         ))
+    except ErpMesRequestError as exc:
+        return jsonify(exc.payload), exc.status_code
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
