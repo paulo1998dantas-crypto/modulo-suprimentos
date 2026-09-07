@@ -1316,6 +1316,7 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .management-statline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#607085;font-size:11px;}
 .management-statline strong{color:#172033;font-size:13px;}
 .management-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 180px auto;gap:8px;align-items:end;padding:10px 12px;border-bottom:1px solid #d8e0ea;}
+.os-history-panel .management-toolbar{grid-template-columns:minmax(220px,1fr) 180px auto auto;}
 .management-toolbar input,.management-toolbar select{margin:0;}
 .management-tools-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:8px;align-items:start;}
 .management-tools-grid .dashboard-table{margin-top:0;}
@@ -1328,6 +1329,8 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .table-toolbar input{width:min(480px,45vw);}
 .history-actions{white-space:nowrap;}
 .history-actions button{padding:5px 7px;}
+.bulk-select-column{width:34px;text-align:center;}
+.bulk-select-column input{width:auto!important;min-height:0;margin:0;}
 .history-modal{display:none;position:fixed;inset:0;z-index:120;background:rgba(15,23,42,.5);padding:22px;align-items:center;justify-content:center;}
 .history-modal.open{display:flex;}
 .history-modal-box{width:min(1380px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:5px;border:1px solid #b9c5d3;padding:14px;box-shadow:0 20px 50px rgba(15,23,42,.25);}
@@ -1359,6 +1362,7 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .dashboard-filterbar{align-items:stretch;flex-direction:column;}
 .dashboard-date-range{grid-template-columns:repeat(2,minmax(0,1fr));}
 .management-toolbar{grid-template-columns:1fr 1fr;}
+.os-history-panel .management-toolbar{grid-template-columns:1fr 1fr;}
 .management-tools-grid{grid-template-columns:1fr;}
 .management-tools-grid .grid-3{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;}
 .card-heading-row,.table-toolbar{align-items:stretch;flex-direction:column;}
@@ -1371,6 +1375,7 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .segmented-control button{border-bottom:1px solid #b9c5d3;}
 .dashboard-date-range{grid-template-columns:1fr;}
 .management-tools-grid .grid-3{grid-template-columns:1fr;}
+.os-history-panel .management-toolbar{grid-template-columns:1fr;}
 .ranking-row,.status-overview-row{grid-template-columns:minmax(100px,1fr) minmax(90px,1.2fr) auto;}
 }
 
@@ -5295,6 +5300,51 @@ alert(error.message);
 }
 }
 
+function atualizarSelecaoOSMassa(){
+const checks = Array.from(document.querySelectorAll('#os_history_table .os-bulk-select:not(:disabled)'));
+const selecionados = checks.filter((input) => input.checked).length;
+const button = document.getElementById('os_bulk_technical_close');
+const count = document.getElementById('os_bulk_selected_count');
+const all = document.getElementById('os_bulk_select_all');
+if (count) count.textContent = String(selecionados);
+if (button) button.disabled = selecionados === 0;
+if (all){
+const visiveis = checks.filter((input) => !input.closest('tr')?.hidden);
+const marcadosVisiveis = visiveis.filter((input) => input.checked).length;
+all.checked = visiveis.length > 0 && marcadosVisiveis === visiveis.length;
+all.indeterminate = marcadosVisiveis > 0 && marcadosVisiveis < visiveis.length;
+}
+}
+
+async function concluirOSSelecionadasEmMassa(){
+const checks = Array.from(document.querySelectorAll('#os_history_table .os-bulk-select:checked:not(:disabled)'));
+if (!checks.length){
+alert('Selecione ao menos uma O.S. para concluir tecnicamente.');
+return;
+}
+const numeros = checks.map((input) => input.dataset.osNumber || input.value);
+if (!confirm(`Concluir tecnicamente ${checks.length} O.S.?\n\n${numeros.join(', ')}\n\nCada O.S. seguirá o mesmo fluxo da conclusão individual. Saldos negativos continuarão exigindo confirmação própria.`)) return;
+const button = document.getElementById('os_bulk_technical_close');
+if (button) button.disabled = true;
+const concluidas = [];
+const falhas = [];
+for (const input of checks){
+const id = input.dataset.documentId || input.value;
+const numero = input.dataset.osNumber || id;
+try {
+const result = await concluirOSComMateriais(`/api/historico/os/${encodeURIComponent(id)}/status`, {status: 'concluido'});
+if (result) concluidas.push(numero);
+else falhas.push(`${numero}: confirmação cancelada`);
+} catch (error){
+falhas.push(`${numero}: ${error.message}`);
+}
+}
+const resumo = [`${concluidas.length} O.S. concluída(s) tecnicamente.`];
+if (falhas.length) resumo.push(`\nNão concluídas (${falhas.length}):\n${falhas.join('\n')}`);
+alert(resumo.join('\n'));
+window.location.href = '/?tab=gestao-os';
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 garantirSubmissionToken("oc_submit_token");
 garantirSubmissionToken("os_submit_token");
@@ -5327,6 +5377,7 @@ visiveis += 1;
 if (count){
 count.textContent = String(visiveis);
 }
+if (tipo === 'os') atualizarSelecaoOSMassa();
 }
 
 ["oc", "os"].forEach((tipo) => {
@@ -5344,6 +5395,19 @@ filtrarHistoricoGestao(tipo);
 }
 filtrarHistoricoGestao(tipo);
 });
+
+const bulkButton = document.getElementById('os_bulk_technical_close');
+const bulkSelectAll = document.getElementById('os_bulk_select_all');
+if (bulkButton) bulkButton.addEventListener('click', concluirOSSelecionadasEmMassa);
+if (bulkSelectAll) bulkSelectAll.addEventListener('change', () => {
+document.querySelectorAll('#os_history_table tbody tr[data-history-search]:not([hidden]) .os-bulk-select:not(:disabled)')
+  .forEach((input) => { input.checked = bulkSelectAll.checked; });
+atualizarSelecaoOSMassa();
+});
+document.querySelectorAll('#os_history_table .os-bulk-select').forEach((input) => {
+input.addEventListener('change', atualizarSelecaoOSMassa);
+});
+atualizarSelecaoOSMassa();
 
 const tabela = document.getElementById("tabela_itens");
 if (tabela){
@@ -6259,11 +6323,12 @@ salvarRascunhoOS();
 <div class="management-toolbar">
 <div><label for="os_history_search">Busca</label><input id="os_history_search" type="search" placeholder="Número, chassi, cliente, município ou MMV"></div>
 <div><label for="os_history_status">Status</label><select id="os_history_status"><option value="">Todos</option><option value="emitido">Emitido</option><option value="RASCUNHO">Rascunho MES</option><option value="ATIVA">Ativa</option><option value="EM_PRODUÇÃO">Em produção</option><option value="FINALIZADA">Finalizada</option><option value="ENTREGUE">Entregue</option><option value="RETIRADA">Retirada</option><option value="CANCELADA">Cancelada</option></select></div>
+{% if can('suprimentos.work_order.technical_close') %}<button id="os_bulk_technical_close" type="button" class="btn-secondary" disabled>Conclusão técnica em massa <span id="os_bulk_selected_count">0</span></button>{% endif %}
 <button type="button" class="btn-secondary" data-clear-history="os">Limpar filtros</button>
 </div>
 <div class="management-table-wrap">
 <table id="os_history_table">
-<thead><tr><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Status MES</th><th>Conclusão</th><th>Usuário</th><th>Ações</th></tr></thead>
+<thead><tr><th class="bulk-select-column"><input id="os_bulk_select_all" type="checkbox" aria-label="Selecionar todas as O.S. visíveis"></th><th>O.S.</th><th>Data</th><th>Chassi</th><th>Cliente</th><th>MMV</th><th>Itens</th><th>Status MES</th><th>Conclusão</th><th>Usuário</th><th>Ações</th></tr></thead>
 <tbody>
 {% for doc in dashboard.ordens_servico %}
 {% set dados = doc.dados or {} %}
@@ -6272,12 +6337,12 @@ salvarRascunhoOS();
 {% set etapas_total = mes_os.etapas_aplicaveis|default(0)|int %}
 {% set etapas_concluidas = mes_os.etapas_concluidas|default(0)|int %}
 {% set percentual = ((etapas_concluidas * 100 / etapas_total)|round|int) if etapas_total else 0 %}
-<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ status_os)|lower }}" data-history-status="{{ status_os }}" data-history-date="{{ doc.data_criacao or '' }}">
-<td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ status_os|lower }}">{{ status_os|replace('_', ' ') }}</span>{% if mes_os %}<span class="integration-detail">Atualizado pelo MES · Técnica: {{ 'CONCLUÍDA' if mes_os.technical_status == 'CONCLUIDA' else 'ABERTA' }}</span>{% endif %}</td><td><strong>{{ percentual }}%</strong><div class="os-progress"><span style="width:{{ percentual }}%"></span></div><span class="integration-detail">{{ etapas_concluidas }}/{{ etapas_total }} etapas</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
+<tr data-history-search="{{ (doc.numero|string ~ ' ' ~ (dados.chassis or '') ~ ' ' ~ (dados.cliente or '') ~ ' ' ~ (dados.municipio or '') ~ ' ' ~ (dados.mmv or '') ~ ' ' ~ status_os)|lower }}" data-history-status="{{ status_os }}" data-history-technical="{{ 'concluido' if mes_os.technical_status == 'CONCLUIDA' or (doc.status or '')|lower == 'concluido' else '' }}" data-history-date="{{ doc.data_criacao or '' }}">
+<td class="bulk-select-column"><input class="os-bulk-select" type="checkbox" value="{{ doc.id }}" data-document-id="{{ doc.id }}" data-os-number="{{ doc.numero or '-' }}" aria-label="Selecionar O.S. {{ doc.numero or '-' }}"{% if (doc.status or '')|lower == 'concluido' or mes_os.technical_status == 'CONCLUIDA' %} disabled{% endif %}></td><td><strong>{{ doc.numero or "-" }}</strong></td><td>{{ doc.data_criacao or "-" }}</td><td>{{ dados.chassis or "-" }}</td><td>{{ dados.cliente or "-" }}</td><td>{{ dados.mmv or "-" }}</td><td>{{ (doc.itens or [])|length }}</td><td><span class="status-badge {{ status_os|lower }}">{{ status_os|replace('_', ' ') }}</span>{% if mes_os %}<span class="integration-detail">Atualizado pelo MES · Técnica: {{ 'CONCLUÍDA' if mes_os.technical_status == 'CONCLUIDA' else 'ABERTA' }}</span>{% endif %}</td><td><strong>{{ percentual }}%</strong><div class="os-progress"><span style="width:{{ percentual }}%"></span></div><span class="integration-detail">{{ etapas_concluidas }}/{{ etapas_total }} etapas</span></td><td>{{ doc.atualizado_por or doc.criado_por or "-" }}</td>
 <td class="history-actions"><button type="button" class="btn-secondary" onclick="visualizarHistoricoOS('{{ doc.id }}')">Abrir documento</button>{% if can('suprimentos.work_order.manage') %}<button type="button" onclick="editarHistoricoOS('{{ doc.id }}')">Editar documento</button>{% endif %}{% if can('suprimentos.work_order.technical_close') and (doc.status or 'emitido') != 'concluido' and mes_os.technical_status != 'CONCLUIDA' %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','concluido','Concluir tecnicamente esta O.S.? Serão baixados os empenhos vinculados, consumidos os candidatos necessários e encerradas as pendências restantes.')">Conclusão técnica</button>{% endif %}{% if mes_os %}<a class="btn btn-secondary" href="/erp/gestao-os">Abrir gestão MES</a>{% elif can('suprimentos.work_order.manage') %}<button type="button" class="btn-secondary" onclick="alterarStatusDocumento('os','{{ doc.id }}','cancelado','Cancelar esta O.S.?')">Cancelar</button><button type="button" class="btn-danger" onclick="excluirHistoricoOS('{{ doc.id }}', '{{ doc.numero }}')">Excluir</button>{% endif %}</td>
 </tr>
 {% else %}
-<tr><td colspan="10">Nenhuma O.S. registrada ainda.</td></tr>
+<tr><td colspan="11">Nenhuma O.S. registrada ainda.</td></tr>
 {% endfor %}
 </tbody>
 </table>
