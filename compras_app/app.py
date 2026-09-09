@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, send_file, redirect, url_for,
 from flask.wrappers import Request as FlaskRequest
 import csv
 import copy
+from email.utils import parsedate_to_datetime
 import hashlib
 import re
 import json
@@ -8180,17 +8181,22 @@ def _pcp_needs_number(value):
 
 
 def _pcp_needs_date(value):
-    """Normalize an ISO date only for ordering the planning projection."""
+    """Parse the date formats returned by the ERP and Excel integrations."""
     raw = str(value or "").strip()
     if not raw:
         return None
     try:
         return datetime.fromisoformat(raw.replace("Z", "+00:00")).date()
     except ValueError:
-        try:
-            return datetime.strptime(raw[:10], "%d/%m/%Y").date()
-        except ValueError:
-            return None
+        pass
+    try:
+        return parsedate_to_datetime(raw).date()
+    except (TypeError, ValueError, OverflowError):
+        pass
+    try:
+        return datetime.strptime(raw[:10], "%d/%m/%Y").date()
+    except ValueError:
+        return None
 
 
 def _forecast_demand_label(forecast):
@@ -8211,38 +8217,42 @@ def _pcp_forecast_summary(requirements):
     for requirement in requirements or []:
         forecast = requirement.get("forecast") or {}
         demand_type = str(forecast.get("tipo_demanda") or "").strip().upper()
+        planned_date = (
+            _pcp_needs_date(forecast.get("data_entrega_prevista"))
+            or _pcp_needs_date(forecast.get("data_prevista_chegada"))
+        )
         key = (
             demand_type,
             str(requirement.get("sku_codigo") or "").strip().upper(),
             str(requirement.get("descricao") or "").strip(),
             str(requirement.get("unidade") or "").strip(),
+            planned_date,
         )
         current = grouped.setdefault(key, {
             "demand_type": demand_type,
             "codigo": key[1],
             "descricao": key[2],
             "unidade": key[3],
+            "planned_date": planned_date,
             "quantidade": 0.0,
             "forecast_codes": set(),
-            "dates": [],
             "bom": set(),
         })
         current["quantidade"] += _pcp_needs_number(requirement.get("quantidade_planejada"))
         code = str(forecast.get("codigo") or "").strip()
         if code:
             current["forecast_codes"].add(code)
-        planned_date = (
-            _pcp_needs_date(forecast.get("data_entrega_prevista"))
-            or _pcp_needs_date(forecast.get("data_prevista_chegada"))
-        )
-        if planned_date:
-            current["dates"].append(planned_date)
         current["bom"].add(
             "B.O.M. explodida" if str(requirement.get("origem") or "").upper() == "BOM" else "SKU direto"
         )
     return sorted(
         grouped.values(),
-        key=lambda row: (row["demand_type"], row["codigo"], row["descricao"]),
+        key=lambda row: (
+            row["planned_date"] or date.max,
+            row["demand_type"],
+            row["codigo"],
+            row["descricao"],
+        ),
     )
 
 
@@ -8291,7 +8301,7 @@ def _pcp_needs_workbook(work_order_needs, forecast_requirements):
             f"O.S. {line.get('numero_os') or ''}".strip(),
             "DEMANDA FIRME — O.S. ABERTA",
             line.get("status_necessidade") or "PENDENTE",
-            line.get("data_entrega_os") or "",
+            _pcp_needs_date(line.get("data_entrega_os")) or "",
             line.get("numero_os") or "",
             line.get("item_number") or "",
             line.get("chassi") or "",
@@ -8308,8 +8318,7 @@ def _pcp_needs_workbook(work_order_needs, forecast_requirements):
         ])
 
     for forecast in _pcp_forecast_summary(forecast_requirements):
-        dates = forecast["dates"]
-        date_label = min(dates).isoformat() if dates else ""
+        date_label = forecast["planned_date"] or ""
         references = ", ".join(sorted(forecast["forecast_codes"])) or "Forecast sem código"
         ws.append([
             "FORECAST",
@@ -8338,6 +8347,8 @@ def _pcp_needs_workbook(work_order_needs, forecast_requirements):
     for row in ws.iter_rows(min_row=header_row + 1, max_row=ws.max_row):
         for index in numeric_columns:
             row[index - 1].number_format = "0.000"
+        if row[4].value:
+            row[4].number_format = "dd/mm/yyyy"
         row[2].alignment = Alignment(wrap_text=True, vertical="top")
         row[10].alignment = Alignment(wrap_text=True, vertical="top")
     for col_idx, column_cells in enumerate(ws.columns, start=1):

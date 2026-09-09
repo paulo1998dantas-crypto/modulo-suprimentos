@@ -2,6 +2,7 @@ import io
 import os
 import sys
 import unittest
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
@@ -51,6 +52,12 @@ class PcpNeedsReportTests(unittest.TestCase):
         self.assertEqual(2, metrics["quantidade_planejada"])
         self.assertEqual(2, metrics["quantidade_consumida_documental"])
         self.assertEqual(1, metrics["skus_planejados"])
+
+    def test_needs_date_parser_accepts_erp_rfc_date(self):
+        self.assertEqual(
+            date(2026, 9, 30),
+            app_module._pcp_needs_date("Wed, 30 Sep 2026 00:00:00 GMT"),
+        )
 
     def test_report_combines_open_os_needs_and_active_forecast_in_one_table(self):
         stock_projection = {
@@ -136,13 +143,48 @@ class PcpNeedsReportTests(unittest.TestCase):
             if row[0] == "FORECAST" and "PREDITIVO" in row[2]
         )
         self.assertEqual("3100", str(os_row[5]))
-        self.assertEqual("2026-08-15", str(os_row[4]))
+        self.assertEqual(date(2026, 8, 15), os_row[4])
+        self.assertEqual("dd/mm/yyyy", workbook["Necessidades PCP"]["E5"].number_format)
         self.assertEqual(3, os_row[14])
         self.assertEqual(4, confirmed_forecast[14])
         self.assertEqual(2, predictive_forecast[14])
         self.assertIsNone(confirmed_forecast[13])
         workbook.close()
         response.close()
+
+    def test_forecast_summary_keeps_different_need_dates_separate(self):
+        requirements = [
+            {
+                "sku_codigo": "MP-001",
+                "descricao": "Manta de teste",
+                "unidade": "pc",
+                "quantidade_planejada": 1,
+                "origem": "BOM",
+                "forecast": {
+                    "codigo": "FCT-0001",
+                    "tipo_demanda": "AGUARDANDO_CHEGADA",
+                    "data_entrega_prevista": "2026-09-10",
+                },
+            },
+            {
+                "sku_codigo": "MP-001",
+                "descricao": "Manta de teste",
+                "unidade": "pc",
+                "quantidade_planejada": 2,
+                "origem": "BOM",
+                "forecast": {
+                    "codigo": "FCT-0002",
+                    "tipo_demanda": "AGUARDANDO_CHEGADA",
+                    "data_entrega_prevista": "2026-09-30",
+                },
+            },
+        ]
+        summary = app_module._pcp_forecast_summary(requirements)
+        self.assertEqual(2, len(summary))
+        self.assertEqual(date(2026, 9, 10), summary[0]["planned_date"])
+        self.assertEqual(1, summary[0]["quantidade"])
+        self.assertEqual(date(2026, 9, 30), summary[1]["planned_date"])
+        self.assertEqual(2, summary[1]["quantidade"])
 
     def test_management_screen_exposes_the_pcp_needs_export(self):
         template = (APP_DIR / "templates" / "erp_gestao_os.html").read_text(encoding="utf-8")
