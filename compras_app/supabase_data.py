@@ -899,12 +899,35 @@ def excluir_documentos(documento_ids):
     return len(ids)
 
 
-def carregar_documentos(force=False, limit=None):
+def carregar_documentos(force=False, limit=None, resumo=False):
+    """Load legacy documents, with an intentionally light read model for lists.
+
+    The management screens only need document metadata, ``dados`` and the
+    original item list.  Loading the full process/component/composition JSON
+    for every document on every page made the single Render instance retain
+    hundreds of megabytes and eventually get SIGKILLed.  Detail/edit routes
+    continue using the default full payload; list routes should pass
+    ``resumo=True``.
+    """
+    if resumo:
+        select = (
+            "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,"
+            "criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,"
+            "layout_arquivo_id,dados,itens"
+        )
+        cache_key = "documentos_resumo"
+    else:
+        select = (
+            "id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,"
+            "criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,"
+            "layout_arquivo_id,dados,itens,processos,componentes,composicao"
+        )
+        cache_key = "documentos"
     rows = _all_rows(
         DOCUMENTOS_TABLE,
-        select="id,created_at,updated_at,tipo,numero,data_criacao,status,submit_token,criado_por,atualizado_por,erp_purchase_order_id,erp_work_order_id,layout_arquivo_id,dados,itens,processos,componentes,composicao",
+        select=select,
         order="data_criacao.desc,created_at.desc",
-        cache_key="documentos",
+        cache_key=cache_key,
         force=force,
     )
     if limit is not None:

@@ -20,6 +20,7 @@ import shutil
 import zipfile
 import subprocess
 import threading
+import time
 import unicodedata
 import uuid
 from datetime import date, timedelta, datetime
@@ -110,6 +111,25 @@ import supabase_data
 
 
 OPERATIONAL_TIMEZONE = ZoneInfo("America/Sao_Paulo")
+
+# Keep a very short cache for the two remote read models. The management page
+# makes several overlapping reads and repeatedly downloading complete
+# Estoque/MES datasets was exhausting the single Render instance.
+_ERP_READ_CACHE = {}
+_ERP_READ_CACHE_LOCK = threading.Lock()
+_ERP_READ_CACHE_TTL_SECONDS = 5.0
+
+
+def _cached_erp_read(cache_key, loader):
+    now = time.monotonic()
+    with _ERP_READ_CACHE_LOCK:
+        cached = _ERP_READ_CACHE.get(cache_key)
+        if cached and now - cached["loaded_at"] < _ERP_READ_CACHE_TTL_SECONDS:
+            return cached["payload"]
+    payload = loader()
+    with _ERP_READ_CACHE_LOCK:
+        _ERP_READ_CACHE[cache_key] = {"loaded_at": time.monotonic(), "payload": payload}
+    return payload
 
 
 def _operational_today():
@@ -681,13 +701,24 @@ def _carregar_historico_local():
     return []
 
 
-def carregar_historico():
+def carregar_historico(resumo=False):
     if supabase_data.enabled():
         try:
-            return supabase_data.carregar_documentos()
+            return supabase_data.carregar_documentos(resumo=resumo)
         except Exception:
             app.logger.exception("Falha ao carregar historico de documentos do Supabase")
-    return _carregar_historico_local()
+    documentos = _carregar_historico_local()
+    if not resumo:
+        return documentos
+    return [
+        {
+            **documento,
+            "processos": {},
+            "componentes": {},
+            "composicao": [],
+        }
+        for documento in documentos
+    ]
 
 
 def salvar_historico(entries):
@@ -980,8 +1011,8 @@ def _carregar_documentos_os_para_vinculo():
     therefore fail the request instead of mixing the two sources of truth.
     """
     if supabase_data.enabled():
-        return supabase_data.carregar_documentos(force=True)
-    return _carregar_historico_local()
+        return supabase_data.carregar_documentos(resumo=True)
+    return carregar_historico(resumo=True)
 
 
 def _os_document_summary(documento):
@@ -4316,7 +4347,10 @@ def _enriquecer_compras_integradas(historico):
     if not erp_feature_enabled():
         return historico
     try:
-        compras = _erp_stock_request("dashboard").get("orders", [])
+        compras = _cached_erp_read(
+            "stock:dashboard",
+            lambda: _erp_stock_request("dashboard"),
+        ).get("orders", [])
         por_id = {
             str(ordem.get("id") or ""): ordem
             for ordem in compras
@@ -4353,7 +4387,10 @@ def _enriquecer_historico_integrado(historico, tab):
     _enriquecer_compras_integradas(historico)
 
     try:
-        ordens_mes = _erp_mes_request("work-orders").get("orders", [])
+        ordens_mes = _cached_erp_read(
+            "mes:work-orders",
+            lambda: _erp_mes_request("work-orders"),
+        ).get("orders", [])
         por_id = {
             str(ordem.get("id") or ""): ordem
             for ordem in ordens_mes
@@ -4420,7 +4457,7 @@ def index():
             if can(tab_permissions[candidate]):
                 tab = candidate
                 break
-    historico = _enriquecer_historico_integrado(carregar_historico(), tab)
+    historico = _enriquecer_historico_integrado(carregar_historico(resumo=True), tab)
     oc_totais = _agrupar_por_data(historico, "oc", "total_pedido")
     os_quantidades = _agrupar_por_data(historico, "os", None)
     dashboard = {
