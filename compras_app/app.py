@@ -1633,6 +1633,26 @@ def _realinhar_valores_linha_por_codigo(codigos_origem, valores_origem, codigos_
     return realinhados
 
 
+def _codigos_forecast_com_vigencia_atual(codigos_form, itens_forecast):
+    """Mantem o SKU atual da tela ao converter um Forecast documental.
+
+    O Forecast fornece a estrutura inicial da O.S., mas uma alteracao manual
+    posterior (por exemplo, trocar 40340051 por 40340055) precisa prevalecer
+    no documento que sera emitido. Quando a linha atual estiver vazia, usamos
+    o SKU planejado como fallback.
+    """
+    codigos_vigentes = []
+    for indice, item in enumerate(itens_forecast or []):
+        codigo_atual = (
+            normalizar_codigo(codigos_form[indice])
+            if indice < len(codigos_form or [])
+            else ""
+        )
+        codigo_forecast = normalizar_codigo((item or {}).get("sku_codigo", ""))
+        codigos_vigentes.append(codigo_atual or codigo_forecast)
+    return codigos_vigentes
+
+
 def carregar_os_processos():
     if supabase_data.enabled():
         try:
@@ -6453,7 +6473,11 @@ def gerar_os():
         luminarias_enviadas = list(luminarias_linha)
         luminarias_qtd_enviadas = list(luminarias_qtd_linha)
         popup_itens_enviados = list(popup_itens_linha)
-        codigos = [str(item.get("sku_codigo") or "").strip() for item in itens_forecast]
+        # O Forecast monta a O.S. inicialmente, mas nao pode sobrescrever uma
+        # troca manual feita pelo usuario depois (ex.: 40340051 -> 40340055).
+        # O codigo vigente na tela e a fonte de verdade; o Forecast fica como
+        # fallback apenas para linhas que nao tenham codigo informado.
+        codigos = _codigos_forecast_com_vigencia_atual(codigos_enviados, itens_forecast)
         qtds = [
             str(_parse_numero_form(item.get("quantidade_por_veiculo"), 0) * forecast_quantidade)
             for item in itens_forecast

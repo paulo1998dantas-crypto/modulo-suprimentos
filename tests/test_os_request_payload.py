@@ -15,6 +15,7 @@ os.environ["SUPRIMENTOS_FILE_LOG"] = "0"
 from app import (  # noqa: E402
     POPUP_ITEM_NAO_APLICAVEL,
     SuprimentosRequest,
+    _codigos_forecast_com_vigencia_atual,
     _parse_os_composition_form,
     _realinhar_valores_linha_por_codigo,
     _resolver_nome_cliente_os,
@@ -25,6 +26,27 @@ from flask import request  # noqa: E402
 
 
 class OsRequestPayloadTests(unittest.TestCase):
+    def test_forecast_keeps_current_item_code_from_form(self):
+        itens_forecast = [
+            {"sku_codigo": "40340051"},
+            {"sku_codigo": "30200025"},
+        ]
+
+        codigos = _codigos_forecast_com_vigencia_atual(
+            ["40340055", "30200025"],
+            itens_forecast,
+        )
+
+        self.assertEqual(["40340055", "30200025"], codigos)
+
+    def test_forecast_is_fallback_when_current_line_is_empty(self):
+        codigos = _codigos_forecast_com_vigencia_atual(
+            ["", "30200025"],
+            [{"sku_codigo": "40340051"}, {"sku_codigo": "30200025"}],
+        )
+
+        self.assertEqual(["40340051", "30200025"], codigos)
+
     def test_forecast_realigns_related_item_selections_by_sku(self):
         selecao_40340025 = json.dumps(
             [{"regra_id": "regra-25", "codigo": "30140032", "qtd": 1}]
