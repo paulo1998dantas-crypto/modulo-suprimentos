@@ -9092,6 +9092,29 @@ def erp_vehicle_entry_update_proxy(entry_id):
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
+
+@app.route("/api/erp/os-management/entries/<entry_id>", methods=["DELETE"])
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_vehicle_entry_delete_proxy(entry_id):
+    """Remove uma entrada incorreta antes da abertura da O.S.
+
+    A validação final permanece no MES, que bloqueia a exclusão quando já
+    houver O.S., compras, forecast ou apontamentos vinculados.
+    """
+    try:
+        payload = request.get_json(silent=True) or {}
+        return jsonify(
+            _erp_mes_request(
+                f"vehicle-entries/{entry_id}",
+                "DELETE",
+                payload,
+            )
+        )
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
 @app.route("/api/erp/os-management/entries/<entry_id>/work-orders", methods=["POST"])
 @login_required
 @erp_feature_required

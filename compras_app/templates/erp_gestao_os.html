@@ -10,7 +10,7 @@
     main{max-width:1580px;margin:auto;padding:18px 22px 32px}.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:13px}
     h1{margin:0;font-size:23px}h2{margin:0 0 10px}.head p{margin:4px 0;color:var(--muted)}.actions{display:flex;gap:7px;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;justify-content:center;min-height:35px;padding:7px 12px;border:1px solid #aebbc7;border-radius:5px;background:#fff;color:#172033;font-weight:800;text-decoration:none;cursor:pointer}
-    .btn.primary{background:var(--blue);border-color:#0f568f;color:#fff}.btn.success{background:var(--green);border-color:#0d6963;color:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn.primary{background:var(--blue);border-color:#0f568f;color:#fff}.btn.success{background:var(--green);border-color:#0d6963;color:#fff}.btn.danger{background:#fff1f2;border-color:#fecdd3;color:#be123c}.btn:disabled{opacity:.5;cursor:not-allowed}
     .metrics{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:8px;margin-bottom:11px}.metric{padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:#fff}
     .metric span{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}.metric strong{display:block;margin-top:4px;font-size:21px}
     .panel{border:1px solid var(--line);border-radius:7px;background:#fff;overflow:hidden}.toolbar{display:flex;align-items:end;gap:8px;padding:10px 12px;background:#f8fafc;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -126,6 +126,7 @@
         <button id="activate-button" class="btn success" type="button" onclick="openMesConfiguration()" hidden>Salvar e parametrizar no MES</button>
         <button id="technical-close-button" class="btn" type="button" onclick="technicalClose()" hidden>Conclusão técnica</button>
         <button id="correct-historical-button" class="btn" type="button" onclick="handleHistoricalCorrection()" hidden>Corrigir dados históricos</button>
+        <button id="delete-entry-button" class="btn danger" type="button" onclick="deleteEntryFromDialog()" hidden>Excluir lançamento incorreto</button>
       </div>
       <button id="save-work" class="btn primary" type="submit">Salvar O.S. rascunho</button>
     </footer>
@@ -255,7 +256,8 @@ function render(){
     const actions=row.can_create_replacement&&permissions.manage
       ? `<button class="btn" type="button" onclick="openWork('${row.entry_id}')">Consultar cancelada</button><br><button class="btn primary" type="button" onclick="openWork('${row.entry_id}',true)">+ Nova O.S. no ITEM</button>`
       : `<button class="btn ${permissions.manage&&!row.work_order_id?'primary':''}" type="button" onclick="openWork('${row.entry_id}')">${permissions.manage?(row.work_order_id?'Abrir':'Alocar e abrir O.S.'):'Consultar'}</button>`;
-    return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. operacional ${esc(row.numero_os||'não aberta')}${revisionLabel}</span>${documentLine}</td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id||row.can_create_replacement?'<br><span class="available">DISPONÍVEL PARA NOVA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${isMesConfigurationPending(row)?'<br><span class="muted">MES: AG. PARAMETRIZAÇÃO</span>':''}${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td>${row.work_order_id?`<button class="btn" type="button" onclick="openMaterials('${row.work_order_id}','${esc(row.numero_os||row.item_number)}')">Consultar</button>`:'<span class="muted">O.S. não aberta</span>'}</td><td>${actions}</td></tr>`}).join('');
+    const deleteAction=permissions.manage&&!row.work_order_id?`<br><button class="btn danger" type="button" onclick="deleteEntry('${row.entry_id}')">Excluir lançamento</button>`:'';
+    return `<tr><td><strong>ITEM ${esc(row.item_number)}</strong><br><span class="muted">O.S. operacional ${esc(row.numero_os||'não aberta')}${revisionLabel}</span>${documentLine}</td><td><strong>${esc(row.chassi)}</strong><br><span class="muted">${esc([row.marca,row.modelo,row.versao].filter(Boolean).join(' '))}</span>${!row.work_order_id||row.can_create_replacement?'<br><span class="available">DISPONÍVEL PARA NOVA O.S.</span>':''}</td><td>${esc(row.cliente_nome||row.entry_client||'—')}</td><td>${date(row.data_chegada)}</td><td>${esc((row.tipo_servico||'—').replaceAll('_',' '))}</td><td>${esc(row.linha||'—')}<br><span class="muted">${esc(row.transformacao||'')}</span></td><td>${date(row.data_comercial_prevista)}</td><td><div>${done}/${total}</div><div class="progress"><span style="width:${pct}%"></span></div></td><td><span class="badge ${esc(status)}">${esc(status.replaceAll('_',' '))}</span>${isMesConfigurationPending(row)?'<br><span class="muted">MES: AG. PARAMETRIZAÇÃO</span>':''}${row.technical_status==='CONCLUIDA'?'<br><span class="muted">Técnica concluída</span>':''}</td><td>${row.work_order_id?`<button class="btn" type="button" onclick="openMaterials('${row.work_order_id}','${esc(row.numero_os||row.item_number)}')">Consultar</button>`:'<span class="muted">O.S. não aberta</span>'}</td><td>${actions}${deleteAction}</td></tr>`}).join('');
 }
 async function loadOrders(){try{message('Atualizando entradas, O.S., documentos e bancos...');const [orders,catalogs,documents,banks]=await Promise.all([api('/api/erp/os-management'),api('/api/erp/os-management/catalogs'),api('/api/erp/os-management/documents'),api('/api/erp/os-management/banks?limit=1000')]);state.orders=orders.orders||[];state.catalogs=catalogs;state.documents=documents.documents||[];state.banks=banks.banks||[];state.required=catalogs.required_work_order_fields||[];loadCatalogFields();renderBankOptions();metrics();render();message('')}catch(error){message(error.message,true)}}
 function clearFilters(){document.getElementById('search').value='';document.getElementById('view-filter').value='{{ initial_view }}';render()}
@@ -293,6 +295,7 @@ function openWork(entryId,createRevision=false){
   form.elements.data_comercial_prevista.disabled=!editable||active;
   const saveButton=document.getElementById('save-work');saveButton.hidden=!editable;saveButton.textContent=createRevision?'Emitir nova O.S. no mesmo ITEM':(active?'Salvar alterações':'Salvar O.S. emitida');
   const saveEntryButton=document.getElementById('save-entry');saveEntryButton.hidden=!editable;saveEntryButton.disabled=!editable;
+  document.getElementById('delete-entry-button').hidden=!(permissions.manage&&!row.work_order_id);
   document.getElementById('activate-button').hidden=!(permissions.manage&&row.work_order_id&&['RASCUNHO','AGUARDANDO_O_S'].includes(row.status));
   const technicalButton=document.getElementById('technical-close-button');technicalButton.hidden=!(permissions.technical&&row.work_order_id);technicalButton.disabled=row.technical_status==='CONCLUIDA'||row.status==='CANCELADA';technicalButton.textContent=row.technical_status==='CONCLUIDA'?'Técnica concluída':'Conclusão técnica';
   const correctionButton=document.getElementById('correct-historical-button'),correctionReasonLabel=document.getElementById('historical-correction-reason-label'),correctionReason=document.getElementById('historical-correction-reason');
@@ -321,6 +324,22 @@ async function saveEntryData(){
   if(!form.elements.entry_id.value||!permissions.manage)return;
   const button=document.getElementById('save-entry');button.disabled=true;
   try{await persistEntry();render();message('Dados físicos da entrada atualizados e auditados. Os demais campos da O.S. permaneceram na tela e não foram descartados.')}catch(error){message(error.message,true)}finally{button.disabled=false}
+}
+async function deleteEntryFromDialog(){await deleteEntry(form.elements.entry_id.value)}
+async function deleteEntry(entryId){
+  const row=state.orders.find(item=>String(item.entry_id)===String(entryId));
+  if(!row||!permissions.manage||row.work_order_id)return;
+  const reason=prompt(`Excluir o lançamento do ITEM ${row.item_number||''}? Informe o motivo:`);
+  if(reason===null)return;
+  const motivo=String(reason||'').trim();
+  if(!motivo){message('Informe o motivo da exclusão do lançamento.',true);return}
+  if(!confirm(`Confirma a exclusão do lançamento do ITEM ${row.item_number||''}? Essa ação remove somente a entrada incorreta e libera o sequencial quando aplicável.`))return;
+  try{
+    await api(`/api/erp/os-management/entries/${encodeURIComponent(entryId)}`,{method:'DELETE',body:JSON.stringify({motivo})});
+    if(workDialog.open&&String(form.elements.entry_id.value)===String(entryId))workDialog.close();
+    await loadOrders();
+    message(`Lançamento do ITEM ${row.item_number||''} excluído e auditado.`);
+  }catch(error){message(error.message,true)}
 }
 async function saveWork(silent=false){const entryId=form.elements.entry_id.value,workId=form.elements.work_order_id.value,payload=workPayload(),wasActive=['ATIVA','EM_PRODUÇÃO'].includes(state.active?.status),wasRevision=state.creatingRevision;await persistEntry();const result=workId?await api(`/api/erp/os-management/work-orders/${workId}`,{method:'PUT',body:JSON.stringify(payload)}):await api(`/api/erp/os-management/entries/${entryId}/work-orders`,{method:'POST',body:JSON.stringify(payload)});state.creatingRevision=false;state.replacementSourceId=null;await loadOrders();const row=state.orders.find(item=>item.entry_id===entryId);if(row)openWork(entryId);if(!silent)message(wasRevision?`Nova revisão da O.S. ${result.numero_os||row?.numero_os||''} emitida no mesmo ITEM. A cancelada foi preservada no histórico.`:(wasActive?`Entrada e alterações da O.S. ${result.numero_os||row?.numero_os||''} salvas e refletidas no MES.`:`Entrada e O.S. ${result.numero_os||row?.numero_os||''} emitidas e salvas. A parametrização das etapas pode ser feita depois no MES.`));return result.id||workId}
 async function handleHistoricalCorrection(){
