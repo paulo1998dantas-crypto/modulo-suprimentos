@@ -1078,6 +1078,13 @@ width:15%;
 .comp-equivalence-summary{display:block;margin-top:5px;color:#526277;font-size:10px;line-height:1.3;}
 .comp-equivalence-editor{display:flex;flex-direction:column;gap:5px;min-width:190px;}
 .comp-equivalence-editor select,.comp-equivalence-editor input{font-size:11px;min-height:27px;}
+.comp-stock-cell{min-width:135px;font-size:11px;line-height:1.3;vertical-align:middle;}
+.comp-stock-cell small{display:block;margin-top:3px;color:#526277;}
+.comp-stock-badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:800;white-space:nowrap;}
+.comp-stock-badge.ok{background:#dcfce7;color:#166534;}
+.comp-stock-badge.parcial{background:#fef3c7;color:#92400e;}
+.comp-stock-badge.sem-saldo{background:#fee2e2;color:#991b1b;}
+.comp-stock-badge.indisponivel{background:#e2e8f0;color:#475569;}
 .btn-row-remove{
 background:#e11d48;
 border:none;
@@ -1416,6 +1423,8 @@ const osDraftStorageKey = `modulo_suprimentos_os_draft_v2:${currentLoginScope}`;
 let osDraftRestoring = false;
 let osDraftSaveTimer = null;
 let osForecastsDocumentais = [];
+const stockAvailabilityCacheOS = new Map();
+let stockAvailabilityRequestOS = 0;
 
 function novoSubmissionToken(){
 if (window.crypto && typeof window.crypto.randomUUID === "function"){
@@ -3826,6 +3835,119 @@ agendarSalvarRascunhoOS();
 
 const equivalenceOptionsCacheOS = new Map();
 
+function formatarQuantidadeEstoqueOS(value){
+const numero = parseNumber(value);
+return numero.toLocaleString("pt-BR", { maximumFractionDigits: 3 });
+}
+
+function infoDisponibilidadeEstoqueOS(codigo){
+return stockAvailabilityCacheOS.get(normalizarCodigoOS(codigo)) || null;
+}
+
+function statusDisponibilidadeEstoqueOS(info, necessario){
+if (!info){
+return { classe: "indisponivel", rotulo: "Saldo indisponível" };
+}
+const disponivel = parseNumber(info.saldo_disponivel);
+const demanda = Math.max(parseNumber(necessario), 0);
+if (disponivel + 0.000001 >= demanda){
+return { classe: "ok", rotulo: "Disponível" };
+}
+if (disponivel > 0){
+return { classe: "parcial", rotulo: "Saldo parcial" };
+}
+return { classe: "sem-saldo", rotulo: "Sem saldo" };
+}
+
+function renderDisponibilidadeComposicaoOS(row, infoAtual){
+const cell = row ? row.querySelector(".comp-stock-cell") : null;
+if (!cell){
+return;
+}
+const codigoInput = row.querySelector('[name="os_comp_codigo[]"]');
+const quantidadeInput = row.querySelector('[name="os_comp_qtd[]"]');
+const codigo = normalizarCodigoOS((codigoInput || {}).value || "");
+const quantidade = parseNumber((quantidadeInput || {}).value || "");
+const info = infoAtual === undefined ? infoDisponibilidadeEstoqueOS(codigo) : infoAtual;
+const status = statusDisponibilidadeEstoqueOS(info, quantidade);
+cell.dataset.status = status.classe;
+if (!info){
+cell.innerHTML = `<span class="comp-stock-badge indisponivel">Saldo indisponível</span><small>Não altera a escolha do componente.</small>`;
+return;
+}
+const disponivel = formatarQuantidadeEstoqueOS(info.saldo_disponivel);
+const fisico = formatarQuantidadeEstoqueOS(info.saldo_atual);
+const empenhado = formatarQuantidadeEstoqueOS(info.saldo_empenhado);
+cell.innerHTML = `<span class="comp-stock-badge ${status.classe}">${status.rotulo}</span><small>Disp.: ${disponivel} · Nec.: ${formatarQuantidadeEstoqueOS(quantidade)}</small><small>Físico: ${fisico} · Emp.: ${empenhado}</small>`;
+}
+
+async function consultarDisponibilidadeEstoqueOS(codigos){
+const solicitados = Array.from(new Set((codigos || []).map((codigo) => normalizarCodigoOS(codigo)).filter(Boolean)));
+const pendentes = solicitados.filter((codigo) => !stockAvailabilityCacheOS.has(codigo));
+if (!pendentes.length){
+return;
+}
+const resposta = await fetch("/api/estoque/disponibilidade", {
+method: "POST",
+headers: { "Content-Type": "application/json", Accept: "application/json" },
+body: JSON.stringify({ skus: pendentes }),
+});
+const payload = await resposta.json().catch(() => ({}));
+if (!resposta.ok || !payload.ok){
+throw new Error(payload.erro || "Não foi possível consultar o saldo do Estoque.");
+}
+(payload.items || []).forEach((item) => {
+const codigo = normalizarCodigoOS(item.sku || "");
+if (codigo){
+stockAvailabilityCacheOS.set(codigo, item);
+}
+});
+pendentes.filter((codigo) => !stockAvailabilityCacheOS.has(codigo)).forEach((codigo) => {
+stockAvailabilityCacheOS.set(codigo, null);
+});
+}
+
+async function atualizarDisponibilidadeComposicaoOS(){
+const rows = Array.from(document.querySelectorAll("#tabela_componentes_body tr"));
+const codigos = rows.map((row) => (row.querySelector('[name="os_comp_codigo[]"]') || {}).value || "");
+rows.forEach((row) => renderDisponibilidadeComposicaoOS(row));
+const requestId = ++stockAvailabilityRequestOS;
+try {
+await consultarDisponibilidadeEstoqueOS(codigos);
+if (requestId !== stockAvailabilityRequestOS){
+return;
+}
+rows.forEach((row) => renderDisponibilidadeComposicaoOS(row));
+} catch (error){
+if (requestId !== stockAvailabilityRequestOS){
+return;
+}
+rows.forEach((row) => renderDisponibilidadeComposicaoOS(row));
+}
+}
+
+async function atualizarDisponibilidadeLinhaOS(row){
+if (!row){
+return;
+}
+const codigo = (row.querySelector('[name="os_comp_codigo[]"]') || {}).value || "";
+renderDisponibilidadeComposicaoOS(row);
+try {
+await consultarDisponibilidadeEstoqueOS([codigo]);
+renderDisponibilidadeComposicaoOS(row);
+} catch (error){
+renderDisponibilidadeComposicaoOS(row);
+}
+}
+
+function textoSaldoEquivalenteOS(sku){
+const info = infoDisponibilidadeEstoqueOS(sku);
+if (!info){
+return "saldo indisponível";
+}
+return `saldo disp. ${formatarQuantidadeEstoqueOS(info.saldo_disponivel)}`;
+}
+
 function campoEquivalenciaOS(row, nome){
 return row ? row.querySelector(`[name="os_comp_${nome}[]"]`) : null;
 }
@@ -3867,7 +3989,7 @@ memberSelect.innerHTML = "";
 (group.members || []).forEach((member) => {
 const option = document.createElement("option");
 option.value = member.sku || "";
-option.textContent = `${member.sku || ""} — ${member.descricao || "Sem descrição"} (fator ${member.fator_unidade_funcional || 1})`;
+option.textContent = `${member.sku || ""} — ${member.descricao || "Sem descrição"} · ${textoSaldoEquivalenteOS(member.sku)} (fator ${member.fator_unidade_funcional || 1})`;
 memberSelect.appendChild(option);
 });
 selecionarOpcaoEquivalenciaOS(memberSelect, selectedSku || "");
@@ -3904,6 +4026,11 @@ const groups = Array.isArray(payload.groups) ? payload.groups : [];
 if (!groups.length){
 cell.textContent = "Nenhuma equivalência aprovada para este componente.";
 return;
+}
+try {
+await consultarDisponibilidadeEstoqueOS(groups.flatMap((group) => (group.members || []).map((member) => member.sku)));
+} catch (error) {
+// A consulta de saldo é apenas informativa; a seleção manual continua disponível.
 }
 const editor = document.createElement("div");
 editor.className = "comp-equivalence-editor";
@@ -3972,6 +4099,7 @@ if (descricao && selected.descricao) descricao.value = selected.descricao;
 if (unidade && selected.unidade) unidade.value = selected.unidade;
 if (qtd) qtd.value = String(selectedQty);
 osComposicaoSource = "custom";
+renderDisponibilidadeComposicaoOS(row);
 resumirEquivalenciaOS(row);
 marcarComposicaoCustom();
 agendarSalvarRascunhoOS();
@@ -3997,14 +4125,17 @@ row.innerHTML = `
 <td><input name="os_comp_descricao[]" value="${escapeHtmlOS(comp.descricao || "")}" style="padding-left:${Math.max(0, Number(comp.level || 0)) * 12 + 8}px" placeholder="Descrição" onblur="aplicarItemManualNaComposicao(this)"></td>
 <td><input name="os_comp_unidade[]" value="${escapeHtmlOS(comp.unidade || "")}" placeholder="Un."></td>
 <td><input name="os_comp_qtd[]" value="${escapeHtmlOS(comp.qtd || "")}" inputmode="decimal"></td>
+<td class="comp-stock-cell" aria-live="polite"></td>
 <td><select name="os_comp_setor[]"><option value="EXPEDICAO"${setor === "EXPEDICAO" ? " selected" : ""}>Expedição</option><option value="PREPARACAO"${setor === "PREPARACAO" ? " selected" : ""}>Preparação</option><option value="F.D"${setor === "F.D" ? " selected" : ""}>Faturamento direto</option></select><input type="hidden" name="os_comp_setor_manual[]" value="${setorManual}"></td>
 <td class="comp-equivalence-cell"></td>
 <td><button type="button" class="btn-row-remove" title="Excluir da composição" onclick="removerLinhaComposicao(this)">×</button></td>
 `;
 tbody.appendChild(row);
 prepararControleEquivalenciaOS(row, comp);
+renderDisponibilidadeComposicaoOS(row);
 });
 sincronizarFonteComposicao();
+void atualizarDisponibilidadeComposicaoOS();
 }
 
 function coletarComposicaoTabela(){
@@ -5900,6 +6031,7 @@ const selectedQty = parseNumber(event.target.value);
 if (groupId && plannedQty && plannedFactor > 0 && selectedFactor > 0 && selectedQty > 0){
 plannedQty.value = String(Math.round((selectedQty / selectedFactor * plannedFactor) * 1000000) / 1000000);
 }
+renderDisponibilidadeComposicaoOS(row);
 }
 marcarComposicaoCustom();
 }
@@ -6903,6 +7035,7 @@ salvarRascunhoOS();
 <th>Descricao</th>
 <th>Unidade</th>
 <th>Qtd</th>
+<th>Disponibilidade</th>
 <th>Destino</th>
 <th>Versão</th>
 <th></th>

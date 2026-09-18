@@ -4563,6 +4563,24 @@ def api_equivalencias_componente(sku):
         return jsonify({"ok": False, "erro": str(exc)}), 502
 
 
+@app.route("/api/estoque/disponibilidade", methods=["POST"])
+@permission_required("suprimentos.work_order.manage")
+def api_disponibilidade_estoque_composicao():
+    """Return the live available balance for the O.S. composition editor."""
+    if not erp_feature_enabled():
+        return jsonify({"ok": False, "erro": "Integração com o Estoque não está habilitada."}), 503
+    payload = request.get_json(silent=True) or {}
+    skus = payload.get("skus") if isinstance(payload, dict) else []
+    if not isinstance(skus, list):
+        return jsonify({"ok": False, "erro": "A lista de SKUs é inválida."}), 400
+    skus = [str(sku or "").strip() for sku in skus if str(sku or "").strip()][:500]
+    try:
+        return jsonify({"ok": True, **_erp_stock_request("stock/availability", "POST", {"skus": skus})})
+    except ValueError as exc:
+        app.logger.warning("Falha ao consultar disponibilidade dos componentes: %s", exc)
+        return jsonify({"ok": False, "erro": str(exc)}), 502
+
+
 @app.route("/api/historico/os/<documento_id>")
 @permission_required("suprimentos.work_order.view")
 def api_historico_os(documento_id):
