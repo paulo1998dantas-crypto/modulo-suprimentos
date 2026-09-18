@@ -4550,6 +4550,19 @@ def index():
     )
 
 
+@app.route("/api/equivalencias/<sku>")
+@permission_required("suprimentos.work_order.manage")
+def api_equivalencias_componente(sku):
+    """Expose only Cadastro-approved versions to the O.S. editor."""
+    if not supabase_data.enabled():
+        return jsonify({"ok": False, "erro": "Equivalências requerem a integração com o Cadastro."}), 404
+    try:
+        return jsonify({"ok": True, "groups": supabase_data.equivalencias_para_sku(sku)})
+    except supabase_data.SupabaseDataError as exc:
+        app.logger.warning("Falha ao consultar equivalências de %s: %s", sku, exc)
+        return jsonify({"ok": False, "erro": str(exc)}), 502
+
+
 @app.route("/api/historico/os/<documento_id>")
 @permission_required("suprimentos.work_order.view")
 def api_historico_os(documento_id):
@@ -6362,8 +6375,71 @@ def _parse_os_composition_form(form):
         fornecedor = str(raw_row.get("fornecedor", "") or "").strip()
         if fornecedor:
             linha["fornecedor"] = fornecedor
+        equivalence_group_id = str(raw_row.get("equivalence_group_id", "") or "").strip()
+        if equivalence_group_id:
+            linha["equivalence_group_id"] = equivalence_group_id
+            linha["sku_planejado"] = normalizar_codigo(raw_row.get("sku_planejado", ""))
+            linha["sku_selecionado"] = normalizar_codigo(raw_row.get("sku_selecionado", ""))
+            linha["quantidade_planejada"] = str(raw_row.get("quantidade_planejada", "") or "").strip()
+            linha["equivalence_planned_factor"] = str(raw_row.get("equivalence_planned_factor", "") or "").strip()
+            linha["equivalence_selected_factor"] = str(raw_row.get("equivalence_selected_factor", "") or "").strip()
+            linha["equivalence_reason"] = str(raw_row.get("equivalence_reason", "") or "").strip()
         composicao.append(linha)
     return composicao
+
+
+def _aplicar_selecoes_equivalencia_os(composicao):
+    """Make an O.S. version choice authoritative before it is persisted.
+
+    Only the group ID and both SKUs from the form are accepted as an intent.
+    Cadastro is queried again for membership, factors and item data so a
+    forged browser request cannot exchange a component for an unrelated SKU.
+    """
+    resultado = []
+    for original in composicao or []:
+        linha = dict(original or {})
+        group_id = str(linha.get("equivalence_group_id") or "").strip()
+        if not group_id:
+            resultado.append(linha)
+            continue
+        escolha = supabase_data.validar_selecao_equivalencia(
+            group_id,
+            linha.get("sku_planejado") or linha.get("codigo"),
+            linha.get("sku_selecionado") or linha.get("codigo"),
+        )
+        planejado = escolha["planned"]
+        selecionado = escolha["selected"]
+        quantidade_planejada = parse_quantidade(
+            linha.get("quantidade_planejada", linha.get("qtd", ""))
+        )
+        if quantidade_planejada <= 0:
+            raise ValueError("A quantidade planejada da versão equivalente deve ser maior que zero.")
+        quantidade_selecionada = (
+            quantidade_planejada
+            / float(planejado["fator_unidade_funcional"])
+            * float(selecionado["fator_unidade_funcional"])
+        )
+        group = escolha["group"]
+        linha.update(
+            {
+                "codigo": selecionado["sku"],
+                "descricao": selecionado.get("descricao") or linha.get("descricao", ""),
+                "unidade": selecionado.get("unidade") or linha.get("unidade", ""),
+                "qtd": _formatar_qtd_saida(quantidade_selecionada),
+                "equivalence_group_id": group["id"],
+                "equivalence_group_code": group["codigo"],
+                "equivalence_group_name": group["nome"],
+                "sku_planejado": planejado["sku"],
+                "sku_selecionado": selecionado["sku"],
+                "quantidade_planejada": _formatar_qtd_saida(quantidade_planejada),
+                "equivalence_planned_factor": planejado["fator_unidade_funcional"],
+                "equivalence_selected_factor": selecionado["fator_unidade_funcional"],
+                "equivalence_reason": str(linha.get("equivalence_reason") or "").strip(),
+                "equivalence_selected_by": current_username(),
+            }
+        )
+        resultado.append(linha)
+    return resultado
 
 
 @app.route("/gerar_os", methods=["POST"])
@@ -6728,6 +6804,7 @@ def gerar_os():
             [*luminarias_extra, *popup_itens_extra],
             componentes,
         )
+    composicao_final = _aplicar_selecoes_equivalencia_os(composicao_final)
     composicao_enriquecida = propagar_setor_preparacao(
         enriquecer_composicao(composicao_final, os_produtos),
         os_produtos,

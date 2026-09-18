@@ -29,6 +29,8 @@ PROCESSOS_TABLE = "suprimentos_processos"
 REGRAS_TABLE = "suprimentos_regras_popup_item"
 RELACOES_TABLE = "suprimentos_relacoes_processo_item"
 BOM_COMPONENTS_TABLE = "cadastro_bom_componentes"
+EQUIVALENCE_GROUPS_TABLE = "cadastro_grupos_equivalencia"
+EQUIVALENCE_MEMBERS_TABLE = "cadastro_equivalencia_membros"
 USERS_TABLE = "users"
 DOCUMENTOS_TABLE = "suprimentos_documentos"
 LAYOUTS_TABLE = "layout_arquivos"
@@ -571,6 +573,109 @@ def carregar_bom_componentes(force=False):
             }
         )
     return componentes
+
+
+def _fator_equivalencia(value):
+    fator = _numeric(value)
+    if fator <= 0:
+        raise SupabaseDataError("O fator da unidade funcional deve ser maior que zero.")
+    return fator
+
+
+def _catalogo_equivalencias(force=False):
+    """Read active equivalence groups and their active members from Cadastro.
+
+    This is deliberately a read model: Suprimentos may select a version only
+    after Cadastro defines the group.  It never creates implicit alternatives.
+    """
+    grupos = _all_rows(
+        EQUIVALENCE_GROUPS_TABLE,
+        select="id,codigo,nome,aplicacao,unidade_funcional,ativo",
+        order="codigo.asc",
+        extra_query=[("ativo", "is.true")],
+        cache_key="equivalence_groups",
+        force=force,
+    )
+    membros = _all_rows(
+        EQUIVALENCE_MEMBERS_TABLE,
+        select="id,grupo_id,sku,fator_unidade_funcional,prioridade,ativo,observacoes",
+        order="prioridade.asc,sku.asc",
+        extra_query=[("ativo", "is.true")],
+        cache_key="equivalence_members",
+        force=force,
+    )
+    por_id = {
+        _clean(grupo.get("id")): {
+            "id": _clean(grupo.get("id")),
+            "codigo": _clean(grupo.get("codigo")),
+            "nome": _clean(grupo.get("nome")),
+            "aplicacao": _clean(grupo.get("aplicacao")),
+            "unidade_funcional": _clean(grupo.get("unidade_funcional")) or "pc",
+            "members": [],
+        }
+        for grupo in grupos
+        if _clean(grupo.get("id"))
+    }
+    try:
+        produtos = supabase_catalog.carregar_produtos(force=force) if supabase_catalog.enabled() else {}
+    except Exception:
+        produtos = {}
+    for membro in membros:
+        group = por_id.get(_clean(membro.get("grupo_id")))
+        sku = _clean(membro.get("sku")).upper()
+        if not group or not sku:
+            continue
+        produto = produtos.get(sku) or {}
+        group["members"].append(
+            {
+                "id": _clean(membro.get("id")),
+                "sku": sku,
+                "fator_unidade_funcional": _fator_equivalencia(membro.get("fator_unidade_funcional")),
+                "prioridade": int(_numeric(membro.get("prioridade")) or 100),
+                "observacoes": _clean(membro.get("observacoes")),
+                "descricao": _clean(produto.get("descricao")),
+                "unidade": _clean(produto.get("unidade")),
+            }
+        )
+    for group in por_id.values():
+        group["members"].sort(key=lambda member: (member["prioridade"], member["sku"]))
+    return por_id
+
+
+def equivalencias_para_sku(sku, force=False):
+    """Return every active group that contains ``sku`` and all its versions."""
+    codigo = _clean(sku).upper()
+    if not codigo:
+        return []
+    groups = _catalogo_equivalencias(force=force)
+    return [
+        group
+        for group in groups.values()
+        if any(member.get("sku") == codigo for member in group.get("members", []))
+    ]
+
+
+def validar_selecao_equivalencia(grupo_id, sku_planejado, sku_selecionado):
+    """Validate an explicit O.S. version choice against Cadastro.
+
+    The browser payload is not trusted.  Both SKUs must be currently active
+    members of the same active group; otherwise the O.S. is rejected.
+    """
+    group = _catalogo_equivalencias().get(_clean(grupo_id))
+    if not group:
+        raise SupabaseDataError("O grupo de equivalência não existe ou está inativo.")
+    planned = _clean(sku_planejado).upper()
+    selected = _clean(sku_selecionado).upper()
+    if not planned or not selected:
+        raise SupabaseDataError("Informe a versão planejada e a versão selecionada.")
+    members = {member.get("sku"): member for member in group.get("members", [])}
+    if planned not in members or selected not in members:
+        raise SupabaseDataError("A versão escolhida não pertence ao grupo de equivalência informado.")
+    return {
+        "group": group,
+        "planned": members[planned],
+        "selected": members[selected],
+    }
 
 
 def carregar_processos(force=False):

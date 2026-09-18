@@ -29,13 +29,26 @@ def consolidar_componentes_por_codigo(linhas, estrategia="max"):
         linha = dict(original or {})
         codigo = normalizar_codigo(linha.get("codigo", ""))
         linha["codigo"] = codigo
-        if not codigo or codigo not in indice_por_codigo:
+        # Duas linhas podem terminar no mesmo SKU físico por versões de B.O.M.
+        # diferentes. Quando há uma escolha explícita de equivalência elas não
+        # podem ser mescladas, pois cada uma precisa manter o SKU planejado e
+        # seu próprio snapshot de decisão na O.S.
+        chave = codigo
+        if linha.get("equivalence_group_id") or linha.get("sku_planejado"):
+            chave = "\x1f".join(
+                [
+                    codigo,
+                    str(linha.get("equivalence_group_id") or "").strip(),
+                    normalizar_codigo(linha.get("sku_planejado") or ""),
+                ]
+            )
+        if not codigo or chave not in indice_por_codigo:
             if codigo:
-                indice_por_codigo[codigo] = len(resultado)
+                indice_por_codigo[chave] = len(resultado)
             resultado.append(linha)
             continue
 
-        atual = resultado[indice_por_codigo[codigo]]
+        atual = resultado[indice_por_codigo[chave]]
         qtd_atual = parse_quantidade(atual.get("qtd", atual.get("quantidade", 0)))
         qtd_nova = parse_quantidade(linha.get("qtd", linha.get("quantidade", 0)))
         qtd_final = qtd_atual + qtd_nova if estrategia == "somar" else max(qtd_atual, qtd_nova)
@@ -96,7 +109,25 @@ def normalizar_linha_composicao(comp, item="", level=0):
         "qtd": comp.get("qtd", comp.get("quantidade", "")),
         "level": level or 0,
     }
-    for campo in ("grupo", "categoria", "fornecedor", "setor", "tipo_requisicao", "setor_manual"):
+    for campo in (
+        "grupo",
+        "categoria",
+        "fornecedor",
+        "setor",
+        "tipo_requisicao",
+        "setor_manual",
+        "line_id",
+        "equivalence_group_id",
+        "equivalence_group_code",
+        "equivalence_group_name",
+        "sku_planejado",
+        "sku_selecionado",
+        "quantidade_planejada",
+        "equivalence_planned_factor",
+        "equivalence_selected_factor",
+        "equivalence_reason",
+        "equivalence_selected_by",
+    ):
         if comp.get(campo, "") != "":
             linha[campo] = comp.get(campo, "")
     return linha

@@ -130,8 +130,7 @@ def enriquecer_composicao(composicao, catalogo):
         unidade_cadastro = item_info.get("unidade", "") or ""
         unidade = unidade_cadastro or comp.get("unidade", "") or ""
         qtd = _converter_qtd_para_unidade_cadastro(comp.get("qtd", ""), comp.get("unidade", ""), unidade_cadastro)
-        linhas.append(
-            {
+        linha = {
                 "item": normalizar_codigo(comp.get("item", "")),
                 "codigo": codigo,
                 "descricao": descricao,
@@ -146,7 +145,24 @@ def enriquecer_composicao(composicao, catalogo):
                 "setor_manual": bool(comp.get("setor_manual", False)),
                 "tipo_requisicao": tipo_requisicao,
             }
-        )
+        # A linha é reclassificada aqui, mas a decisão explícita de versão
+        # precisa atravessar toda a cadeia até o documento/Supabase.
+        for campo in (
+            "line_id",
+            "equivalence_group_id",
+            "equivalence_group_code",
+            "equivalence_group_name",
+            "sku_planejado",
+            "sku_selecionado",
+            "quantidade_planejada",
+            "equivalence_planned_factor",
+            "equivalence_selected_factor",
+            "equivalence_reason",
+            "equivalence_selected_by",
+        ):
+            if comp.get(campo, "") != "":
+                linha[campo] = comp.get(campo, "")
+        linhas.append(linha)
     return linhas
 
 

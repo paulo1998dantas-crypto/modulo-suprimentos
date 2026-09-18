@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 
 from werkzeug.datastructures import MultiDict
 
@@ -16,6 +17,7 @@ from app import (  # noqa: E402
     POPUP_ITEM_NAO_APLICAVEL,
     SuprimentosRequest,
     _codigos_forecast_com_vigencia_atual,
+    _aplicar_selecoes_equivalencia_os,
     _parse_os_composition_form,
     _realinhar_valores_linha_por_codigo,
     _resolver_nome_cliente_os,
@@ -152,6 +154,36 @@ class OsRequestPayloadTests(unittest.TestCase):
         self.assertEqual(parsed[0]["item"], "40340049")
         self.assertEqual(parsed[-1]["setor"], "PREPARACAO")
         self.assertTrue(parsed[-1]["setor_manual"])
+
+    def test_json_composition_preserves_explicit_equivalence_intent(self):
+        form = MultiDict({"os_composicao_json": json.dumps([{
+            "codigo": "10220077", "qtd": "4", "equivalence_group_id": "group-1",
+            "sku_planejado": "10220077", "sku_selecionado": "10220078",
+            "quantidade_planejada": "4", "equivalence_planned_factor": "1",
+            "equivalence_selected_factor": "2", "equivalence_reason": "Versão disponível",
+        }])})
+
+        parsed = _parse_os_composition_form(form)
+
+        self.assertEqual("group-1", parsed[0]["equivalence_group_id"])
+        self.assertEqual("10220077", parsed[0]["sku_planejado"])
+        self.assertEqual("10220078", parsed[0]["sku_selecionado"])
+
+    def test_equivalence_selection_is_revalidated_and_recalculates_quantity(self):
+        choice = {
+            "group": {"id": "group-1", "codigo": "EQ-CAPA", "nome": "CAPA", "unidade_funcional": "pc"},
+            "planned": {"sku": "10220077", "fator_unidade_funcional": 1, "descricao": "Versão 1", "unidade": "pc"},
+            "selected": {"sku": "10220078", "fator_unidade_funcional": 2, "descricao": "Versão 2", "unidade": "pc"},
+        }
+        with patch("app.supabase_data.validar_selecao_equivalencia", return_value=choice), patch("app.current_username", return_value="PAULO"):
+            result = _aplicar_selecoes_equivalencia_os([{
+                "codigo": "10220077", "qtd": "4", "equivalence_group_id": "group-1",
+                "sku_planejado": "10220077", "sku_selecionado": "10220078", "quantidade_planejada": "4",
+            }])
+
+        self.assertEqual("10220078", result[0]["codigo"])
+        self.assertEqual(8, result[0]["qtd"])
+        self.assertEqual("PAULO", result[0]["equivalence_selected_by"])
 
     def test_request_limits_cover_long_orders(self):
         self.assertGreaterEqual(SuprimentosRequest.max_form_parts, 20_000)
