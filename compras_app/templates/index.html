@@ -1080,7 +1080,7 @@ width:15%;
 .comp-equivalence-editor select,.comp-equivalence-editor input{font-size:11px;min-height:27px;}
 .comp-stock-cell{min-width:135px;font-size:11px;line-height:1.3;vertical-align:middle;}
 .comp-stock-cell small{display:block;margin-top:3px;color:#526277;}
-.comp-stock-badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:800;white-space:nowrap;}
+.comp-stock-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:800;white-space:nowrap;}
 .comp-stock-badge.ok{background:#dcfce7;color:#166534;}
 .comp-stock-badge.parcial{background:#fef3c7;color:#92400e;}
 .comp-stock-badge.sem-saldo{background:#fee2e2;color:#991b1b;}
@@ -1266,6 +1266,20 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 .tabela-os,.tabela-componentes{min-width:920px;}
 .table-scroll{width:100%;overflow:auto;border:1px solid #d8e0ea;}
 .table-scroll table{width:100%;}
+.composicao-editor{min-width:1490px;table-layout:auto;}
+.composicao-editor th:nth-child(1),.composicao-editor td:nth-child(1){width:120px;min-width:120px;}
+.composicao-editor th:nth-child(2),.composicao-editor td:nth-child(2){width:135px;min-width:135px;}
+.composicao-editor th:nth-child(3),.composicao-editor td:nth-child(3){width:410px;min-width:300px;}
+.composicao-editor th:nth-child(4),.composicao-editor td:nth-child(4){width:82px;min-width:82px;}
+.composicao-editor th:nth-child(5),.composicao-editor td:nth-child(5){width:82px;min-width:82px;}
+.composicao-editor th:nth-child(6),.composicao-editor td:nth-child(6){width:235px;min-width:235px;}
+.composicao-editor th:nth-child(7),.composicao-editor td:nth-child(7){width:135px;min-width:135px;}
+.composicao-editor th:nth-child(8),.composicao-editor td:nth-child(8){width:235px;min-width:205px;}
+.composicao-editor th:nth-child(9),.composicao-editor td:nth-child(9){width:46px;min-width:46px;}
+.composicao-editor .comp-stock-cell{padding:9px 11px;}
+.composicao-editor .comp-stock-badge{font-size:12px;padding:6px 10px;box-shadow:0 1px 2px rgba(15,23,42,.08);}
+.composicao-editor .comp-stock-cell small{font-size:12px;line-height:1.35;}
+.composicao-editor .comp-stock-cell small strong{font-size:13px;color:#172033;font-variant-numeric:tabular-nums;}
 .card-heading-row,.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .compact-actions,.history-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .composition-status,.table-toolbar span{font-size:11px;color:#607085;}
@@ -3870,15 +3884,16 @@ const codigo = normalizarCodigoOS((codigoInput || {}).value || "");
 const quantidade = parseNumber((quantidadeInput || {}).value || "");
 const info = infoAtual === undefined ? infoDisponibilidadeEstoqueOS(codigo) : infoAtual;
 const status = statusDisponibilidadeEstoqueOS(info, quantidade);
+const iconeStatus = { ok: "✓", parcial: "!", "sem-saldo": "×", indisponivel: "?" }[status.classe] || "?";
 cell.dataset.status = status.classe;
 if (!info){
-cell.innerHTML = `<span class="comp-stock-badge indisponivel">Saldo indisponível</span><small>Não altera a escolha do componente.</small>`;
+cell.innerHTML = `<span class="comp-stock-badge indisponivel"><span aria-hidden="true">${iconeStatus}</span>Saldo indisponível</span><small>Não altera a escolha do componente.</small>`;
 return;
 }
 const disponivel = formatarQuantidadeEstoqueOS(info.saldo_disponivel);
 const fisico = formatarQuantidadeEstoqueOS(info.saldo_atual);
 const empenhado = formatarQuantidadeEstoqueOS(info.saldo_empenhado);
-cell.innerHTML = `<span class="comp-stock-badge ${status.classe}">${status.rotulo}</span><small>Disp.: ${disponivel} · Nec.: ${formatarQuantidadeEstoqueOS(quantidade)}</small><small>Físico: ${fisico} · Emp.: ${empenhado}</small>`;
+cell.innerHTML = `<span class="comp-stock-badge ${status.classe}"><span aria-hidden="true">${iconeStatus}</span>${status.rotulo}</span><small>Disp.: <strong>${disponivel}</strong> · Nec.: <strong>${formatarQuantidadeEstoqueOS(quantidade)}</strong></small><small>Físico: ${fisico} · Emp.: ${empenhado}</small>`;
 }
 
 async function consultarDisponibilidadeEstoqueOS(codigos){
