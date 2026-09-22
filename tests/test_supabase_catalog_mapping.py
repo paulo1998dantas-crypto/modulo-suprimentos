@@ -19,11 +19,12 @@ class SupabaseCatalogMappingTests(unittest.TestCase):
                 "category_label": "18 - REVESTIMENTO",
                 "ativo": True,
                 "field_values": {"prefixo": "PP"},
+                "form_values": {"grupo_codigo": ["10"]},
             }
         )
 
         self.assertEqual(sku, "10180192")
-        self.assertEqual(product["grupo"], "PP")
+        self.assertEqual(product["grupo"], "10 - INSUMO")
         self.assertEqual(product["descricao"], "PP ARO JANELA")
 
     def test_legacy_group_fallback_is_preserved_when_cadastro_has_no_detail(self):

@@ -219,14 +219,32 @@ def _all_rows():
 
 
 def _group_from_sku(sku):
-    prefix = _clean(sku)[:2]
-    return {
-        "10": "10 - INSUMO",
-        "20": "20 - PRODUTO EM PROCESSO",
-        "30": "30 - CONJUNTO / KIT",
-        "40": "40 - TRANSFORMACAO",
-        "50": "50 - MRO",
-    }.get(prefix, "")
+    return _group_from_code(_clean(sku)[:2])
+
+
+_GROUP_LABELS = {
+    "10": "10 - INSUMO",
+    "20": "20 - PRODUTO PROCESSO",
+    "30": "30 - CONJUNTO / KIT",
+    "40": "40 - TRANSFORMACAO",
+    "50": "50 - MRO (MANUTENCAO, REPARO E OPERACOES)",
+    "60": "60 - EMBALAGEM",
+    "70": "70 - ATIVO FIXO",
+    "80": "80 - VEICULO",
+    "90": "90 - PROTOTIPO",
+}
+
+
+def _group_from_code(value):
+    return _GROUP_LABELS.get(_clean(value), "")
+
+
+def _group_from_registration(row):
+    form_values = row.get("form_values") if isinstance(row.get("form_values"), dict) else {}
+    value = form_values.get("grupo_codigo") or form_values.get("pn_grupo_codigo")
+    if isinstance(value, list):
+        value = next((_clean(item) for item in value if _clean(item)), "")
+    return _group_from_code(value)
 
 
 def _first_value(values, keys):
@@ -265,10 +283,9 @@ def row_to_produto(row):
         ],
     )
     fornecedor = _first_value(values, ["fornecedor", "cod_fornecedor"])
-    # Keep the same group source used by Estoque: the detailed prefix/group
-    # saved in Cadastro wins; the SKU prefix is only a compatibility fallback
-    # for legacy rows that never had a detailed group.
-    grupo = _first_value(values, ["grupo", "prefixo"]) or _group_from_sku(sku)
+    # GRUPO is the structural group selected in Cadastro (form_values), not
+    # a technical field such as PREFIXO=PP/ABS/CJ.
+    grupo = _group_from_registration(row) or _group_from_sku(sku)
     status_value = "ATIVO" if row.get("ativo", True) else "INATIVO"
     produto = {
         "descricao": descricao_primaria,
