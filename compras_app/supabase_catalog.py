@@ -265,11 +265,15 @@ def row_to_produto(row):
         ],
     )
     fornecedor = _first_value(values, ["fornecedor", "cod_fornecedor"])
+    # Keep the same group source used by Estoque: the detailed prefix/group
+    # saved in Cadastro wins; the SKU prefix is only a compatibility fallback
+    # for legacy rows that never had a detailed group.
+    grupo = _first_value(values, ["grupo", "prefixo"]) or _group_from_sku(sku)
     status_value = "ATIVO" if row.get("ativo", True) else "INATIVO"
     produto = {
         "descricao": descricao_primaria,
         "unidade": unidade,
-        "grupo": _group_from_sku(sku),
+        "grupo": grupo,
         "categoria": _clean(row.get("category_label")),
         "processo_conjunto": _first_value(values, ["processo_conjunto", "processo", "processo_vinculado"]),
         "fornecedor": fornecedor,
