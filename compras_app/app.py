@@ -79,7 +79,7 @@ from gerar_oc import gerar_word, construir_nome_oc
 from gerar_os import gerar_os_docx
 from gerar_op import build_production_order_docx
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
-from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, identificar_nome_processo, normalizar_nome_processo
+from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, identificar_nome_processo, normalizar_nome_processo, normalizar_texto
 from portal_sso import consume_ticket, enabled as portal_sso_enabled, normalize_next, portal_login_url, portal_logout_url
 from os_setores import (
     SETOR_EXPEDICAO,
@@ -2414,14 +2414,30 @@ def parse_os_docx_atualizado(file_storage):
             cells = [c.text.strip() for c in row.cells]
             if not any(cells):
                 continue
+            descricao = _limpar_placeholder(cells[1]) if len(cells) > 1 else ""
+            marcador_nivel = re.match(r"^\s*((?:>\s*)+)", descricao)
+            level = marcador_nivel.group(1).count(">") if marcador_nivel else 0
+            if marcador_nivel:
+                descricao = descricao[marcador_nivel.end():].strip()
             composicao.append({
                 "item": "",
                 "codigo": _limpar_placeholder(cells[0]) if len(cells) > 0 else "",
-                "descricao": _limpar_placeholder(cells[1]) if len(cells) > 1 else "",
+                "descricao": descricao,
                 "qtd": _normalizar_qtd(cells[2]) if len(cells) > 2 else "",
                 "unidade": _limpar_placeholder(cells[3]) if len(cells) > 3 else "",
-                "level": 0,
+                "level": level,
             })
+    item_principal = next(
+        (str(item.get("codigo") or "").strip() for item in itens if item.get("codigo")),
+        "",
+    )
+    pais_por_nivel = {}
+    for linha in composicao:
+        nivel = int(linha.get("level") or 0)
+        linha["item"] = pais_por_nivel.get(nivel - 1, item_principal) if nivel else item_principal
+        pais_por_nivel[nivel] = linha.get("codigo", "")
+        for nivel_antigo in [chave for chave in pais_por_nivel if chave > nivel]:
+            pais_por_nivel.pop(nivel_antigo, None)
     data["composicao"] = composicao
 
     if refs.get("observacoes") is not None:
@@ -2432,35 +2448,71 @@ def parse_os_docx_atualizado(file_storage):
     processos = {nome: [] for nome in PROCESSOS_ORDEM}
     for nome, idx in refs.get("processos", {}).items():
         tabela_proc = doc.tables[idx]
-        header_idx = encontrar_linha_cabecalho(tabela_proc, "ATIVIDADE", "RESPONS")
-        inicio = (header_idx or 0) + 1
+        # Nos modelos atuais, os rótulos de atividade e responsável ficam em
+        # linhas diferentes (atividade na linha 3; responsável na linha 1).
+        # Procurar os dois na mesma linha fazia o leitor começar no topo da
+        # tabela e importar "OK/NOK", datas e os próprios cabeçalhos como
+        # atividades da O.S.
+        header_idx = encontrar_linha_cabecalho(tabela_proc, "ATIVIDADE")
+        if header_idx is None:
+            header_idx = 1 if len(tabela_proc.rows) > 2 else 0
+        activity_col = 1
+        for cell_idx, cell in enumerate(tabela_proc.rows[header_idx].cells):
+            if "ATIVIDADE" in normalizar_texto(cell.text):
+                activity_col = cell_idx
+                break
+
+        responsible_col = None
+        for row in tabela_proc.rows[:header_idx + 1]:
+            for cell_idx, cell in enumerate(row.cells):
+                if "RESPONS" in normalizar_texto(cell.text):
+                    responsible_col = cell_idx
+                    break
+            if responsible_col is not None:
+                break
+        if responsible_col is None and len(tabela_proc.columns) > 2:
+            responsible_col = 2
+
+        inicio = header_idx + 1
         linhas = []
         for row in tabela_proc.rows[inicio:]:
             cells = [c.text.strip() for c in row.cells]
-            atividade = cells[1] if len(cells) > 1 else ""
-            if not atividade:
+            atividade_original = cells[activity_col] if len(cells) > activity_col else ""
+            marcador_responsavel = re.search(
+                r"(?:^|\n)\s*RESPONS[AÁ]VEL\s*:\s*(.*)",
+                atividade_original,
+                flags=re.IGNORECASE,
+            )
+            responsavel_impresso = marcador_responsavel.group(1).strip() if marcador_responsavel else ""
+            if marcador_responsavel:
+                atividade_original = atividade_original[:marcador_responsavel.start()].strip()
+            atividade = re.sub(r"\s+", " ", atividade_original).strip()
+            if not atividade or not re.search(r"[A-Za-zÀ-ÿ0-9]", atividade):
                 continue
-            responsavel_idx = 2 if len(cells) > 6 else 3
-            data_idx = 3 if len(cells) > 6 else None
-            inicio_idx = 4 if len(cells) > 6 else None
-            fim_idx = 5 if len(cells) > 6 else None
-            feito_idx = 6 if len(cells) > 6 else 4 if len(cells) > 4 else None
-            linha = {
-                "atividade": atividade,
-                "responsavel": cells[responsavel_idx] if len(cells) > responsavel_idx else "",
-            }
-            if data_idx is not None:
-                linha["data"] = cells[data_idx] if len(cells) > data_idx else ""
-                linha["inicio"] = cells[inicio_idx] if len(cells) > inicio_idx else ""
-                linha["fim"] = cells[fim_idx] if len(cells) > fim_idx else ""
-                linha["feito"] = cells[feito_idx] if len(cells) > feito_idx else ""
+            texto_atividade = normalizar_texto(atividade)
+            if texto_atividade in {"ATIVIDADE", "OK/NOK", "DATA", "HORA INICIO", "HORA FIM"}:
+                continue
+            if re.fullmatch(r"[_\-.\s]+", atividade):
+                continue
+            responsavel = cells[responsible_col] if responsible_col is not None and len(cells) > responsible_col else ""
+            if normalizar_texto(responsavel) == normalizar_texto(atividade_original):
+                responsavel = ""
+            linha = {"atividade": atividade, "responsavel": responsavel_impresso or responsavel}
             linhas.append(linha)
-        processos[nome] = linhas
+        processos[normalizar_nome_processo(nome)] = linhas
     data["processos"] = processos
+
+    for paragraph in doc.paragraphs:
+        texto = " ".join((paragraph.text or "").split())
+        texto_norm = normalizar_texto(texto)
+        if texto_norm.startswith("DESCRICAO DO SERVICO:"):
+            data["descricao_servico"] = texto.split(":", 1)[1].strip() if ":" in texto else ""
+        elif texto_norm.startswith("PROCESSO VINCULADO:"):
+            data["processo_conjunto"] = texto.split(":", 1)[1].strip() if ":" in texto else ""
 
     obs_final = ""
     for p in doc.paragraphs:
-        if p.text.strip().upper().startswith("OBS FINAL"):
+        if normalizar_texto(p.text).startswith("OBS FINAL"):
             obs_final = p.text.split(":", 1)[-1].strip()
             break
     data["obs"] = obs_final
@@ -2537,6 +2589,8 @@ def parse_os_pdf(file_storage):
         "previsao_inicio": _parse_datetime_ddmmyyyy(_buscar_valor_linha(linhas, "PREVISÃO INICIO") or _buscar_valor_linha(linhas, "PREVISAO INICIO")),
         "previsao_termino": _parse_datetime_ddmmyyyy(_buscar_valor_linha(linhas, "PREVISÃO TÉRMINO") or _buscar_valor_linha(linhas, "PREVISAO TERMINO")),
         "obs_materiais": _buscar_valor_linha(linhas, "OBSERVAÇÕES") or _buscar_valor_linha(linhas, "OBSERVACOES"),
+        "descricao_servico": _buscar_valor_linha(linhas, "DESCRIÇÃO DO SERVIÇO") or _buscar_valor_linha(linhas, "DESCRICAO DO SERVICO"),
+        "processo_conjunto": _buscar_valor_linha(linhas, "PROCESSO VINCULADO"),
         "obs": "",
         "itens": [],
         "processos": {},
@@ -2574,6 +2628,12 @@ def parse_os_pdf(file_storage):
             })
     data["itens"] = itens
 
+    for linha in linhas:
+        texto_norm = normalizar_texto(linha)
+        if texto_norm.startswith("DESCRICAO DO SERVICO") and ":" in linha:
+            data["descricao_servico"] = linha.split(":", 1)[1].strip()
+            break
+
     composicao = []
     capturar = False
     for linha in linhas:
@@ -2599,37 +2659,48 @@ def parse_os_pdf(file_storage):
                 "qtd": qtd,
                 "unidade": un,
             })
+    item_principal = next((str(item.get("codigo") or "").strip() for item in data["itens"] if item.get("codigo")), "")
+    pilha_pais = {}
+    for linha in composicao:
+        marcador = re.match(r"^\s*((?:>\s*)+)", linha["descricao"])
+        nivel = marcador.group(1).count(">") if marcador else 0
+        if marcador:
+            linha["descricao"] = linha["descricao"][marcador.end():].strip()
+        linha["level"] = nivel
+        linha["item"] = pilha_pais.get(nivel - 1, item_principal) if nivel else item_principal
+        pilha_pais[nivel] = linha["codigo"]
+        for nivel_antigo in [chave for chave in pilha_pais if chave > nivel]:
+            pilha_pais.pop(nivel_antigo, None)
     data["composicao"] = composicao
 
-    processos = {}
+    processos = {nome: [] for nome in PROCESSOS_ORDEM}
     current = None
     for linha in linhas:
-        up = linha.upper()
-        if "PROCESSOS DE PRODUÇÃO" in up or "PROCESSOS DE PRODUCAO" in up:
-            if "CORTE" in up:
-                current = "CORTE"
-            elif "AR CONDICIONADO" in up:
-                current = "AR CONDICIONADO"
-            elif "PREPARA" in up:
-                current = "PREPARAÃ‡ÃƒO DE PEÃ‡AS"
-            elif "ISOLAMENTO" in up:
-                current = "ISOLAMENTO"
-            elif "REVESTIMENTO" in up:
-                current = "REVESTIMENTO"
-            elif "BANCOS" in up:
-                current = "BANCOS"
-            elif "ELÉTRICA" in up or "ELETRICA" in up:
-                current = "ELÃ‰TRICA 2"
-            elif "LIMPEZA" in up:
-                current = "LIMPEZA/LIBERAÃ‡ÃƒO"
-            processos.setdefault(current, [])
+        texto_norm = normalizar_texto(linha)
+        if "PROCESSOS DE PRODUCAO" in texto_norm:
+            nome_processo = identificar_nome_processo(linha)
+            current = normalizar_nome_processo(nome_processo) if nome_processo else None
             continue
         if current:
-            if up.startswith("#") or up.startswith("ATIVIDADE") or up.startswith("RESPONS"):
+            marcador_responsavel = re.search(r"RESPONS[AÁ]VEL\s*:\s*(.*)", linha, flags=re.IGNORECASE)
+            if marcador_responsavel and not linha[:marcador_responsavel.start()].strip():
+                if processos[current]:
+                    processos[current][-1]["responsavel"] = marcador_responsavel.group(1).strip()
                 continue
-            texto = re.sub(r"^\\d+\\s+", "", linha).strip()
-            if texto:
-                processos[current].append({"atividade": texto, "responsavel": ""})
+            atividade_original = linha[:marcador_responsavel.start()].strip() if marcador_responsavel else linha.strip()
+            atividade_original = re.sub(r"^\s*(?:#|\d+[.)-]?)\s*", "", atividade_original).strip()
+            atividade_norm = normalizar_texto(atividade_original)
+            if (
+                not atividade_original
+                or not re.search(r"[A-Z0-9]", atividade_norm)
+                or any(token in atividade_norm for token in ("OK/NOK", "HORA INICIO", "HORA FIM"))
+                or ("ATIVIDADE" in atividade_norm and ("|" in atividade_original or atividade_norm.startswith("ATIVIDADE")))
+                or atividade_norm in {"ATIVIDADE", "RESPONSAVEL", "DATA"}
+                or re.fullmatch(r"[_\-.\s]+", atividade_original)
+            ):
+                continue
+            responsavel = marcador_responsavel.group(1).strip() if marcador_responsavel else ""
+            processos[current].append({"atividade": atividade_original, "responsavel": responsavel})
     data["processos"] = processos
     return data
 
@@ -7673,16 +7744,21 @@ def importar_os_documento():
         else:
             data = {}
         if data:
-            # A importacao de O.S serve como base de preenchimento. A composicao
-            # deve ser recalculada pela B.O.M atual no Supabase para evitar
-            # duplicidade, dados antigos e payloads grandes demais.
+            # A composição impressa é mantida como uma fotografia da O.S de
+            # origem. As linhas já vêm explodidas; os vínculos pai/filho e os
+            # níveis são recuperados para que a tela não exploda a B.O.M de
+            # novo nem duplique componentes ao copiar a ordem.
             data["itens"] = _atribuir_line_ids(
                 data.get("itens") or [],
                 "os-item",
                 campos_chave=("codigo", "descricao", "qtd", "unidade", "serie"),
             )
             data["processos"] = _atribuir_line_ids_processos(data.get("processos") or {})
-            data["composicao"] = []
+            data["composicao"] = _atribuir_line_ids(
+                data.get("composicao") or [],
+                "os-comp",
+                campos_chave=("item", "codigo", "qtd", "unidade", "level"),
+            )
             salvar_json(_user_scoped_file(OS_IMPORT_FILE), data)
     return redirect(url_for("index", tab="os"))
 

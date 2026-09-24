@@ -1426,6 +1426,7 @@ const osPrefill = {{ os_prefill|tojson }};
 let ocPrefillApplied = false;
 let osPrefillApplied = false;
 const hasOsPrefill = osPrefill && Object.keys(osPrefill).length > 0;
+const hasOsPrefillProcesses = Object.values((osPrefill && osPrefill.processos) || {}).some((linhas) => Array.isArray(linhas) && linhas.length > 0);
 let osComposicaoSource = "bom";
 let osTabInitialized = false;
 let osPopupRegraFila = [];
@@ -2445,7 +2446,7 @@ modal.addEventListener("click", onBackdrop);
 
 function aplicarProcessoAutomaticoOS(options){
 const forcar = Boolean(options && options.forcar);
-if (!forcar && hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
+if (!forcar && hasOsPrefillProcesses){
 return;
 }
 const input = document.getElementById("os_processo_conjunto");
@@ -4256,7 +4257,7 @@ return resultado;
 
 function preencherProcessosPadrao(conjunto, options){
 const forcar = Boolean(options && options.forcar);
-if (!forcar && hasOsPrefill && osPrefill.processos && Object.keys(osPrefill.processos).length){
+if (!forcar && hasOsPrefillProcesses){
 return;
 }
 const data = mesclarProcessosPadrao(conjunto);
@@ -4573,6 +4574,11 @@ osPrefillApplied = true;
 const clienteInput = document.querySelector('input[name="os_cliente_busca"]');
 if (clienteInput && osPrefill.cliente){
 aplicarClienteSelecionado(clienteInput, osPrefill.cliente);
+const clienteHidden = document.querySelector('input[name="os_cliente"]');
+if (clienteHidden && !clienteHidden.value){
+clienteInput.value = osPrefill.cliente;
+clienteHidden.value = osPrefill.cliente;
+}
 }
 const campos = [
 ["os_numero", "os_numero"],
@@ -4595,6 +4601,10 @@ obsMateriais.value = osPrefill.obs_materiais;
 const obs = document.querySelector('textarea[name="os_obs"]');
 if (obs && osPrefill.obs){
 obs.value = osPrefill.obs;
+}
+const descricaoServico = document.querySelector('textarea[name="os_descricao_servico"]');
+if (descricaoServico && osPrefill.descricao_servico){
+descricaoServico.value = osPrefill.descricao_servico;
 }
 
 const tabela = document.getElementById("tabela_os");
@@ -4645,7 +4655,10 @@ atualizarLuminariaLinhaOS(row, { semPopup: true });
 }
 }
 
-if (osPrefill.processos){
+const infoProcessoAutomatico = resolverProcessoAutomaticoOS();
+definirProcessoConjuntoUI(osPrefill.processo_conjunto || infoProcessoAutomatico.conjunto || "");
+
+if (osPrefill.processos && hasOsPrefillProcesses){
 osProcessoDefs.forEach((processo) => {
 const linhas = osPrefill.processos[processo.nome] || [];
 aplicarProcessoTabela(processo.key, linhas);

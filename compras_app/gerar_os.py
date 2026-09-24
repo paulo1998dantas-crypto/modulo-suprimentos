@@ -336,7 +336,11 @@ def _preencher_tabela_processo(tabela, linhas):
             _set_cell_text(cells_reais[0], str(offset + 1))
             _set_cell_align(cells_reais[0], WD_ALIGN_PARAGRAPH.CENTER)
         if len(cells_reais) > 1:
-            _set_cell_text(cells_reais[1], linha.get("atividade", ""))
+            atividade = str(linha.get("atividade", "") or "").strip()
+            responsavel = str(linha.get("responsavel", "") or "").strip()
+            if responsavel:
+                atividade = f"{atividade}\nRESPONSÁVEL: {responsavel}"
+            _set_cell_text(cells_reais[1], atividade)
             _formatar_cell_atividade(cells_reais[1])
 
 
@@ -707,6 +711,15 @@ def gerar_os_docx(
         linhas = processos_exibicao.get(nome, [])
         if idx < len(doc.tables) and linhas:
             _preencher_tabela_processo(doc.tables[idx], linhas)
+
+    if modo == "completa":
+        for campo, rotulo in (
+            ("descricao_servico", "DESCRIÇÃO DO SERVIÇO"),
+            ("processo_conjunto", "PROCESSO VINCULADO"),
+        ):
+            valor = str(dados.get(campo, "") or "").strip()
+            if valor:
+                doc.add_paragraph(f"{rotulo}: {valor}")
 
     if dados.get("obs"):
         doc.add_paragraph("")
