@@ -6093,6 +6093,7 @@ def gerar_oc():
     cofins_list = request.form.getlist("cofins[]")
     datas_necessidade = request.form.getlist("data_necessidade[]")
     line_ids = request.form.getlist("oc_line_id[]")
+    desconto_modos = request.form.getlist("desconto_modo[]")
 
     produtos = carregar_produtos()
     for i in range(len(codigos)):
@@ -6106,6 +6107,13 @@ def gerar_oc():
         qtd = _parse_numero_form(qtds[i] if i < len(qtds) else "", 0.0)
         valor = _parse_numero_form(valores[i] if i < len(valores) else "", 0.0)
         desconto = _parse_numero_form(descontos[i] if i < len(descontos) else "", 0.0)
+        desconto_modo = (
+            str(desconto_modos[i] or "peca").strip().lower()
+            if i < len(desconto_modos)
+            else "peca"
+        )
+        if desconto_modo not in {"peca", "linha"}:
+            desconto_modo = "peca"
 
         produto_info = produtos.get(codigo_item, {})
         campos_extras = produto_info.get("campos_extras") if isinstance(produto_info.get("campos_extras"), dict) else {}
@@ -6118,7 +6126,9 @@ def gerar_oc():
         icms_val = icms if icms != "" else produto_info.get("icms")
         cofins_val = cofins if cofins != "" else produto_info.get("cofins")
 
-        total = calcular_total_item(qtd, valor, desconto, ipi_val, icms_val, cofins_val)
+        total = calcular_total_item(
+            qtd, valor, desconto, ipi_val, icms_val, cofins_val, desconto_modo
+        )
         data_necessidade_item = _erp_iso_date(
             datas_necessidade[i] if i < len(datas_necessidade) else ""
         ) or _erp_iso_date(request.form.get("previsao", ""))
@@ -6132,6 +6142,7 @@ def gerar_oc():
             "qtd": qtd,
             "valor": valor,
             "desconto": desconto,
+            "desconto_modo": desconto_modo,
             "ipi": ipi_val,
             "icms": icms_val,
             "cofins": cofins_val,
@@ -8275,7 +8286,10 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
                 "descricao_original": item.get("descricao"),
                 "unidade": item.get("unidade") or "UN",
                 "quantidade_pedida": item.get("qtd"),
-                "valor_unitario_pedido": item.get("valor"),
+                # O estoque não possui um campo separado para desconto. Envie
+                # o preço unitário líquido do desconto; a regra atual de tributos
+                # no módulo de Compras permanece inalterada.
+                "valor_unitario_pedido": _valor_unitario_efetivo_oc(item),
                 "destino": (dados_pedido.get("destino") or "").strip(),
                 "data_necessidade": (
                     _erp_iso_date(item.get("data_necessidade"))
@@ -8286,6 +8300,23 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
         ],
     }
     return _erp_stock_request("purchase-orders/legacy-sync", "POST", payload)
+
+
+def _valor_unitario_efetivo_oc(item):
+    try:
+        valor = float(item.get("valor") or 0)
+        desconto = float(item.get("desconto") or 0)
+    except (TypeError, ValueError):
+        valor = 0
+        desconto = 0
+    if str(item.get("desconto_modo") or "peca").strip().lower() == "peca":
+        return max(0, round(valor - desconto, 4))
+    # Documentos anteriores guardavam desconto total da linha; o valor que já
+    # estava integrado ao Estoque era o preço bruto por unidade.
+    if item.get("valor") is not None:
+        return item.get("valor")
+    # Compatibilidade com chamadas antigas sem total calculado.
+    return valor
 
 
 @app.route("/api/erp/work-order-options")

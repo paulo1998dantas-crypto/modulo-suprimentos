@@ -1,4 +1,4 @@
-def calcular_total_item(qtd, valor, desconto, ipi=0, icms=0, cofins=0):
+def calcular_total_item(qtd, valor, desconto, ipi=0, icms=0, cofins=0, desconto_modo="peca"):
     qtd = float(qtd) if qtd else 0
     valor = float(valor) if valor else 0
     desconto = float(desconto) if desconto else 0
@@ -6,7 +6,12 @@ def calcular_total_item(qtd, valor, desconto, ipi=0, icms=0, cofins=0):
     icms = float(icms) if icms else 0
     cofins = float(cofins) if cofins else 0
 
-    base = (qtd * valor) - desconto
+    # Novas compras informam o desconto em reais por unidade. O modo "linha"
+    # existe apenas para reabrir documentos antigos sem alterar seu histórico.
+    if str(desconto_modo or "peca").strip().lower() in {"linha", "line", "legacy"}:
+        base = (qtd * valor) - desconto
+    else:
+        base = qtd * (valor - desconto)
     if base <= 0:
         return 0
     percentual = (ipi + icms + cofins) / 100

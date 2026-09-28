@@ -687,6 +687,39 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual("rascunho", register.call_args.kwargs["status"])
         self.assertEqual("oc-token", register.call_args.kwargs["submit_token"])
 
+    def test_purchase_save_applies_discount_to_every_piece(self):
+        with (
+            patch.object(app_module, "login_enabled", return_value=False),
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "carregar_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "proximo_numero_oc", return_value=52),
+            patch.object(app_module, "registrar_historico") as register,
+            patch.object(app_module, "gerar_word") as generate,
+        ):
+            response = app_module.app.test_client().post("/gerar_oc", data={
+                "acao": "salvar",
+                "oc_submit_token": "oc-discount-token",
+                "fornecedor": "Fornecedor",
+                "allocation_mode": "ESTOQUE",
+                "codigo[]": "SKU-1",
+                "descricao[]": "Item",
+                "unidade[]": "UN",
+                "qtd[]": "2",
+                "valor[]": "323.50",
+                "desconto[]": "9.70",
+                "desconto_modo[]": "peca",
+                "ipi[]": "3.25",
+                "frete": "0",
+            })
+
+        self.assertEqual(302, response.status_code)
+        generate.assert_not_called()
+        item = register.call_args.kwargs["itens"][0]
+        self.assertAlmostEqual(647.997, item["total"], places=3)
+        self.assertEqual("peca", item["desconto_modo"])
+
     def test_emitted_purchase_edit_updates_same_erp_order_without_printing(self):
         existing = {
             "id": "doc-10",
@@ -788,6 +821,36 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertEqual("O.S. 712", payload["destino"])
         self.assertEqual("O.S. 712", payload["lines"][0]["destino"])
         self.assertEqual("suprimentos-oc:doc-10", payload["idempotency_key"])
+
+    def test_purchase_sync_uses_net_unit_value_and_preserves_tax_handling(self):
+        with (
+            patch.object(app_module, "erp_feature_enabled", return_value=True),
+            patch.object(
+                app_module,
+                "_erp_stock_request",
+                return_value={"id": "order-discount"},
+            ) as request_erp,
+        ):
+            app_module._sync_emitted_legacy_oc_to_erp(
+                {"id": "doc-discount", "data_criacao": "2026-09-28"},
+                {"previsao": "2026-10-01", "frete": 0},
+                [{
+                    "codigo": "SKU-1",
+                    "descricao": "Item",
+                    "unidade": "UN",
+                    "qtd": 2,
+                    "valor": 323.50,
+                    "desconto": 9.70,
+                    "desconto_modo": "peca",
+                    "ipi": 3.25,
+                    "total": 647.997,
+                }],
+                "2812",
+                "Fornecedor",
+            )
+
+        payload = request_erp.call_args.args[2]
+        self.assertEqual(313.8, payload["lines"][0]["valor_unitario_pedido"])
 
     def test_purchase_history_api_attaches_same_integrated_order_for_editing(self):
         document = {

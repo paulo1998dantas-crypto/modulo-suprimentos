@@ -18,12 +18,34 @@ os.environ["SUPRIMENTOS_FILE_LOG"] = "0"
 import app as app_module  # noqa: E402
 import gerar_oc  # noqa: E402
 import supabase_data  # noqa: E402
+from calculos import calcular_total_item  # noqa: E402
 
 
 class PurchaseTransitTests(unittest.TestCase):
     def setUp(self):
         app_module.app.config.update(TESTING=True)
         self.client = app_module.app.test_client()
+
+    def test_purchase_discount_is_per_piece_before_tax_and_keeps_legacy_mode(self):
+        self.assertAlmostEqual(
+            647.997,
+            calcular_total_item(2, 323.50, 9.70, ipi=3.25),
+            places=3,
+        )
+        self.assertAlmostEqual(
+            658.01225,
+            calcular_total_item(2, 323.50, 9.70, ipi=3.25, desconto_modo="linha"),
+            places=5,
+        )
+
+    def test_purchase_preview_exposes_per_piece_discount_semantics(self):
+        template = (APP_DIR / "templates" / "index.html").read_text(encoding="utf-8")
+        self.assertIn(
+            "parseNumber(qtd.value) * (parseNumber(valor.value) - parseNumber(desconto.value))",
+            template,
+        )
+        self.assertIn("Desconto/peça", template)
+        self.assertIn('atualizarModoDescontoOC(e.target.closest("tr"), "peca")', template)
 
     def test_live_transit_uses_shared_order_lines_and_pending_balance(self):
         orders = [{
@@ -303,6 +325,7 @@ class PurchaseTransitTests(unittest.TestCase):
             headers = [" ".join(cell.text.split()).upper() for cell in product_table.rows[0].cells]
             remittance_column = headers.index("DATA DE REMESSA")
             body = product_table.rows[1].cells
+            self.assertIn("DESCONTO/PEÇA", headers)
             self.assertEqual("Item 1", " ".join(body[1].text.split()))
             self.assertEqual("5", body[3].text.strip())
             self.assertEqual("15/09/2026", body[remittance_column].text.strip())

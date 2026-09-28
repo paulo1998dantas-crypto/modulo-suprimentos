@@ -298,6 +298,31 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
     # Keep this dynamic so the existing template stays compatible while every
     # newly generated O.C. gets a dedicated date cell for each line.
     header_cells = tabela.rows[0].cells
+    desconto_column = next(
+        (
+            index
+            for index, cell in enumerate(header_cells)
+            if "DESCONTO" in (cell.text or "").upper()
+        ),
+        None,
+    )
+    if desconto_column is not None and not any(
+        str(item.get("desconto_modo") or "peca").lower() == "linha"
+        for item in itens
+    ):
+        desconto_header = header_cells[desconto_column]
+        if desconto_header.paragraphs:
+            paragraph = desconto_header.paragraphs[0]
+            if paragraph.runs:
+                paragraph.runs[0].text = "Desconto/peça"
+                for run in paragraph.runs[1:]:
+                    run.text = ""
+            else:
+                paragraph.add_run("Desconto/peça")
+            for extra_paragraph in desconto_header.paragraphs[1:]:
+                extra_paragraph.text = ""
+        else:
+            desconto_header.text = "Desconto/peça"
     remittance_column = next(
         (
             index

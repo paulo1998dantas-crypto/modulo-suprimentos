@@ -2965,7 +2965,7 @@ linha.innerHTML = `
 <td><input type="number" step="1" min="0" name="qtd[]"></td>
 <td><input type="date" name="data_necessidade[]" required></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
-<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0"></div></td>
+<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0" title="Desconto por peça"></div><input type="hidden" name="desconto_modo[]" value="peca"><small data-desconto-legado-hint hidden>Documento antigo: desconto total da linha</small></td>
 <td><input type="number" step="0.01" min="0" name="ipi[]"></td>
 <td><input type="number" step="0.01" min="0" name="icms[]"></td>
 <td><input type="number" step="0.01" min="0" name="cofins[]"></td>
@@ -3303,7 +3303,11 @@ if (!qtd || !valor || !desconto || !totalItem){
 return;
 }
 
-const base = (parseNumber(qtd.value) * parseNumber(valor.value)) - parseNumber(desconto.value);
+const descontoModo = row.querySelector('input[name="desconto_modo[]"]');
+const descontoEhDaLinha = descontoModo && descontoModo.value === "linha";
+const base = descontoEhDaLinha
+? (parseNumber(qtd.value) * parseNumber(valor.value)) - parseNumber(desconto.value)
+: parseNumber(qtd.value) * (parseNumber(valor.value) - parseNumber(desconto.value));
 const taxa = parseNumber(ipi && ipi.value) + parseNumber(icms && icms.value) + parseNumber(cofins && cofins.value);
 const total = base > 0 ? base * (1 + (taxa / 100)) : 0;
 totalItem.value = total > 0 ? formatCurrency(total) : "R$ 0,00";
@@ -5248,7 +5252,10 @@ document.getElementById("historico_oc_meta").textContent = `${doc.data_criacao |
 document.getElementById("historico_oc_dados").innerHTML = [
 ["Fornecedor", dados.fornecedor || dados.razao_social], ["CNPJ", dados.cnpj], ["Categoria", dados.oc_categoria || (doc.erp_purchase_order || {}).categoria], ["Destino", dados.destino || (doc.erp_purchase_order || {}).destino], ["O.S. / alocação", dados.allocation_reference || (doc.erp_purchase_order || {}).allocation_reference || (dados.allocation_mode === "ESTOQUE" ? "ESTOQUE" : "-")], ["Previsão", dados.previsao], ["Total", `R$ ${Number(dados.total_pedido || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`], ["Pagamento", dados.forma_pagamento], ["Frete", dados.tipo_frete], ["Criado por", doc.criado_por], ["Atualizado por", doc.atualizado_por]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
-document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.data_necessidade || dados.previsao || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(item.desconto || "")}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`).join("") || '<tr><td colspan="8">Sem itens.</td></tr>';
+document.getElementById("historico_oc_itens").innerHTML = (doc.itens || []).map((item) => {
+const descontoLabel = item.desconto_modo === "linha" || !item.desconto_modo ? " (total da linha)" : " (por peça)";
+return `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${escapeHtmlOS(item.data_necessidade || dados.previsao || "")}</td><td>${escapeHtmlOS(item.valor || "")}</td><td>${escapeHtmlOS(`${item.desconto || ""}${descontoLabel}`)}</td><td>${escapeHtmlOS(item.total || "")}</td></tr>`;
+}).join("") || '<tr><td colspan="8">Sem itens.</td></tr>';
 const editButton = document.getElementById("historico_oc_editar");
 if (editButton) editButton.onclick = () => editarDocumentoHistoricoOC(doc);
 const modal = document.getElementById("historico_oc_modal");
@@ -5291,6 +5298,19 @@ if (Number.isNaN(parsed.getTime()) || parsed.getFullYear() !== year || parsed.ge
 return candidate;
 }
 
+function atualizarModoDescontoOC(row, mode){
+if (!row) return;
+const input = row.querySelector('input[name="desconto[]"]');
+const modeInput = row.querySelector('input[name="desconto_modo[]"]');
+const legacyHint = row.querySelector('[data-desconto-legado-hint]');
+const isLegacyLine = mode === "linha";
+if (modeInput) modeInput.value = isLegacyLine ? "linha" : "peca";
+if (input) input.title = isLegacyLine
+? "Documento antigo: desconto total da linha. Ao alterar este campo, passa a ser desconto por peça."
+: "Desconto por peça";
+if (legacyHint) legacyHint.hidden = !isLegacyLine;
+}
+
 function preencherCampoOC(input, value){
 if (!input) return;
 const safeValue = value === undefined || value === null ? "" : value;
@@ -5329,8 +5349,9 @@ while (tabela.rows.length > 2) tabela.deleteRow(2);
 itens.forEach((item, index) => {
 if (index > 0) adicionarLinha();
 const row = tabela.rows[index + 1];
-const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"data_necessidade[]":item.data_necessidade || dados.previsao,"valor[]":item.valor,"desconto[]":item.desconto,"ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
+const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"data_necessidade[]":item.data_necessidade || dados.previsao,"valor[]":item.valor,"desconto[]":item.desconto,"desconto_modo[]":item.desconto_modo || "linha","ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
 Object.entries(valores).forEach(([name, value]) => { preencherCampoOC(row.querySelector(`[name="${name}"]`), value); });
+atualizarModoDescontoOC(row, valores["desconto_modo[]"]);
 });
 calcularTotais();
 fecharHistoricoOC();
@@ -5768,6 +5789,9 @@ preencherPorDescricao(e.target);
 });
 
 tabela.addEventListener("input", (e) => {
+if (e.target && e.target.name === "desconto[]"){
+atualizarModoDescontoOC(e.target.closest("tr"), "peca");
+}
 if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]"].includes(e.target.name)){
 calcularTotais();
 }
@@ -6326,7 +6350,7 @@ salvarRascunhoOS();
 <th>Qtd</th>
 <th>Data remessa</th>
 <th>Valor Unit</th>
-<th>Desconto</th>
+<th title="Valor de desconto aplicado a cada peça">Desconto/peça</th>
 <th>IPI</th>
 <th>ICMS</th>
 <th>COFINS</th>
@@ -6352,7 +6376,7 @@ salvarRascunhoOS();
 <td><input type="number" step="1" min="0" name="qtd[]"></td>
 <td><input type="date" name="data_necessidade[]" required></td>
 <td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="valor[]"></div></td>
-<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0"></div></td>
+<td><div class="input-group"><span class="input-prefix">R$</span><input type="number" step="0.01" min="0" name="desconto[]" value="0" title="Desconto por peça"></div><input type="hidden" name="desconto_modo[]" value="peca"><small data-desconto-legado-hint hidden>Documento antigo: desconto total da linha</small></td>
 <td><input type="number" step="0.01" min="0" name="ipi[]"></td>
 <td><input type="number" step="0.01" min="0" name="icms[]"></td>
 <td><input type="number" step="0.01" min="0" name="cofins[]"></td>
