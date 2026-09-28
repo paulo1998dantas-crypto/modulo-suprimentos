@@ -800,34 +800,43 @@ font-weight:700;
 color:#111827;
 }
 
+.oc-items-table-wrap{
+width:100%;
+overflow-x:auto;
+}
+
+.tabela-itens{
+min-width:1200px;
+}
+
 .tabela-itens th:nth-child(2),
 .tabela-itens td:nth-child(2){
-width:18%;
+width:16%;
 }
 
 .tabela-itens th:nth-child(1),
 .tabela-itens td:nth-child(1){
-width:9%;
+width:8%;
 }
 
 .tabela-itens th:nth-child(3),
 .tabela-itens td:nth-child(3){
-width:6%;
+width:5%;
 }
 
 .tabela-itens th:nth-child(4),
 .tabela-itens td:nth-child(4){
-width:6%;
+width:5%;
 }
 
 .tabela-itens th:nth-child(5),
 .tabela-itens td:nth-child(5){
-width:13%;
+width:10%;
 }
 
 .tabela-itens th:nth-child(6),
 .tabela-itens td:nth-child(6){
-width:13%;
+width:9%;
 }
 
 .tabela-itens th:nth-child(7),
@@ -837,21 +846,46 @@ width:9%;
 
 .tabela-itens th:nth-child(8),
 .tabela-itens td:nth-child(8){
-width:9%;
+width:6%;
 }
 
 .tabela-itens th:nth-child(9),
 .tabela-itens td:nth-child(9){
-width:9%;
+width:6%;
 }
 
 .tabela-itens th:nth-child(10),
 .tabela-itens td:nth-child(10){
-width:12%;
+width:6%;
 }
 .tabela-itens th:nth-child(11),
 .tabela-itens td:nth-child(11){
-width:4%;
+width:15%;
+}
+
+.tabela-itens th:nth-child(12),
+.tabela-itens td:nth-child(12){
+width:5%;
+}
+
+.tabela-itens th:nth-child(11){
+background:#dbeafe;
+color:#1e3a8a;
+}
+
+.tabela-itens td:nth-child(11){
+vertical-align:middle;
+background:#f8fbff;
+}
+
+.tabela-itens td:nth-child(11) input[name="total_item[]"]{
+min-width:140px;
+font-size:14px;
+font-weight:700;
+text-align:right;
+color:#0f172a;
+background:#eff6ff;
+border-color:#93c5fd;
 }
 
 .tabela-itens input[name="descricao[]"],
@@ -6341,6 +6375,7 @@ salvarRascunhoOS();
 
 <h3>Itens do Pedido</h3>
 
+<div class="oc-items-table-wrap">
 <table id="tabela_itens" class="tabela-itens">
 
 <tr>
@@ -6354,7 +6389,7 @@ salvarRascunhoOS();
 <th>IPI</th>
 <th>ICMS</th>
 <th>COFINS</th>
-<th>Total Item</th>
+<th>Total da linha</th>
 <th></th>
 </tr>
 
@@ -6385,6 +6420,7 @@ salvarRascunhoOS();
 </tr>
 
 </table>
+</div>
 
 <datalist id="oc-produtos-list">
 {% for key, p in produtos.items() %}

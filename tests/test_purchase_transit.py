@@ -46,6 +46,9 @@ class PurchaseTransitTests(unittest.TestCase):
         )
         self.assertIn("Desconto/peça", template)
         self.assertIn('atualizarModoDescontoOC(e.target.closest("tr"), "peca")', template)
+        self.assertIn(".tabela-itens th:nth-child(11),", template)
+        self.assertIn("width:15%;", template)
+        self.assertIn("oc-items-table-wrap", template)
 
     def test_live_transit_uses_shared_order_lines_and_pending_balance(self):
         orders = [{
