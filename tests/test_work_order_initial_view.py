@@ -36,6 +36,15 @@ class WorkOrderInitialViewContractTest(unittest.TestCase):
         self.assertIn("delete data.cliente_nome", template)
         self.assertIn("O cliente é definido exclusivamente nos dados da entrada", template)
 
+    def test_air_system_type_accepts_manual_text_with_existing_suggestions(self):
+        template = TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn(
+            'name="tipo_sistema_ar" list="air-system-type-options"', template
+        )
+        self.assertIn('id="air-system-type-options"', template)
+        self.assertIn("datalistOptions('air-system-type-options',state.catalogs.ar_tipos)", template)
+        self.assertNotIn("selectOptions('tipo_sistema_ar'", template)
+
 
 if __name__ == "__main__":
     unittest.main()

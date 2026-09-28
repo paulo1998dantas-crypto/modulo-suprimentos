@@ -78,6 +78,7 @@
   <form id="work-form" novalidate>
     <input name="entry_id" type="hidden"><input name="work_order_id" type="hidden"><input name="transformacao_codigo" type="hidden"><input name="transformacao" type="hidden">
     <datalist id="not-applicable-option"><option value="N/A"></option></datalist>
+    <datalist id="air-system-type-options"></datalist>
     <header class="modal-head"><div><h2 id="work-title">Abrir O.S.</h2><small id="work-subtitle"></small></div><button class="btn" type="button" onclick="workDialog.close()">Fechar</button></header>
     <div class="modal-body">
       <div id="required-summary" class="required-summary">Somente o tipo de serviço é estruturalmente obrigatório. Os demais campos podem ficar vazios ou receber N/A.</div>
@@ -112,7 +113,7 @@
 
         <div class="section-title"><strong>Climatização e complementos</strong></div>
         <label id="air-provider-label"><span>Fornecedor do ar</span><select name="ar_condicionado"></select></label>
-        <label class="span2"><span>Tipo de sistema de ar</span><select name="tipo_sistema_ar"></select></label>
+        <label class="span2"><span>Tipo de sistema de ar</span><input name="tipo_sistema_ar" list="air-system-type-options" maxlength="180" placeholder="Selecione uma sugestão ou digite manualmente"><small class="muted">Você pode usar um tipo sugerido ou informar outro texto.</small></label>
         <label><span>Ar quente?</span><select name="ar_quente"></select></label>
         <label class="span2">Acessório<input name="acessorio" list="not-applicable-option"></label><label class="span2">Plotagem<input name="plotagem" list="not-applicable-option"></label>
 
@@ -184,10 +185,11 @@ function message(text,error=false){const box=document.getElementById('message');
 async function api(url,options={}){const response=await fetch(url,{headers:{'Content-Type':'application/json'},...options});let body={};try{body=await response.json()}catch{}if(!response.ok||body.ok===false)throw new Error(body.error||`Falha na operação (${response.status}).`);return body}
 function optionsWithNotApplicable(values){return [...new Set([...(values||[]),'N/A'])]}
 function selectOptions(name,values,placeholder='Selecione...'){const el=form.elements[name];el.innerHTML=`<option value="">${placeholder}</option>`+optionsWithNotApplicable(values).map(v=>`<option value="${esc(v)}">${v==='N/A'?'N/A — não aplicável':esc(v)}</option>`).join('')}
+function datalistOptions(id,values){document.getElementById(id).innerHTML=optionsWithNotApplicable(values).map(v=>`<option value="${esc(v)}"></option>`).join('')}
 function loadCatalogFields(){
   selectOptions('vendedor',state.catalogs.vendedores);selectOptions('mercado',state.catalogs.mercados);
   selectOptions('tipo_veiculo',state.catalogs.tipos_veiculo);selectOptions('linha',state.catalogs.linhas);
-  selectOptions('ar_condicionado',state.catalogs.ar_fornecedores);selectOptions('tipo_sistema_ar',state.catalogs.ar_tipos);
+  selectOptions('ar_condicionado',state.catalogs.ar_fornecedores);datalistOptions('air-system-type-options',state.catalogs.ar_tipos);
   selectOptions('ar_quente',state.catalogs.sim_nao);
   selectOptions('entry_marca',state.catalogs.marcas);selectOptions('entry_modelo',state.catalogs.modelos);selectOptions('entry_versao',state.catalogs.versoes);
   const transformations=state.catalogs.transformacoes||[],el=document.getElementById('transformation-select');
