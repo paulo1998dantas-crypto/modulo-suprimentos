@@ -433,6 +433,7 @@ CAMPOS_PRODUTO_DESCARTADOS = {
     "ipi",
     "icms",
     "cofins",
+    "pis",
     "observacao",
 }
 
@@ -6091,6 +6092,7 @@ def gerar_oc():
     ipis = request.form.getlist("ipi[]")
     icmss = request.form.getlist("icms[]")
     cofins_list = request.form.getlist("cofins[]")
+    pis_list = request.form.getlist("pis[]")
     datas_necessidade = request.form.getlist("data_necessidade[]")
     line_ids = request.form.getlist("oc_line_id[]")
     desconto_modos = request.form.getlist("desconto_modo[]")
@@ -6103,6 +6105,7 @@ def gerar_oc():
         ipi = ipis[i] if i < len(ipis) else ""
         icms = icmss[i] if i < len(icmss) else ""
         cofins = cofins_list[i] if i < len(cofins_list) else ""
+        pis = pis_list[i] if i < len(pis_list) else ""
 
         qtd = _parse_numero_form(qtds[i] if i < len(qtds) else "", 0.0)
         valor = _parse_numero_form(valores[i] if i < len(valores) else "", 0.0)
@@ -6125,9 +6128,17 @@ def gerar_oc():
         ipi_val = ipi if ipi != "" else produto_info.get("ipi")
         icms_val = icms if icms != "" else produto_info.get("icms")
         cofins_val = cofins if cofins != "" else produto_info.get("cofins")
+        pis_val = pis if pis != "" else produto_info.get("pis")
 
         total = calcular_total_item(
-            qtd, valor, desconto, ipi_val, icms_val, cofins_val, desconto_modo
+            qtd,
+            valor,
+            desconto,
+            ipi_val,
+            icms_val,
+            cofins_val,
+            desconto_modo,
+            pis=pis_val,
         )
         data_necessidade_item = _erp_iso_date(
             datas_necessidade[i] if i < len(datas_necessidade) else ""
@@ -6146,6 +6157,7 @@ def gerar_oc():
             "ipi": ipi_val,
             "icms": icms_val,
             "cofins": cofins_val,
+            "pis": pis_val,
             "total": total,
             "data_necessidade": data_necessidade_item,
         })
@@ -7923,7 +7935,7 @@ def exportar_dashboard():
         ws_oc_itens = wb.create_sheet("Compras Itens")
         ws_oc_itens.append(base_headers + [
             "ID Linha", "Indice", "Codigo", "Descricao", "Unidade", "Qtd", "Valor", "Desconto",
-            "IPI", "ICMS", "COFINS", "Total", "Data Necessidade / Remessa", "Status Linha", "ACAO"
+            "IPI", "ICMS", "COFINS", "PIS", "Total", "Data Necessidade / Remessa", "Status Linha", "ACAO"
         ])
     if tipo_filtro in {"", "os"}:
         ws_os = wb.create_sheet("Ordens de Servico")
@@ -7994,6 +8006,7 @@ def exportar_dashboard():
                     item.get("ipi", ""),
                     item.get("icms", ""),
                     item.get("cofins", ""),
+                    item.get("pis", ""),
                     item.get("total", ""),
                     item.get("data_necessidade", "") or dados.get("previsao", ""),
                     _linha_status(item),

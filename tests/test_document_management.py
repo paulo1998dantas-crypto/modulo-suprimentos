@@ -608,7 +608,10 @@ class DocumentManagementTests(unittest.TestCase):
             "criado_por": "ana",
             "atualizado_por": "bia",
             "dados": {"fornecedor": "Fornecedor", "total_pedido": 123.45},
-            "itens": [{"codigo": "SKU-1", "descricao": "Item", "qtd": 2, "total": 123.45}],
+            "itens": [{
+                "codigo": "SKU-1", "descricao": "Item", "qtd": 2, "total": 123.45,
+                "ipi": 3.25, "pis": 1.65,
+            }],
         }]
         with (
             patch.object(app_module, "login_enabled", return_value=False),
@@ -627,8 +630,10 @@ class DocumentManagementTests(unittest.TestCase):
         self.assertIn("ID Linha", item_rows[0])
         self.assertIn("Status Linha", item_rows[0])
         self.assertIn("ACAO", item_rows[0])
+        self.assertIn("PIS", item_rows[0])
         self.assertEqual("rascunho", main_rows[1][1])
         self.assertEqual("SKU-1", item_rows[1][8])
+        self.assertEqual(1.65, item_rows[1][17])
         workbook.close()
         response.close()
 
@@ -711,13 +716,15 @@ class DocumentManagementTests(unittest.TestCase):
                 "desconto[]": "9.70",
                 "desconto_modo[]": "peca",
                 "ipi[]": "3.25",
+                "pis[]": "1.65",
                 "frete": "0",
             })
 
         self.assertEqual(302, response.status_code)
         generate.assert_not_called()
         item = register.call_args.kwargs["itens"][0]
-        self.assertAlmostEqual(647.997, item["total"], places=3)
+        self.assertAlmostEqual(658.3524, item["total"], places=4)
+        self.assertEqual("1.65", item["pis"])
         self.assertEqual("peca", item["desconto_modo"])
 
     def test_emitted_purchase_edit_updates_same_erp_order_without_printing(self):

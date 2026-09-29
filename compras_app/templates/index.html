@@ -806,7 +806,7 @@ overflow-x:auto;
 }
 
 .tabela-itens{
-min-width:1200px;
+min-width:1280px;
 }
 
 .tabela-itens th:nth-child(2),
@@ -860,25 +860,30 @@ width:6%;
 }
 .tabela-itens th:nth-child(11),
 .tabela-itens td:nth-child(11){
-width:15%;
+width:6%;
 }
 
 .tabela-itens th:nth-child(12),
 .tabela-itens td:nth-child(12){
+width:15%;
+}
+
+.tabela-itens th:nth-child(13),
+.tabela-itens td:nth-child(13){
 width:5%;
 }
 
-.tabela-itens th:nth-child(11){
+.tabela-itens th:nth-child(12){
 background:#dbeafe;
 color:#1e3a8a;
 }
 
-.tabela-itens td:nth-child(11){
+.tabela-itens td:nth-child(12){
 vertical-align:middle;
 background:#f8fbff;
 }
 
-.tabela-itens td:nth-child(11) input[name="total_item[]"]{
+.tabela-itens td:nth-child(12) input[name="total_item[]"]{
 min-width:140px;
 font-size:14px;
 font-weight:700;
@@ -2864,6 +2869,7 @@ valor: item.valor || "",
 ipi: item.ipi || "",
 icms: item.icms || "",
 cofins: item.cofins || "",
+pis: item.pis || "",
 };
 });
 }
@@ -3003,6 +3009,7 @@ linha.innerHTML = `
 <td><input type="number" step="0.01" min="0" name="ipi[]"></td>
 <td><input type="number" step="0.01" min="0" name="icms[]"></td>
 <td><input type="number" step="0.01" min="0" name="cofins[]"></td>
+<td><input type="number" step="0.01" min="0" name="pis[]"></td>
 <td><input name="total_item[]" readonly></td>
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOC(this)">-</button></td>
 `;
@@ -3032,6 +3039,7 @@ const desconto = row.querySelector('input[name="desconto[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
 const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
+const pis = row.querySelector('input[name="pis[]"]');
 const total = row.querySelector('input[name="total_item[]"]');
 if (select) select.value = "";
 if (lineId) lineId.value = "";
@@ -3044,6 +3052,7 @@ if (desconto) desconto.value = "0";
 if (ipi) ipi.value = "";
 if (icms) icms.value = "";
 if (cofins) cofins.value = "";
+if (pis) pis.value = "";
 if (total) total.value = "";
 calcularTotais();
 return;
@@ -3069,6 +3078,7 @@ const valor = row.querySelector('input[name="valor[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
 const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
+const pis = row.querySelector('input[name="pis[]"]');
 if (codigoInput) codigoInput.value = codigo;
 if (descricaoInput) descricaoInput.value = produto.descricao || produto.nome || "";
 if (unidade) unidade.value = produto.unidade || "UN";
@@ -3076,6 +3086,7 @@ if (valor) valor.value = produto.valor || "";
 if (ipi) ipi.value = produto.ipi || "";
 if (icms) icms.value = produto.icms || "";
 if (cofins) cofins.value = produto.cofins || "";
+if (pis) pis.value = produto.pis || "";
 }
 
 function preencherPorDescricao(input){
@@ -3332,6 +3343,7 @@ const totalItem = row.querySelector('input[name="total_item[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
 const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
+const pis = row.querySelector('input[name="pis[]"]');
 
 if (!qtd || !valor || !desconto || !totalItem){
 return;
@@ -3342,7 +3354,7 @@ const descontoEhDaLinha = descontoModo && descontoModo.value === "linha";
 const base = descontoEhDaLinha
 ? (parseNumber(qtd.value) * parseNumber(valor.value)) - parseNumber(desconto.value)
 : parseNumber(qtd.value) * (parseNumber(valor.value) - parseNumber(desconto.value));
-const taxa = parseNumber(ipi && ipi.value) + parseNumber(icms && icms.value) + parseNumber(cofins && cofins.value);
+const taxa = parseNumber(ipi && ipi.value) + parseNumber(icms && icms.value) + parseNumber(cofins && cofins.value) + parseNumber(pis && pis.value);
 const total = base > 0 ? base * (1 + (taxa / 100)) : 0;
 totalItem.value = total > 0 ? formatCurrency(total) : "R$ 0,00";
 totalItens += total > 0 ? total : 0;
@@ -4476,6 +4488,7 @@ const desconto = row.querySelector('input[name="desconto[]"]');
 const ipi = row.querySelector('input[name="ipi[]"]');
 const icms = row.querySelector('input[name="icms[]"]');
 const cofins = row.querySelector('input[name="cofins[]"]');
+const pis = row.querySelector('input[name="pis[]"]');
 const total = row.querySelector('input[name="total_item[]"]');
 if (select) select.value = "";
 if (lineId) lineId.value = "";
@@ -4488,6 +4501,7 @@ if (desconto) desconto.value = "0";
 if (ipi) ipi.value = "";
 if (icms) icms.value = "";
 if (cofins) cofins.value = "";
+if (pis) pis.value = "";
 if (total) total.value = "";
 }
 }
@@ -5383,7 +5397,7 @@ while (tabela.rows.length > 2) tabela.deleteRow(2);
 itens.forEach((item, index) => {
 if (index > 0) adicionarLinha();
 const row = tabela.rows[index + 1];
-const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"data_necessidade[]":item.data_necessidade || dados.previsao,"valor[]":item.valor,"desconto[]":item.desconto,"desconto_modo[]":item.desconto_modo || "linha","ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"total_item[]":item.total};
+const valores = {"oc_line_id[]":item.line_id,"codigo[]":item.codigo,"descricao[]":item.descricao,"unidade[]":item.unidade,"qtd[]":item.qtd,"data_necessidade[]":item.data_necessidade || dados.previsao,"valor[]":item.valor,"desconto[]":item.desconto,"desconto_modo[]":item.desconto_modo || "linha","ipi[]":item.ipi,"icms[]":item.icms,"cofins[]":item.cofins,"pis[]":item.pis,"total_item[]":item.total};
 Object.entries(valores).forEach(([name, value]) => { preencherCampoOC(row.querySelector(`[name="${name}"]`), value); });
 atualizarModoDescontoOC(row, valores["desconto_modo[]"]);
 });
@@ -5826,7 +5840,7 @@ tabela.addEventListener("input", (e) => {
 if (e.target && e.target.name === "desconto[]"){
 atualizarModoDescontoOC(e.target.closest("tr"), "peca");
 }
-if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]"].includes(e.target.name)){
+if (["qtd[]", "valor[]", "desconto[]", "ipi[]", "icms[]", "cofins[]", "pis[]"].includes(e.target.name)){
 calcularTotais();
 }
 });
@@ -6389,6 +6403,7 @@ salvarRascunhoOS();
 <th>IPI</th>
 <th>ICMS</th>
 <th>COFINS</th>
+<th>PIS</th>
 <th>Total da linha</th>
 <th></th>
 </tr>
@@ -6415,6 +6430,7 @@ salvarRascunhoOS();
 <td><input type="number" step="0.01" min="0" name="ipi[]"></td>
 <td><input type="number" step="0.01" min="0" name="icms[]"></td>
 <td><input type="number" step="0.01" min="0" name="cofins[]"></td>
+<td><input type="number" step="0.01" min="0" name="pis[]"></td>
 <td><input name="total_item[]" readonly></td>
 <td><button type="button" class="btn-row-remove" onclick="removerLinhaItemOC(this)">-</button></td>
 </tr>

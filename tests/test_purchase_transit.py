@@ -28,6 +28,11 @@ class PurchaseTransitTests(unittest.TestCase):
 
     def test_purchase_discount_is_per_piece_before_tax_and_keeps_legacy_mode(self):
         self.assertAlmostEqual(
+            990.00,
+            calcular_total_item(1, 1000.00, 100.00, ipi=10.00),
+            places=2,
+        )
+        self.assertAlmostEqual(
             647.997,
             calcular_total_item(2, 323.50, 9.70, ipi=3.25),
             places=3,
@@ -37,6 +42,11 @@ class PurchaseTransitTests(unittest.TestCase):
             calcular_total_item(2, 323.50, 9.70, ipi=3.25, desconto_modo="linha"),
             places=5,
         )
+        self.assertAlmostEqual(
+            658.3524,
+            calcular_total_item(2, 323.50, 9.70, ipi=3.25, pis=1.65),
+            places=4,
+        )
 
     def test_purchase_preview_exposes_per_piece_discount_semantics(self):
         template = (APP_DIR / "templates" / "index.html").read_text(encoding="utf-8")
@@ -44,9 +54,11 @@ class PurchaseTransitTests(unittest.TestCase):
             "parseNumber(qtd.value) * (parseNumber(valor.value) - parseNumber(desconto.value))",
             template,
         )
+        self.assertIn('name="pis[]"', template)
+        self.assertIn("+ parseNumber(pis && pis.value)", template)
         self.assertIn("Desconto/peça", template)
         self.assertIn('atualizarModoDescontoOC(e.target.closest("tr"), "peca")', template)
-        self.assertIn(".tabela-itens th:nth-child(11),", template)
+        self.assertIn(".tabela-itens th:nth-child(12),", template)
         self.assertIn("width:15%;", template)
         self.assertIn("oc-items-table-wrap", template)
 
@@ -340,6 +352,43 @@ class PurchaseTransitTests(unittest.TestCase):
     def test_document_quantity_format_removes_only_trailing_zeroes(self):
         self.assertEqual("5", gerar_oc._format_quantity(5.0))
         self.assertEqual("2,5", gerar_oc._format_quantity("2,50"))
+
+    def test_emitted_purchase_document_line_total_includes_pis(self):
+        total = calcular_total_item(2, 323.50, 9.70, ipi=3.25, pis=1.65)
+        path = gerar_oc.gerar_word(
+            "2802",
+            "Fornecedor",
+            {"previsao": "2026-08-10", "total_itens": total, "total_pedido": total},
+            [{
+                "codigo": "SKU-1",
+                "descricao": "Item com PIS",
+                "unidade": "UN",
+                "qtd": 2,
+                "valor": 323.50,
+                "desconto": 9.70,
+                "total": total,
+                "ipi": 3.25,
+                "pis": 1.65,
+                "data_necessidade": "2026-09-15",
+            }],
+            incluir_composicao=False,
+            componentes={},
+        )
+        try:
+            document = Document(path)
+            product_table = next(
+                table
+                for table in document.tables
+                if any(
+                    "DATA DE REMESSA" in " ".join(cell.text.split()).upper()
+                    for cell in table.rows[0].cells
+                )
+            )
+            self.assertEqual("R$ 658,35", product_table.rows[1].cells[6].text.strip())
+        finally:
+            generated = Path(path)
+            generated.unlink(missing_ok=True)
+            generated.parent.rmdir()
 
     def test_transit_api_and_export_share_the_same_projection(self):
         rows = [{
