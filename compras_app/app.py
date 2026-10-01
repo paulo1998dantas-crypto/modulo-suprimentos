@@ -1415,6 +1415,24 @@ def _snapshot_cadastro_cliente_os(cadastro):
     return resultado
 
 
+def _contatos_cliente_faturamento_direto(dados, clientes):
+    """Atualiza somente os contatos do cliente no documento de faturamento direto."""
+    cadastro = (dados or {}).get("cliente_cadastro") or {}
+    cadastro = dict(cadastro) if isinstance(cadastro, dict) else {}
+    atual = {}
+    for campo in ("cnpj_cpf", "cnpj", "identificador"):
+        if cadastro.get(campo):
+            atual = _resolver_cadastro_cliente_os(cadastro[campo], clientes)
+            if atual:
+                break
+    if not atual:
+        atual = _resolver_cadastro_cliente_os((dados or {}).get("cliente"), clientes)
+    for campo in ("telefone", "celular", "whatsapp", "email", "site"):
+        if campo in atual:
+            cadastro[campo] = atual[campo]
+    return cadastro
+
+
 def _resolver_nome_cliente_os(valor, clientes=None):
     valor = _limpar_valor_busca(valor)
     if not valor:
@@ -7295,6 +7313,9 @@ def gerar_os():
             item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
         fornecedor_titulo = _sanitize_output_name(fornecedor) or "SEM FORNECEDOR"
         dados_requisicao = dict(dados)
+        dados_requisicao["cliente_cadastro"] = _contatos_cliente_faturamento_direto(
+            dados, clientes_os
+        )
         dados_requisicao["fornecedor_requisicao"] = fornecedor
         arquivos_docx.append(
             gerar_os_docx(

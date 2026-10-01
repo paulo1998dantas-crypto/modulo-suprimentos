@@ -16,6 +16,42 @@ from gerar_os import _inserir_dados_cliente_faturamento  # noqa: E402
 
 
 class WorkOrderCustomerBillingTests(unittest.TestCase):
+    def test_direct_billing_refreshes_only_customer_contacts_by_registry_id(self):
+        dados = {
+            "cliente": "CLIENTE EXEMPLO",
+            "cliente_cadastro": {
+                "cnpj_cpf": "12.345.678/0001-90",
+                "razao_social": "CLIENTE EXEMPLO LTDA",
+                "telefone": "",
+                "email": "antigo@example.com",
+            },
+        }
+        clientes = {
+            "outro": {
+                "cliente": "CLIENTE EXEMPLO",
+                "telefone": "0000000000",
+                "email": "outro@example.com",
+            },
+            "12.345.678/0001-90": {
+                "cliente": "CLIENTE EXEMPLO",
+                "telefone": "1133334444",
+                "celular": "11999998888",
+                "whatsapp": "11999998888",
+                "email": "contato@example.com",
+                "site": "exemplo.com.br",
+            },
+        }
+
+        cadastro = app_module._contatos_cliente_faturamento_direto(dados, clientes)
+
+        self.assertEqual("CLIENTE EXEMPLO LTDA", cadastro["razao_social"])
+        self.assertEqual("1133334444", cadastro["telefone"])
+        self.assertEqual("11999998888", cadastro["celular"])
+        self.assertEqual("11999998888", cadastro["whatsapp"])
+        self.assertEqual("contato@example.com", cadastro["email"])
+        self.assertEqual("exemplo.com.br", cadastro["site"])
+        self.assertEqual("antigo@example.com", dados["cliente_cadastro"]["email"])
+
     def test_customer_resolves_by_registry_key_and_keeps_full_snapshot(self):
         customers = {
             "12.345.678/0001-90": {
@@ -89,7 +125,11 @@ class WorkOrderCustomerBillingTests(unittest.TestCase):
                     "cidade": "Campinas",
                     "uf": "SP",
                     "cep": "13000-000",
+                    "telefone": "1133334444",
+                    "celular": "11999998888",
+                    "whatsapp": "11999997777",
                     "email": "fiscal@example.com",
+                    "site": "exemplo.com.br",
                 },
             },
             {},
@@ -102,7 +142,19 @@ class WorkOrderCustomerBillingTests(unittest.TestCase):
         self.assertIn("DADOS CADASTRAIS DO CLIENTE PARA FATURAMENTO DIRETO", texto)
         self.assertIn("12.345.678/0001-90", texto)
         self.assertIn("Rua Um, 25, Galpão 2", texto)
+        self.assertIn("1133334444", texto)
+        self.assertIn("11999998888", texto)
+        self.assertIn("11999997777", texto)
         self.assertIn("fiscal@example.com", texto)
+        self.assertIn("exemplo.com.br", texto)
+        contatos = {
+            row.cells[0].text: row.cells[1].text
+            for table in doc.tables for row in table.rows
+        }
+        self.assertEqual("1133334444", contatos["Telefone"])
+        self.assertEqual("11999998888", contatos["Celular"])
+        self.assertEqual("11999997777", contatos["WhatsApp"])
+        self.assertEqual("fiscal@example.com", contatos["E-mail"])
 
 
 if __name__ == "__main__":

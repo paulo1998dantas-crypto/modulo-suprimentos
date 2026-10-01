@@ -258,11 +258,6 @@ def _inserir_dados_cliente_faturamento(doc, dados, refs):
         for campo in ("cidade", "uf")
         if str(cadastro.get(campo) or "").strip()
     )
-    telefones = " / ".join(
-        str(cadastro.get(campo) or "").strip()
-        for campo in ("telefone", "celular", "whatsapp")
-        if str(cadastro.get(campo) or "").strip()
-    )
     linhas = (
         ("Tipo de pessoa", "Pessoa física" if cadastro.get("pessoa_fisica") else "Pessoa jurídica" if cadastro.get("pessoa_fisica") is not None else ""),
         ("Identificador do cadastro", cadastro.get("identificador")),
@@ -280,7 +275,9 @@ def _inserir_dados_cliente_faturamento(doc, dados, refs):
         ("Código do país", cadastro.get("codigo_pais")),
         ("Código da UF", cadastro.get("codigo_uf")),
         ("CEP", cadastro.get("cep")),
-        ("Telefone / celular / WhatsApp", telefones),
+        ("Telefone", cadastro.get("telefone")),
+        ("Celular", cadastro.get("celular")),
+        ("WhatsApp", cadastro.get("whatsapp")),
         ("E-mail", cadastro.get("email")),
         ("Site", cadastro.get("site")),
     )
