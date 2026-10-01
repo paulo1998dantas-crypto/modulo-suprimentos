@@ -5502,8 +5502,9 @@ try {
 const doc = await carregarHistoricoOS(id);
 historicoOSAtual = doc;
 const dados = doc.dados || {};
-document.getElementById("historico_os_title").textContent = `O.S. ${doc.numero || ""}`;
-document.getElementById("historico_os_meta").textContent = `${doc.data_criacao || "-"} · ${dados.chassis || "Sem chassi"}`;
+const numeroOS = doc.numero || dados.os_numero || dados.numero_os || "";
+document.getElementById("historico_os_title").textContent = `O.S. ${numeroOS}`;
+document.getElementById("historico_os_meta").textContent = `${doc.data_criacao || "-"} · ${dados.chassis || dados.chassi || dados.os_chassis || "Sem chassi"}`;
 document.getElementById("historico_os_dados").innerHTML = [
 ["Cliente", dados.cliente], ["Município", dados.municipio], ["MMV", dados.mmv], ["Processo", dados.processo_conjunto]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
@@ -5535,14 +5536,15 @@ modal.setAttribute("aria-hidden", "true");
 function editarDocumentoHistoricoOS(doc){
 cancelarAgendamentoRascunhoOS();
 const dados = doc.dados || {};
+const numeroOS = doc.numero || dados.os_numero || dados.numero_os || "";
 const draft = {
 version: 2,
 campos: {
 os_cliente: dados.cliente || "",
 os_cliente_busca: dados.cliente || "",
-os_numero: doc.numero || "",
-os_chassis: dados.chassis || "",
-os_municipio: dados.municipio || "",
+os_numero: numeroOS,
+os_chassis: dados.chassis || dados.chassi || dados.os_chassis || "",
+os_municipio: dados.municipio || dados.município || "",
 os_mmv: dados.mmv || "",
 os_previsao_inicio: dados.previsao_inicio || "",
 os_previsao_termino: dados.previsao_termino || "",
@@ -5576,7 +5578,7 @@ osTabInitialized = true;
 fecharHistoricoOS();
 const tabButton = document.querySelector('[data-tab="tab-os"]');
 if (tabButton) tabButton.click();
-osDraftStatus(`Editando a O.S. ${doc.numero}. Ao gerar, este mesmo registro será atualizado.`);
+osDraftStatus(`Editando a O.S. ${numeroOS}. Ao gerar, este mesmo registro será atualizado.`);
 document.getElementById("form-os").scrollIntoView({ behavior: "smooth", block: "start" });
 salvarRascunhoOS();
 }

@@ -6628,6 +6628,56 @@ def _aplicar_selecoes_equivalencia_os(composicao):
     return resultado
 
 
+def _preservar_cabecalho_os_em_edicao(dados, documento_anterior):
+    """Keep existing O.S. header values when an edit submits them blank."""
+    resultado = dict(dados or {})
+    dados_anteriores = (documento_anterior or {}).get("dados") or {}
+    if not isinstance(dados_anteriores, dict):
+        dados_anteriores = {}
+    aliases = {
+        "cliente": ("cliente",),
+        "chassis": ("chassis", "chassi"),
+        "municipio": ("municipio", "município"),
+        "mmv": ("mmv",),
+        "previsao_inicio": ("previsao_inicio", "previsão_inicio"),
+        "previsao_termino": ("previsao_termino", "previsão_termino"),
+        "descricao_servico": ("descricao_servico", "descrição_servico"),
+        "obs_materiais": ("obs_materiais",),
+        "obs": ("obs",),
+    }
+    for campo, nomes_anteriores in aliases.items():
+        if str(resultado.get(campo) or "").strip():
+            continue
+        valor_anterior = next(
+            (
+                dados_anteriores.get(nome)
+                for nome in nomes_anteriores
+                if str(dados_anteriores.get(nome) or "").strip()
+            ),
+            None,
+        )
+        if valor_anterior is not None:
+            resultado[campo] = valor_anterior
+    if not resultado.get("cliente_cadastro"):
+        cliente_anterior = dados_anteriores.get("cliente_cadastro")
+        if isinstance(cliente_anterior, dict) and cliente_anterior:
+            resultado["cliente_cadastro"] = cliente_anterior
+    return resultado
+
+
+def _numero_os_historico(documento):
+    documento = documento or {}
+    dados = documento.get("dados") or {}
+    if not isinstance(dados, dict):
+        dados = {}
+    return str(
+        documento.get("numero")
+        or dados.get("os_numero")
+        or dados.get("numero_os")
+        or ""
+    ).strip()
+
+
 @app.route("/gerar_os", methods=["POST"])
 @permission_required("suprimentos.work_order.manage")
 def gerar_os():
@@ -6929,6 +6979,8 @@ def gerar_os():
         "obs": request.form.get("os_obs", ""),
         "processo_conjunto": conjunto_processo,
     }
+    if historico_existente:
+        dados = _preservar_cabecalho_os_em_edicao(dados, historico_existente)
     if forecast:
         # A data do Forecast e' uma sugestao operacional: ela preenche a O.S.
         # documental quando o PCP ainda nao informou uma data mais precisa.
@@ -6984,7 +7036,7 @@ def gerar_os():
         processos_final = processos_modelo
 
     numero_manual = request.form.get("os_numero", "").strip()
-    numero_os = numero_manual or str((historico_existente or {}).get("numero") or "").strip() or proximo_numero_os()
+    numero_os = numero_manual or _numero_os_historico(historico_existente) or proximo_numero_os()
 
     layout_pdf = request.files.get("os_layout_pdf")
     layout_catalogo_id = request.form.get("os_layout_arquivo_id", "").strip()

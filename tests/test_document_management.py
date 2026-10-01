@@ -22,6 +22,71 @@ import supabase_data
 
 
 class DocumentManagementTests(unittest.TestCase):
+    def test_os_edit_preserves_existing_header_when_form_fields_are_blank(self):
+        previous = {
+            "dados": {
+                "cliente": "CLIENTE TESTE",
+                "chassis": "CHASSI-123",
+                "municipio": "CURITIBA",
+                "mmv": "MMV-42",
+                "previsao_inicio": "2026-10-01T08:00",
+                "previsao_termino": "2026-10-15T18:00",
+                "descricao_servico": "TRANSFORMAÇÃO",
+                "obs_materiais": "Separar junto ao veículo",
+                "obs": "Manter acabamento original",
+                "cliente_cadastro": {"cnpj": "12345678000199"},
+            }
+        }
+
+        result = app_module._preservar_cabecalho_os_em_edicao(
+            {
+                "cliente": "",
+                "chassis": "",
+                "municipio": "",
+                "mmv": "",
+                "previsao_inicio": "",
+                "previsao_termino": "",
+                "descricao_servico": "",
+                "obs_materiais": "",
+                "obs": "",
+                "cliente_cadastro": {},
+            },
+            previous,
+        )
+
+        self.assertEqual(previous["dados"], result)
+
+    def test_os_edit_uses_updated_header_values_and_preserves_unsubmitted_values(self):
+        previous = {"dados": {"cliente": "CLIENTE ANTIGO", "chassis": "CHASSI-ANTIGO", "mmv": "MMV-1"}}
+
+        result = app_module._preservar_cabecalho_os_em_edicao(
+            {"cliente": "CLIENTE NOVO", "chassis": "", "mmv": "MMV-2"},
+            previous,
+        )
+
+        self.assertEqual("CLIENTE NOVO", result["cliente"])
+        self.assertEqual("CHASSI-ANTIGO", result["chassis"])
+        self.assertEqual("MMV-2", result["mmv"])
+
+    def test_os_edit_supports_legacy_header_field_names(self):
+        result = app_module._preservar_cabecalho_os_em_edicao(
+            {"chassis": "", "municipio": ""},
+            {"dados": {"chassi": "CHASSI-ANTIGO", "município": "SÃO PAULO"}},
+        )
+
+        self.assertEqual("CHASSI-ANTIGO", result["chassis"])
+        self.assertEqual("SÃO PAULO", result["municipio"])
+
+    def test_os_edit_resolves_number_from_legacy_document_data(self):
+        self.assertEqual(
+            "3185",
+            app_module._numero_os_historico({"dados": {"os_numero": "3185"}}),
+        )
+        self.assertEqual(
+            "3186",
+            app_module._numero_os_historico({"numero": "3186", "dados": {"os_numero": "3185"}}),
+        )
+
     def test_direct_billing_aliases_are_recognized_without_false_positive(self):
         self.assertTrue(app_module._eh_faturamento_direto("FATURAMENTO DIRETO - INSTALACAO"))
         self.assertTrue(app_module._eh_faturamento_direto("F.D. AR CONDICIONADO - CLIM"))
