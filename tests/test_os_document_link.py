@@ -1,8 +1,12 @@
+import io
 import os
 import sys
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
+
+from docx import Document
 
 
 APP_DIR = Path(__file__).resolve().parents[1] / "compras_app"
@@ -41,33 +45,239 @@ class WorkOrderDocumentLinkTests(unittest.TestCase):
             "dados": {"cliente": "CLIENTE TESTE", "chassis": "9BRTESTE123456789"},
         }
 
-    def test_reissue_detects_stale_transformation_from_operational_os(self):
+    def test_reissue_uses_latest_document_transformation_among_other_items(self):
         document = self.document(work_id="11111111-1111-1111-1111-111111111111")
         with patch.object(
             app_module,
             "_erp_mes_request",
-            return_value={"work_order": {"numero_os": "3096", "transformacao_codigo": "40340028"}},
+            return_value={"work_order": {
+                "numero_os": "3096",
+                "status": "EM_PRODUÇÃO",
+                "documento_os_id": 101,
+                "transformacao_codigo": "40340028",
+                "transformacao": "JI CONFORT",
+            }},
         ) as mes_request:
-            divergence = app_module._divergencia_transformacao_documento_os(
-                document, [{"codigo": "40340050"}]
+            plan = app_module._preparar_transformacao_documento_os(
+                document,
+                [
+                    {"codigo": "10100001", "descricao": "Banco"},
+                    {"codigo": "30240077", "descricao": "Conjunto"},
+                    {"codigo": "40340050", "descricao": "JI URBAN"},
+                ],
             )
-        self.assertIn("40340028", divergence)
-        self.assertIn("40340050", divergence)
+        self.assertEqual("40340050", plan["codigo"])
+        self.assertEqual("JI URBAN", plan["descricao"])
+        self.assertEqual("EM_PRODUÇÃO", plan["status"])
         mes_request.assert_called_once_with("work-orders/11111111-1111-1111-1111-111111111111")
 
-    def test_reissue_accepts_current_transformation(self):
+    def test_reissue_keeps_current_transformation_when_document_matches(self):
         document = self.document(work_id="11111111-1111-1111-1111-111111111111")
         with patch.object(
             app_module,
             "_erp_mes_request",
-            return_value={"work_order": {"transformacao_codigo": "40340028"}},
+            return_value={"work_order": {
+                "numero_os": "3096", "transformacao_codigo": "40340028", "transformacao": "JI CONFORT"
+            }},
         ):
-            self.assertEqual(
-                "",
-                app_module._divergencia_transformacao_documento_os(
-                    document, [{"codigo": "40340028"}]
-                ),
+            self.assertIsNone(
+                app_module._preparar_transformacao_documento_os(
+                    document, [{"codigo": "40340028", "descricao": "JI CONFORT"}]
+                )
             )
+
+    def test_open_os_sync_updates_only_transformation(self):
+        plan = {"work_id": "work-1", "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                "codigo": "40340050", "descricao": "JI URBAN"}
+        with patch.object(app_module, "_erp_mes_request") as mes_request:
+            app_module._aplicar_transformacao_documento_os(plan)
+        mes_request.assert_called_once_with(
+            "work-orders/work-1", "PUT",
+            {"transformacao_codigo": "40340050", "transformacao": "JI URBAN"},
+        )
+
+    def test_closed_os_sync_uses_audited_historical_correction(self):
+        plan = {"work_id": "work-1", "numero_os": "3096", "status": "ENTREGUE",
+                "codigo": "40340050", "descricao": "JI URBAN"}
+        with patch.object(app_module, "_erp_mes_request") as mes_request:
+            app_module._aplicar_transformacao_documento_os(plan)
+        path, method, body = mes_request.call_args.args
+        self.assertEqual("work-orders/work-1/historical-correction", path)
+        self.assertEqual("PATCH", method)
+        self.assertEqual({"transformacao_codigo": "40340050", "transformacao": "JI URBAN"}, body["work_order"])
+        self.assertIn("3096", body["motivo"])
+
+    def test_timeout_after_mes_commit_is_confirmed_by_readback(self):
+        plan = {"work_id": "work-1", "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                "codigo": "40340050", "descricao": "JI URBAN"}
+        with patch.object(app_module, "_erp_mes_request", side_effect=[
+            ValueError("timeout"),
+            {"work_order": {"transformacao_codigo": "40340050", "transformacao": "JI URBAN"}},
+        ]) as mes_request:
+            app_module._aplicar_transformacao_documento_os(plan)
+        self.assertEqual(2, mes_request.call_count)
+
+    def test_timeout_without_mes_readback_does_not_assume_rollback_is_safe(self):
+        plan = {"work_id": "work-1", "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                "codigo": "40340050", "descricao": "JI URBAN"}
+        with patch.object(app_module, "_erp_mes_request", side_effect=[
+            ValueError("timeout"), ValueError("MES indisponível"),
+        ]):
+            with self.assertRaises(app_module.SincronizacaoMesIndeterminada):
+                app_module._aplicar_transformacao_documento_os(plan)
+
+    def test_saving_edited_document_syncs_operational_os(self):
+        document = self.document(work_id="11111111-1111-1111-1111-111111111111")
+        with (
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "obter_historico_documento", return_value=document),
+            patch.object(app_module, "carregar_os_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_os_produtos", return_value={
+                "40340050": {"descricao": "JI URBAN", "unidade": "un"}
+            }),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_regras_popup_item", return_value=[]),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "carregar_os_processos", return_value={}),
+            patch.object(app_module, "carregar_relacoes_processo_item", return_value={}),
+            patch.object(app_module, "get_bom_dir", return_value=""),
+            patch.object(app_module, "registrar_historico", return_value={"id": "101"}) as register,
+            patch.object(app_module, "_erp_mes_request", side_effect=[
+                {"work_order": {
+                    "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                    "documento_os_id": 101, "transformacao_codigo": "40340028",
+                    "transformacao": "JI CONFORT",
+                }},
+                {"ok": True},
+            ]) as mes_request,
+        ):
+            response = self.client.post("/gerar_os", data={
+                "acao": "salvar", "os_historico_id": "101", "os_numero": "3096",
+                "os_composicao_source": "custom", "os_composicao_json": "[]",
+                "os_codigo[]": "40340050", "os_qtd[]": "1",
+            })
+
+        self.assertEqual(302, response.status_code)
+        self.assertEqual("40340050", register.call_args.kwargs["itens"][0]["codigo"])
+        self.assertEqual("work-orders/11111111-1111-1111-1111-111111111111", mes_request.call_args.args[0])
+        self.assertEqual("PUT", mes_request.call_args.args[1])
+        self.assertEqual("40340050", mes_request.call_args.args[2]["transformacao_codigo"])
+
+    def test_failed_mes_sync_restores_previous_document(self):
+        document = self.document(work_id="11111111-1111-1111-1111-111111111111")
+        with (
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "obter_historico_documento", return_value=document),
+            patch.object(app_module, "carregar_os_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_os_produtos", return_value={
+                "40340050": {"descricao": "JI URBAN", "unidade": "un"}
+            }),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_regras_popup_item", return_value=[]),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "carregar_os_processos", return_value={}),
+            patch.object(app_module, "carregar_relacoes_processo_item", return_value={}),
+            patch.object(app_module, "get_bom_dir", return_value=""),
+            patch.object(app_module, "registrar_historico", return_value={"id": "101"}),
+            patch.object(app_module, "salvar_historico_documento_atualizado") as restore,
+            patch.object(app_module, "_erp_mes_request", side_effect=[
+                {"work_order": {
+                    "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                    "documento_os_id": 101, "transformacao_codigo": "40340028",
+                    "transformacao": "JI CONFORT",
+                }},
+                ValueError("aplicabilidade bloqueada"),
+                {"work_order": {"transformacao_codigo": "40340028", "transformacao": "JI CONFORT"}},
+            ]),
+        ):
+            response = self.client.post("/gerar_os", data={
+                "acao": "salvar", "os_historico_id": "101", "os_numero": "3096",
+                "os_composicao_source": "custom", "os_composicao_json": "[]",
+                "os_codigo[]": "40340050", "os_qtd[]": "1",
+            })
+
+        self.assertEqual(409, response.status_code)
+        self.assertIn("aplicabilidade bloqueada", response.get_data(as_text=True))
+        restore.assert_called_once_with("101", document)
+
+    def test_uncertain_mes_sync_keeps_latest_document_until_verified(self):
+        document = self.document(work_id="11111111-1111-1111-1111-111111111111")
+        with (
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "obter_historico_documento", return_value=document),
+            patch.object(app_module, "carregar_os_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_os_produtos", return_value={
+                "40340050": {"descricao": "JI URBAN", "unidade": "un"}
+            }),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_regras_popup_item", return_value=[]),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "carregar_os_processos", return_value={}),
+            patch.object(app_module, "carregar_relacoes_processo_item", return_value={}),
+            patch.object(app_module, "get_bom_dir", return_value=""),
+            patch.object(app_module, "registrar_historico", return_value={"id": "101"}) as register,
+            patch.object(app_module, "salvar_historico_documento_atualizado") as restore,
+            patch.object(app_module, "_erp_mes_request", side_effect=[
+                {"work_order": {
+                    "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                    "documento_os_id": 101, "transformacao_codigo": "40340028",
+                    "transformacao": "JI CONFORT",
+                }},
+                ValueError("timeout"),
+                ValueError("MES indisponível"),
+            ]),
+        ):
+            response = self.client.post("/gerar_os", data={
+                "acao": "salvar", "os_historico_id": "101", "os_numero": "3096",
+                "os_composicao_source": "custom", "os_composicao_json": "[]",
+                "os_codigo[]": "40340050", "os_qtd[]": "1",
+            })
+
+        self.assertEqual(503, response.status_code)
+        self.assertIn("edição foi salva no documento", response.get_data(as_text=True))
+        self.assertEqual("40340050", register.call_args.kwargs["itens"][0]["codigo"])
+        restore.assert_not_called()
+
+    def test_reissue_zip_contains_latest_edited_transformation(self):
+        document = self.document(work_id="11111111-1111-1111-1111-111111111111")
+        with (
+            patch.object(app_module, "atualizar_skus_automatico", return_value={}),
+            patch.object(app_module, "obter_historico_documento", return_value=document),
+            patch.object(app_module, "carregar_os_fornecedores", return_value={}),
+            patch.object(app_module, "carregar_os_produtos", return_value={
+                "40340050": {"descricao": "JI URBAN", "unidade": "un"},
+                "10100001": {"descricao": "Banco", "unidade": "pc"},
+            }),
+            patch.object(app_module, "carregar_produtos", return_value={}),
+            patch.object(app_module, "carregar_regras_popup_item", return_value=[]),
+            patch.object(app_module, "carregar_os_componentes", return_value={}),
+            patch.object(app_module, "carregar_os_processos", return_value={}),
+            patch.object(app_module, "carregar_relacoes_processo_item", return_value={}),
+            patch.object(app_module, "get_bom_dir", return_value=""),
+            patch.object(app_module, "registrar_historico", return_value={"id": "101"}) as register,
+            patch.object(app_module, "_erp_mes_request", side_effect=[
+                {"work_order": {
+                    "numero_os": "3096", "status": "EM_PRODUÇÃO",
+                    "documento_os_id": 101, "transformacao_codigo": "40340028",
+                    "transformacao": "JI CONFORT",
+                }},
+                {"ok": True},
+            ]) as mes_request,
+        ):
+            response = self.client.post("/gerar_os", data={
+                "acao": "imprimir", "os_historico_id": "101", "os_numero": "3096",
+                "os_composicao_source": "custom", "os_composicao_json": '[{"item":"10100001","codigo":"10100001","descricao":"Banco","qtd":1,"level":0}]',
+                "os_codigo[]": ["10100001", "40340050"], "os_qtd[]": ["1", "1"],
+            })
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(["10100001", "40340050"], [row["codigo"] for row in register.call_args.kwargs["itens"]])
+        self.assertEqual("PUT", mes_request.call_args.args[1])
+        with zipfile.ZipFile(io.BytesIO(response.data)) as package:
+            complete = next(name for name in package.namelist() if "O.S Completa" in name)
+            docx = Document(io.BytesIO(package.read(complete)))
+        product_rows = [row.cells[0].text for row in docx.tables[2].rows[1:]]
+        self.assertEqual(["10100001", "40340050"], product_rows)
 
     def test_documents_endpoint_lists_only_active_service_orders(self):
         rows = [

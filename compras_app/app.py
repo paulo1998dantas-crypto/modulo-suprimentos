@@ -1004,28 +1004,85 @@ def _document_work_order_id(documento):
     ).strip()
 
 
-def _divergencia_transformacao_documento_os(documento, itens):
-    """Impede que a reemissão use uma transformação já alterada no MES."""
+class SincronizacaoMesIndeterminada(ValueError):
+    """O MES não respondeu à confirmação; a escrita pode ter sido aplicada."""
+
+
+def _preparar_transformacao_documento_os(documento, itens):
+    """A última edição documental é a fonte da transformação vinculada no MES."""
     work_id = _document_work_order_id(documento)
     if not work_id:
-        return ""
+        return None
+    transformacoes = {
+        normalizar_codigo(item.get("codigo") or ""): str(item.get("descricao") or "").strip()
+        for item in itens or []
+        if normalizar_codigo(item.get("codigo") or "").startswith("4034")
+    }
+    if not transformacoes:
+        return None
+    if len(transformacoes) != 1:
+        raise ValueError("A O.S. vinculada deve ter uma única transformação antes da reemissão.")
+    codigo_documento, descricao_documento = next(iter(transformacoes.items()))
+    if not descricao_documento:
+        raise ValueError(f"A transformação {codigo_documento} está sem descrição no documento.")
     detalhe = _erp_mes_request(f"work-orders/{work_id}")
     work_order = (detalhe or {}).get("work_order") or {}
-    codigo_vigente = normalizar_codigo(work_order.get("transformacao_codigo") or "")
-    if not codigo_vigente:
-        return ""
-    codigos_documento = {
-        normalizar_codigo(item.get("codigo") or "") for item in itens or []
+    if not work_order:
+        raise ValueError("A O.S. operacional vinculada ao documento não foi encontrada.")
+    numero_documento = str((documento or {}).get("numero") or "").strip()
+    if numero_documento and str(work_order.get("numero_os") or "").strip() != numero_documento:
+        raise ValueError("O número da O.S. operacional não corresponde ao documento em edição.")
+    documento_operacional_id = work_order.get("documento_os_id")
+    if documento_operacional_id and str(documento_operacional_id) != str(documento.get("id") or ""):
+        raise ValueError("A O.S. operacional está vinculada a outro documento.")
+    codigo_atual = normalizar_codigo(work_order.get("transformacao_codigo") or "")
+    descricao_atual = str(work_order.get("transformacao") or "").strip()
+    if codigo_atual == codigo_documento and descricao_atual == descricao_documento:
+        return None
+    return {
+        "work_id": work_id,
+        "numero_os": numero_documento,
+        "status": str(work_order.get("status") or "").upper(),
+        "codigo": codigo_documento,
+        "descricao": descricao_documento,
     }
-    if codigo_vigente in codigos_documento:
-        return ""
-    numero_os = str((documento or {}).get("numero") or work_order.get("numero_os") or "").strip()
-    return (
-        f"A O.S. {numero_os} está divergente da Gestão de O.S.: a transformação "
-        f"vigente é {codigo_vigente}, mas o documento contém "
-        f"{', '.join(sorted(codigos_documento)) or 'nenhum SKU'}. "
-        "Edite o item do documento, confira/recarregue a B.O.M. e reemita a O.S."
-    )
+
+
+def _aplicar_transformacao_documento_os(plano):
+    if not plano:
+        return
+    campos = {"transformacao_codigo": plano["codigo"], "transformacao": plano["descricao"]}
+    work_id = plano["work_id"]
+    try:
+        if plano["status"] in {"RASCUNHO", "AGUARDANDO_O_S", "ATIVA", "EM_PRODUÇÃO"}:
+            _erp_mes_request(f"work-orders/{work_id}", "PUT", campos)
+        else:
+            _erp_mes_request(
+                f"work-orders/{work_id}/historical-correction",
+                "PATCH",
+                {
+                    "work_order": campos,
+                    "entry": {},
+                    "motivo": f"Transformação atualizada pela edição do documento O.S. {plano['numero_os']}.",
+                },
+            )
+    except ValueError as exc:
+        # Um timeout pode ocorrer depois de o MES confirmar a transação. A
+        # leitura evita desfazer o documento quando a alteração já entrou.
+        try:
+            detalhe = _erp_mes_request(f"work-orders/{work_id}")
+        except ValueError as verificacao:
+            raise SincronizacaoMesIndeterminada(
+                "O MES não confirmou se a transformação foi atualizada. "
+                "Confira a O.S. na Gestão antes de tentar novamente."
+            ) from verificacao
+        atual = (detalhe or {}).get("work_order") or {}
+        if (
+            normalizar_codigo(atual.get("transformacao_codigo") or "") == plano["codigo"]
+            and str(atual.get("transformacao") or "").strip() == plano["descricao"]
+        ):
+            return
+        raise exc
 
 
 def _carregar_documentos_os_para_vinculo():
@@ -6965,14 +7022,11 @@ def gerar_os():
 
     total_itens = sum(item["total"] for item in itens)
 
-    if historico_existente and acao != "salvar":
-        try:
-            divergencia = _divergencia_transformacao_documento_os(historico_existente, itens)
-        except ValueError:
-            app.logger.exception("Falha ao conferir a transformação da O.S. documental %s", historico_form_id)
-            return "Não foi possível conferir a transformação vigente da O.S. no MES. Tente novamente.", 502
-        if divergencia:
-            return divergencia, 409
+    try:
+        plano_transformacao = _preparar_transformacao_documento_os(historico_existente, itens)
+    except ValueError as exc:
+        app.logger.warning("Falha ao preparar atualização da O.S. %s: %s", historico_form_id, exc)
+        return f"A edição da O.S. não foi salva: {exc}", 409
 
     processos = carregar_os_processos()
     relacoes_processo_item = carregar_relacoes_processo_item()
@@ -7175,7 +7229,7 @@ def gerar_os():
     if acao == "salvar" and not historico_existente:
         status_documento = "rascunho"
     if acao == "salvar":
-        registrar_historico(
+        documento_salvo = registrar_historico(
             "os",
             numero_os,
             dados_historico,
@@ -7188,6 +7242,29 @@ def gerar_os():
             submit_token=submit_token,
             layout_arquivo_id=layout_arquivo_id,
         )
+        try:
+            _aplicar_transformacao_documento_os(plano_transformacao)
+        except SincronizacaoMesIndeterminada as exc:
+            app.logger.exception("Estado indeterminado ao sincronizar transformação da O.S. %s", numero_os)
+            return (
+                f"A edição foi salva no documento, mas não foi possível confirmar a atualização no MES: {exc}",
+                503,
+            )
+        except ValueError as exc:
+            app.logger.exception("Falha ao sincronizar transformação da O.S. %s com o MES", numero_os)
+            try:
+                if historico_existente:
+                    salvar_historico_documento_atualizado(historico_existente["id"], historico_existente)
+                else:
+                    excluir_historico_documento(documento_salvo.get("id"))
+            except Exception:
+                app.logger.exception("Falha ao restaurar documento da O.S. %s", numero_os)
+                return (
+                    "A atualização no MES falhou e o documento não pôde ser restaurado. "
+                    "Confira ambos os registros antes de tentar novamente.",
+                    500,
+                )
+            return f"A edição da O.S. não foi concluída no MES: {exc}", 409
         limpar_importacao(_user_scoped_file(OS_IMPORT_FILE))
         return redirect(url_for("index", tab="dashboard", documento_status="O.S. salva sem impressao."))
 
@@ -7204,7 +7281,7 @@ def gerar_os():
                 componentes,
                 processos_final,
                 layout_clone,
-                composicao_final or None,
+                composicao_final,
                 modo=config_modo["doc_mode"],
                 titulo_arquivo=config_modo["titulo"],
                 incluir_cliente_nome=config_modo.get("incluir_cliente_nome", True),
@@ -7254,6 +7331,7 @@ def gerar_os():
         submit_token=submit_token,
         layout_arquivo_id=layout_arquivo_id,
     )
+    consumo_forecast_novo = False
     if forecast:
         # A RPC realiza lock da linha do Forecast e torna retentativas do mesmo
         # documento idempotentes. Se outra emissao consumiu o saldo entre a
@@ -7266,6 +7344,7 @@ def gerar_os():
                 f"forecast-os-documento:{documento_emitido.get('id')}",
                 current_username(),
             )
+            consumo_forecast_novo = not bool(consumo.get("idempotente"))
             dados_historico["forecast_consumo"].update({
                 "status": "CONFIRMADO",
                 "consumo_id": consumo.get("id"),
@@ -7305,6 +7384,46 @@ def gerar_os():
                     pass
             mensagem = str(exc).strip() or "Nao foi possivel abater o saldo do Forecast."
             return f"O.S. nao foi emitida: {mensagem}", 409
+    try:
+        _aplicar_transformacao_documento_os(plano_transformacao)
+    except SincronizacaoMesIndeterminada as exc:
+        app.logger.exception("Estado indeterminado ao sincronizar transformação da O.S. %s", numero_os)
+        for path in [*arquivos_docx, arquivo_requisicao_materiais]:
+            shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+        return (
+            f"A edição foi salva no documento, mas a reemissão não pôde confirmar o MES: {exc}",
+            503,
+        )
+    except ValueError as exc:
+        app.logger.exception("Falha ao sincronizar transformação da O.S. %s com o MES", numero_os)
+        rollback_falhou = False
+        if consumo_forecast_novo:
+            try:
+                supabase_data.cancelar_consumo_forecast_em_os_documento(
+                    documento_emitido.get("id"),
+                    current_username(),
+                    "Falha ao sincronizar transformação da O.S. com o MES.",
+                )
+            except Exception:
+                rollback_falhou = True
+                app.logger.exception("Falha ao estornar Forecast da O.S. %s", numero_os)
+        try:
+            if historico_existente:
+                salvar_historico_documento_atualizado(historico_existente["id"], historico_existente)
+            else:
+                excluir_historico_documento(documento_emitido.get("id"))
+        except Exception:
+            rollback_falhou = True
+            app.logger.exception("Falha ao restaurar documento da O.S. %s", numero_os)
+        for path in [*arquivos_docx, arquivo_requisicao_materiais]:
+            shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+        if rollback_falhou:
+            return (
+                "A atualização no MES falhou e a reemissão não pôde ser totalmente revertida. "
+                "Confira documento, O.S. e Forecast antes de tentar novamente.",
+                500,
+            )
+        return f"A O.S. não foi reemitida porque a atualização no MES falhou: {exc}", 409
     limpar_importacao(_user_scoped_file(OS_IMPORT_FILE))
 
     arquivos_saida = [
