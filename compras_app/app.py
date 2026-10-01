@@ -1245,19 +1245,93 @@ def carregar_os_produtos(force=False):
         return json.load(f)
 
 
-def carregar_os_fornecedores():
+def carregar_os_fornecedores(completo=False):
     if supabase_data.enabled():
         try:
-            return supabase_data.carregar_pessoas("cliente")
+            clientes = supabase_data.carregar_pessoas("cliente")
         except Exception:
             app.logger.exception("Falha ao carregar clientes do Supabase")
             return {}
+    else:
+        if not os.path.exists(OS_FORNECEDORES_FILE):
+            return {}
+        with open(OS_FORNECEDORES_FILE, "r", encoding="utf-8") as f:
+            clientes = json.load(f)
 
-    if not os.path.exists(OS_FORNECEDORES_FILE):
+    if completo or not isinstance(clientes, dict):
+        return clientes
+    campos_os = {
+        "data_registro", "cliente", "nome_fantasia", "razao_social", "identificador", "cnpj_cpf", "cnpj",
+        "codigo_identificador_unico", "pessoa_fisica", "rg", "ie", "logradouro",
+        "logradouro_numero", "complemento", "endereco", "bairro", "cidade",
+        "codigo_municipio", "pais", "codigo_pais", "cep", "uf", "codigo_uf",
+        "telefone", "whatsapp", "celular", "email", "site",
+    }
+    return {
+        chave: {
+            campo: valor
+            for campo, valor in (info.items() if isinstance(info, dict) else (("cliente", info),))
+            if campo in campos_os
+        }
+        for chave, info in clientes.items()
+    }
+
+
+def _resolver_cadastro_cliente_os(valor, clientes=None):
+    valor = _limpar_valor_busca(valor)
+    if not valor:
         return {}
 
-    with open(OS_FORNECEDORES_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    clientes = clientes if isinstance(clientes, dict) else carregar_os_fornecedores()
+    valor_normalizado = valor.casefold()
+    for chave, candidato in clientes.items():
+        if not isinstance(candidato, dict):
+            candidato = {"cliente": str(candidato or "")}
+        identificadores = (
+            chave,
+            candidato.get("identificador"),
+            candidato.get("cnpj_cpf"),
+            candidato.get("cnpj"),
+            candidato.get("cliente"),
+            candidato.get("nome_fantasia"),
+            candidato.get("razao_social"),
+        )
+        if any(str(item or "").strip().casefold() == valor_normalizado for item in identificadores):
+            return dict(candidato)
+    return {}
+
+
+def _snapshot_cadastro_cliente_os(cadastro):
+    if not isinstance(cadastro, dict):
+        return {}
+    campos = (
+        "data_registro", "identificador", "pessoa_fisica", "nome_fantasia", "razao_social", "cnpj_cpf",
+        "codigo_identificador_unico", "rg", "ie", "logradouro", "logradouro_numero",
+        "complemento", "bairro", "cidade", "codigo_municipio", "pais", "codigo_pais",
+        "cep", "uf", "codigo_uf", "telefone", "whatsapp", "celular", "email", "site",
+        "cliente", "eh_cliente", "fornecedor", "colaborador", "transportadora", "pessoa_grupo",
+        "vendedor_padrao", "categoria", "tabela_preco", "observacoes", "limite_credito",
+        "periodicidade_venda_compra_dias", "validation", "valor_minimo_compra",
+        "data_nascimento_fundacao", "payload",
+    )
+
+    def json_value(value):
+        if isinstance(value, dict):
+            return {str(key): json_value(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [json_value(item) for item in value]
+        if hasattr(value, "isoformat"):
+            return value.isoformat()
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        return str(value)
+
+    resultado = {campo: json_value(cadastro[campo]) for campo in campos if campo in cadastro}
+    # Preserve legacy aliases as well as the full registry fields.
+    for campo in ("cliente", "cnpj", "endereco"):
+        if campo in cadastro:
+            resultado[campo] = json_value(cadastro[campo])
+    return resultado
 
 
 def _resolver_nome_cliente_os(valor, clientes=None):
@@ -1265,26 +1339,8 @@ def _resolver_nome_cliente_os(valor, clientes=None):
     if not valor:
         return ""
 
-    clientes = clientes if isinstance(clientes, dict) else carregar_os_fornecedores()
-    info = clientes.get(valor)
-    if not isinstance(info, dict):
-        valor_normalizado = valor.casefold()
-        for chave, candidato in clientes.items():
-            if str(chave).strip().casefold() == valor_normalizado:
-                info = candidato
-                break
-            if not isinstance(candidato, dict):
-                continue
-            nomes = (
-                candidato.get("cliente"),
-                candidato.get("nome_fantasia"),
-                candidato.get("razao_social"),
-            )
-            if any(str(nome or "").strip().casefold() == valor_normalizado for nome in nomes):
-                info = candidato
-                break
-
-    if not isinstance(info, dict):
+    info = _resolver_cadastro_cliente_os(valor, clientes)
+    if not info:
         return valor
     return _limpar_valor_busca(
         info.get("cliente")
@@ -1292,6 +1348,24 @@ def _resolver_nome_cliente_os(valor, clientes=None):
         or info.get("razao_social")
         or valor
     )
+
+
+def _registro_cliente_os_legado(pessoa, nome):
+    pessoa = pessoa if isinstance(pessoa, dict) else {}
+    cadastro = dict(pessoa)
+    cadastro.update({
+        "cliente": nome,
+        "eh_cliente": str(pessoa.get("cliente") or "").strip().upper() in {"SIM", "S", "1", "TRUE"},
+        "nome_fantasia": pessoa.get("nome_fantasia") or nome,
+        "cnpj": pessoa.get("cnpj_cpf", ""),
+        "cnpj_cpf": pessoa.get("cnpj_cpf", ""),
+        "endereco": " ".join(
+            str(pessoa.get(campo) or "").strip()
+            for campo in ("logradouro", "logradouro_numero", "complemento")
+            if str(pessoa.get(campo) or "").strip()
+        ),
+    })
+    return cadastro
 
 
 def salvar_fornecedores(fornecedores):
@@ -3596,7 +3670,7 @@ def importar_os_fornecedores(file_storage):
         campos_esperados={"cliente", "fornecedor"},
     )
 
-    fornecedores = carregar_os_fornecedores()
+    fornecedores = carregar_os_fornecedores(completo=True)
     count = 0
 
     for row in rows:
@@ -3685,7 +3759,7 @@ def importar_pessoas(file_storage):
 
     if not supabase_data.enabled():
         fornecedores = carregar_fornecedores()
-        clientes = carregar_os_fornecedores()
+        clientes = carregar_os_fornecedores(completo=True)
         for pessoa in pessoas:
             nome = pessoa.get("nome_fantasia") or pessoa.get("razao_social") or pessoa.get("cnpj_cpf")
             if not nome:
@@ -3706,7 +3780,7 @@ def importar_pessoas(file_storage):
             if str(pessoa.get("fornecedor", "")).strip().upper() in {"SIM", "S", "1", "TRUE"}:
                 fornecedores[pessoa.get("cnpj_cpf") or nome] = legacy
             if str(pessoa.get("cliente", "")).strip().upper() in {"SIM", "S", "1", "TRUE"}:
-                clientes[nome] = {"cliente": nome}
+                clientes[nome] = _registro_cliente_os_legado(pessoa, nome)
         salvar_fornecedores(fornecedores)
         salvar_os_fornecedores(clientes)
         return len(pessoas)
@@ -6614,12 +6688,21 @@ def gerar_os():
                     f"Saldo disponivel: {_formatar_qtd_saida(saldo_forecast)}.",
                     409,
                 )
+    clientes_os = carregar_os_fornecedores(completo=True)
     cliente_selecionado = _limpar_valor_busca(
         request.form.get("os_cliente", "") or request.form.get("os_cliente_busca", "")
     )
-    cliente = _resolver_nome_cliente_os(cliente_selecionado)
+    cliente_cadastro = _resolver_cadastro_cliente_os(cliente_selecionado, clientes_os)
+    cliente = _resolver_nome_cliente_os(cliente_selecionado, clientes_os)
     if forecast and str(forecast.get("cliente_nome") or "").strip():
         cliente = str(forecast.get("cliente_nome") or "").strip()
+        cliente_cadastro = _resolver_cadastro_cliente_os(cliente, clientes_os)
+    if not cliente_cadastro:
+        cliente_cadastro = (
+            (dados_historico_anterior.get("cliente_cadastro") or {})
+            if isinstance(dados_historico_anterior, dict)
+            else {}
+        )
     os_produtos = carregar_os_produtos()
     produtos_catalogo = carregar_produtos()
     bom_dir = get_bom_dir()
@@ -6833,6 +6916,7 @@ def gerar_os():
 
     dados = {
         "cliente": cliente,
+        "cliente_cadastro": _snapshot_cadastro_cliente_os(cliente_cadastro),
         "previsao_inicio": request.form.get("os_previsao_inicio", ""),
         "previsao_termino": request.form.get("os_previsao_termino", ""),
         "chassis": request.form.get("os_chassis", ""),
@@ -7257,8 +7341,8 @@ def cadastrar_pessoa():
                 }
                 salvar_fornecedores(fornecedores)
             if pessoa.get("cliente"):
-                clientes = carregar_os_fornecedores()
-                clientes[nome] = {"cliente": nome}
+                clientes = carregar_os_fornecedores(completo=True)
+                clientes[nome] = _registro_cliente_os_legado(pessoa, nome)
                 salvar_os_fornecedores(clientes)
     return redirect(url_for("index", tab="cadastro"))
 
@@ -7290,7 +7374,7 @@ def cadastrar_item():
 @permission_required("suprimentos.master_data.manage")
 def cadastrar_os_fornecedor():
 
-    fornecedores = carregar_os_fornecedores()
+    fornecedores = carregar_os_fornecedores(completo=True)
 
     cliente = request.form.get("os_fornecedor", "").strip()
     if cliente:

@@ -10,7 +10,7 @@ from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 
 from composicao import normalizar_componentes, resolver_composicao_final
 from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO
@@ -239,6 +239,85 @@ def _configurar_cabecalho_requisicao(doc, refs, dados):
         )
         _set_cell_text(tabela_dados.cell(3, 2), "")
         _set_cell_text(tabela_dados.cell(3, 3), "")
+
+
+def _inserir_dados_cliente_faturamento(doc, dados, refs):
+    cadastro = dados.get("cliente_cadastro") or {}
+    if not isinstance(cadastro, dict):
+        cadastro = {}
+
+    logradouro = str(cadastro.get("logradouro") or cadastro.get("endereco") or "").strip()
+    partes_endereco = [logradouro]
+    for campo in ("logradouro_numero", "complemento"):
+        valor = str(cadastro.get(campo) or "").strip()
+        if valor and valor.casefold() not in logradouro.casefold():
+            partes_endereco.append(valor)
+    endereco = ", ".join(parte for parte in partes_endereco if parte)
+    municipio_uf = " / ".join(
+        str(cadastro.get(campo) or "").strip()
+        for campo in ("cidade", "uf")
+        if str(cadastro.get(campo) or "").strip()
+    )
+    telefones = " / ".join(
+        str(cadastro.get(campo) or "").strip()
+        for campo in ("telefone", "celular", "whatsapp")
+        if str(cadastro.get(campo) or "").strip()
+    )
+    linhas = (
+        ("Tipo de pessoa", "Pessoa física" if cadastro.get("pessoa_fisica") else "Pessoa jurídica" if cadastro.get("pessoa_fisica") is not None else ""),
+        ("Identificador do cadastro", cadastro.get("identificador")),
+        ("Nome fantasia", cadastro.get("nome_fantasia") or cadastro.get("cliente") or dados.get("cliente")),
+        ("Razão social", cadastro.get("razao_social")),
+        ("CNPJ / CPF", cadastro.get("cnpj_cpf") or cadastro.get("cnpj")),
+        ("Código identificador único", cadastro.get("codigo_identificador_unico")),
+        ("Inscrição estadual", cadastro.get("ie")),
+        ("RG", cadastro.get("rg")),
+        ("Endereço", endereco),
+        ("Bairro", cadastro.get("bairro")),
+        ("Cidade / UF", municipio_uf),
+        ("Código do município", cadastro.get("codigo_municipio")),
+        ("País", cadastro.get("pais")),
+        ("Código do país", cadastro.get("codigo_pais")),
+        ("Código da UF", cadastro.get("codigo_uf")),
+        ("CEP", cadastro.get("cep")),
+        ("Telefone / celular / WhatsApp", telefones),
+        ("E-mail", cadastro.get("email")),
+        ("Site", cadastro.get("site")),
+    )
+    linhas = [(rotulo, str(valor).strip()) for rotulo, valor in linhas if str(valor or "").strip()]
+    if not linhas:
+        return
+
+    indice_layout = refs.get("layout")
+    tabela_layout = (
+        doc.tables[indice_layout]
+        if indice_layout is not None and indice_layout < len(doc.tables)
+        else None
+    )
+    titulo = doc.add_paragraph()
+    run = titulo.add_run("DADOS CADASTRAIS DO CLIENTE PARA FATURAMENTO DIRETO")
+    run.bold = True
+    tabela = doc.add_table(rows=0, cols=2)
+    try:
+        tabela.style = "Table Grid"
+    except Exception:
+        pass
+    for rotulo, valor in linhas:
+        celulas = tabela.add_row().cells
+        _set_cell_text(celulas[0], rotulo)
+        _set_cell_text(celulas[1], valor)
+        for run in celulas[0].paragraphs[0].runs:
+            run.bold = True
+        for celula in celulas:
+            for paragrafo in celula.paragraphs:
+                for texto in paragrafo.runs:
+                    texto.font.size = Pt(9)
+
+    if tabela_layout is not None:
+        titulo._p.getparent().remove(titulo._p)
+        tabela._tbl.getparent().remove(tabela._tbl)
+        tabela_layout._tbl.addprevious(titulo._p)
+        titulo._p.addnext(tabela._tbl)
 
 
 def _preencher_tabela_produtos(tabela, itens):
@@ -773,6 +852,8 @@ def gerar_os_docx(
                 _set_cell_align(tabela_dados.rows[row_idx].cells[col_idx], WD_ALIGN_PARAGRAPH.LEFT)
 
     _alinhar_tabelas_processo(refs, doc)
+    if modo == "faturamento_direto":
+        _inserir_dados_cliente_faturamento(doc, dados, refs)
     return _salvar_documento_os(
         doc,
         numero_os,

@@ -2774,6 +2774,56 @@ function obterDisplayCliente(chave, item){
 return (item && item.cliente) || chave || "";
 }
 
+function atualizarResumoClienteOS(cliente){
+const resumo = document.getElementById("os_cliente_dados_cadastro");
+const grade = document.getElementById("os_cliente_dados_grade");
+if (!resumo || !grade){
+return;
+}
+grade.innerHTML = "";
+if (!cliente){
+resumo.hidden = true;
+return;
+}
+const endereco = [cliente.logradouro || cliente.endereco, cliente.logradouro_numero, cliente.complemento]
+.filter((parte) => String(parte || "").trim())
+.join(", ");
+const campos = [
+["Tipo de pessoa", typeof cliente.pessoa_fisica === "boolean" ? (cliente.pessoa_fisica ? "Pessoa física" : "Pessoa jurídica") : ""],
+["Data de cadastro", cliente.data_registro],
+["Identificador", cliente.identificador],
+["Nome fantasia", cliente.nome_fantasia || cliente.cliente],
+["Razão social", cliente.razao_social],
+["CNPJ / CPF", cliente.cnpj_cpf || cliente.cnpj],
+["Código identificador único", cliente.codigo_identificador_unico],
+["RG", cliente.rg],
+["Inscrição estadual", cliente.ie],
+["Endereço", endereco],
+["Bairro", cliente.bairro],
+["Cidade / UF", [cliente.cidade, cliente.uf].filter(Boolean).join(" / ")],
+["Código do município", cliente.codigo_municipio],
+["País", cliente.pais],
+["Código do país", cliente.codigo_pais],
+["Código da UF", cliente.codigo_uf],
+["CEP", cliente.cep],
+["Telefone", cliente.telefone],
+["Celular / WhatsApp", [cliente.celular, cliente.whatsapp].filter(Boolean).join(" / ")],
+["E-mail", cliente.email],
+["Site", cliente.site],
+];
+campos.forEach(([rotulo, valor]) => {
+if (!String(valor || "").trim()) return;
+const item = document.createElement("div");
+const label = document.createElement("strong");
+const conteudo = document.createElement("span");
+label.textContent = `${rotulo}: `;
+conteudo.textContent = String(valor);
+item.append(label, conteudo);
+grade.appendChild(item);
+});
+resumo.hidden = false;
+}
+
 function formatarCadastroBusca(chave, display){
 if (!display || display === chave){
 return chave || "";
@@ -3167,12 +3217,14 @@ if (!cliente || !input){
 if (hidden){
 hidden.value = "";
 }
+atualizarResumoClienteOS(null);
 return;
 }
 if (hidden){
 hidden.value = chave;
 }
 input.value = formatarCadastroBusca(chave, obterDisplayCliente(chave, cliente));
+atualizarResumoClienteOS(cliente);
 }
 
 function preencherFornecedorOS(input){
@@ -6935,6 +6987,11 @@ salvarRascunhoOS();
 <div class="lookup-field">
 <input name="os_cliente_busca" data-lookup-source="clientes" autocomplete="off" placeholder="Digite codigo ou nome do cliente">
 <div class="lookup-menu"></div>
+</div>
+</div>
+<div id="os_cliente_dados_cadastro" hidden style="grid-column:1/-1;margin-top:10px;padding:12px;border:1px solid #bfdbfe;border-radius:8px;background:#eff6ff;font-size:12px;color:#1e3a5f;">
+<strong style="display:block;margin-bottom:7px;">Dados do cliente que serão levados ao faturamento direto</strong>
+<div id="os_cliente_dados_grade" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 16px;"></div>
 </div>
 </div>
 </div>

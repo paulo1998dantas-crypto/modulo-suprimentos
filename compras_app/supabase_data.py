@@ -510,8 +510,24 @@ def salvar_pessoas_legacy(registros, tipo):
 def _pessoa_to_legacy(row, tipo):
     nome = _clean(row.get("nome_fantasia")) or _clean(row.get("razao_social")) or _clean(row.get("cnpj_cpf"))
     legacy = {
+        # Keep the full people record available to the O.S flow. The legacy
+        # aliases below remain for existing supplier/client screens.
+        **{
+            key: value
+            for key, value in row.items()
+            if key not in {"search_text", "created_at", "updated_at"}
+        },
+        "identificador": _clean(row.get("identificador")),
+        "pessoa_fisica": _bool(row.get("pessoa_fisica")),
+        "nome_fantasia": _clean(row.get("nome_fantasia")),
         "razao_social": _clean(row.get("razao_social")),
+        "cnpj_cpf": _clean(row.get("cnpj_cpf")),
         "cnpj": _clean(row.get("cnpj_cpf")),
+        "rg": _clean(row.get("rg")),
+        "ie": _clean(row.get("ie")),
+        "logradouro": _clean(row.get("logradouro")),
+        "logradouro_numero": _clean(row.get("logradouro_numero")),
+        "complemento": _clean(row.get("complemento")),
         "email": _clean(row.get("email")),
         "telefone": _clean(row.get("telefone") or row.get("celular") or row.get("whatsapp")),
         "endereco": _search_text(row.get("logradouro"), row.get("logradouro_numero"), row.get("complemento")),
@@ -521,6 +537,7 @@ def _pessoa_to_legacy(row, tipo):
         "cep": _clean(row.get("cep")),
     }
     if tipo == "cliente":
+        legacy["eh_cliente"] = _bool(row.get("cliente"))
         legacy["cliente"] = nome
     else:
         legacy["fornecedor"] = nome
