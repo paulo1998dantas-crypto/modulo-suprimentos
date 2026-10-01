@@ -18,6 +18,28 @@ from processos_os import PROCESSOS_ORDEM  # noqa: E402
 
 
 class WorkOrderImportCopyTests(unittest.TestCase):
+    def test_empty_manual_composition_is_not_recreated_in_docx(self):
+        path = gerar_os_docx(
+            "OS-SEM-COMPONENTES",
+            {"cliente": "CLIENTE", "chassis": "CHASSI-TESTE"},
+            [{"codigo": "40340028", "descricao": "JI CONFORT", "qtd": 1, "unidade": "UN"}],
+            {"40340028": [{"codigo": "COMP-ANTIGO", "quantidade": 2}]},
+            {},
+            composicao_resolvida=[],
+        )
+        try:
+            parsed = app_module.parse_os_docx_atualizado(
+                SimpleNamespace(stream=io.BytesIO(Path(path).read_bytes()))
+            )
+        finally:
+            try:
+                os.remove(path)
+                os.rmdir(os.path.dirname(path))
+            except OSError:
+                pass
+
+        self.assertEqual([], parsed["composicao"])
+
     def test_generated_os_round_trip_keeps_processes_service_and_nested_composition(self):
         data = {
             "cliente": "CLIENTE TESTE",

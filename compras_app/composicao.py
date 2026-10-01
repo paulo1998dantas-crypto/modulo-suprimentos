@@ -332,20 +332,30 @@ def mesclar_raizes_adicionais(linhas_base, raizes_adicionais, componentes):
     return resultado
 
 
-def expandir_composicao_manual(linhas, componentes):
+def expandir_composicao_manual(linhas, componentes, preservar_snapshot=False):
     """Normaliza uma composição editada manualmente e expande itens-raiz com B.O.M.
 
     A tela de O.S. permite adicionar materiais além dos itens originalmente
     selecionados. Quando esse material é um conjunto, ele deve seguir a mesma
     regra de explosão da B.O.M. dos itens principais. Apenas linhas-raiz
     (``item`` vazio ou igual ao próprio ``codigo``) são expandidas aqui: as
-    linhas-filhas já gravadas por uma explosão anterior permanecem intactas e
-    não são duplicadas.
+    Na reemissão de um documento salvo, ``preservar_snapshot`` mantém as
+    linhas-filhas editadas em vez de substituí-las pela B.O.M. atual. Uma
+    raiz com ``line_id`` pode ter sido esvaziada intencionalmente pelo usuário.
+    A atualização explícita da B.O.M. continua reexpandindo todas as raízes.
     """
     componentes_norm = normalizar_componentes(componentes)
     resultado = []
+    linhas = list(linhas or [])
+    pais_com_filhos = {
+        normalizar_codigo(linha.get("item", ""))
+        for linha in linhas
+        if normalizar_codigo(linha.get("item", ""))
+        and normalizar_codigo(linha.get("item", ""))
+        != normalizar_codigo(linha.get("codigo", ""))
+    }
 
-    for linha in linhas or []:
+    for linha in linhas:
         origem = dict(linha or {})
         codigo = normalizar_codigo(origem.get("codigo", ""))
         item_pai = normalizar_codigo(origem.get("item", ""))
@@ -359,7 +369,10 @@ def expandir_composicao_manual(linhas, componentes):
             quantidade = 1.0
 
         linha_raiz = not item_pai or item_pai == codigo
-        if linha_raiz and codigo and quantidade and codigo in componentes_norm:
+        raiz_ja_editada = preservar_snapshot and (
+            bool(origem.get("line_id")) or codigo in pais_com_filhos
+        )
+        if linha_raiz and not raiz_ja_editada and codigo and quantidade and codigo in componentes_norm:
             raiz = normalizar_linha_composicao(
                 origem,
                 item=codigo,

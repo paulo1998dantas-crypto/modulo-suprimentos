@@ -1004,6 +1004,30 @@ def _document_work_order_id(documento):
     ).strip()
 
 
+def _divergencia_transformacao_documento_os(documento, itens):
+    """Impede que a reemissão use uma transformação já alterada no MES."""
+    work_id = _document_work_order_id(documento)
+    if not work_id:
+        return ""
+    detalhe = _erp_mes_request(f"work-orders/{work_id}")
+    work_order = (detalhe or {}).get("work_order") or {}
+    codigo_vigente = normalizar_codigo(work_order.get("transformacao_codigo") or "")
+    if not codigo_vigente:
+        return ""
+    codigos_documento = {
+        normalizar_codigo(item.get("codigo") or "") for item in itens or []
+    }
+    if codigo_vigente in codigos_documento:
+        return ""
+    numero_os = str((documento or {}).get("numero") or work_order.get("numero_os") or "").strip()
+    return (
+        f"A O.S. {numero_os} está divergente da Gestão de O.S.: a transformação "
+        f"vigente é {codigo_vigente}, mas o documento contém "
+        f"{', '.join(sorted(codigos_documento)) or 'nenhum SKU'}. "
+        "Edite o item do documento, confira/recarregue a B.O.M. e reemita a O.S."
+    )
+
+
 def _carregar_documentos_os_para_vinculo():
     """Load documents from the configured source without cross-source fallback.
 
@@ -6941,6 +6965,15 @@ def gerar_os():
 
     total_itens = sum(item["total"] for item in itens)
 
+    if historico_existente and acao != "salvar":
+        try:
+            divergencia = _divergencia_transformacao_documento_os(historico_existente, itens)
+        except ValueError:
+            app.logger.exception("Falha ao conferir a transformação da O.S. documental %s", historico_form_id)
+            return "Não foi possível conferir a transformação vigente da O.S. no MES. Tente novamente.", 502
+        if divergencia:
+            return divergencia, 409
+
     processos = carregar_os_processos()
     relacoes_processo_item = carregar_relacoes_processo_item()
     processo_por_item = construir_processo_por_item(
@@ -7043,7 +7076,11 @@ def gerar_os():
     composicao_importada = _parse_os_composition_form(request.form)
 
     if composicao_source == "custom":
-        composicao_final = expandir_composicao_manual(composicao_importada, componentes)
+        composicao_final = expandir_composicao_manual(
+            composicao_importada,
+            componentes,
+            preservar_snapshot=usando_composicao_historica,
+        )
     else:
         composicao_final = resolver_composicao_final(itens, componentes, composicao_importada or None)
     if composicao_source != "custom":

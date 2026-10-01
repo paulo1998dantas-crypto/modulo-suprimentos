@@ -693,7 +693,11 @@ def gerar_os_docx(
     if refs.get("itens") is not None:
         _preencher_tabela_produtos(doc.tables[refs["itens"]], itens)
 
-    composicao_final = composicao_resolvida or resolver_composicao_final(itens, componentes)
+    composicao_final = (
+        composicao_resolvida
+        if composicao_resolvida is not None
+        else resolver_composicao_final(itens, componentes)
+    )
     ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao", "faturamento_direto"}
     ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao", "faturamento_direto"}
 

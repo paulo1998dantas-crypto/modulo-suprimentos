@@ -124,6 +124,37 @@ def test_manual_readded_root_keeps_only_one_copy_of_existing_subtree():
     assert [linha["codigo"] for linha in resultado] == ["CJ-EXTINTOR", "EXTINTOR"]
 
 
+def test_manual_edit_does_not_restore_removed_bom_component_or_quantity():
+    componentes = {
+        "CJ-VIDRO": [
+            {"codigo": "VIDRO-ANTIGO", "quantidade": 2},
+            {"codigo": "COLA", "quantidade": 4},
+        ]
+    }
+    linhas = [
+        {"line_id": "salva-1", "item": "CJ-VIDRO", "codigo": "CJ-VIDRO", "qtd": 1, "level": 0},
+        {"line_id": "salva-2", "item": "CJ-VIDRO", "codigo": "VIDRO-NOVO", "qtd": 2, "level": 1},
+        {"line_id": "salva-3", "item": "CJ-VIDRO", "codigo": "COLA", "qtd": 1, "level": 1},
+    ]
+
+    resultado = expandir_composicao_manual(linhas, componentes, preservar_snapshot=True)
+
+    assert [linha["codigo"] for linha in resultado] == ["CJ-VIDRO", "VIDRO-NOVO", "COLA"]
+    assert resultado[-1]["qtd"] == 1
+
+
+def test_saved_root_without_children_stays_empty_after_manual_deletion():
+    componentes = {"CJ-VIDRO": [{"codigo": "VIDRO-ANTIGO", "quantidade": 2}]}
+
+    resultado = expandir_composicao_manual(
+        [{"line_id": "salva-1", "item": "CJ-VIDRO", "codigo": "CJ-VIDRO", "qtd": 1}],
+        componentes,
+        preservar_snapshot=True,
+    )
+
+    assert [linha["codigo"] for linha in resultado] == ["CJ-VIDRO"]
+
+
 def test_extra_root_already_covered_by_main_bom_is_not_reexploded():
     componentes = {"CJ-EXTINTOR": [{"codigo": "EXTINTOR", "quantidade": 1}]}
     base = [

@@ -41,6 +41,34 @@ class WorkOrderDocumentLinkTests(unittest.TestCase):
             "dados": {"cliente": "CLIENTE TESTE", "chassis": "9BRTESTE123456789"},
         }
 
+    def test_reissue_detects_stale_transformation_from_operational_os(self):
+        document = self.document(work_id="11111111-1111-1111-1111-111111111111")
+        with patch.object(
+            app_module,
+            "_erp_mes_request",
+            return_value={"work_order": {"numero_os": "3096", "transformacao_codigo": "40340028"}},
+        ) as mes_request:
+            divergence = app_module._divergencia_transformacao_documento_os(
+                document, [{"codigo": "40340050"}]
+            )
+        self.assertIn("40340028", divergence)
+        self.assertIn("40340050", divergence)
+        mes_request.assert_called_once_with("work-orders/11111111-1111-1111-1111-111111111111")
+
+    def test_reissue_accepts_current_transformation(self):
+        document = self.document(work_id="11111111-1111-1111-1111-111111111111")
+        with patch.object(
+            app_module,
+            "_erp_mes_request",
+            return_value={"work_order": {"transformacao_codigo": "40340028"}},
+        ):
+            self.assertEqual(
+                "",
+                app_module._divergencia_transformacao_documento_os(
+                    document, [{"codigo": "40340028"}]
+                ),
+            )
+
     def test_documents_endpoint_lists_only_active_service_orders(self):
         rows = [
             self.document(),

@@ -5533,6 +5533,40 @@ modal.classList.remove("open");
 modal.setAttribute("aria-hidden", "true");
 }
 
+async function conferirTransformacaoOperacionalAoEditarOS(doc){
+const workId = String(doc.erp_work_order_id || (doc.dados || {}).erp_work_order_id || "").trim();
+if (!workId) return;
+try {
+const response = await fetch(`/api/erp/os-management/${encodeURIComponent(workId)}`, { headers: { "Accept": "application/json" } });
+const payload = await response.json();
+if (!response.ok || !payload.ok) throw new Error(payload.error || "MES indisponível");
+if (String((document.getElementById("os_historico_id") || {}).value || "") !== String(doc.id || "")) return;
+const codigo = normalizarCodigoOS(((payload.work_order || {}).transformacao_codigo || ""));
+const codigosDocumento = (doc.itens || []).map((item) => normalizarCodigoOS(item.codigo || "")).filter(Boolean);
+if (!codigo || codigosDocumento.includes(codigo)) return;
+const numeroOS = doc.numero || (doc.dados || {}).os_numero || "";
+const aviso = `A O.S. ${numeroOS} foi alterada na Gestão de O.S. A transformação vigente é ${codigo}, mas o documento usa ${codigosDocumento.join(", ") || "outro SKU"}.\n\nAtualizar o item e refazer a composição com a B.O.M. vigente? Ajustes manuais da composição deverão ser revisados antes de reemitir.`;
+if (!window.confirm(aviso)) {
+osDraftStatus(`O.S. ${numeroOS}: documento e transformação operacional divergentes. A reemissão será bloqueada até a correção.`);
+return;
+}
+const row = Array.from(document.querySelectorAll("#tabela_os tr")).slice(1).find((item) => {
+const campo = item.querySelector('input[name="os_codigo[]"]');
+return campo && normalizarCodigoOS(campo.value).startsWith("4034");
+}) || document.querySelector("#tabela_os tr:nth-child(2)");
+if (!row || !getProdutoInfo(osProdutos, codigo)) {
+osDraftStatus(`A transformação ${codigo} ainda não está disponível no catálogo do documento. Atualize a página e confira o cadastro.`);
+return;
+}
+osComposicaoSource = "bom";
+aplicarProdutoLinhaOS(row, codigo, { semPopup: true });
+salvarRascunhoOS();
+osDraftStatus(`O.S. ${numeroOS}: transformação ${codigo} aplicada. Revise a nova B.O.M. e os processos antes de reemitir.`);
+} catch (error) {
+osDraftStatus(`Não foi possível conferir a transformação da O.S. no MES: ${error.message}`);
+}
+}
+
 function editarDocumentoHistoricoOS(doc){
 cancelarAgendamentoRascunhoOS();
 const dados = doc.dados || {};
@@ -5581,6 +5615,7 @@ if (tabButton) tabButton.click();
 osDraftStatus(`Editando a O.S. ${numeroOS}. Ao gerar, este mesmo registro será atualizado.`);
 document.getElementById("form-os").scrollIntoView({ behavior: "smooth", block: "start" });
 salvarRascunhoOS();
+void conferirTransformacaoOperacionalAoEditarOS(doc);
 }
 
 let osLayoutBlobUrl = "";
