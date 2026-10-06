@@ -108,6 +108,7 @@ from processos_transformacao import (
 )
 import supabase_catalog
 import supabase_data
+import purchase_request_routes as purchase_requests
 
 
 OPERATIONAL_TIMEZONE = ZoneInfo("America/Sao_Paulo")
@@ -4704,6 +4705,14 @@ def index():
         relacoes_processo_item,
     )
     oc_prefill = carregar_importacao(_user_scoped_file(OC_IMPORT_FILE))
+    if request.args.get("purchase_requests"):
+        try:
+            ids = purchase_requests.parse_ids(request.args["purchase_requests"].split(","))
+            oc_prefill = purchase_requests.prefill(ids, _erp_stock_request, current_user(), can)
+        except PermissionError as exc:
+            return str(exc), 403
+        except (ValueError, OSError) as exc:
+            return "Não foi possível preparar o pedido: " + str(exc), 400
     os_prefill = carregar_importacao(_user_scoped_file(OS_IMPORT_FILE))
     requested_tab = str(request.args.get("tab") or "").strip().lower()
     tab = requested_tab or "oc"
@@ -6249,6 +6258,18 @@ def gerar_oc():
     historico_existente = obter_historico_documento(historico_id) if historico_id else None
     if historico_id and (not historico_existente or historico_existente.get("tipo") != "oc"):
         return "O.C. indicada para edicao nao foi encontrada.", 404
+    try:
+        request_ids = purchase_requests.parse_ids(request.form.get("purchase_request_ids", "[]"))
+        previous_ids = purchase_requests.parse_ids(((historico_existente or {}).get("dados") or {}).get("purchase_request_ids") or [])
+        request_ids = list(dict.fromkeys(request_ids + previous_ids))
+        if request_ids:
+            purchase_requests.check_csrf(request.form.get("purchase_requests_csrf"))
+            if not erp_feature_enabled() or not purchase_requests.buyer_allowed(current_user(), can):
+                raise PermissionError("Somente comprador/administrador, com integração ativa, pode emitir pedidos de solicitações.")
+    except PermissionError as exc:
+        return str(exc), 403
+    except ValueError as exc:
+        return str(exc), 400
     atualizar_skus_automatico()
     fornecedor = request.form.get("fornecedor", "")
     fornecedores = carregar_fornecedores()
@@ -6482,6 +6503,9 @@ def gerar_oc():
     incluir_composicao = oc_mode != "resumido"
     componentes = carregar_os_componentes()
     dados_hist = dict(dados_pedido)
+    if request_ids:
+        dados_pedido["purchase_request_ids"] = request_ids
+        dados_hist["purchase_request_ids"] = request_ids
     dados_hist["fornecedor"] = fornecedor_nome
     status_documento = (
         ((historico_existente or {}).get("status") or "emitido")
@@ -6555,7 +6579,7 @@ def gerar_oc():
         dados_hist,
         itens=itens,
         documento_id=historico_id or None,
-        status="emitido",
+        status="rascunho" if request_ids and sync_result is None else "emitido",
         submit_token=submit_token,
     )
     try:
@@ -6571,11 +6595,21 @@ def gerar_oc():
             )
         if sync_result and sync_result.get("locked"):
             app.logger.warning("O.C. %s emitida, mas ja possui recebimento e nao foi alterada no ERP.", numero_oc)
-    except Exception:
+        if request_ids:
+            if not sync_result or not sync_result.get("id") or sync_result.get("locked"):
+                raise ValueError("Pedido não confirmado para as solicitações. Consulte a integração antes de reemitir.")
+            dados_hist["erp_purchase_order_id"] = str(sync_result["id"])
+            registrar_historico("oc", numero_oc, dados_hist, itens=itens,
+                documento_id=historico_emitido.get("id"), status="emitido", submit_token=submit_token)
+    except Exception as exc:
         # Preserve the existing document workflow if the optional integration is
         # unavailable.  The failure is explicit in the application log and no
         # receipt/movement is ever fabricated in Estoque.
         app.logger.exception("Falha ao publicar O.C. %s no ERP", numero_oc)
+        if request_ids:
+            return redirect(url_for("index", tab="gestao-oc", documento_status=(
+                "Emissão vinculada às solicitações não foi confirmada integralmente. "
+                "Consulte o pedido e o workflow antes de tentar novamente; o rascunho foi preservado. " + str(exc))))
     limpar_importacao(_user_scoped_file(OC_IMPORT_FILE))
     @after_this_request
     def _cleanup_oc(response):
@@ -8427,8 +8461,17 @@ def _erp_stock_request(path, method="GET", payload=None):
         with urllib.request.urlopen(req, timeout=25) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
-        data = json.loads(exc.read().decode("utf-8") or "{}")
+        try:
+            data = json.loads(exc.read().decode("utf-8") or "{}")
+        except (ValueError, UnicodeError):
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
         raise ValueError(data.get("error") or "Falha no Estoque.")
+
+
+purchase_requests.register(app, lambda *args, **kwargs: _erp_stock_request(*args, **kwargs),
+                           current_user, can, login_required, erp_feature_required)
 
 
 def _erp_stock_binary_request(path):
@@ -8595,6 +8638,7 @@ def _sync_emitted_legacy_oc_to_erp(historico, dados_pedido, itens, numero_oc, fo
         raise ValueError("A O.C. nao recebeu identificador de historico para sincronizacao.")
     payload = {
         "numero_oc": numero_oc,
+        "purchase_request_ids": dados_pedido.get("purchase_request_ids") or [],
         "categoria": (dados_pedido.get("oc_categoria") or "GERAL").strip().upper(),
         "fornecedor_nome": fornecedor_nome,
         "data_emissao": _erp_iso_date((historico or {}).get("data_criacao")) or date.today().isoformat(),

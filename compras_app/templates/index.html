@@ -4513,6 +4513,8 @@ limparRascunhoOS({ silencioso: true });
 }
 
 function limparOCForm(){
+const linkedRequests = document.getElementById("oc_purchase_request_ids");
+if (linkedRequests) linkedRequests.value = "[]";
 const form = document.querySelector('form[action="/gerar_oc"]');
 if (!form){
 return;
@@ -4593,6 +4595,8 @@ if (ocPrefillApplied || !ocPrefill || Object.keys(ocPrefill).length === 0){
 return;
 }
 ocPrefillApplied = true;
+document.getElementById("oc_purchase_request_ids").value = JSON.stringify(ocPrefill.purchase_request_ids || []);
+if (ocPrefill.allocation_mode) definirAlocacaoOC(ocPrefill.allocation_mode, "", "ESTOQUE", ocPrefill.allocation_reference || "ESTOQUE");
 const fornecedorInput = document.querySelector('input[name="fornecedor_busca"]');
 if (fornecedorInput && ocPrefill.fornecedor){
 aplicarFornecedorSelecionado(fornecedorInput, ocPrefill.fornecedor);
@@ -5425,6 +5429,7 @@ limparOCForm();
 const form = document.getElementById("form-oc");
 const dados = doc.dados || {};
 const erpOC = doc.erp_purchase_order || {};
+document.getElementById("oc_purchase_request_ids").value = JSON.stringify(dados.purchase_request_ids || []);
 document.getElementById("oc_historico_id").value = doc.id || "";
 document.getElementById("oc_numero").value = doc.numero || "";
 document.getElementById("oc_submit_token").value = doc.submit_token || novoSubmissionToken();
@@ -6291,6 +6296,7 @@ salvarRascunhoOS();
 <img class="logo" src="/static/logo.png" alt="Logo">
 <div class="topbar-actions">
 <div class="nav-tabs">
+{% include "_purchase_requests_nav.html" %}
 {% if can('suprimentos.purchase.create') %}
 <button type="button" class="tab-btn active" data-tab="tab-oc">Compras</button>
 {% endif %}
@@ -6334,6 +6340,11 @@ salvarRascunhoOS();
 </form>
 </div>
 <form id="form-oc" method="POST" action="/gerar_oc">
+{% if oc_prefill.purchase_request_ids %}
+<div class="card" style="background:#eef8f6;border-left:4px solid #087f7a"><strong>Pedido originado de {{ oc_prefill.purchase_request_ids|length }} solicitação(ões).</strong> Confira fornecedor, preços e datas. Salvar sem imprimir mantém o rascunho; emitir confirma o pedido e conclui as solicitações no workflow.</div>
+{% endif %}
+<input type="hidden" id="oc_purchase_request_ids" name="purchase_request_ids" value="[]">
+<input type="hidden" name="purchase_requests_csrf" value="{{ purchase_requests_csrf }}">
 <input type="hidden" id="oc_historico_id" name="oc_historico_id" value="">
 <input type="hidden" id="oc_numero" name="oc_numero" value="">
 <input type="hidden" id="oc_submit_token" name="oc_submit_token" value="">

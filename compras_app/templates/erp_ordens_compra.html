@@ -38,6 +38,7 @@
     <div class="top">
       <div><h1>Gestão de Compras</h1><p class="sub">Acompanhamento das O.C. emitidas pelo formulário completo de Suprimentos.</p></div>
       <div class="actions">
+        {% include "_purchase_requests_nav.html" %}
         {% if can('suprimentos.purchase.edit') %}<a class="btn secondary" href="/?tab=gestao-oc">Gestão do comprador</a>{% endif %}
         {% if can('suprimentos.purchase.export') %}<a class="btn secondary" href="/erp/relatorios/compras-inspecao.xlsx">Exportar Compras + Inspeção</a>{% endif %}
         {% if can('suprimentos.purchase.export') %}<a class="btn secondary" href="/erp/relatorios/compras-transito.xlsx">Exportar trânsito pendente</a>{% endif %}
