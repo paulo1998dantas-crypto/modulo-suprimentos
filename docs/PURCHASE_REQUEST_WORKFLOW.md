@@ -5,6 +5,8 @@
 - Estoque: menu **Solicitações de compra**; selecionar SKU ativo, quantidade e data de necessidade. Referência/O.S./setor e observações opcionais.
 - Suprimentos: **Solicitações**; perfis PCP/ADMIN possuem o formulário de Planejamento/PCP.
 - A tabela consolidada de Compras contém as duas origens, filtros e paginação (100 linhas por página). Os demais usuários autenticados podem consultar e abrir o histórico.
+- Antes de criar a solicitação, o Estoque procura linhas do mesmo SKU em O.C. emitidas ou parcialmente recebidas, com saldo pendente. Se houver mais de uma, vincula a O.C. cuja data de necessidade está mais próxima da necessidade informada; a linha entra na mesma fila como **ANTECIPAÇÃO**, com número da O.C., fornecedor, status e saldo pendente visíveis.
+- Solicitações de antecipação não podem ser convertidas em uma nova O.C. pelo fluxo de criação. O comprador contata o fornecedor fora do sistema e usa **Registrar solicitação ao fornecedor** para atribuir a demanda e gravar protocolo/retorno no histórico; o sistema não envia contato automaticamente.
 - COMPRADOR/ADMIN pode assumir, registrar observações, cancelar/reabrir e selecionar solicitações para preparar o formulário atual de O.C.
 - Estados: SOLICITADA → EM_COMPRAS → CONCLUIDA; CANCELADA pode ser reaberta. Emissão direta também pode concluir SOLICITADA.
 - Salvar novo rascunho não conclui. Emitir confirma o pedido integrado; somente então conclui as solicitações.
@@ -25,7 +27,7 @@ Notificações no menu mostram solicitações novas/em tratamento, com atualiza�
 
 ## Publicação (ainda não executada)
 
-1. Aplicar em transação a migração **ModuloEstoque/supabase/migrations/20261006120000_purchase_requests.sql**. É aditiva, não altera cadastros ou saldos existentes.
+1. Aplicar em transação a migração base **ModuloEstoque/supabase/migrations/20261006120000_purchase_requests.sql** e depois as migrações incrementais do workflow. São aditivas e não alteram cadastros ou saldos existentes.
 2. Publicar Estoque: tabelas/serviço, endpoints internos e integração de conclusão/cancelamento de O.C.
 3. Publicar Suprimentos: PCP, tabela consolidada, notificações e preenchimento do pedido.
 4. Manter ERP_FEATURE_FLAG habilitada, ERP_STOCK_API_URL/ERP_BACKEND_TOKEN configurados e os usuários com os perfis atuais.
