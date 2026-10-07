@@ -64,6 +64,10 @@ from config import (
     set_processos_dir,
     pasta_os,
 )
+from air_productivity_report import (
+    build_air_productivity_workbook,
+    prepare_air_productivity_data,
+)
 from calculos import calcular_total_item
 from composicao import (
     consolidar_componentes_por_codigo,
@@ -8553,6 +8557,23 @@ def _erp_mes_request(path, method="GET", payload=None):
         raise ValueError(f"MES indisponível: {exc.reason}") from exc
 
 
+def _erp_mes_all_work_orders():
+    """Read every MES work-order page for a fresh report export."""
+    page_size = 1500
+    offset = 0
+    orders = []
+    while True:
+        payload = _erp_mes_request(f"work-orders?limit={page_size}&offset={offset}")
+        page = payload.get("orders", []) if isinstance(payload, dict) else []
+        if not isinstance(page, list):
+            raise ValueError("O MES retornou uma lista de O.S. inválida para o relatório.")
+        orders.extend(page)
+        if len(page) < page_size:
+            break
+        offset += len(page)
+    return orders
+
+
 def _resolve_linked_legacy_os_work_id(documento):
     """Resolve and persist the structural MES link without guessing duplicates."""
     direct_id = str(
@@ -9014,6 +9035,33 @@ def erp_pcp_needs_report():
         output,
         as_attachment=True,
         download_name=f"Necessidades_PCP_{date.today().isoformat()}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@app.route("/erp/relatorios/produtividade-fornecedor-ar.xlsx")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_air_supplier_productivity_report():
+    try:
+        # This report bypasses the short-lived management-page cache: each
+        # export reads the current O.S. and completion date from the MES.
+        work_orders = _erp_mes_all_work_orders()
+        report = prepare_air_productivity_data(work_orders, target_per_supplier=2)
+        generated_at = datetime.now(OPERATIONAL_TIMEZONE)
+        wb = build_air_productivity_workbook(report, generated_at=generated_at)
+        output = io.BytesIO()
+        wb.save(output)
+        wb.close()
+        output.seek(0)
+    except Exception as exc:
+        app.logger.exception("Falha ao exportar produtividade dos fornecedores de ar")
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=f"Produtividade_Ar_{generated_at:%Y%m%d_%H%M}.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
