@@ -66,6 +66,18 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertEqual(403,response.status_code)
         proxy.assert_not_called()
 
+    def test_requester_edit_and_exclude_actions_are_forwarded_for_stock_ownership_check(self):
+        self.role("PCP")
+        for action in ("EDITAR", "EXCLUIR"):
+            with self.subTest(action=action),patch.object(mod,"_erp_stock_request",return_value={"ok":True}) as proxy:
+                response=self.client.post(
+                    "/api/erp/purchase-requests/"+self.id+"/action",
+                    json={"action":action,"version":1,"reason":"Correção do solicitante"},
+                    headers={"X-CSRF-Token":"csrf"},
+                )
+                self.assertEqual(200,response.status_code)
+                proxy.assert_called_once()
+
     def test_buyer_action_and_notifications(self):
         with patch.object(mod,"_erp_stock_request",return_value={"ok":True,"new":2,"in_progress":3}) as proxy:
             self.assertEqual(200,self.client.get("/api/erp/purchase-requests/notifications").status_code)
