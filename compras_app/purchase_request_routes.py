@@ -57,9 +57,10 @@ def register(app, stock_request, get_user, can, login_required, feature_required
     @feature_required
     def screen():
         user = get_user()
+        can_submit = bool(role_codes(user) & {"ADMIN", "PCP"} and can("suprimentos.work_order.manage"))
         return render_template("purchase_requests.html", current_user=user, request_config={
             "api":"/api/erp/purchase-requests", "origin":"PCP",
-            "can_submit":bool(role_codes(user) & {"ADMIN","PCP"} and can("suprimentos.work_order.manage")),
+            "can_submit":can_submit, "can_edit_origin":can_submit,
             "can_manage":buyer_allowed(user, can), "user_id":user.get("id"),
             "csrf":csrf_token(), "purchases_url":"/?tab=gestao-oc"})
 

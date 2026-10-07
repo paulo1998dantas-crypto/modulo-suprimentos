@@ -44,6 +44,7 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         response=self.client.get("/erp/solicitacoes")
         self.assertNotIn("Preparar pedido das selecionadas",response.get_data(as_text=True))
         self.assertIn("Planejamento / PCP",response.get_data(as_text=True))
+        self.assertIn("can_edit_origin",response.get_data(as_text=True))
 
     def test_new_pcp_input_forces_origin_on_backend_and_preserves_actor(self):
         self.role("PCP")
