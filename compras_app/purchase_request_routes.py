@@ -73,7 +73,7 @@ def register(app, stock_request, get_user, can, login_required, feature_required
         if not user:
             return jsonify(ok=False,error="Autenticação obrigatória."),401
         try:
-            allowed_get = suffix in {"","options","notifications"} or (
+            allowed_get = suffix in {"","options","notifications","work-orders"} or (
                 suffix.endswith(("/history", "/orders")) and len(suffix.split("/")) == 2)
             allowed_post = suffix == "" or (
                 suffix.endswith("/action") and len(suffix.split("/")) == 2)

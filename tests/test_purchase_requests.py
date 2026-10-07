@@ -55,6 +55,29 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertEqual("purchase-requests",proxy.call_args.args[0])
         self.assertEqual("POST",proxy.call_args.args[1])
 
+    def test_work_order_lookup_and_multiple_references_are_forwarded(self):
+        self.role("PCP")
+        work_orders=[str(uuid4()),str(uuid4())]
+        with patch.object(mod,"_erp_stock_request",return_value={"ok":True,"items":[]}) as proxy:
+            response=self.client.get("/api/erp/purchase-requests/work-orders?q=3185")
+        self.assertEqual(200,response.status_code)
+        self.assertEqual("purchase-requests/work-orders?q=3185",proxy.call_args.args[0])
+        payload={"sku_codigo":"MAT-001","sector":"PRODUÇÃO","work_order_ids":work_orders}
+        with patch.object(mod,"_erp_stock_request",return_value={"ok":True}) as proxy:
+            response=self.client.post("/api/erp/purchase-requests",json=payload,
+                                      headers={"X-CSRF-Token":"csrf"})
+        self.assertEqual(200,response.status_code)
+        self.assertEqual(payload,proxy.call_args.args[2])
+
+    def test_duplicate_message_from_stock_is_preserved_for_pcp(self):
+        self.role("PCP")
+        with patch.object(mod,"_erp_stock_request",side_effect=ValueError(
+                "Solicitação duplicada: MAT-001 para O.S. 3185")):
+            response=self.client.post("/api/erp/purchase-requests",json={"sku_codigo":"MAT-001"},
+                                      headers={"X-CSRF-Token":"csrf"})
+        self.assertEqual(400,response.status_code)
+        self.assertIn("Solicitação duplicada",response.json["error"])
+
     def test_no_csrf_no_action(self):
         with patch.object(mod,"_erp_stock_request") as proxy:
             response=self.client.post("/api/erp/purchase-requests/"+self.id+"/action",json={"action":"CANCELAR"})
