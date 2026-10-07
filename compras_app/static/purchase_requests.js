@@ -8,7 +8,7 @@ const labels = {SOLICITADA:"Solicitada",EM_COMPRAS:"Em compras",CONCLUIDA:"Compr
 const date = value => !value ? "—" : /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.split("-").reverse().join("/") : new Date(value).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"});
 const qty = value => Number(value).toLocaleString("pt-BR",{maximumFractionDigits:3});
 const node = (tag,text,className) => {const n=document.createElement(tag);if(text!=null)n.textContent=text;if(className)n.className=className;return n;};
-let page=1,total=0,rows=[],key=crypto.randomUUID(),loading=false,closingAnticipationRow=null,editingRow=null,editSkuTimer=null;
+let page=1,total=0,rows=[],key=crypto.randomUUID(),loading=false,closingAnticipationRow=null,editingRow=null,editSkuTimer=null,allocatingOrderRow=null;
 let loadSerial=0;
 function message(text,error=false){$("pr-message").textContent=text;$("pr-message").classList.toggle("pr-error",error);}
 async function api(path="",payload){
@@ -43,6 +43,7 @@ function render(){
   const canEditRequest=pending&&(cfg.can_manage||canEditOrigin||(isOwner&&row.status==="SOLICITADA"));
   if(canEditRequest){actions.append(button("Editar",()=>openEdit(row)));actions.append(button("Excluir",()=>excludeRequest(row)));}
   if(cfg.can_manage){
+   if(pending)actions.append(button("Alocar pedido existente",()=>openOrderAllocation(row)));
    if(row.status==="SOLICITADA")actions.append(button(anticipation?"Registrar solicitação ao fornecedor":"Assumir",()=>act(row,anticipation?"SOLICITAR_ANTECIPACAO":"ASSUMIR")));
    if(anticipation&&row.status==="EM_COMPRAS")actions.append(button("Confirmar data negociada",()=>openAnticipationConfirmation(row)));
    if(anticipation&&pending)actions.append(button("Converter em nova O.C.",()=>act(row,"CONVERTER_NOVA_COMPRA")));
@@ -131,6 +132,30 @@ async function confirmAnticipation(){
  }catch(e){message(e.message,true);}
  finally{$("pr-confirm-anticipation-save").disabled=false;}
 }
+async function openOrderAllocation(row){
+ try{
+  const data=await api("/"+encodeURIComponent(row.id)+"/orders");
+  const select=$("pr-allocate-order");select.replaceChildren(node("option","Selecione uma O.C. vigente que cubra a quantidade"));select.firstChild.value="";
+  for(const order of data.items||[]){
+   const option=node("option","O.C. "+order.numero_oc+" · "+(order.fornecedor_nome||"Fornecedor não informado")+" · saldo disponível "+qty(order.available_quantity)+" · previsão "+date(order.delivery_date));
+   option.value=order.id;select.append(option);
+  }
+  if(!(data.items||[]).length)return message("Não há pedido vigente com saldo suficiente para cobrir esta solicitação.",true);
+  allocatingOrderRow=row;$("pr-allocate-reason").value="";$("pr-allocate-dialog").showModal();
+ }catch(e){message(e.message,true);}
+}
+async function allocateExistingOrder(){
+ const row=allocatingOrderRow,orderId=$("pr-allocate-order").value,reason=$("pr-allocate-reason").value.trim();
+ if(!row)return;
+ if(!orderId||!reason)return message("Selecione o pedido vigente e informe o motivo da alocação.",true);
+ $("pr-allocate-save").disabled=true;
+ try{
+  await api("/"+encodeURIComponent(row.id)+"/action",{action:"ALOCAR_PEDIDO",version:row.version,purchase_order_id:orderId,reason});
+  $("pr-allocate-dialog").close();allocatingOrderRow=null;
+  message("Pedido existente alocado e solicitação concluída com rastreabilidade.");await load();
+ }catch(e){message(e.message,true);}
+ finally{$("pr-allocate-save").disabled=false;}
+}
 async function act(row,action){
  const reason=prompt(action==="OBSERVACAO"?"Observação/retorno do fornecedor para a linha do tempo:":action==="SOLICITAR_ANTECIPACAO"?"Após contatar o fornecedor sobre a antecipação da OC indicada, informe o protocolo ou retorno. O sistema registra o contato, mas não envia mensagem ao fornecedor:":action==="CONVERTER_NOVA_COMPRA"?"Justifique por que a antecipação não atende e esta solicitação precisa virar uma nova O.C.:":"Informe o motivo para "+action.toLowerCase()+":");
  if(!reason||!reason.trim())return;
@@ -139,6 +164,8 @@ async function act(row,action){
 $("pr-close-history").onclick=()=>$("pr-history").close();
 $("pr-confirm-anticipation-cancel").onclick=()=>{$("pr-confirm-anticipation").close();closingAnticipationRow=null;};
 $("pr-confirm-anticipation-save").onclick=confirmAnticipation;
+$("pr-allocate-cancel").onclick=()=>{$("pr-allocate-dialog").close();allocatingOrderRow=null;};
+$("pr-allocate-save").onclick=allocateExistingOrder;
 $("pr-edit-cancel").onclick=()=>{$("pr-edit-request").close();editingRow=null;};
 $("pr-edit-sku-search").oninput=()=>{clearTimeout(editSkuTimer);editSkuTimer=setTimeout(()=>fillSkuOptions($("pr-edit-sku"),$("pr-edit-sku-search").value).catch(e=>message(e.message,true)),250);};
 $("pr-edit-form").onsubmit=async event=>{

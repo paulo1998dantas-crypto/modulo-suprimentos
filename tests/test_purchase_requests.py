@@ -39,7 +39,8 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         response=self.client.get("/erp/solicitacoes")
         self.assertEqual(200,response.status_code)
         text=response.get_data(as_text=True)
-        self.assertIn("Preparar pedido das selecionadas",text)
+        self.assertIn("Criar O.C. com selecionadas",text)
+        self.assertIn('"can_manage": true',text)
         self.role("PCP")
         response=self.client.get("/erp/solicitacoes")
         self.assertNotIn("Preparar pedido das selecionadas",response.get_data(as_text=True))
@@ -82,7 +83,10 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
     def test_buyer_action_and_notifications(self):
         with patch.object(mod,"_erp_stock_request",return_value={"ok":True,"new":2,"in_progress":3}) as proxy:
             self.assertEqual(200,self.client.get("/api/erp/purchase-requests/notifications").status_code)
+            order_options=self.client.get("/api/erp/purchase-requests/"+self.id+"/orders")
             response=self.client.post("/api/erp/purchase-requests/"+self.id+"/action",json={"action":"ASSUMIR","version":1,"reason":"Teste"},headers={"X-CSRF-Token":"csrf"})
+        self.assertEqual(200,order_options.status_code)
+        self.assertIn("/orders",proxy.call_args_list[1].args[0])
         self.assertEqual(200,response.status_code)
         self.assertTrue(proxy.call_args.args[0].endswith("/action"))
 

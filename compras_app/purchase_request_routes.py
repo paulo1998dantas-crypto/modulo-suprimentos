@@ -74,7 +74,7 @@ def register(app, stock_request, get_user, can, login_required, feature_required
             return jsonify(ok=False,error="Autenticação obrigatória."),401
         try:
             allowed_get = suffix in {"","options","notifications"} or (
-                suffix.endswith("/history") and len(suffix.split("/")) == 2)
+                suffix.endswith(("/history", "/orders")) and len(suffix.split("/")) == 2)
             allowed_post = suffix == "" or (
                 suffix.endswith("/action") and len(suffix.split("/")) == 2)
             if (request.method == "GET" and not allowed_get) or (request.method == "POST" and not allowed_post):
@@ -87,7 +87,7 @@ def register(app, stock_request, get_user, can, login_required, feature_required
                         raise PermissionError("Somente o comprador (ou administrador) pode tratar solicitações.")
                 elif not role_codes(user) & {"ADMIN","PCP"} or not can("suprimentos.work_order.manage"):
                     raise PermissionError("Seu perfil não pode solicitar pelo PCP.")
-            if suffix.endswith(("/history","/action")):
+            if suffix.endswith(("/history","/action","/orders")):
                 suffix = str(UUID(suffix.split("/")[0]))+"/"+suffix.split("/")[1]
             path="purchase-requests"+("/"+suffix if suffix else "")
             if request.method == "GET" and request.query_string:
