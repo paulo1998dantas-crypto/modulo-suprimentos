@@ -1,8 +1,10 @@
 """PCP request input and buyer cockpit; Estoque owns canonical persistence."""
 import hmac
 import secrets
+from io import BytesIO
+from urllib.parse import urlencode
 from uuid import UUID
-from flask import Blueprint, request, session, jsonify, render_template, current_app
+from flask import Blueprint, request, session, jsonify, render_template, current_app, send_file
 
 def csrf_token():
     if not session.get("purchase_requests_csrf"):
@@ -44,7 +46,7 @@ def prefill(ids, stock_request, user, can):
             "itens": [{"codigo":r["sku_codigo"],"descricao":r["descricao"],"unidade":r["unidade"],
                        "qtd":r["quantity"],"data_necessidade":r["needed_at"]} for r in rows]}
 
-def register(app, stock_request, get_user, can, login_required, feature_required):
+def register(app, stock_request, get_user, can, login_required, feature_required, stock_binary_request=None):
     bp = Blueprint("purchase_requests", __name__)
 
     @app.context_processor
@@ -63,6 +65,33 @@ def register(app, stock_request, get_user, can, login_required, feature_required
             "can_submit":can_submit, "can_edit_origin":can_submit,
             "can_manage":buyer_allowed(user, can), "user_id":user.get("id"),
             "csrf":csrf_token(), "purchases_url":"/?tab=gestao-oc"})
+
+    @bp.route("/api/erp/purchase-requests/export.xlsx")
+    @login_required
+    @feature_required
+    def export_excel():
+        if not get_user():
+            return jsonify(ok=False, error="Autenticação obrigatória."), 401
+        try:
+            if stock_binary_request is None:
+                raise ValueError("Exportação do workflow indisponível.")
+            # Same filters as the displayed queue; page is deliberately not forwarded.
+            query = urlencode({key: request.args[key] for key in
+                               ("q", "status", "origin", "from", "to") if request.args.get(key)})
+            path = "purchase-requests/export.xlsx" + ("?" + query if query else "")
+            content = stock_binary_request(path)
+            response = send_file(BytesIO(content), as_attachment=True,
+                                 mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                 download_name="Solicitacoes_de_compra.xlsx", max_age=0)
+            response.headers["Cache-Control"] = "no-store"
+            return response
+        except PermissionError as exc:
+            return jsonify(ok=False, error=str(exc)), 403
+        except ValueError as exc:
+            return jsonify(ok=False, error=str(exc)), 400
+        except Exception:
+            current_app.logger.exception("Falha ao exportar solicitações do Estoque")
+            return jsonify(ok=False, error="Exportação indisponível. Tente novamente."), 503
 
     @bp.route("/api/erp/purchase-requests", defaults={"suffix":""}, methods=["GET","POST"])
     @bp.route("/api/erp/purchase-requests/<path:suffix>", methods=["GET","POST"])

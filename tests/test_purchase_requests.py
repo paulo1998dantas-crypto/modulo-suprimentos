@@ -47,6 +47,44 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertIn("Planejamento / PCP",response.get_data(as_text=True))
         self.assertIn("can_edit_origin",response.get_data(as_text=True))
 
+    def test_compact_screen_keeps_details_actions_and_excel_button(self):
+        text = self.client.get("/erp/solicitacoes").get_data(as_text=True)
+        self.assertIn('id="pr-export"', text)
+        self.assertIn('id="pr-details"', text)
+        self.assertIn("purchase_requests_compact.css", text)
+        self.assertIn("Qtd. / necessidade", text)
+        self.assertNotIn("<th>Solicitada em</th>", text)
+        self.assertIn("20261008-excel", text)
+
+    def test_excel_proxy_forwards_filters_but_not_page(self):
+        for role in ("COMPRADOR", "PCP"):
+            with self.subTest(role=role):
+                self.role(role)
+                with patch.object(mod, "_erp_stock_binary_request", return_value=b"PKexcel") as proxy:
+                    response = self.client.get("/api/erp/purchase-requests/export.xlsx?origin=PCP&q=vidro&status=SOLICITADA&from=2026-10-01&to=2026-10-31&page=7")
+                self.assertEqual(200, response.status_code)
+                self.assertTrue(response.data.startswith(b"PK"))
+                self.assertIn("attachment", response.headers["Content-Disposition"])
+                self.assertEqual("no-store", response.headers["Cache-Control"])
+                self.assertNotIn("page=", proxy.call_args.args[0])
+                self.assertIn("origin=PCP", proxy.call_args.args[0])
+                self.assertIn("from=2026-10-01", proxy.call_args.args[0])
+                response.close()
+
+    def test_excel_proxy_reports_backend_error_instead_of_fake_excel(self):
+        with patch.object(mod, "_erp_stock_binary_request", side_effect=ValueError("Workflow indisponível")):
+            response = self.client.get("/api/erp/purchase-requests/export.xlsx")
+        self.assertEqual(400, response.status_code)
+        self.assertEqual("Workflow indisponível", response.json["error"])
+
+    def test_excel_requires_authenticated_user(self):
+        with self.client.session_transaction() as session:
+            session.pop("suprimentos_user", None)
+        with patch.object(mod, "_erp_stock_binary_request") as proxy:
+            response = self.client.get("/api/erp/purchase-requests/export.xlsx")
+        self.assertIn(response.status_code, (401, 403))
+        proxy.assert_not_called()
+
     def test_new_pcp_input_forces_origin_on_backend_and_preserves_actor(self):
         self.role("PCP")
         with patch.object(mod,"_erp_stock_request",return_value={"ok":True,"request":{"id":self.id}}) as proxy:

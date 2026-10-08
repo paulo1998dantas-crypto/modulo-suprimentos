@@ -8475,7 +8475,8 @@ def _erp_stock_request(path, method="GET", payload=None):
 
 
 purchase_requests.register(app, lambda *args, **kwargs: _erp_stock_request(*args, **kwargs),
-                           current_user, can, login_required, erp_feature_required)
+                           current_user, can, login_required, erp_feature_required,
+                           stock_binary_request=lambda path: _erp_stock_binary_request(path))
 
 
 def _erp_stock_binary_request(path):
