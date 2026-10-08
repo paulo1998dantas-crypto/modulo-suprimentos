@@ -1449,11 +1449,12 @@ td input,td select{min-height:29px;padding:4px 6px;border-color:#cfd8e3;}
 <script>
 const produtos = {{ produtos|tojson }};
 const fornecedores = {{ fornecedores|tojson }};
-{% if catalogo_status.enabled %}
-const osProdutos = produtos;
-{% else %}
 const osProdutos = {{ os_produtos|tojson }};
-{% endif %}
+const osCodigosInativos = new Set({{ os_codigos_inativos|default([])|tojson }});
+const osCatalogoDisponivel = {{ os_catalogo_disponivel|default(true)|tojson }};
+function itemAtivoOS(item){
+return osCatalogoDisponivel && !osCodigosInativos.has(normalizarCodigoOS((item || {}).sku_selecionado || (item || {}).codigo || ""));
+}
 const osFornecedores = {{ os_fornecedores|tojson }};
 const osComponentes = {{ os_componentes|tojson }};
 const osProcessos = {{ os_processos|tojson }};
@@ -1881,6 +1882,7 @@ return true;
 
 function regrasPopupItemParaCodigo(codigo){
 const codigoNorm = normalizarCodigoOS(codigo);
+if (!itemAtivoOS({codigo: codigoNorm})) return [];
 return (osRegrasPopupItem || []).filter((regra) => normalizarCodigoOS(regra.gatilho) === codigoNorm);
 }
 
@@ -2036,7 +2038,7 @@ const opcaoNaoAplicavel = document.createElement("option");
 opcaoNaoAplicavel.value = OS_POPUP_NAO_APLICAVEL;
 opcaoNaoAplicavel.textContent = "Não aplicável";
 select.appendChild(opcaoNaoAplicavel);
-(atual.regra.opcoes || []).forEach((codigo) => {
+(atual.regra.opcoes || []).filter((codigo) => itemAtivoOS({codigo})).forEach((codigo) => {
 const item = getProdutoInfo(produtos, codigo) || getProdutoInfo(osProdutos, codigo) || {};
 const option = document.createElement("option");
 const codigoNorm = normalizarCodigoOS(codigo);
@@ -3660,6 +3662,11 @@ function preencherOSItem(input){
 if (!input){
 return;
 }
+if (!itemAtivoOS({codigo: input.value})){
+input.value = "";
+alert("Item inativo. Selecione um cadastro ativo para a O.S.");
+return;
+}
 const row = input.closest("tr");
 if (!row){
 return;
@@ -3900,6 +3907,12 @@ const row = input ? input.closest("tr") : null;
 if (!row){
 return;
 }
+if (!itemAtivoOS({codigo: input.value})){
+row.remove();
+marcarComposicaoCustom();
+alert("Item inativo. Selecione um cadastro ativo para a composição.");
+return;
+}
 const codigo = extrairCodigo(input.value, osProdutos);
 if (!codigo){
 return;
@@ -4104,7 +4117,7 @@ Array.from(select.options).forEach((option) => { option.selected = option.value 
 
 function preencherVersoesEquivalentesOS(memberSelect, group, selectedSku){
 memberSelect.innerHTML = "";
-(group.members || []).forEach((member) => {
+(group.members || []).filter((member) => itemAtivoOS({codigo: member.sku})).forEach((member) => {
 const option = document.createElement("option");
 option.value = member.sku || "";
 option.textContent = `${member.sku || ""} — ${member.descricao || "Sem descrição"} · ${textoSaldoEquivalenteOS(member.sku)} (fator ${member.fator_unidade_funcional || 1})`;
@@ -4233,7 +4246,7 @@ if (!tbody){
 return;
 }
 tbody.innerHTML = "";
-consolidarComposicaoPorCodigoOS(rows, "max").forEach((comp) => {
+consolidarComposicaoPorCodigoOS((rows || []).filter(itemAtivoOS), "max").forEach((comp) => {
 const row = document.createElement("tr");
 const setor = ["PREPARACAO", "EXPEDICAO", "F.D"].includes(comp.setor) ? comp.setor : destinoAutomaticoComposicao(comp);
 const setorManual = comp.setor_manual ? "1" : "0";
@@ -4249,6 +4262,9 @@ row.innerHTML = `
 <td><button type="button" class="btn-row-remove" title="Excluir da composição" onclick="removerLinhaComposicao(this)">×</button></td>
 `;
 tbody.appendChild(row);
+if (!itemAtivoOS({codigo: comp.item})){
+row.querySelector(".comp-parent-cell span").textContent = "-";
+}
 prepararControleEquivalenciaOS(row, comp);
 renderDisponibilidadeComposicaoOS(row);
 });
@@ -4720,7 +4736,7 @@ if (tabela && osPrefill.itens && osPrefill.itens.length){
 while (tabela.rows.length > 2){
 tabela.deleteRow(2);
 }
-const items = osPrefill.itens;
+const items = osPrefill.itens.filter(itemAtivoOS);
 for (let i = 0; i < items.length; i++){
 if (i > 0){
 adicionarLinhaOS();
@@ -5008,7 +5024,7 @@ input.value = value || "";
 }
 });
 const tabela = document.getElementById("tabela_os");
-const items = Array.isArray(data.itens) && data.itens.length ? data.itens : [];
+const items = Array.isArray(data.itens) ? data.itens.filter(itemAtivoOS) : [];
 if (tabela && items.length){
 while (tabela.rows.length > 2){
 tabela.deleteRow(2);
@@ -5513,14 +5529,17 @@ document.getElementById("historico_os_meta").textContent = `${doc.data_criacao |
 document.getElementById("historico_os_dados").innerHTML = [
 ["Cliente", dados.cliente], ["Município", dados.municipio], ["MMV", dados.mmv], ["Processo", dados.processo_conjunto]
 ].map(([label, value]) => `<div><span>${escapeHtmlOS(label)}</span><strong>${escapeHtmlOS(value || "-")}</strong></div>`).join("");
-document.getElementById("historico_os_itens").innerHTML = (doc.itens || []).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td></tr>`).join("") || '<tr><td colspan="4">Sem itens.</td></tr>';
-document.getElementById("historico_os_composicao").innerHTML = (doc.composicao || []).map((item) => {
+document.getElementById("historico_os_itens").innerHTML = (doc.itens || []).filter(itemAtivoOS).map((item) => `<tr><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td></tr>`).join("") || '<tr><td colspan="4">Sem itens.</td></tr>';
+document.getElementById("historico_os_composicao").innerHTML = (doc.composicao || []).filter(itemAtivoOS).map((item) => {
 const setor = item.setor === "PREPARACAO" ? { classe: "prep", label: "Preparação" } : item.setor === "F.D" ? { classe: "fd", label: "Faturamento direto" } : { classe: "exp", label: "Expedição" };
 const version = item.equivalence_group_code
 ? `${escapeHtmlOS(item.equivalence_group_code)}<br><small>${escapeHtmlOS(item.sku_planejado || "")} → ${escapeHtmlOS(item.sku_selecionado || item.codigo || "")}${item.equivalence_selected_by ? ` · ${escapeHtmlOS(item.equivalence_selected_by)}` : ""}</small>`
 : "—";
 return `<tr><td>${escapeHtmlOS(item.item || "")}</td><td>${escapeHtmlOS(item.codigo || "")}</td><td>${escapeHtmlOS(item.descricao || "")}</td><td>${escapeHtmlOS(item.unidade || "")}</td><td>${escapeHtmlOS(item.qtd || "")}</td><td>${version}</td><td><span class="sector-badge ${setor.classe}">${setor.label}</span></td></tr>`;
 }).join("") || '<tr><td colspan="7">Sem composição.</td></tr>';
+document.querySelectorAll("#historico_os_composicao tr td:first-child").forEach((cell) => {
+if (!itemAtivoOS({codigo: cell.textContent})) cell.textContent = "-";
+});
 const editButton = document.getElementById("historico_os_editar");
 if (editButton) editButton.onclick = () => editarDocumentoHistoricoOS(doc);
 const modal = document.getElementById("historico_os_modal");
@@ -6948,6 +6967,9 @@ salvarRascunhoOS();
 <input type="hidden" id="os_composicao_json" name="os_composicao_json" value="">
 <input type="hidden" id="os_forecast_id" name="os_forecast_id" value="">
 <input type="hidden" id="os_forecast_quantidade" name="os_forecast_quantidade" value="">
+{% if not (os_catalogo_disponivel|default(true)) %}
+<div class="card" role="alert">Não foi possível conferir os itens ativos no Cadastro. Recarregue a página antes de editar ou emitir a O.S.</div>
+{% endif %}
 
 <dialog id="os_layout_preview_modal" class="layout-preview-modal" aria-labelledby="os_layout_preview_title">
 <div class="layout-preview-header">
@@ -7143,8 +7165,12 @@ salvarRascunhoOS();
 <select id="luminaria_os_select">
 <option value="" selected disabled>Selecione</option>
 <option value="__NAO_APLICAVEL__">Não aplicável</option>
+{% if '10260092' not in (os_codigos_inativos|default([])) and (os_catalogo_disponivel|default(true)) %}
 <option value="10260092">10260092 - ELETRICA LUMINARIA ALURE 30</option>
+{% endif %}
+{% if '10260095' not in (os_codigos_inativos|default([])) and (os_catalogo_disponivel|default(true)) %}
 <option value="10260095">10260095 - ELETRICA LUMINARIA VAN TAMANHO M</option>
+{% endif %}
 </select>
 <label for="luminaria_os_qtd" style="margin-top:10px;display:block;">Quantidade</label>
 <input id="luminaria_os_qtd" type="number" min="1" step="1" value="1">

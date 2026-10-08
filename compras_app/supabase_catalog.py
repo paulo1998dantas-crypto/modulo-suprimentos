@@ -13,6 +13,7 @@ CACHE_TTL_SECONDS = 10
 _cache = {
     "loaded_at": 0.0,
     "produtos": None,
+    "inativos": None,
     "error": "",
 }
 
@@ -314,17 +315,28 @@ def carregar_produtos(force=False):
     if not force and cached is not None and now - float(_cache.get("loaded_at") or 0) < CACHE_TTL_SECONDS:
         return cached
     produtos = {}
+    inativos = set()
     for row in _all_rows():
+        if row.get("ativo") is False and _clean(row.get("sku")):
+            inativos.add(_clean(row["sku"]))
         sku, produto = row_to_produto(row)
         if sku:
             produtos[sku] = produto
     _cache["produtos"] = produtos
+    _cache["inativos"] = inativos
     _cache["loaded_at"] = now
     _cache["error"] = ""
     return produtos
 
 
+def carregar_codigos_inativos(force=False):
+    """Use explicit Cadastro status; absence from the active list is not inactivity."""
+    carregar_produtos(force=force or _cache.get("inativos") is None)
+    return set(_cache.get("inativos") or ())
+
+
 def clear_cache():
     _cache["loaded_at"] = 0.0
     _cache["produtos"] = None
+    _cache["inativos"] = None
     _cache["error"] = ""

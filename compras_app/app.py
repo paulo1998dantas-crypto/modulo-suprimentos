@@ -81,6 +81,12 @@ from composicao import (
 )
 from gerar_oc import gerar_word, construir_nome_oc
 from gerar_os import gerar_os_docx
+from os_item_visibility import (
+    codigos_inativos_catalogos,
+    filtrar_catalogo_os,
+    filtrar_linhas_ativas_os,
+    linhas_para_exibicao_os,
+)
 from gerar_op import build_production_order_docx
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 from processos_os import PROCESSOS_ORDEM, PROCESSOS_OS, PROCESSOS_POR_KEY, identificar_nome_processo, normalizar_nome_processo, normalizar_texto
@@ -1329,6 +1335,17 @@ def carregar_os_produtos(force=False):
 
     with open(OS_PRODUTOS_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def carregar_os_codigos_inativos(os_produtos=None, produtos=None, force=False):
+    if supabase_catalog.enabled():
+        # Do not treat an unavailable catalogue as an empty inactive list.
+        # Emission uses force=True to validate against the current Cadastro.
+        return supabase_catalog.carregar_codigos_inativos(force=force)
+    return codigos_inativos_catalogos(
+        carregar_os_produtos() if os_produtos is None else os_produtos,
+        carregar_produtos() if produtos is None else produtos,
+    )
 
 
 def carregar_os_fornecedores(completo=False):
@@ -4700,6 +4717,14 @@ def index():
     os_produtos = carregar_os_produtos()
     os_fornecedores = carregar_os_fornecedores()
     os_componentes = carregar_os_componentes()
+    os_catalogo_disponivel = True
+    try:
+        os_codigos_inativos = carregar_os_codigos_inativos(os_produtos, produtos)
+    except supabase_catalog.SupabaseCatalogError:
+        app.logger.exception("Falha ao conferir itens inativos da O.S.")
+        os_codigos_inativos = set()
+        os_catalogo_disponivel = False
+    os_produtos = filtrar_catalogo_os(os_produtos, os_codigos_inativos) if os_catalogo_disponivel else {}
     os_processos = carregar_os_processos()
     relacoes_processo_item = carregar_relacoes_processo_item()
     regras_popup_item = carregar_regras_popup_item()
@@ -4781,6 +4806,8 @@ def index():
         os_produtos=os_produtos,
         os_fornecedores=os_fornecedores,
         os_componentes=os_componentes,
+        os_codigos_inativos=sorted(os_codigos_inativos),
+        os_catalogo_disponivel=os_catalogo_disponivel,
         os_processos=os_processos,
         oc_prefill=oc_prefill,
         os_prefill=os_prefill,
@@ -6892,6 +6919,12 @@ def gerar_os():
         )
     os_produtos = carregar_os_produtos()
     produtos_catalogo = carregar_produtos()
+    try:
+        codigos_inativos = carregar_os_codigos_inativos(os_produtos, produtos_catalogo, force=True)
+    except supabase_catalog.SupabaseCatalogError:
+        app.logger.exception("Falha ao validar o Cadastro antes de salvar/emitir O.S.")
+        return "Não foi possível conferir os itens ativos no Cadastro. A O.S. não foi alterada; tente novamente.", 503
+    os_produtos = filtrar_catalogo_os(os_produtos, codigos_inativos)
     bom_dir = get_bom_dir()
     if not supabase_data.enabled() and bom_dir and os.path.isdir(bom_dir):
         resultado_bom = importar_bom_diretorio(bom_dir, somente_se_mais_novo=True)
@@ -6964,12 +6997,16 @@ def gerar_os():
     popup_itens_extra = []
     regras_popup_por_gatilho = {}
     for regra in carregar_regras_popup_item():
+        if normalizar_codigo(regra.get("gatilho", "")) in codigos_inativos:
+            continue
         regras_popup_por_gatilho.setdefault(regra.get("gatilho", ""), []).append(regra)
     componentes = carregar_os_componentes()
     for idx in range(len(codigos)):
         codigo_item = normalizar_codigo(codigos[idx])
         if not codigo_item:
             continue
+        if codigo_item in codigos_inativos:
+            return f"O item {codigo_item} está inativo. Selecione um cadastro ativo para a O.S.", 409
         qtd_raw = str(qtds[idx]).strip() if idx < len(qtds) else ""
         qtd = _parse_numero_form(qtd_raw, 1.0)
         if qtd <= 0:
@@ -7010,6 +7047,8 @@ def gerar_os():
         )
 
         luminaria_codigo = normalizar_codigo(luminarias_linha[idx]) if idx < len(luminarias_linha) else ""
+        if luminaria_codigo in codigos_inativos and not usando_composicao_historica:
+            return f"A luminária {luminaria_codigo} está inativa. Selecione um cadastro ativo.", 409
         if luminaria_codigo and luminaria_codigo != POPUP_ITEM_NAO_APLICAVEL:
             luminaria_info = produtos_catalogo.get(luminaria_codigo, {}) or os_produtos.get(luminaria_codigo, {})
             luminaria_qtd_raw = str(luminarias_qtd_linha[idx]).strip() if idx < len(luminarias_qtd_linha) else ""
@@ -7055,6 +7094,8 @@ def gerar_os():
             relacionado_codigo = normalizar_codigo(selecao.get("codigo", ""))
             if not relacionado_codigo or relacionado_codigo == POPUP_ITEM_NAO_APLICAVEL:
                 continue
+            if relacionado_codigo in codigos_inativos and not usando_composicao_historica:
+                return f"O item relacionado {relacionado_codigo} está inativo. Selecione um cadastro ativo.", 409
             relacionado_qtd = _parse_numero_form(selecao.get("qtd", 1), 1.0)
             if relacionado_qtd <= 0:
                 relacionado_qtd = 1
@@ -7199,7 +7240,9 @@ def gerar_os():
             [*luminarias_extra, *popup_itens_extra],
             componentes,
         )
+    composicao_final = filtrar_linhas_ativas_os(composicao_final, codigos_inativos)
     composicao_final = _aplicar_selecoes_equivalencia_os(composicao_final)
+    composicao_final = filtrar_linhas_ativas_os(composicao_final, codigos_inativos)
     composicao_enriquecida = propagar_setor_preparacao(
         enriquecer_composicao(composicao_final, os_produtos),
         os_produtos,
@@ -7232,8 +7275,8 @@ def gerar_os():
             chaves_preparacao.add(chave)
     requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
 
-    itens_expedicao = construir_itens_os_expedicao(pendencias_expedicao)
-    itens_preparacao = construir_itens_os_preparacao(pendencias_preparacao)
+    itens_expedicao = construir_itens_os_expedicao(linhas_para_exibicao_os(pendencias_expedicao, codigos_inativos))
+    itens_preparacao = construir_itens_os_preparacao(linhas_para_exibicao_os(pendencias_preparacao, codigos_inativos))
     for item in itens_expedicao + itens_preparacao:
         item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
 
@@ -7346,7 +7389,7 @@ def gerar_os():
         )
 
     for fornecedor, linhas_fornecedor in agrupar_linhas_por_fornecedor(pendencias_faturamento_direto):
-        itens_fornecedor = construir_itens_os_setor(agrupar_linhas_setor(linhas_fornecedor))
+        itens_fornecedor = construir_itens_os_setor(agrupar_linhas_setor(linhas_para_exibicao_os(linhas_fornecedor, codigos_inativos)))
         for item in itens_fornecedor:
             item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
         fornecedor_titulo = _sanitize_output_name(fornecedor) or "SEM FORNECEDOR"
@@ -7372,7 +7415,7 @@ def gerar_os():
     arquivo_requisicao_materiais = _criar_planilha_requisicao_materiais(
         numero_os,
         dados,
-        requisicao_materiais,
+        linhas_para_exibicao_os(requisicao_materiais, codigos_inativos),
         "03 - Requisicao de Materiais",
     )
 
@@ -9535,7 +9578,13 @@ def erp_work_order_management_list():
 @permission_required("suprimentos.work_order.view")
 def erp_work_order_catalogs():
     try:
-        return jsonify(_erp_mes_request("catalogs"))
+        catalogos = dict(_erp_mes_request("catalogs"))
+        inativos = carregar_os_codigos_inativos()
+        catalogos["transformacoes"] = filtrar_linhas_ativas_os(catalogos.get("transformacoes"), inativos)
+        return jsonify(catalogos)
+    except supabase_catalog.SupabaseCatalogError:
+        app.logger.exception("Falha ao conferir transformações ativas na Gestão de O.S.")
+        return jsonify({"ok": False, "error": "Não foi possível conferir os itens ativos no Cadastro."}), 503
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
