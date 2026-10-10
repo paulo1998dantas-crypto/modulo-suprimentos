@@ -425,7 +425,28 @@ async function openMaterials(workId,number){
     if(!materialsDialog.open)materialsDialog.showModal();
   }catch(error){message(error.message,true)}
 }
-loadOrders();
+async function openCommercialAllocation(){
+ const id=new URLSearchParams(location.search).get('program_id');if(!id)return;
+ try{
+  const program=(await api('/api/erp/programacao-comercial')).rows.find(r=>r.id===id&&!r.history);
+  if(!program||program.commercial_status==='CANCELADO')throw Error('Programação não está vigente.');
+  const candidates=state.orders.filter(r=>program.chassi&&norm(r.chassi)===norm(program.chassi));
+  if(candidates.length!==1){document.getElementById('search').value=program.chassi||'';render();message('Programação selecionada. Selecione o ITEM disponível; confirme o chassi no Comercial antes de alocar. Proposta '+(program.proposal.display_number||program.proposal.number));return}
+  const row=candidates[0];openWork(row.entry_id);
+  if(row.work_order_id){message('A O.S. já existe. Use Vincular O.S. na programação para confirmar a referência sem sobrescrever sua composição.');return}
+  const f=program.forecast||{},meta=f.dados_planejamento||{},p=program.proposal||{},cfg=p.configuration||{};
+  fill('proposta_numero',p.programming_number||p.display_number||p.number);
+  for(const name of ['tipo_servico','vendedor','mercado','tipo_veiculo','linha','transformacao_codigo','transformacao'])if(f[name])fill(name,f[name]);
+  for(const name of ['municipio','uf','lotacao','ar_condicionado','tipo_sistema_ar','acessibilidade','acessorio','plotagem','ar_quente'])if(meta[name]||cfg[name])fill(name,meta[name]||cfg[name]);
+  if(p.accepted_date)fill('data_aprovacao',String(p.accepted_date).slice(0,10));
+  if(p.expected_delivery)fill('data_comercial_prevista',String(p.expected_delivery).slice(0,10));
+  const code=f.transformacao_codigo||'';const select=document.getElementById('transformation-select');
+  if(select&&[...select.options].some(o=>o.value===code))select.value=code;
+  loadSelectedBanks(meta.codigo_banco||cfg.banco_sku||'',meta.conjunto_bancos||cfg.banco_descricao||'');renderSelectedBanks();checkMissing();
+  message('Dados da programação carregados. Confira e salve a abertura da O.S.; a conversão é confirmada pelo MES.');
+ }catch(e){message(e.message,true)}
+}
+loadOrders().then(openCommercialAllocation);
 </script>
 </body>
 </html>

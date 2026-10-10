@@ -279,6 +279,41 @@ class WorkOrderDocumentLinkTests(unittest.TestCase):
         product_rows = [row.cells[0].text for row in docx.tables[2].rows[1:]]
         self.assertEqual(["10100001", "40340050"], product_rows)
 
+    def test_commercial_docx_prepares_but_does_not_consume_forecast(self):
+        document=self.document()
+        forecast={'id':'forecast-commercial','codigo':'FC1','status':'ATIVO','tipo_demanda':'PREVISAO_DEMANDA',
+          'cliente_nome':'CLIENTE TESTE','proposta_numero':'1098.1','quantidade_planejada':1,'quantidade_saldo_documental':1,
+          'itens_planejados':[{'sku_codigo':'40340050','quantidade_por_veiculo':1,'descricao':'JI URBAN','unidade':'pc'}],
+          'dados_planejamento':{'comercial_programacao_id':'slot-1','comercial_proposta_id':'proposal-1','chassi':'9BRTESTE123456789','mmv':'TRANSIT L4H3'}}
+        with (
+            patch.object(app_module, 'atualizar_skus_automatico',return_value={}),
+            patch.object(app_module, 'obter_historico_documento',return_value=document),
+            patch.object(app_module.supabase_data, 'enabled',return_value=True),
+            patch.object(app_module.supabase_data, 'obter_forecast',return_value=forecast),
+            patch.object(app_module.supabase_data, 'consumir_forecast_em_os_documento') as consume,
+            patch.object(app_module, 'carregar_os_fornecedores',return_value={}),
+            patch.object(app_module, 'carregar_os_produtos',return_value={'40340050':{'descricao':'JI URBAN','unidade':'pc'}}),
+            patch.object(app_module, 'carregar_produtos',return_value={}),
+            patch.object(app_module, 'carregar_regras_popup_item',return_value=[]),
+            patch.object(app_module, 'carregar_os_componentes',return_value={}),
+            patch.object(app_module, 'carregar_os_processos',return_value={}),
+            patch.object(app_module, 'carregar_relacoes_processo_item',return_value={}),
+            patch.object(app_module, 'get_bom_dir',return_value=''),
+            patch.object(app_module, 'registrar_historico',return_value={'id':'101'}) as register,
+        ):
+            response=self.client.post('/gerar_os',data={'acao':'imprimir','os_historico_id':'101','os_numero':'3096',
+              'os_forecast_id':forecast['id'],'os_forecast_quantidade':'1','os_composicao_source':'custom',
+              'os_composicao_json':'[]','os_codigo[]':'40340050','os_qtd[]':'1'})
+        self.assertEqual(200,response.status_code,response.get_data(as_text=True) if response.status_code!=200 else '')
+        consume.assert_not_called()
+        saved=register.call_args.args[2]
+        self.assertEqual('PREPARADO',saved['forecast_consumo']['status'])
+        self.assertEqual('1098.1',saved['forecast_consumo']['proposta_numero'])
+        self.assertEqual('9BRTESTE123456789',saved['chassis'])
+        self.assertEqual('TRANSIT L4H3',saved['mmv'])
+        with zipfile.ZipFile(io.BytesIO(response.data)) as package:
+            self.assertTrue(any('O.S Completa' in name for name in package.namelist()))
+
     def test_documents_endpoint_lists_only_active_service_orders(self):
         rows = [
             self.document(),

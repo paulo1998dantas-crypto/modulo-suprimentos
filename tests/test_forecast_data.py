@@ -107,7 +107,7 @@ class ForecastDataTests(unittest.TestCase):
             patch.object(supabase_data, "carregar_forecasts", return_value=forecasts),
             patch.object(supabase_data, "_all_rows", return_value=requirements),
         ):
-            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True)
+            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True, include_legacy=True)
 
         self.assertEqual(1, len(rows))
         self.assertEqual("SKU-1", rows[0]["sku_codigo"])
@@ -176,7 +176,7 @@ class ForecastDataTests(unittest.TestCase):
             patch.object(supabase_data, "carregar_forecasts", return_value=forecasts),
             patch.object(supabase_data, "_all_rows", return_value=requirements),
         ):
-            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True)
+            rows = supabase_data.carregar_necessidades_forecasts_ativos(force=True, include_legacy=True)
 
         self.assertEqual(1, len(rows))
         self.assertEqual(4, rows[0]["quantidade_planejada"])

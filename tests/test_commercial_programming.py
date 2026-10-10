@@ -13,7 +13,7 @@ def test_board_is_readonly_and_auto_links_arrival():
       'comercial_propostas':[{'id':'q1','number':'1','status':'ACEITA','accepted_at':'today','accepted_date':'today'}],
       'erp_vehicles':[{'id':'v1','chassi':'VIN'}],
       'erp_vehicle_entries':[{'id':'e1','vehicle_id':'v1','item_number':3185,'status':'EM PRODUÇÃO'}],
-      'erp_work_orders':[{'id':'w1','vehicle_entry_id':'e1','numero_os':'3185','status':'EM PRODUÇÃO','is_current':True}],
+      'erp_work_orders':[{'id':'w1','vehicle_entry_id':'e1','numero_os':'3185','proposta_numero':'1','status':'EM PRODUÇÃO','is_current':True}],
     }
     calls=[]
     def read(table,**kw):

@@ -1569,7 +1569,7 @@ if (!quantidadeInput.value || parseNumber(quantidadeInput.value) > saldo){
 quantidadeInput.value = saldo > 0 ? String(saldo) : "";
 }
 const itens = Array.isArray(forecast.itens_planejados) ? forecast.itens_planejados.length : 0;
-resumo.textContent = `${forecast.codigo || "Forecast"}: saldo documental de ${formatarQuantidadeForecastOS(saldo)} veiculo(s), ${itens} SKU(s) planejado(s). A emissao abate somente a quantidade informada.`;
+resumo.textContent = `${forecast.codigo || "Forecast"}: ${formatarQuantidadeForecastOS(saldo)} veiculo(s), ${itens} SKU(s) planejado(s). `+(forecast.dados_planejamento?.comercial_programacao_id?'O DOCX prepara a O.S.; a vinculação no MES confirma a conversão.':'A emissao abate somente a quantidade informada.');
 }
 
 async function carregarForecastsDocumentoOS(){
@@ -1585,7 +1585,7 @@ if (!response.ok || !payload.ok){
 throw new Error(payload.error || "Nao foi possivel carregar os Forecasts.");
 }
 osForecastsDocumentais = (payload.forecasts || []).filter((forecast) => {
-return String(forecast.tipo_demanda || "").toUpperCase() === "AGUARDANDO_CHEGADA"
+return Boolean(forecast.dados_planejamento?.comercial_programacao_id)
 && String(forecast.status || "").toUpperCase() === "ATIVO"
 && parseNumber(forecast.quantidade_saldo_documental) > 0;
 });
@@ -1594,13 +1594,19 @@ select.innerHTML = '<option value="">Sem Forecast (O.S. manual)</option>';
 osForecastsDocumentais.forEach((forecast) => {
 const option = document.createElement("option");
 option.value = forecast.id;
-option.textContent = `${forecast.codigo || "Forecast"} - ${forecast.cliente_nome || "Cliente nao informado"} - saldo ${formatarQuantidadeForecastOS(forecast.quantidade_saldo_documental)}`;
+option.textContent = `${forecast.proposta_numero || forecast.codigo || "Forecast"} - ${forecast.dados_planejamento?.chassi || 'sem chassi'} - ${forecast.cliente_nome || "Cliente nao informado"} - ${forecast.dados_planejamento?.status_comercial || forecast.status}`;
 select.appendChild(option);
 });
 if (selectedId && osForecastsDocumentais.some((forecast) => String(forecast.id) === String(selectedId))){
 select.value = selectedId;
 }
 atualizarResumoForecastDocumentoOS();
+const requested=new URLSearchParams(window.location.search).get('forecast_id');
+if(requested&&!window.commercialForecastApplied&&osForecastsDocumentais.some(f=>String(f.id)===requested)){
+window.commercialForecastApplied=true;select.value=requested;
+const qty=document.getElementById('os_forecast_quantidade_input');if(qty)qty.value='1';
+aplicarForecastDocumentoOS();
+}
 } catch (error) {
 if (resumo){
 resumo.textContent = `Forecast indisponivel nesta tela: ${error.message}`;
@@ -1669,6 +1675,13 @@ try {
 preencherItensDoForecastOS(forecast, quantidade);
 if (forecastIdInput) forecastIdInput.value = forecast.id;
 if (forecastQuantidadeInput) forecastQuantidadeInput.value = String(quantidade);
+const meta=forecast.dados_planejamento||{};
+if(meta.comercial_programacao_id){
+const chassisInput=document.querySelector('input[name="os_chassis"]');
+const mmvInput=document.querySelector('input[name="os_mmv"]');
+if(chassisInput)chassisInput.value=meta.chassi||meta.chassis||'';
+if(mmvInput)mmvInput.value=meta.mmv||'';
+}
 const clienteBusca = document.querySelector('input[name="os_cliente_busca"]');
 const clienteHidden = document.querySelector('input[name="os_cliente"]');
 if (clienteBusca && forecast.cliente_nome) clienteBusca.value = forecast.cliente_nome;
@@ -1678,8 +1691,8 @@ const termino = document.querySelector('input[name="os_previsao_termino"]');
 if (inicio && !inicio.value && forecast.data_prevista_chegada) inicio.value = `${String(forecast.data_prevista_chegada).slice(0, 10)}T08:00`;
 if (termino && !termino.value && forecast.data_entrega_prevista) termino.value = `${String(forecast.data_entrega_prevista).slice(0, 10)}T18:00`;
 const descricao = document.querySelector('textarea[name="os_descricao_servico"]');
-if (descricao && !descricao.value.trim()) descricao.value = `Conversao documental do Forecast ${forecast.codigo || ""}.`;
-if (resumo) resumo.textContent = `Forecast aplicado. Ao salvar fica apenas preparado; ao gerar o DOCX serao abatidos ${formatarQuantidadeForecastOS(quantidade)} veiculo(s) do saldo.`;
+if (descricao && !descricao.value.trim()) descricao.value = `Proposta ${forecast.proposta_numero || ''} — Forecast ${forecast.codigo || ""}.`;
+if (resumo) resumo.textContent = meta.comercial_programacao_id?'Programação aplicada. O DOCX prepara a O.S.; o Forecast só é convertido ao vincular o chassi e a proposta vigente no MES.':`Forecast aplicado. Ao gerar o DOCX serao abatidos ${formatarQuantidadeForecastOS(quantidade)} veiculo(s) do saldo.`;
 salvarRascunhoOS();
 } catch (error) {
 alert(error.message || "Nao foi possivel aplicar o Forecast.");
@@ -6993,8 +7006,8 @@ salvarRascunhoOS();
 </div>
 
 <div class="card" id="os_forecast_documental_card">
-<h3>Converter Forecast em O.S. documental</h3>
-<p style="margin:0 0 12px;color:#475569;">Use um Forecast <strong>Aguardando chegada</strong> para montar esta O.S. com seus SKUs, B.O.M. e quantidades proporcionais. Salvar mantém o Forecast intacto; gerar o pacote DOCX confirma o abatimento do saldo.</p>
+<h3>Preparar O.S. a partir da programação / Forecast</h3>
+<p style="margin:0 0 12px;color:#475569;">Importe os SKUs e a B.O.M. da programação comercial. O DOCX prepara o documento; a vinculação de chassi + proposta no MES confirma a conversão em demanda real. Forecasts legados mantêm a conversão documental.</p>
 <div class="grid-4">
 <div>
 <label>Forecast confirmado</label>

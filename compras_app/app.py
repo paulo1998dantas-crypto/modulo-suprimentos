@@ -6886,7 +6886,7 @@ def gerar_os():
             return "Nao foi possivel consultar o Forecast selecionado.", 502
         if not forecast:
             return "Forecast selecionado nao foi encontrado.", 404
-        if str(forecast.get("tipo_demanda") or "").upper() != "AGUARDANDO_CHEGADA":
+        if str(forecast.get("tipo_demanda") or "").upper() != "AGUARDANDO_CHEGADA" and not (forecast.get('dados_planejamento') or {}).get('comercial_programacao_id'):
             return "Somente Forecasts aguardando chegada podem gerar O.S. documental.", 400
         mesmo_consumo_historico = (
             str(consumo_forecast_anterior.get("forecast_id") or "") == str(forecast_id)
@@ -7170,6 +7170,15 @@ def gerar_os():
         # documental quando o PCP ainda nao informou uma data mais precisa.
         # Nunca convertemos aqui Forecast em veiculo, reserva, empenho ou saldo
         # fisico; este vinculo existe apenas para a emissao documental da O.S.
+        meta=forecast.get('dados_planejamento') or {}
+        if meta.get('comercial_programacao_id'):
+            planned_vin=str(meta.get('chassi') or '').strip().upper()
+            actual_vin=str(dados.get('chassis') or '').strip().upper()
+            if planned_vin and actual_vin and planned_vin!=actual_vin:
+                return 'Chassi diferente da programação vigente. Atualize o vínculo no Comercial antes de emitir.',409
+            dados['chassis']=actual_vin or planned_vin
+            dados['mmv']=str(meta.get('mmv') or dados.get('mmv') or '')
+            dados['municipio']=dados.get('municipio') or meta.get('municipio','')
         data_chegada = str(
             forecast.get("data_prevista_chegada")
             or forecast.get("data_confirmacao")
@@ -7192,6 +7201,9 @@ def gerar_os():
             "quantidade_planejada": _parse_numero_form(forecast.get("quantidade_planejada"), 0),
             "saldo_antes": _parse_numero_form(forecast.get("quantidade_saldo_documental"), 0),
             "status": "PREPARADO",
+            "comercial_programacao_id":meta.get('comercial_programacao_id'),
+            "comercial_proposta_id":meta.get('comercial_proposta_id'),
+            "proposta_numero":forecast.get('proposta_numero'),
         }
 
     processos_final = {nome: [] for nome in PROCESSOS_ORDEM}
@@ -7434,7 +7446,7 @@ def gerar_os():
         layout_arquivo_id=layout_arquivo_id,
     )
     consumo_forecast_novo = False
-    if forecast:
+    if forecast and not (forecast.get('dados_planejamento') or {}).get('comercial_programacao_id'):
         # A RPC realiza lock da linha do Forecast e torna retentativas do mesmo
         # documento idempotentes. Se outra emissao consumiu o saldo entre a
         # abertura da tela e este instante, a O.S. volta ao estado anterior.
@@ -9347,6 +9359,54 @@ def erp_forecast_screen():
 def erp_programacao_comercial_api():
     try:
         return jsonify({"ok": True, "rows": supabase_data.carregar_programacao_comercial(force=True)})
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.post('/api/erp/programacao-comercial/<forecast_id>/considerar')
+@login_required
+@erp_feature_required
+@permission_required('suprimentos.work_order.manage')
+def erp_programacao_considerar_api(forecast_id):
+    data=request.get_json(silent=True) or {}
+    try:
+        purchase_requests.check_csrf(request.headers.get('X-CSRF-Token'))
+        saved=supabase_data.definir_consideracao_comercial_pcp(forecast_id,data.get('considerar'),data.get('version'),current_username())
+        return jsonify(ok=True,forecast=saved)
+    except PermissionError as exc:
+        return jsonify(ok=False,error=str(exc)),403
+    except ValueError as exc:
+        return jsonify(ok=False,error=str(exc)),400
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.post('/api/erp/programacao-comercial/<program_id>/vincular-os')
+@login_required
+@erp_feature_required
+@permission_required('suprimentos.work_order.manage')
+def erp_programacao_vincular_os_api(program_id):
+    try:
+        purchase_requests.check_csrf(request.headers.get('X-CSRF-Token'))
+        result=supabase_data.vincular_os_comercial_pcp(program_id,request.get_json(silent=True) or {},current_username())
+        return jsonify(ok=True,result=result)
+    except PermissionError as exc:
+        return jsonify(ok=False,error=str(exc)),403
+    except Exception as exc:
+        return _forecast_error_response(exc)
+
+
+@app.get('/api/erp/programacao-comercial/os-disponiveis')
+@login_required
+@erp_feature_required
+@permission_required('suprimentos.work_order.view')
+def erp_programacao_os_disponiveis_api():
+    try:
+        allowed={'RASCUNHO','AGUARDANDO_O_S','ATIVA','EM_PRODUÇÃO','EM_PRODUCAO'}
+        rows=[r for r in _erp_mes_all_work_orders() if r.get('work_order_id') and r.get('is_current',True)
+            and str(r.get('status') or '').upper() in allowed]
+        fields=['work_order_id','entry_id','item_number','numero_os','proposta_numero','chassi','cliente_nome','status','marca','modelo','versao']
+        return jsonify(ok=True,orders=[{k:r.get(k) for k in fields} for r in rows])
     except Exception as exc:
         return _forecast_error_response(exc)
 

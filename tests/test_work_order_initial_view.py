@@ -24,7 +24,7 @@ class WorkOrderInitialViewContractTest(unittest.TestCase):
         self.assertIn("async function persistEntry()", template)
         self.assertIn("await persistEntry();const result=workId?await api", template)
         save_entry = template.split("async function saveEntryData(){", 1)[1].split(
-            "async function saveWork", 1
+            "\nasync function", 1
         )[0]
         self.assertNotIn("await loadOrders()", save_entry)
         self.assertNotIn("openWork(entryId)", save_entry)

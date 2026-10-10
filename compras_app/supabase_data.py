@@ -1476,6 +1476,8 @@ def enriquecer_forecasts_com_consumos(forecasts, force=False):
         forecast_id = _clean(forecast.get("id"))
         planejada = max(_numeric(forecast.get("quantidade_planejada")), 0)
         consumida = max(ativos_por_forecast.get(forecast_id, 0), 0)
+        if (forecast.get('dados_planejamento') or {}).get('comercial_programacao_id'):
+            consumida=planejada if _clean(forecast.get('status')).upper()=='CONVERTIDO' else 0
         saldo = max(planejada - consumida, 0)
         forecast["quantidade_consumida_documental"] = consumida
         forecast["quantidade_saldo_documental"] = saldo
@@ -1538,16 +1540,22 @@ def carregar_programacao_comercial(force=False):
     """Read-only PCP board. Sale prices/private notes never cross this boundary."""
     programs = _all_rows(
         "comercial_programacao",
-        select="id,proposal_id,sequence,chassi,vehicle_sku,vehicle_description,status,programmed_at,released_at,finalized_at,forecast_id,vehicle_entry_id,work_order_id,integration_status,integration_error,term_toriba,financial_released,bank_purchase_order_id",
+        select="id,version,proposal_id,sequence,chassi,vehicle_sku,vehicle_description,status,programmed_at,released_at,finalized_at,forecast_id,vehicle_entry_id,work_order_id,integration_status,integration_error,term_toriba,financial_released,bank_purchase_order_id",
         extra_query=[("included", "eq.true"), ("programmed_at", "not.is.null")],
         order="created_at.desc", cache_key="comercial_programming_pcp", force=force,
     )
     proposals = _all_rows(
         "comercial_propostas",
-        select="id,number,revision,client_name,client_type,client_state,destination,seller,seats,configuration,accepted_at,accepted_date,expected_arrival,expected_delivery,quote_status,status",
+        select="id,number,revision,kind,parent_id,created_at,emitted_at,client_name,client_type,client_state,destination,seller,seats,configuration,accepted_at,accepted_date,expected_arrival,expected_delivery,quote_status,status",
         order="created_at.desc", cache_key="comercial_proposals_pcp", force=force,
     )
     by_proposal = {_clean(p.get("id")): p for p in proposals}
+    for p in proposals:
+        cfg=p.get('configuration') or {}
+        p['display_number']=(_clean(cfg.get('original_proposal_number')) or _clean(p.get('number')))+(f".{int(p.get('revision') or 1)-1}" if int(p.get('revision') or 1)>1 and p.get('kind')!='COMPLEMENTAR' else '')
+    for p in proposals:
+        complements=sorted((x for x in proposals if x.get('parent_id')==p.get('id') and x.get('kind')=='COMPLEMENTAR' and x.get('emitted_at') and x.get('status')!='CANCELADA'),key=lambda x:(_clean(x.get('created_at')),_clean(x.get('id'))))
+        p['programming_number']=p['display_number']+''.join(' > '+_clean(x.get('number')) for x in complements)
     forecasts = {_clean(f.get("id")): f for f in carregar_forecasts(force=force)}
     # VIN lookup is read-only: ambiguous arrivals are exposed, never guessed.
     vins = {_clean(p.get("chassi")).upper() for p in programs if p.get("chassi")}
@@ -1556,7 +1564,7 @@ def carregar_programacao_comercial(force=False):
         vehicles = _all_rows("erp_vehicles", select="id,chassi", cache_key="commercial_pcp_vehicles", force=force)
         ids = {_clean(v.get("id")): _clean(v.get("chassi")).upper() for v in vehicles if _clean(v.get("chassi")).upper() in vins}
         entries = _all_rows("erp_vehicle_entries", select="id,item_number,vehicle_id,status", cache_key="commercial_pcp_entries", force=force)
-        orders = _all_rows("erp_work_orders", select="id,vehicle_entry_id,numero_os,status,is_current", extra_query=[("is_current","eq.true")], cache_key="commercial_pcp_orders", force=force)
+        orders = _all_rows("erp_work_orders", select="id,vehicle_entry_id,numero_os,proposta_numero,status,is_current", extra_query=[("is_current","eq.true")], cache_key="commercial_pcp_orders", force=force)
         by_entry = {}
         for order in orders: by_entry.setdefault(_clean(order.get("vehicle_entry_id")), []).append(order)
         for entry in entries:
@@ -1573,16 +1581,28 @@ def carregar_programacao_comercial(force=False):
         ambiguous = len(matches)>1 or (bool(matches) and len(matches[0][1])>1)
         arrival = matches[0][0] if len(matches)==1 and not ambiguous else {}
         order = matches[0][1][0] if len(matches)==1 and len(matches[0][1])==1 else {}
+        label=proposal['display_number']
+        matched_order=bool(order and _clean(order.get('proposta_numero')).upper() in {label.upper(),proposal['programming_number'].upper()})
         status = _clean(program.get("status")) or "AG. ACEITE"
         if status not in {"CANCELADO", "FINALIZADO COMERCIAL"} and proposal.get("status") != "HISTÓRICA":
             arrived = not ambiguous and bool(arrival or program.get("vehicle_entry_id") or (forecast or {}).get("vehicle_entry_id"))
             released = bool(program.get("released_at"))
             accepted = bool(proposal.get("accepted_at") and proposal.get("accepted_date"))
             status = "FINALIZADO COMERCIAL" if arrived and released and accepted else "AG. CHEGADA" if released and accepted else "AG. ACEITE"
-        result.append({**program, "proposal": proposal, "forecast": forecast, "commercial_status": status,
-                       "item_number":arrival.get("item_number"), "number_os":order.get("numero_os"), "production_status":order.get("status") or "SEM O.S.",
-                       "current_vehicle_entry_id":arrival.get("id") or program.get("vehicle_entry_id"), "current_work_order_id":order.get("id") or program.get("work_order_id"),
+        result.append({**program, "proposal": {**proposal,"display_number":label}, "forecast": forecast, "commercial_status": status,
+                       "considerar_forecast":(forecast or {}).get('dados_planejamento',{}).get('pcp_considerar',True),
+                       "proposal_matches_order":matched_order,
+                       "item_number":arrival.get("item_number"), "number_os":order.get("numero_os") if matched_order else None, "production_status":order.get("status") or "SEM O.S.",
+                       "current_vehicle_entry_id":arrival.get("id") or program.get("vehicle_entry_id"), "current_work_order_id":order.get("id") if matched_order else None,
                        "integration_conflict":ambiguous})
+    try:
+        archives=_all_rows('comercial_programacao_historico_pcp',select='id,payload',cache_key='comercial_programming_history_pcp',force=force)
+    except SupabaseDataError as exc:
+        if 'PGRST205' not in str(exc) or 'comercial_programacao_historico_pcp' not in str(exc): raise
+        # Rolling deploy: show the current board, but visibly gate new actions.
+        archives=[]
+        for r in result:r['workflow_migration_pending']=True
+    result.extend({**r['payload'],'forecast':None,'forecast_id':None,'considerar_forecast':False} for r in archives if r.get('payload'))
     return result
 
 
@@ -1614,7 +1634,7 @@ def carregar_necessidades_forecast(forecast_id, force=False):
     )
 
 
-def carregar_necessidades_forecasts_ativos(force=False):
+def carregar_necessidades_forecasts_ativos(force=False, include_legacy=False):
     """Read the MRP projection for every active Forecast in one batch.
 
     Forecast remains a planning-only domain.  This projection is deliberately
@@ -1626,6 +1646,8 @@ def carregar_necessidades_forecasts_ativos(force=False):
         row
         for row in carregar_forecasts(force=force)
         if _clean(row.get("status")).upper() == "ATIVO"
+        and (row.get("dados_planejamento") or {}).get("pcp_considerar",True) is not False
+        and (include_legacy or (row.get("dados_planejamento") or {}).get("comercial_programacao_id"))
     ]
     if any((f.get("dados_planejamento") or {}).get("comercial_programacao_id") for f in forecasts):
         programs={_clean(p.get("id")):p for p in carregar_programacao_comercial(force=force)}
@@ -1671,6 +1693,8 @@ def carregar_necessidades_forecasts_ativos(force=False):
             if quantidade_planejada > 0
             else 1
         )
+        if (forecast.get('dados_planejamento') or {}).get('comercial_programacao_id'):
+            fator_saldo=1  # DOCX preparado não é alocação física.
         if fator_saldo <= 0.000001:
             continue
         linha = {**dict(requirement), "forecast": forecast}
@@ -1773,6 +1797,41 @@ def atualizar_forecast(forecast_id, forecast, actor, expected_version=None):
         raise ValueError("O Forecast foi alterado por outro usuario. Atualize a tela e tente novamente.")
     clear_cache()
     saved["itens_planejados"] = carregar_itens_forecast(saved.get("id"), force=True)
+    return saved
+
+
+def definir_consideracao_comercial_pcp(forecast_id, considerar, version, actor):
+    if not isinstance(considerar,bool) or isinstance(version,bool) or not isinstance(version,int) or version<1:
+        raise ValueError('Informe a consideração e a versão vigente do Forecast.')
+    saved=_rpc('comercial_definir_consideracao_pcp',{'p_forecast_id':_clean(forecast_id),
+        'p_expected_version':version,'p_considerar':considerar,'p_actor':_clean(actor)})
+    clear_cache()
+    return saved
+
+
+def vincular_os_comercial_pcp(program_id, payload, actor):
+    if not isinstance(payload,dict):
+        raise ValueError('Vínculo de O.S. inválido.')
+    for key in ['program_version','forecast_version']:
+        if isinstance(payload.get(key),bool) or not isinstance(payload.get(key),int) or payload[key]<1:
+            raise ValueError('Atualize a programação antes de vincular a O.S.')
+    from uuid import UUID
+    try: work_id=str(UUID(str(payload.get('work_order_id') or '')))
+    except ValueError as exc: raise ValueError('Selecione uma O.S. válida.') from exc
+    if payload.get('confirmed') is not True:
+        raise ValueError('Confirme o vínculo e a alteração da referência da proposta.')
+    try:
+        saved=_rpc('comercial_vincular_os_pcp',{'p_program_id':_clean(program_id),
+            'p_program_version':payload['program_version'],'p_forecast_version':payload['forecast_version'],
+            'p_work_id':work_id,'p_old_proposal':_clean(payload.get('old_proposal')),
+            'p_old_chassi':_clean(payload.get('old_chassi')).upper(),'p_actor':_clean(actor)})
+    except SupabaseDataError as exc:
+        raw=str(exc);message=_supabase_error_message(exc)
+        if '"P0001"' in raw and message: raise ValueError(message) from exc
+        raise
+    if not isinstance(saved,dict) or saved.get('status')!='CONVERTIDO':
+        raise SupabaseDataError('O banco não confirmou o vínculo da O.S.')
+    clear_cache()
     return saved
 
 
