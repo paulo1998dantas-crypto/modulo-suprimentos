@@ -8898,6 +8898,9 @@ def _pcp_needs_date(value):
 
 
 def _forecast_demand_label(forecast):
+    planning=(forecast or {}).get("dados_planejamento") or {}
+    if planning.get("comercial_programacao_id"):
+        return "PROGRAMAÇÃO COMERCIAL — "+str(planning.get("status_comercial") or "AG. ACEITE")
     demand_type = str((forecast or {}).get("tipo_demanda") or "").strip().upper()
     if demand_type == "AGUARDANDO_CHEGADA":
         return "FORECAST CONFIRMADO — AGUARDANDO CHEGADA"
@@ -8920,7 +8923,7 @@ def _pcp_forecast_summary(requirements):
             or _pcp_needs_date(forecast.get("data_prevista_chegada"))
         )
         key = (
-            demand_type,
+            _forecast_demand_label(forecast),
             str(requirement.get("sku_codigo") or "").strip().upper(),
             str(requirement.get("descricao") or "").strip(),
             str(requirement.get("unidade") or "").strip(),
@@ -8928,6 +8931,8 @@ def _pcp_forecast_summary(requirements):
         )
         current = grouped.setdefault(key, {
             "demand_type": demand_type,
+            "demand_label": _forecast_demand_label(forecast),
+            "commercial": bool((forecast.get("dados_planejamento") or {}).get("comercial_programacao_id")),
             "codigo": key[1],
             "descricao": key[2],
             "unidade": key[3],
@@ -8937,7 +8942,8 @@ def _pcp_forecast_summary(requirements):
             "bom": set(),
         })
         current["quantidade"] += _pcp_needs_number(requirement.get("quantidade_planejada"))
-        code = str(forecast.get("codigo") or "").strip()
+        planning=forecast.get("dados_planejamento") or {}
+        code = ("Proposta "+str(forecast.get("proposta_numero") or "—")+" / Veículo "+str(planning.get("sequencia") or "—")) if planning.get("comercial_programacao_id") else str(forecast.get("codigo") or "").strip()
         if code:
             current["forecast_codes"].add(code)
         current["bom"].add(
@@ -8971,7 +8977,7 @@ def _pcp_needs_workbook(work_order_needs, forecast_requirements):
         "Saldo em fluxo (informativo)", "Setor", "Origem B.O.M.",
     ]
     ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(headers))
-    ws.cell(1, 1, "RELATÓRIO PCP — NECESSIDADES DE O.S. E FORECAST")
+    ws.cell(1, 1, "RELATÓRIO PCP — NECESSIDADES DE O.S. E PROGRAMAÇÃO COMERCIAL")
     ws.cell(1, 1).font = Font(bold=True, color="FFFFFF", size=14)
     ws.cell(1, 1).fill = PatternFill("solid", fgColor="0B1C3A")
     ws.cell(1, 1).alignment = Alignment(horizontal="center")
@@ -9019,9 +9025,9 @@ def _pcp_needs_workbook(work_order_needs, forecast_requirements):
         date_label = forecast["planned_date"] or ""
         references = ", ".join(sorted(forecast["forecast_codes"])) or "Forecast sem código"
         ws.append([
-            "FORECAST",
+            "PROGRAMAÇÃO COMERCIAL" if forecast["commercial"] else "FORECAST LEGADO",
             references,
-            _forecast_demand_label({"tipo_demanda": forecast["demand_type"]}),
+            forecast["demand_label"],
             "ATIVO",
             date_label,
             "",
@@ -9331,7 +9337,18 @@ def _forecast_error_response(exc):
 def erp_forecast_screen():
     if not forecast_feature_enabled():
         return "Forecast desativado pela feature flag.", 404
-    return render_template("erp_forecast.html", current_user=current_user())
+    return render_template("erp_programacao_comercial.html", current_user=current_user())
+
+
+@app.route("/api/erp/programacao-comercial")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.view")
+def erp_programacao_comercial_api():
+    try:
+        return jsonify({"ok": True, "rows": supabase_data.carregar_programacao_comercial(force=True)})
+    except Exception as exc:
+        return _forecast_error_response(exc)
 
 
 @app.route("/api/erp/forecasts")

@@ -6335,7 +6335,7 @@ salvarRascunhoOS();
 <a class="tab-btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>
 {% endif %}
 {% if can('suprimentos.work_order.view') %}
-<a class="tab-btn" href="/erp/forecast">FORECAST</a>
+<a class="tab-btn" href="/erp/forecast">PROGRAMAÇÃO COMERCIAL</a>
 {% endif %}
 </div>
 {% if current_user %}
@@ -6821,7 +6821,7 @@ salvarRascunhoOS();
 {% endif %}
 <a class="btn" href="/erp/gestao-os">Gestão Operacional O.S.</a>
 {% if can('suprimentos.production_order.view') %}<a class="btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>{% endif %}
-{% if can('suprimentos.work_order.view') %}<a class="btn" href="/erp/forecast">FORECAST</a>{% endif %}
+{% if can('suprimentos.work_order.view') %}<a class="btn" href="/erp/forecast">PROGRAMAÇÃO COMERCIAL</a>{% endif %}
 {% if can('suprimentos.work_order.manage') %}
 <form method="POST" action="/atualizar_bom_os_abertas" onsubmit="return confirm('Atualizar a B.O.M. de todas as O.S. abertas? O sistema manterá os itens principais, inclusões manuais, escolhas de pop-up, setores e status; atualizará somente os componentes abaixo desses itens conforme a B.O.M. vigente. Para substituir toda a composição pela B.O.M. padrão, use Recarregar B.O.M. dentro da edição da O.S. Esta ação não movimenta estoque, empenhos, baixas ou O.C.');">
 <input type="hidden" name="confirmar_atualizacao_bom_os" value="sim">

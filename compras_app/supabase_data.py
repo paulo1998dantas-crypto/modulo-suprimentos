@@ -1534,6 +1534,58 @@ def carregar_forecasts(force=False):
     return enriquecer_forecasts_com_consumos(forecasts, force=force)
 
 
+def carregar_programacao_comercial(force=False):
+    """Read-only PCP board. Sale prices/private notes never cross this boundary."""
+    programs = _all_rows(
+        "comercial_programacao",
+        select="id,proposal_id,sequence,chassi,vehicle_sku,vehicle_description,status,programmed_at,released_at,finalized_at,forecast_id,vehicle_entry_id,work_order_id,integration_status,integration_error,term_toriba,financial_released,bank_purchase_order_id",
+        extra_query=[("included", "eq.true"), ("programmed_at", "not.is.null")],
+        order="created_at.desc", cache_key="comercial_programming_pcp", force=force,
+    )
+    proposals = _all_rows(
+        "comercial_propostas",
+        select="id,number,revision,client_name,client_type,client_state,destination,seller,seats,configuration,accepted_at,accepted_date,expected_arrival,expected_delivery,quote_status,status",
+        order="created_at.desc", cache_key="comercial_proposals_pcp", force=force,
+    )
+    by_proposal = {_clean(p.get("id")): p for p in proposals}
+    forecasts = {_clean(f.get("id")): f for f in carregar_forecasts(force=force)}
+    # VIN lookup is read-only: ambiguous arrivals are exposed, never guessed.
+    vins = {_clean(p.get("chassi")).upper() for p in programs if p.get("chassi")}
+    live = {}
+    if vins:
+        vehicles = _all_rows("erp_vehicles", select="id,chassi", cache_key="commercial_pcp_vehicles", force=force)
+        ids = {_clean(v.get("id")): _clean(v.get("chassi")).upper() for v in vehicles if _clean(v.get("chassi")).upper() in vins}
+        entries = _all_rows("erp_vehicle_entries", select="id,item_number,vehicle_id,status", cache_key="commercial_pcp_entries", force=force)
+        orders = _all_rows("erp_work_orders", select="id,vehicle_entry_id,numero_os,status,is_current", extra_query=[("is_current","eq.true")], cache_key="commercial_pcp_orders", force=force)
+        by_entry = {}
+        for order in orders: by_entry.setdefault(_clean(order.get("vehicle_entry_id")), []).append(order)
+        for entry in entries:
+            vin = ids.get(_clean(entry.get("vehicle_id")))
+            if vin and _clean(entry.get("status")).upper() not in {"CANCELADO","EXCLUIDO","EXCLUÍDO"}:
+                live.setdefault(vin, []).append((entry, by_entry.get(_clean(entry.get("id")), [])))
+    result = []
+    for program in programs:
+        proposal = by_proposal.get(_clean(program.get("proposal_id")))
+        if not proposal:
+            raise SupabaseDataError("Programação sem proposta vinculada; confira o Comercial.")
+        forecast = forecasts.get(_clean(program.get("forecast_id")))
+        matches = live.get(_clean(program.get("chassi")).upper(), [])
+        ambiguous = len(matches)>1 or (bool(matches) and len(matches[0][1])>1)
+        arrival = matches[0][0] if len(matches)==1 and not ambiguous else {}
+        order = matches[0][1][0] if len(matches)==1 and len(matches[0][1])==1 else {}
+        status = _clean(program.get("status")) or "AG. ACEITE"
+        if status not in {"CANCELADO", "FINALIZADO COMERCIAL"} and proposal.get("status") != "HISTÓRICA":
+            arrived = not ambiguous and bool(arrival or program.get("vehicle_entry_id") or (forecast or {}).get("vehicle_entry_id"))
+            released = bool(program.get("released_at"))
+            accepted = bool(proposal.get("accepted_at") and proposal.get("accepted_date"))
+            status = "FINALIZADO COMERCIAL" if arrived and released and accepted else "AG. CHEGADA" if released and accepted else "AG. ACEITE"
+        result.append({**program, "proposal": proposal, "forecast": forecast, "commercial_status": status,
+                       "item_number":arrival.get("item_number"), "number_os":order.get("numero_os"), "production_status":order.get("status") or "SEM O.S.",
+                       "current_vehicle_entry_id":arrival.get("id") or program.get("vehicle_entry_id"), "current_work_order_id":order.get("id") or program.get("work_order_id"),
+                       "integration_conflict":ambiguous})
+    return result
+
+
 def carregar_itens_forecast(forecast_id, force=False):
     if not _clean(forecast_id):
         return []
@@ -1575,6 +1627,22 @@ def carregar_necessidades_forecasts_ativos(force=False):
         for row in carregar_forecasts(force=force)
         if _clean(row.get("status")).upper() == "ATIVO"
     ]
+    if any((f.get("dados_planejamento") or {}).get("comercial_programacao_id") for f in forecasts):
+        programs={_clean(p.get("id")):p for p in carregar_programacao_comercial(force=force)}
+        reconciled=[]
+        for forecast in forecasts:
+            meta=forecast.get("dados_planejamento") or {}
+            program_id=_clean(meta.get("comercial_programacao_id"))
+            if program_id:
+                program=programs.get(program_id)
+                # Removed/cancelled/physical demand must not also be Forecast.
+                if not program or program.get("commercial_status")=="CANCELADO": continue
+                if program.get("integration_conflict"):
+                    raise SupabaseDataError("Vínculo de programação ambíguo; confira Comercial/MES antes de calcular a demanda.")
+                if program.get("current_work_order_id") or forecast.get("work_order_id") or forecast.get("vehicle_entry_id"): continue
+                forecast={**forecast,"dados_planejamento":{**meta,"status_comercial":program["commercial_status"]}}
+            reconciled.append(forecast)
+        forecasts=reconciled
     by_id = {_clean(row.get("id")): row for row in forecasts if _clean(row.get("id"))}
     if not by_id:
         return []

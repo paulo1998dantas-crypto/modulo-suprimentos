@@ -27,11 +27,11 @@ class ForecastRouteTests(unittest.TestCase):
             app_module.app.jinja_env.globals["can"] = lambda _permission: True
             response = self.client.get("/erp/forecast")
         self.assertEqual(200, response.status_code)
-        self.assertIn(b"FORECAST", response.data)
-        self.assertIn(b"Aguardando chegada", response.data)
-        self.assertIn(b"Saldo ativo de Forecast", response.data)
-        self.assertIn(b"CONVERTIDO EM O.S.", response.data)
-        self.assertIn(b"O volume convertido", response.data)
+        self.assertIn("Programação de veículos".encode(), response.data)
+        self.assertIn(b"AG. ACEITE", response.data)
+        self.assertIn(b"AG. CHEGADA", response.data)
+        self.assertIn(b"/api/erp/programacao-comercial", response.data)
+        self.assertNotIn(b"Novo Forecast", response.data)
 
     def test_forecast_list_returns_metrics(self):
         rows = [{"status": "ATIVO", "tipo_demanda": "PREVISAO_DEMANDA", "quantidade_planejada": 2}]

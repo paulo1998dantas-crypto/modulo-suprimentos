@@ -136,14 +136,14 @@ class PcpNeedsReportTests(unittest.TestCase):
         os_row = next(row for row in rows if row[0] == "O.S.")
         confirmed_forecast = next(
             row for row in rows
-            if row[0] == "FORECAST" and "CONFIRMADO" in row[2]
+            if row[0] == "FORECAST LEGADO" and "CONFIRMADO" in row[2]
         )
         predictive_forecast = next(
             row for row in rows
-            if row[0] == "FORECAST" and "PREDITIVO" in row[2]
+            if row[0] == "FORECAST LEGADO" and "PREDITIVO" in row[2]
         )
         self.assertEqual("3100", str(os_row[5]))
-        self.assertEqual(date(2026, 8, 15), os_row[4])
+        self.assertEqual(date(2026, 8, 15), os_row[4].date() if hasattr(os_row[4], "date") else os_row[4])
         self.assertEqual("dd/mm/yyyy", workbook["Necessidades PCP"]["E5"].number_format)
         self.assertEqual(3, os_row[14])
         self.assertEqual(4, confirmed_forecast[14])
