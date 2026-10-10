@@ -1617,7 +1617,9 @@ resumo.classList.add("is-warning");
 
 function preencherItensDoForecastOS(forecast, quantidade){
 const tabela = document.getElementById("tabela_os");
-const itens = Array.isArray(forecast.itens_planejados) ? forecast.itens_planejados : [];
+const opcoesComerciais = (forecast.dados_planejamento || {}).comercial_opcoes_os;
+const itens = opcoesComerciais?.version === 1 && Array.isArray(opcoesComerciais.document_lines)
+? opcoesComerciais.document_lines : (Array.isArray(forecast.itens_planejados) ? forecast.itens_planejados : []);
 if (!tabela || !itens.length){
 throw new Error("O Forecast nao possui SKUs planejados. Complete o planejamento antes de converter.");
 }
@@ -1645,6 +1647,14 @@ if (descricaoInput && item.descricao) descricaoInput.value = item.descricao;
 if (unidadeInput && item.unidade) unidadeInput.value = item.unidade;
 atualizarFornecedorDiretoLinha(row);
 atualizarLuminariaLinhaOS(row, { semPopup: true });
+if (opcoesComerciais?.version === 1 && item.technical_options?.root_sku === codigo){
+const escolhas = item.technical_options;
+const setEscolha = (name,value) => { const input=row.querySelector(`input[name="${name}[]"]`);if(input)input.value=value; };
+setEscolha('os_fornecedor_item',item.fornecedor || '');
+setEscolha('os_luminaria',escolhas.luminaria?.codigo || '');
+setEscolha('os_luminaria_qtd',escolhas.luminaria?.codigo === '__NAO_APLICAVEL__' ? '0' : escolhas.luminaria?.qtd ? String(parseNumber(escolhas.luminaria.qtd)*quantidade) : '');
+setEscolha('os_popup_itens',JSON.stringify((escolhas.selections || []).map(s=>({...s,qtd:s.codigo === '__NAO_APLICAVEL__' ? '0' : String(parseNumber(s.qtd)*quantidade)}))));
+}
 });
 osComposicaoSource = "bom";
 renderComponentes();

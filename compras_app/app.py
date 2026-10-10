@@ -69,6 +69,7 @@ from air_productivity_report import (
     prepare_air_productivity_data,
 )
 from calculos import calcular_total_item
+from commercial_options import document_lines as commercial_document_lines,choices_for_lines,merge_choices
 from composicao import (
     consolidar_componentes_por_codigo,
     expandir_composicao_manual,
@@ -6956,7 +6957,10 @@ def gerar_os():
         )
     )
     if aplicar_itens_do_forecast:
-        itens_forecast = forecast.get("itens_planejados") or []
+        try:
+            itens_forecast = commercial_document_lines(forecast)
+        except ValueError as exc:
+            return str(exc),409
         if not itens_forecast:
             return "O Forecast nao possui SKUs planejados. Complete o Forecast antes de gerar a O.S.", 400
         codigos_enviados = list(codigos)
@@ -6992,6 +6996,12 @@ def gerar_os():
         popup_itens_linha = _realinhar_valores_linha_por_codigo(
             codigos_enviados, popup_itens_enviados, codigos, "[]"
         )
+        try:
+            defaults=choices_for_lines(forecast,codigos,forecast_quantidade)
+            fornecedores_linha,luminarias_linha,luminarias_qtd_linha,popup_itens_linha=merge_choices(
+                defaults,fornecedores_linha,luminarias_linha,luminarias_qtd_linha,popup_itens_linha)
+        except ValueError as exc:
+            return str(exc),409
         line_ids = [""] * len(codigos)
     luminarias_extra = []
     popup_itens_extra = []
