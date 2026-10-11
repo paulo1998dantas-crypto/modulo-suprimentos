@@ -1557,35 +1557,38 @@ def carregar_programacao_comercial(force=False):
         complements=sorted((x for x in proposals if x.get('parent_id')==p.get('id') and x.get('kind')=='COMPLEMENTAR' and x.get('emitted_at') and x.get('status')!='CANCELADA'),key=lambda x:(_clean(x.get('created_at')),_clean(x.get('id'))))
         p['programming_number']=p['display_number']+''.join(' > '+_clean(x.get('number')) for x in complements)
     forecasts = {_clean(f.get("id")): f for f in carregar_forecasts(force=force)}
-    # VIN lookup is read-only: ambiguous arrivals are exposed, never guessed.
-    vins = {_clean(p.get("chassi")).upper() for p in programs if p.get("chassi")}
+    # A VIN can have multiple visits. Only persisted MES/PCP entry identifiers
+    # establish ownership; a single VIN match is not implicit authorization.
+    entry_ids = {_clean(p.get("vehicle_entry_id") or (forecasts.get(_clean(p.get("forecast_id"))) or {}).get("vehicle_entry_id")) for p in programs}
+    entry_ids.discard("")
     live = {}
-    if vins:
+    if entry_ids:
         vehicles = _all_rows("erp_vehicles", select="id,chassi", cache_key="commercial_pcp_vehicles", force=force)
-        ids = {_clean(v.get("id")): _clean(v.get("chassi")).upper() for v in vehicles if _clean(v.get("chassi")).upper() in vins}
+        ids = {_clean(v.get("id")): _clean(v.get("chassi")).upper() for v in vehicles}
         entries = _all_rows("erp_vehicle_entries", select="id,item_number,vehicle_id,status", cache_key="commercial_pcp_entries", force=force)
         orders = _all_rows("erp_work_orders", select="id,vehicle_entry_id,numero_os,proposta_numero,status,is_current", extra_query=[("is_current","eq.true")], cache_key="commercial_pcp_orders", force=force)
         by_entry = {}
         for order in orders: by_entry.setdefault(_clean(order.get("vehicle_entry_id")), []).append(order)
         for entry in entries:
             vin = ids.get(_clean(entry.get("vehicle_id")))
-            if vin and _clean(entry.get("status")).upper() not in {"CANCELADO","EXCLUIDO","EXCLUÍDO"}:
-                live.setdefault(vin, []).append((entry, by_entry.get(_clean(entry.get("id")), [])))
+            if _clean(entry.get("id")) in entry_ids and vin and _clean(entry.get("status")).upper() not in {"CANCELADO","EXCLUIDO","EXCLUÍDO"}:
+                live[_clean(entry.get("id"))] = (entry, by_entry.get(_clean(entry.get("id")), []), vin)
     result = []
     for program in programs:
         proposal = by_proposal.get(_clean(program.get("proposal_id")))
         if not proposal:
             raise SupabaseDataError("Programação sem proposta vinculada; confira o Comercial.")
         forecast = forecasts.get(_clean(program.get("forecast_id")))
-        matches = live.get(_clean(program.get("chassi")).upper(), [])
-        ambiguous = len(matches)>1 or (bool(matches) and len(matches[0][1])>1)
-        arrival = matches[0][0] if len(matches)==1 and not ambiguous else {}
-        order = matches[0][1][0] if len(matches)==1 and len(matches[0][1])==1 else {}
+        entry_id=_clean(program.get("vehicle_entry_id") or (forecast or {}).get("vehicle_entry_id"))
+        match = live.get(entry_id)
+        ambiguous = bool(match and (len(match[1])>1 or (program.get("chassi") and _clean(program["chassi"]).upper()!=match[2])))
+        arrival = match[0] if match and not ambiguous else {}
+        order = match[1][0] if match and len(match[1])==1 and not ambiguous else {}
         label=proposal['display_number']
         matched_order=bool(order and _clean(order.get('proposta_numero')).upper() in {label.upper(),proposal['programming_number'].upper()})
         status = _clean(program.get("status")) or "AG. ACEITE"
         if status not in {"CANCELADO", "FINALIZADO COMERCIAL"} and proposal.get("status") != "HISTÓRICA":
-            arrived = not ambiguous and bool(arrival or program.get("vehicle_entry_id") or (forecast or {}).get("vehicle_entry_id"))
+            arrived = not ambiguous and bool(arrival)
             released = bool(program.get("released_at"))
             accepted = bool(proposal.get("accepted_at") and proposal.get("accepted_date"))
             status = "FINALIZADO COMERCIAL" if arrived and released and accepted else "AG. CHEGADA" if released and accepted else "AG. ACEITE"
@@ -1593,7 +1596,7 @@ def carregar_programacao_comercial(force=False):
                        "considerar_forecast":(forecast or {}).get('dados_planejamento',{}).get('pcp_considerar',True),
                        "proposal_matches_order":matched_order,
                        "item_number":arrival.get("item_number"), "number_os":order.get("numero_os") if matched_order else None, "production_status":order.get("status") or "SEM O.S.",
-                       "current_vehicle_entry_id":arrival.get("id") or program.get("vehicle_entry_id"), "current_work_order_id":order.get("id") if matched_order else None,
+                       "current_vehicle_entry_id":arrival.get("id"), "current_work_order_id":order.get("id") if matched_order else None,
                        "integration_conflict":ambiguous})
     try:
         archives=_all_rows('comercial_programacao_historico_pcp',select='id,payload',cache_key='comercial_programming_history_pcp',force=force)

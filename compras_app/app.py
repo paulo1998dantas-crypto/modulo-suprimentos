@@ -9764,6 +9764,18 @@ def _normalize_work_order_banks(
     return payload
 
 
+@app.route("/api/erp/os-management/entries/<entry_id>/commercial-proposals")
+@login_required
+@erp_feature_required
+@permission_required("suprimentos.work_order.manage")
+def erp_entry_commercial_proposals_proxy(entry_id):
+    try:
+        query = urllib.parse.urlencode({"search": request.args.get("search", "")})
+        return jsonify(_erp_mes_request(f"vehicle-entries/{entry_id}/commercial-proposals?{query}"))
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 409
+
+
 @app.route("/api/erp/os-management/documents")
 @login_required
 @erp_feature_required

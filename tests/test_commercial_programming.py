@@ -7,9 +7,9 @@ os.environ['SUPRIMENTOS_FILE_LOG']='0'
 import supabase_data as data
 
 
-def test_board_is_readonly_and_auto_links_arrival():
+def test_board_is_readonly_and_uses_selected_entry():
     sources={
-      'comercial_programacao':[{'id':'p1','proposal_id':'q1','sequence':1,'chassi':'VIN','status':'AG. CHEGADA','programmed_at':'today','released_at':'today'}],
+      'comercial_programacao':[{'id':'p1','proposal_id':'q1','sequence':1,'chassi':'VIN','vehicle_entry_id':'e1','work_order_id':'w1','status':'AG. CHEGADA','programmed_at':'today','released_at':'today'}],
       'comercial_propostas':[{'id':'q1','number':'1','status':'ACEITA','accepted_at':'today','accepted_date':'today'}],
       'erp_vehicles':[{'id':'v1','chassi':'VIN'}],
       'erp_vehicle_entries':[{'id':'e1','vehicle_id':'v1','item_number':3185,'status':'EM PRODUÇÃO'}],
@@ -25,6 +25,24 @@ def test_board_is_readonly_and_auto_links_arrival():
     assert board[0]['commercial_status']=='FINALIZADO COMERCIAL'
     assert board[0]['current_work_order_id']=='w1' and board[0]['item_number']==3185
     request.assert_not_called()
+
+
+def test_board_repeated_vin_does_not_infer_a_visit():
+    sources={
+      'comercial_programacao':[{'id':'p','proposal_id':'q','chassi':'VIN','status':'AG. CHEGADA','released_at':'today'}],
+      'comercial_propostas':[{'id':'q','number':'2','accepted_at':'today','accepted_date':'today'}],
+      'erp_vehicles':[{'id':'v','chassi':'VIN'}],
+      'erp_vehicle_entries':[{'id':'e1','vehicle_id':'v','item_number':1},{'id':'e2','vehicle_id':'v','item_number':2}],
+      'erp_work_orders':[{'id':'w1','vehicle_entry_id':'e1','numero_os':'1','proposta_numero':'1'},
+                         {'id':'w2','vehicle_entry_id':'e2','numero_os':'2','proposta_numero':'2'}],
+    }
+    with patch.object(data,'_all_rows',side_effect=lambda table,**kw:sources.get(table,[])),patch.object(data,'carregar_forecasts',return_value=[]):
+        board=data.carregar_programacao_comercial()
+        assert board[0]['item_number'] is None and board[0]['commercial_status']=='AG. CHEGADA'
+        sources['comercial_programacao'][0].update(vehicle_entry_id='e2',work_order_id='w2')
+        board=data.carregar_programacao_comercial()
+        assert board[0]['item_number']==2 and board[0]['current_work_order_id']=='w2'
+        assert board[0]['commercial_status']=='FINALIZADO COMERCIAL'
 
 
 def test_report_avoids_double_count_and_uses_current_commercial_status():
