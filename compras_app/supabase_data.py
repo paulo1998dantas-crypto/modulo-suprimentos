@@ -1557,16 +1557,34 @@ def carregar_programacao_comercial(force=False):
         complements=sorted((x for x in proposals if x.get('parent_id')==p.get('id') and x.get('kind')=='COMPLEMENTAR' and x.get('emitted_at') and x.get('status')!='CANCELADA'),key=lambda x:(_clean(x.get('created_at')),_clean(x.get('id'))))
         p['programming_number']=p['display_number']+''.join(' > '+_clean(x.get('number')) for x in complements)
     forecasts = {_clean(f.get("id")): f for f in carregar_forecasts(force=force)}
-    # A VIN can have multiple visits. Only persisted MES/PCP entry identifiers
-    # establish ownership; a single VIN match is not implicit authorization.
+    from arrival_recognition import arrival_candidates
+    # Include competitors outside the PCP filter before recognizing any arrival.
+    owners = _all_rows("comercial_programacao",
+        select="id,chassi,included,status,proposal_id,programmed_at,vehicle_entry_id,work_order_id,forecast_id",
+        extra_query=[("included","eq.true"),("status","neq.CANCELADO")],
+        cache_key="commercial_arrival_owners",force=force)
+    for owner in owners:
+        p=by_proposal.get(_clean(owner.get("proposal_id")), {})
+        owner["proposal_status"]=p.get("status")
+        owner["proposal_kind"]=p.get("kind")
+        owner["forecast_entry_id"]=(forecasts.get(_clean(owner.get("forecast_id"))) or {}).get("vehicle_entry_id")
     entry_ids = {_clean(p.get("vehicle_entry_id") or (forecasts.get(_clean(p.get("forecast_id"))) or {}).get("vehicle_entry_id")) for p in programs}
     entry_ids.discard("")
     live = {}
-    if entry_ids:
-        vehicles = _all_rows("erp_vehicles", select="id,chassi", cache_key="commercial_pcp_vehicles", force=force)
+    candidates = {}
+    if programs:
+        vehicles = _all_rows("erp_vehicles", select="id,chassi,mmv,marca,modelo,versao,chassi_completo", cache_key="commercial_pcp_vehicles", force=force)
         ids = {_clean(v.get("id")): _clean(v.get("chassi")).upper() for v in vehicles}
-        entries = _all_rows("erp_vehicle_entries", select="id,item_number,vehicle_id,status", cache_key="commercial_pcp_entries", force=force)
+        physical = {_clean(v.get("id")):v for v in vehicles}
+        entries = _all_rows("erp_vehicle_entries", select="id,item_number,vehicle_id,status,data_chegada,created_at", cache_key="commercial_pcp_entries", force=force)
         orders = _all_rows("erp_work_orders", select="id,vehicle_entry_id,numero_os,proposta_numero,status,is_current", extra_query=[("is_current","eq.true")], cache_key="commercial_pcp_orders", force=force)
+        for entry in entries:
+            v=physical.get(_clean(entry.get("vehicle_id")), {})
+            entry["entry_chassi"]=v.get("chassi")
+            entry["chassi_completo"]=v.get("chassi_completo")
+            entry["mmv_mes"]=_clean(v.get("mmv")) or " ".join(_clean(v.get(k)) for k in ("marca","modelo","versao") if _clean(v.get(k)))
+        candidates=arrival_candidates(owners,entries,orders)
+        entry_ids.update(c["entry_id"] for c in candidates.values() if c.get("entry_id"))
         by_entry = {}
         for order in orders: by_entry.setdefault(_clean(order.get("vehicle_entry_id")), []).append(order)
         for entry in entries:
@@ -1580,6 +1598,8 @@ def carregar_programacao_comercial(force=False):
             raise SupabaseDataError("Programação sem proposta vinculada; confira o Comercial.")
         forecast = forecasts.get(_clean(program.get("forecast_id")))
         entry_id=_clean(program.get("vehicle_entry_id") or (forecast or {}).get("vehicle_entry_id"))
+        candidate=candidates.get(_clean(program.get("id")), {}) if not entry_id else {}
+        entry_id=entry_id or candidate.get("entry_id")
         match = live.get(entry_id)
         ambiguous = bool(match and (len(match[1])>1 or (program.get("chassi") and _clean(program["chassi"]).upper()!=match[2])))
         arrival = match[0] if match and not ambiguous else {}
@@ -1592,10 +1612,18 @@ def carregar_programacao_comercial(force=False):
             released = bool(program.get("released_at"))
             accepted = bool(proposal.get("accepted_at") and proposal.get("accepted_date"))
             status = "FINALIZADO COMERCIAL" if arrived and released and accepted else "AG. CHEGADA" if released and accepted else "AG. ACEITE"
+        awaiting_os=bool(arrival and not order and not ambiguous and program.get("released_at")
+            and program.get("programmed_at") and proposal.get("accepted_at") and proposal.get("accepted_date")
+            and status!="CANCELADO" and proposal.get("status") not in {"CANCELADA","SUBSTITUÍDA"}
+            and _clean(arrival.get("status")).upper().replace("_"," ") not in {"CANCELADO","EXCLUIDO","EXCLUÍDO","RETIRADA","RETIRADO","ENTREGUE"})
         result.append({**program, "proposal": {**proposal,"display_number":label}, "forecast": forecast, "commercial_status": status,
                        "considerar_forecast":(forecast or {}).get('dados_planejamento',{}).get('pcp_considerar',True),
                        "proposal_matches_order":matched_order,
-                       "item_number":arrival.get("item_number"), "number_os":order.get("numero_os") if matched_order else None, "production_status":order.get("status") or "SEM O.S.",
+                       "item_number":arrival.get("item_number"), "number_os":order.get("numero_os") if matched_order else None, "production_status":order.get("status") or ("AGUARDANDO O.S." if arrival else "SEM CHEGADA"),
+                       "arrived":bool(arrival), "arrival_inferred":bool(candidate.get("arrival_inferred")),
+                       "arrival_date":arrival.get("data_chegada") or arrival.get("created_at"),
+                       "mmv_mes":arrival.get("mmv_mes"), "awaiting_os":awaiting_os,
+                       "integration_warning":candidate.get("arrival_warning") or ("CHEGADA IDENTIFICADA POR CHASSI ÚNICO" if candidate.get("arrival_inferred") else ""),
                        "current_vehicle_entry_id":arrival.get("id"), "current_work_order_id":order.get("id") if matched_order else None,
                        "integration_conflict":ambiguous})
     try:

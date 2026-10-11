@@ -34,6 +34,19 @@ em toda requisição, sem reutilizar a matriz de permissões em cache.
 Assim, desativacao de usuario ou alteracao de acesso feita na gestao central do
 Estoque passa a valer sem recriar usuarios nos outros modulos.
 
+## Programação comercial e chegada no PCP
+
+O painel consulta novamente Comercial/MES ao atualizar e distingue chegada
+identificada de vínculo definitivo com a O.S. Chassi completo exatamente igual,
+uma única entrada física, uma única proposta concorrente e ausência de O.S.
+permitem reconhecer a chegada em leitura. Visitas repetidas/concorrência exigem
+confirmação manual; o painel não escolhe a primeira ocorrência.
+
+O filtro AGUARDANDO O.S. mostra veículo presente, proposta aceita, programada e
+liberada ao PCP, ainda sem O.S. ITEM JI, chegada real e MMV vêm do MES. A chegada
+sozinha não converte nem retira a demanda do Forecast. A confirmação operacional
+continua no MES/PCP, com auditoria, preservando estoque e apontamentos.
+
 ## Gestao de documentos
 
 O modulo permite salvar O.C. e O.S. sem gerar arquivos, editar registros existentes, emitir/reemitir, concluir tecnicamente, cancelar, excluir e exportar relatorios detalhados em Excel. Rascunhos do navegador e importacoes temporarias sao isolados pelo login; o dashboard e a base emitida continuam compartilhados.
