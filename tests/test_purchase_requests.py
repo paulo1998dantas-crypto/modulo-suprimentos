@@ -54,7 +54,7 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertIn("purchase_requests_compact.css", text)
         self.assertIn("Qtd. / necessidade", text)
         self.assertNotIn("<th>Solicitada em</th>", text)
-        self.assertIn("20261008-excel", text)
+        self.assertIn("20261011-situacao", text)
 
     def test_excel_proxy_forwards_filters_but_not_page(self):
         for role in ("COMPRADOR", "PCP"):
