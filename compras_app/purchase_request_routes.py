@@ -59,10 +59,11 @@ def register(app, stock_request, get_user, can, login_required, feature_required
     @feature_required
     def screen():
         user = get_user()
-        can_submit = bool(role_codes(user) & {"ADMIN", "PCP"} and can("suprimentos.work_order.manage"))
+        can_edit_origin = bool(role_codes(user) & {"ADMIN", "PCP"} and can("suprimentos.work_order.manage"))
+        can_submit = bool("PCP" in role_codes(user) and can("suprimentos.work_order.manage"))
         return render_template("purchase_requests.html", current_user=user, request_config={
             "api":"/api/erp/purchase-requests", "origin":"PCP",
-            "can_submit":can_submit, "can_edit_origin":can_submit,
+            "can_submit":can_submit, "can_edit_origin":can_edit_origin,
             "can_manage":buyer_allowed(user, can), "user_id":user.get("id"),
             "csrf":csrf_token(), "purchases_url":"/?tab=gestao-oc"})
 
@@ -114,8 +115,8 @@ def register(app, stock_request, get_user, can, login_required, feature_required
                     action = (request.get_json(silent=True) or {}).get("action")
                     if not buyer_allowed(user,can) and action not in {"EDITAR", "EXCLUIR"}:
                         raise PermissionError("Somente o comprador (ou administrador) pode tratar solicitações.")
-                elif not role_codes(user) & {"ADMIN","PCP"} or not can("suprimentos.work_order.manage"):
-                    raise PermissionError("Seu perfil não pode solicitar pelo PCP.")
+                elif "PCP" not in role_codes(user) or not can("suprimentos.work_order.manage"):
+                    raise PermissionError("Somente usuários com o perfil PCP podem incluir solicitações de compra.")
             if suffix.endswith(("/history","/action","/orders")):
                 suffix = str(UUID(suffix.split("/")[0]))+"/"+suffix.split("/")[1]
             path="purchase-requests"+("/"+suffix if suffix else "")

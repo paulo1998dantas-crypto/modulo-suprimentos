@@ -93,6 +93,28 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertEqual("purchase-requests",proxy.call_args.args[0])
         self.assertEqual("POST",proxy.call_args.args[1])
 
+    def test_only_explicit_pcp_role_can_submit_not_admin_or_buyer(self):
+        for role in ("ADMIN", "ADM", "COMPRADOR", "OPERADOR", "COMERCIAL"):
+            with self.subTest(role=role):
+                self.role(role)
+                with patch.object(mod,"_erp_stock_request") as proxy:
+                    response=self.client.post("/api/erp/purchase-requests",json={
+                        "sku_codigo":"MAT-001", "roles":["PCP"]},
+                        headers={"X-CSRF-Token":"csrf"})
+                self.assertEqual(403,response.status_code)
+                proxy.assert_not_called()
+                page=self.client.get("/erp/solicitacoes").get_data(as_text=True)
+                self.assertIn('"can_submit": false',page)
+
+    def test_admin_and_pcp_combined_roles_can_submit(self):
+        with self.client.session_transaction() as sess:
+            sess["suprimentos_user"]=dict(sess["suprimentos_user"],roles=["ADMIN","PCP"])
+        with patch.object(mod,"_erp_stock_request",return_value={"ok":True}) as proxy:
+            response=self.client.post("/api/erp/purchase-requests",json={"sku_codigo":"MAT-001"},
+                headers={"X-CSRF-Token":"csrf"})
+        self.assertEqual(200,response.status_code)
+        proxy.assert_called_once()
+
     def test_work_order_lookup_and_multiple_references_are_forwarded(self):
         self.role("PCP")
         work_orders=[str(uuid4()),str(uuid4())]
