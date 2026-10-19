@@ -9764,6 +9764,26 @@ def _normalize_work_order_banks(
     return payload
 
 
+def _manual_work_order_proposal(payload):
+    """Keep the PCP reference independent from Commercial enrollment.
+
+    Drop selection metadata from stale clients so the MES cannot replace the
+    typed reference with a Commercial label. Existing links are not deleted.
+    Missing proposal fields remain missing on partial updates.
+    """
+    for key in ("commercial_program_id", "commercial_program_version", "commercial_link_reason"):
+        payload.pop(key, None)
+    if "proposta_numero" in payload:
+        value = payload["proposta_numero"]
+        if value is not None and not isinstance(value, str):
+            raise ValueError("Informe a proposta como texto.")
+        proposal = (value or "").strip()
+        if len(proposal) > 80:
+            raise ValueError("A referência da proposta deve ter no máximo 80 caracteres.")
+        payload["proposta_numero"] = proposal or None
+    return payload
+
+
 @app.route("/api/erp/os-management/entries/<entry_id>/commercial-proposals")
 @login_required
 @erp_feature_required
@@ -9891,6 +9911,7 @@ def erp_vehicle_entry_delete_proxy(entry_id):
 def erp_work_order_create_proxy(entry_id):
     try:
         payload = dict(request.get_json(silent=True) or {})
+        _manual_work_order_proposal(payload)
         # Forecast is consumed exclusively by successful documentary O.S.
         # emission. Allocation in MES must never decrement it again.
         payload.pop("forecast_id", None)
@@ -9911,6 +9932,7 @@ def erp_work_order_create_proxy(entry_id):
 def erp_work_order_update_proxy(work_id):
     try:
         payload = dict(request.get_json(silent=True) or {})
+        _manual_work_order_proposal(payload)
         original_code = str(payload.pop("original_codigo_banco", "") or "").strip()
         original_description = str(
             payload.pop("original_conjunto_bancos", "") or ""
@@ -9964,6 +9986,8 @@ def erp_work_order_historical_correction_proxy(work_id):
         if not reason:
             raise ValueError("Informe o motivo da correção histórica da O.S.")
         work_payload = dict(payload.get("work_order") or {})
+        _manual_work_order_proposal(work_payload)
+        _manual_work_order_proposal(payload)
         original_code = str(payload.pop("original_codigo_banco", "") or "").strip()
         original_description = str(
             payload.pop("original_conjunto_bancos", "") or ""

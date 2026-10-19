@@ -5,13 +5,14 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class ProposalSelectionTests(unittest.TestCase):
-    def test_opening_sends_explicit_id_version_not_chassis_lookup(self):
+    def test_pcp_uses_free_text_without_a_commercial_selection(self):
         source=(ROOT/'compras_app/templates/erp_gestao_os.html').read_text(encoding='utf-8')
-        for token in ('data.commercial_program_id=row.id','data.commercial_program_version=row.version',
-                      'allocationProposals.entry!==form.elements.entry_id.value',
-                      'ticket!==allocationProposals.ticket','name="proposta_numero" readonly'):
-            self.assertIn(token,source)
-        self.assertNotIn("r.linked?'selected':''",source)
+        self.assertIn('name="proposta_numero" type="text" maxlength="80"',source)
+        self.assertIn('Texto livre. Não exige cadastro ou atualização no Comercial.',source)
+        self.assertNotIn('name="proposta_numero" readonly',source)
+        for token in ('allocation-proposal-select','loadAllocationProposals',
+                      'proposalSelectionPayload','data.commercial_program_id'):
+            self.assertNotIn(token,source)
 
     def test_proxy_requires_manage_permission_and_uses_mes_entry(self):
         source=(ROOT/'compras_app/app.py').read_text(encoding='utf-8')

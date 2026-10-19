@@ -98,8 +98,7 @@
         <label class="span4" id="document-allocation-label"><span>Documento de O.S. emitido (opcional)</span><select name="document_id" id="document-select"></select><small id="document-link-hint" class="muted">Selecione o documento emitido que pertence a este ITEM/chassi. O Forecast já foi abatido na emissão do DOCX e não será consumido novamente nesta alocação.</small></label>
         <div class="section-title"><strong>Dados comerciais da O.S.</strong><small class="muted">O cliente é definido exclusivamente nos dados da entrada do veículo.</small></div>
         <label class="required"><span>Tipo de serviço</span><select name="tipo_servico" data-required><option value="TRANSFORMAÇÃO">TRANSFORMAÇÃO</option><option value="PÓS-VENDA">PÓS-VENDA</option><option value="INSTALAÇÃO_DE_ACESSÓRIO">INSTALAÇÃO DE ACESSÓRIO</option><option value="RETORNO">RETORNO</option><option value="OUTRO">OUTRO</option><option value="N/A">N/A — não aplicável</option></select></label>
-        <label><span>Proposta vigente</span><input name="proposta_numero" readonly><small>O vínculo usa o ITEM/O.S., nunca o chassi sozinho.</small></label>
-        <label class="span4"><span>Selecionar proposta comercial / veículo</span><input id="allocation-proposal-search" type="search" placeholder="Buscar número da proposta, cliente ou destino"><button class="btn" type="button" onclick="loadAllocationProposals()">Buscar propostas</button><select id="allocation-proposal-select"><option value="">Manter referência / sem novo vínculo</option></select><small id="allocation-proposal-hint">Selecione e confira a vaga comercial antes de salvar.</small></label>
+        <label><span>Proposta</span><input name="proposta_numero" type="text" maxlength="80" placeholder="Informe o número ou referência da proposta"><small>Texto livre. Não exige cadastro ou atualização no Comercial.</small></label>
         <label><span>Data de aprovação</span><input name="data_aprovacao" type="date"></label>
         <label><span>Vendedor</span><select name="vendedor"></select></label>
         <label><span>Mercado</span><select name="mercado"></select></label>
@@ -307,13 +306,13 @@ function openWork(entryId,createRevision=false){
   const technicalButton=document.getElementById('technical-close-button');technicalButton.hidden=!(permissions.technical&&row.work_order_id);technicalButton.disabled=row.technical_status==='CONCLUIDA'||row.status==='CANCELADA';technicalButton.textContent=row.technical_status==='CONCLUIDA'?'Técnica concluída':'Conclusão técnica';
   const correctionButton=document.getElementById('correct-historical-button'),correctionReasonLabel=document.getElementById('historical-correction-reason-label'),correctionReason=document.getElementById('historical-correction-reason');
   correctionReasonLabel.hidden=true;correctionReason.disabled=true;correctionButton.hidden=!(permissions.manage&&row.work_order_id&&!editable);correctionButton.disabled=false;correctionButton.textContent='Corrigir dados históricos';
-  loadAllocationProposals();checkMissing();if(!workDialog.open)workDialog.showModal();
+  checkMissing();if(!workDialog.open)workDialog.showModal();
 }
 document.getElementById('transformation-select').addEventListener('change',event=>{if(event.target.value!=='__LEGACY__'){fill('transformacao_codigo',event.target.value);fill('transformacao',transformationDescription(event.target.value))}checkMissing()});
 document.getElementById('bank-add').addEventListener('click',addSelectedBank);
 document.getElementById('bank-search').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();addSelectedBank()}});
 document.getElementById('document-select').addEventListener('change',event=>{const document=state.documents.find(item=>String(item.id)===String(event.target.value));document.getElementById('document-link-hint').textContent=document?`Ao salvar, o Documento O.S. ${document.numero} será vinculado ao ITEM ${state.active?.item_number||''} / chassi ${state.active?.chassi||''}.`:'A O.S. operacional será mantida sem documento vinculado.'});
-function workPayload(){syncBankFields();const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;delete data.cliente_nome;delete data.historical_correction_reason;delete data.forecast_id;const workId=data.work_order_id;delete data.work_order_id;Object.keys(data).filter(key=>key.startsWith('entry_')).forEach(key=>delete data[key]);if(workId){data.original_codigo_banco=state.bankOriginal.code;data.original_conjunto_bancos=state.bankOriginal.description}if(state.creatingRevision){data.create_replacement=true;data.supersedes_work_order_id=state.replacementSourceId}const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}const bankCode=String(data.codigo_banco||'').trim(),legacyChanged=state.selectedBanks.some(item=>item.legacy)&&norm(bankCode)!==norm(state.bankOriginal.code);if(legacyChanged)throw new Error('Remova o código legado não localizado ou restaure a seleção original antes de salvar.');proposalSelectionPayload(data);Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
+function workPayload(){syncBankFields();const data=Object.fromEntries(new FormData(form).entries());delete data.entry_id;delete data.cliente_nome;delete data.historical_correction_reason;delete data.forecast_id;const workId=data.work_order_id;delete data.work_order_id;Object.keys(data).filter(key=>key.startsWith('entry_')).forEach(key=>delete data[key]);if(workId){data.original_codigo_banco=state.bankOriginal.code;data.original_conjunto_bancos=state.bankOriginal.description}if(state.creatingRevision){data.create_replacement=true;data.supersedes_work_order_id=state.replacementSourceId}const transformationValue=document.getElementById('transformation-select').value;if(transformationValue==='__LEGACY__'){data.transformacao_codigo=form.elements.transformacao_codigo.value;data.transformacao=form.elements.transformacao.value}else{data.transformacao_codigo=transformationValue;data.transformacao=transformationDescription(transformationValue)}const bankCode=String(data.codigo_banco||'').trim(),legacyChanged=state.selectedBanks.some(item=>item.legacy)&&norm(bankCode)!==norm(state.bankOriginal.code);if(legacyChanged)throw new Error('Remova o código legado não localizado ou restaure a seleção original antes de salvar.');Object.keys(data).forEach(key=>{if(data[key]==='')data[key]=null});return data}
 function entryPayload(){return {chassi:form.elements.entry_chassi.value,marca:form.elements.entry_marca.value,modelo:form.elements.entry_modelo.value,versao:form.elements.entry_versao.value,modelo_veicular:form.elements.entry_modelo_veicular.value,avarias:form.elements.entry_avarias.value,cliente_nome:form.elements.entry_cliente_nome.value,observacoes:form.elements.entry_observacoes.value}}
 function historicalEntryPayload(){
   const values=entryPayload(),current={chassi:state.active?.chassi,marca:state.active?.marca,modelo:state.active?.modelo,versao:state.active?.versao,modelo_veicular:state.active?.modelo_veicular,avarias:state.active?.avarias,cliente_nome:state.active?.entry_client,observacoes:state.active?.entry_notes},changed={};
@@ -425,26 +424,6 @@ async function openMaterials(workId,number){
     document.getElementById('materials-pending-rows').innerHTML=needs.length?needs.map((line,index)=>`<tr><td>${esc(line.codigo||'—')}</td><td>${esc(line.descricao||'—')}</td><td>${esc(line.unidade||'—')}</td><td>${date(line.data_entrega_os)}</td><td>${esc(qty(line.quantidade_necessaria))}</td><td>${esc(qty(line.quantidade_coberta))}</td><td><strong>${esc(qty(line.quantidade_pendente))}</strong></td><td>${sharedPoolCell(line)}</td><td>${esc(line.setor||'—')}</td><td>${permissions.poolAdmin&&sharedCandidates(line).length?`<button class="btn success" type="button" onclick="openSharedConsumption(${index})">Baixar do fluxo</button>`:'<span class="muted">Somente consulta</span>'}</td></tr>`).join(''):'<tr><td colspan="10" class="empty">Nenhuma pendência ativa: necessidade coberta ou O.S. tecnicamente concluída.</td></tr>';
     if(!materialsDialog.open)materialsDialog.showModal();
   }catch(error){message(error.message,true)}
-}
-const allocationProposals={ticket:0,rows:[],entry:null};
-async function loadAllocationProposals(){
- const entryId=form.elements.entry_id.value,ticket=++allocationProposals.ticket,select=document.getElementById('allocation-proposal-select');
- allocationProposals.rows=[];allocationProposals.entry=entryId;select.innerHTML='<option value="">Manter referência / sem novo vínculo</option>';
- if(!entryId||!permissions.manage)return;
- try{
-  const result=await api(`/api/erp/os-management/entries/${encodeURIComponent(entryId)}/commercial-proposals?search=${encodeURIComponent(document.getElementById('allocation-proposal-search').value)}`);
-  if(ticket!==allocationProposals.ticket||entryId!==form.elements.entry_id.value)return;
-  allocationProposals.rows=result.rows||[];
-  select.innerHTML+=allocationProposals.rows.map(r=>`<option value="${esc(r.id)}">${esc(r.proposal_number)} · ${esc(r.client_name||'Cliente a definir')} · veículo ${esc(r.sequence)} · ${esc(r.chassi||'Sem chassi')}</option>`).join('');
-  document.getElementById('allocation-proposal-hint').textContent='Ao salvar, esta vaga será vinculada somente ao ITEM '+state.active.item_number+' / O.S. deste card. Chassis repetidos de outras entradas ficam preservados.';
- }catch(e){if(ticket===allocationProposals.ticket)document.getElementById('allocation-proposal-hint').textContent=e.message}
-}
-function proposalSelectionPayload(data){
- const id=document.getElementById('allocation-proposal-select').value;if(!id)return;
- const row=allocationProposals.rows.find(r=>String(r.id)===id);
- if(!row||allocationProposals.entry!==form.elements.entry_id.value)throw Error('Atualize a lista de propostas deste ITEM.');
- data.commercial_program_id=row.id;data.commercial_program_version=row.version;
- data.commercial_link_reason='Proposta selecionada na abertura/edição da O.S. pelo PCP';
 }
 async function openCommercialAllocation(){
  const id=new URLSearchParams(location.search).get('program_id');if(!id)return;
