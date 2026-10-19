@@ -55,6 +55,26 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertIn("Qtd. / necessidade", text)
         self.assertNotIn("<th>Solicitada em</th>", text)
         self.assertIn("20261011-situacao", text)
+        self.assertIn('id="pr-complete-dialog"', text)
+        self.assertIn('id="pr-complete-order"', text)
+        self.assertIn('id="pr-complete-date"', text)
+        self.assertIn("20261019-concluir", text)
+
+    def test_completion_preserves_buyer_permission_and_audited_action(self):
+        payload = {"action": "ALOCAR_PEDIDO", "version": 7,
+                   "purchase_order_id": str(uuid4()), "reason": "Pedido atende"}
+        for role in ("COMPRADOR", "ADMIN", "PCP", "COMERCIAL"):
+            with self.subTest(role=role):
+                self.role(role)
+                with patch.object(mod, "_erp_stock_request", return_value={"ok": True}) as proxy:
+                    response = self.client.post("/api/erp/purchase-requests/"+self.id+"/action",
+                        json=payload, headers={"X-CSRF-Token": "csrf"})
+                if role in ("COMPRADOR", "ADMIN"):
+                    self.assertEqual(200, response.status_code)
+                    self.assertEqual(payload, proxy.call_args.args[2])
+                else:
+                    self.assertEqual(403, response.status_code)
+                    proxy.assert_not_called()
 
     def test_excel_proxy_forwards_filters_but_not_page(self):
         for role in ("COMPRADOR", "PCP"):

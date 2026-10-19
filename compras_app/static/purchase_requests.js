@@ -9,7 +9,7 @@ const referenceReviewLabels={VINCULADA:"Vinculada automaticamente",VINCULADA_PAR
 const date = value => !value ? "—" : /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.split("-").reverse().join("/") : new Date(value).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"});
 const qty = value => Number(value).toLocaleString("pt-BR",{maximumFractionDigits:3});
 const node = (tag,text,className) => {const n=document.createElement(tag);if(text!=null)n.textContent=text;if(className)n.className=className;return n;};
-let page=1,total=0,rows=[],key=crypto.randomUUID(),loading=false,closingAnticipationRow=null,editingRow=null,editSkuTimer=null,allocatingOrderRow=null;
+let page=1,total=0,rows=[],key=crypto.randomUUID(),loading=false,closingAnticipationRow=null,editingRow=null,editSkuTimer=null,allocatingOrderRow=null,completingRow=null;
 let loadSerial=0;
 let appliedFilters=null,exporting=false;
 function message(text,error=false){$("pr-message").textContent=text;$("pr-message").classList.toggle("pr-error",error);}
@@ -99,6 +99,7 @@ function render(){
   if(anticipation){line(order,"Saldo: "+qty(row.anticipation_pending_quantity||0)+" "+row.unidade);line(order,"Previsão: "+date(row.anticipation_delivery_date));}
   if(row.anticipation_confirmed_delivery_date)line(order,"Negociada: "+date(row.anticipation_confirmed_delivery_date));
   const actionCell=cell("Ações","pr-actions-cell");actionCell.append(button("Detalhes",()=>showDetails(row)));
+  if(cfg.can_manage&&pending)actionCell.append(button("Concluir",()=>openCompletion(row)));
   const menu=node("details",null,"pr-row-menu");menu.append(node("summary","Ações"));
   const actions=node("div",null,"pr-row-actions");actions.append(button("Histórico",()=>showHistory(row.id)));
   const isOwner=String(row.requested_by_id)===String(cfg.user_id);
@@ -248,6 +249,25 @@ async function confirmAnticipation(){
  }catch(e){message(e.message,true);}
  finally{$("pr-confirm-anticipation-save").disabled=false;}
 }
+function openCompletion(row){
+ if(!cfg.can_manage||!["SOLICITADA","EM_COMPRAS"].includes(row.status))return;
+ completingRow=row;
+ $("pr-complete-reference").textContent="SOL-"+row.id.slice(0,8).toUpperCase()+" · "+row.sku_codigo+" · "+row.descricao;
+ const anticipation=row.request_type==="ANTECIPACAO";
+ $("pr-complete-date").hidden=!(anticipation&&row.status==="EM_COMPRAS");
+ $("pr-complete-note").textContent=anticipation&&row.status==="SOLICITADA"
+  ?"Vincule um pedido válido para concluir. Para confirmar uma nova data negociada, registre primeiro a solicitação ao fornecedor em Ações."
+  :"A conclusão exige um pedido válido ou, para antecipação em compras, a confirmação da nova data negociada. A data, o responsável e o vínculo ficam registrados no histórico.";
+ $("pr-complete-dialog").showModal();
+}
+function chooseCompletion(method){
+ const row=completingRow;
+ if(!row||!cfg.can_manage||!["SOLICITADA","EM_COMPRAS"].includes(row.status))return;
+ if(method!=="order"&&!(method==="date"&&row.request_type==="ANTECIPACAO"&&row.status==="EM_COMPRAS"))return;
+ $("pr-complete-dialog").close();completingRow=null;
+ if(method==="date")openAnticipationConfirmation(row);
+ else openOrderAllocation(row);
+}
 async function openOrderAllocation(row){
  try{
   const data=await api("/"+encodeURIComponent(row.id)+"/orders");
@@ -278,6 +298,10 @@ async function act(row,action){
  try{await api("/"+encodeURIComponent(row.id)+"/action",{action,reason,version:row.version});message("Atualização registrada no histórico.");await load();}catch(e){message(e.message,true);}
 }
 $("pr-close-history").onclick=()=>$("pr-history").close();
+$("pr-complete-cancel").onclick=()=>{$("pr-complete-dialog").close();completingRow=null;};
+$("pr-complete-dialog").addEventListener("cancel",()=>{completingRow=null;});
+$("pr-complete-order").onclick=()=>chooseCompletion("order");
+$("pr-complete-date").onclick=()=>chooseCompletion("date");
 $("pr-confirm-anticipation-cancel").onclick=()=>{$("pr-confirm-anticipation").close();closingAnticipationRow=null;};
 $("pr-confirm-anticipation-save").onclick=confirmAnticipation;
 $("pr-allocate-cancel").onclick=()=>{$("pr-allocate-dialog").close();allocatingOrderRow=null;};

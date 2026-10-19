@@ -50,6 +50,15 @@
   </section>
   <dialog id="pr-details"><div class="pr-heading"><h2>Detalhes da solicitação</h2><button type="button" id="pr-close-details">Fechar</button></div><div id="pr-details-content"></div></dialog>
   <dialog id="pr-history"><div class="pr-heading"><h2>Rastreabilidade da solicitação</h2><button id="pr-close-history">Fechar</button></div><div id="pr-history-content"></div></dialog>
+  <dialog id="pr-complete-dialog" class="pr-confirm-dialog" aria-labelledby="pr-complete-title">
+    <div class="pr-heading"><h2 id="pr-complete-title">Concluir solicitação</h2><button type="button" id="pr-complete-cancel">Cancelar</button></div>
+    <p id="pr-complete-reference"></p>
+    <p id="pr-complete-note" class="pr-note"></p>
+    <div class="pr-actions">
+      <button type="button" id="pr-complete-order">Vincular pedido e concluir</button>
+      <button type="button" id="pr-complete-date" hidden>Confirmar nova data negociada</button>
+    </div>
+  </dialog>
   <dialog id="pr-confirm-anticipation" class="pr-confirm-dialog">
     <div class="pr-heading"><div><h2>Confirmar antecipação negociada</h2><p>Preencha os dados acordados com o fornecedor para encerrar a solicitação.</p></div><button type="button" id="pr-confirm-anticipation-cancel">Cancelar</button></div>
     <p id="pr-confirm-anticipation-order" class="pr-note"></p>
@@ -84,5 +93,5 @@
   </dialog>
 </section>
 <script id="pr-config" type="application/json">{{ request_config|tojson }}</script>
-<script src="/static/purchase_requests.js?v=20261011-situacao" defer></script>
+<script src="/static/purchase_requests.js?v=20261019-concluir" defer></script>
 
