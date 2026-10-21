@@ -65,6 +65,7 @@ def register(app, stock_request, get_user, can, login_required, feature_required
             "api":"/api/erp/purchase-requests", "origin":"PCP",
             "can_submit":can_submit, "can_edit_origin":can_edit_origin,
             "can_manage":buyer_allowed(user, can), "user_id":user.get("id"),
+            "can_admin":"ADMIN" in role_codes(user),
             "csrf":csrf_token(), "purchases_url":"/?tab=gestao-oc"})
 
     @bp.route("/api/erp/purchase-requests/export.xlsx")
@@ -113,7 +114,10 @@ def register(app, stock_request, get_user, can, login_required, feature_required
                 check_csrf(request.headers.get("X-CSRF-Token"))
                 if suffix:
                     action = (request.get_json(silent=True) or {}).get("action")
-                    if not buyer_allowed(user,can) and action not in {"EDITAR", "EXCLUIR"}:
+                    if action in {"EDITAR_QUANTIDADE_ADMIN", "EXCLUIR_DEFINITIVO"}:
+                        if "ADMIN" not in role_codes(user):
+                            raise PermissionError("Somente ADMIN pode corrigir quantidades históricas ou excluir definitivamente.")
+                    elif not buyer_allowed(user,can) and action not in {"EDITAR", "EXCLUIR"}:
                         raise PermissionError("Somente o comprador (ou administrador) pode tratar solicitações.")
                 elif "PCP" not in role_codes(user) or not can("suprimentos.work_order.manage"):
                     raise PermissionError("Somente usuários com o perfil PCP podem incluir solicitações de compra.")

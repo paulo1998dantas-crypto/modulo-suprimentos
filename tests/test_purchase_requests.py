@@ -58,7 +58,7 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
         self.assertIn('id="pr-complete-dialog"', text)
         self.assertIn('id="pr-complete-order"', text)
         self.assertIn('id="pr-complete-date"', text)
-        self.assertIn("20261019-concluir", text)
+        self.assertIn("20261021-admin-historico", text)
 
     def test_completion_preserves_buyer_permission_and_audited_action(self):
         payload = {"action": "ALOCAR_PEDIDO", "version": 7,
@@ -161,6 +161,30 @@ class PurchaseRequestIntegrationTests(unittest.TestCase):
     def test_no_csrf_no_action(self):
         with patch.object(mod,"_erp_stock_request") as proxy:
             response=self.client.post("/api/erp/purchase-requests/"+self.id+"/action",json={"action":"CANCELAR"})
+        self.assertEqual(403,response.status_code)
+        proxy.assert_not_called()
+
+    def test_historical_admin_actions_require_admin_and_csrf(self):
+        for role in ("ADMIN", "ADM", "COMPRADOR", "PCP", "COMERCIAL"):
+            self.role(role)
+            for action in ("EXCLUIR_DEFINITIVO", "EDITAR_QUANTIDADE_ADMIN"):
+                payload = dict(action=action, version=3, confirmation=self.id, quantity=8)
+                with self.subTest(role=role, action=action):
+                    with patch.object(mod,"_erp_stock_request",return_value={"ok":True}) as proxy:
+                        response=self.client.post("/api/erp/purchase-requests/"+self.id+"/action",
+                            json=payload,headers={"X-CSRF-Token":"csrf"})
+                    self.assertEqual(200 if role in ("ADMIN","ADM") else 403,response.status_code)
+                    if role in ("ADMIN","ADM"):
+                        self.assertEqual(payload,proxy.call_args.args[2])
+                    else:
+                        proxy.assert_not_called()
+            page=self.client.get("/erp/solicitacoes").get_data(as_text=True)
+            self.assertIn('"can_admin": '+("true" if role in ("ADMIN","ADM") else "false"),page)
+            self.assertEqual(role in ("ADMIN","ADM"),'id="pr-admin-dialog"' in page)
+        self.role("ADMIN")
+        with patch.object(mod,"_erp_stock_request") as proxy:
+            response=self.client.post("/api/erp/purchase-requests/"+self.id+"/action",
+                json={"action":"EXCLUIR_DEFINITIVO","version":1,"confirmation":self.id})
         self.assertEqual(403,response.status_code)
         proxy.assert_not_called()
 
