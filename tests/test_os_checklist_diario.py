@@ -9,7 +9,9 @@ from docx.oxml.ns import qn
 APP_DIR = Path(__file__).resolve().parents[1] / "compras_app"
 sys.path.insert(0, str(APP_DIR))
 
-from config import TEMPLATE_OS
+from config import TEMPLATE_OS, TEMPLATE_DIARIO_BORDO
+from copy import deepcopy
+from lxml import etree
 from gerar_os import (
     _celulas_unicas_linha,
     _incluir_ok_nok_por_atividade,
@@ -58,13 +60,23 @@ class ChecklistDiarioTest(unittest.TestCase):
         _inserir_diario_bordo(doc, "3211", {"chassis": "VJ687280"})
         self.assertEqual(antes, [t._tbl.xml for t in doc.tables[:-1]])
         diario = doc.tables[-1]
-        self.assertEqual("DIÁRIO DE BORDO DA O.S.", diario.cell(0, 0).text)
-        self.assertIn("3211", diario.cell(1, 0).text)
-        self.assertIn("VJ687280", diario.cell(1, 0).text)
-        self.assertEqual(19, len(diario.rows))
-        self.assertEqual(3, len(diario.columns))
-        self.assertEqual(16, len(diario.rows[3:]))
-        self.assertTrue(diario._tbl.getprevious().xpath(".//w:pageBreakBefore"))
+        modelo = Document(TEMPLATE_DIARIO_BORDO)
+        self.assertIn("Diário de bordo", " ".join(c.text for c in diario.rows[0].cells))
+        self.assertEqual(42, len(diario.rows))
+        self.assertEqual(10, len(diario.columns))
+        self.assertEqual(2, len(doc.sections))
+        for campo in ("page_width", "page_height", "top_margin", "bottom_margin", "left_margin", "right_margin"):
+            self.assertEqual(getattr(modelo.sections[0], campo), getattr(doc.sections[-1], campo))
+        self.assertFalse(doc.sections[-1].footer.is_linked_to_previous)
+        self.assertFalse(doc.sections[-1].header.is_linked_to_previous)
+        self.assertFalse(any(p.text.strip() for p in doc.sections[-1].footer.paragraphs))
+        # A tabela é a do arquivo aprovado, incluindo formas Sim/Não e duas fichas.
+        def xml_sem_ids(tabela):
+            xml = deepcopy(tabela._tbl)
+            for item in xml.xpath(".//wp:docPr"):
+                item.set("id", "0")
+            return etree.tostring(xml, method="c14n", exclusive=True)
+        self.assertEqual(xml_sem_ids(modelo.tables[0]), xml_sem_ids(diario))
         self.assertLess(doc._body._element.index(layout._tbl), doc._body._element.index(diario._tbl))
         count = len(doc.tables)
         _inserir_diario_bordo(doc, "3211", {"chassis": "VJ687280"})
@@ -76,7 +88,7 @@ class ChecklistDiarioTest(unittest.TestCase):
                 with patch("gerar_os._salvar_documento_os", side_effect=lambda doc, *a, **k: doc):
                     doc = gerar_os_docx("3211", {"chassis": "VJ687280"}, [], {}, {},
                                         composicao_resolvida=[], modo=modo)
-                diario = [t for t in doc.tables if "DIÁRIO DE BORDO DA O.S." in t.rows[0].cells[0].text]
+                diario = [t for t in doc.tables if "diário de bordo" in " ".join(c.text for c in t.rows[0].cells).casefold()]
                 self.assertEqual(1 if modo == "completa" else 0, len(diario))
                 self.assertIn("VJ687280", " ".join(c.text for t in doc.tables for r in t.rows for c in r.cells))
 

@@ -4,11 +4,13 @@ Alteração restrita à apresentação dos documentos gerados pelo Suprimentos.
 
 - Tabelas de processo: cada atividade possui duas marcações independentes,
   OK e NOK. Responsável, data, hora de início e fim continuam no cabeçalho.
-- O.S. completa: página inteira de diário de bordo após o layout, identificada
-  com número da O.S. e chassi; 16 linhas para data/hora, setor/operador e anotações.
+- O.S. completa: após o layout, anexa o arquivo aprovado `modelo_diario_bordo.docx`,
+  preservando as duas fichas, campos manuais de operador/veículo/etapa/setup/trabalho,
+  ocorrências, tempo da parada, caixas Sim/Não, dimensões e margens originais.
+  Página exclusiva com cabeçalho e rodapé vazios como no modelo fornecido.
 - Produção e preparação reutilizam o checklist por atividade. Diário não é
   acrescentado às requisições, faturamentos diretos, máscaras ou versões resumidas.
-- Os DOCX binários originais permanecem preservados; o gerador aplica a
+- Os templates anteriores permanecem preservados; o gerador aplica a
   formatação durante a emissão, incluindo reemissões. Documentos já emitidos
   não são sobrescritos automaticamente.
 - A importação DOCX/PDF é compatível com modelos antigos e com o checklist

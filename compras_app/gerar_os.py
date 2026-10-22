@@ -9,12 +9,13 @@ import pypdfium2 as pdfium
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_ROW_HEIGHT_RULE
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
+from docx.enum.section import WD_SECTION_START
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches, Pt
 
 from composicao import normalizar_componentes, resolver_composicao_final
-from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO
+from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO, TEMPLATE_DIARIO_BORDO
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
 
 logger = logging.getLogger(__name__)
@@ -516,73 +517,35 @@ def _incluir_ok_nok_por_atividade(tabela):
 
 
 def _inserir_diario_bordo(doc, numero_os, dados):
-    """Uma página de formulário após o layout, somente na O.S. completa."""
-    titulo = "DIÁRIO DE BORDO DA O.S."
-    if any(tabela.rows and titulo in tabela.rows[0].cells[0].text for tabela in doc.tables):
+    """Anexa o formulário original, sem redesenhar, somente na O.S. completa."""
+    if any(tabela.rows and "diário de bordo" in " ".join(
+        cell.text for cell in tabela.rows[0].cells
+    ).casefold() for tabela in doc.tables):
         return
-    secao = doc.sections[-1]
-    largura = secao.page_width - secao.left_margin - secao.right_margin
-    altura = secao.page_height - secao.top_margin - secao.bottom_margin
-    quebra = doc.add_paragraph()
-    quebra.paragraph_format.page_break_before = True
-    quebra.paragraph_format.space_before = Pt(0)
-    quebra.paragraph_format.space_after = Pt(0)
-    quebra.paragraph_format.line_spacing = Pt(1)
-    quebra.add_run().font.size = Pt(1)
-
-    quantidade_linhas = 16
-    tabela = doc.add_table(rows=3 + quantidade_linhas, cols=3)
-    tabela.autofit = False
-    larguras = [int(largura * 0.12), int(largura * 0.22)]
-    larguras.append(largura - sum(larguras))
-    for coluna, medida in zip(tabela.columns, larguras):
-        coluna.width = medida
-    props = tabela._tbl.tblPr
-    props.find(qn("w:tblW")).set(qn("w:w"), str(round(largura / 635)))
-    props.find(qn("w:tblW")).set(qn("w:type"), "dxa")
-    bordas = OxmlElement("w:tblBorders")
-    for lado in ("top", "left", "bottom", "right", "insideH", "insideV"):
-        borda = OxmlElement("w:" + lado)
-        for atributo, valor in (("val", "single"), ("sz", "6"), ("color", "000000")):
-            borda.set(qn("w:" + atributo), valor)
-        bordas.append(borda)
-    props.append(bordas)
-    tabela.cell(0, 0).merge(tabela.cell(0, 2)).text = titulo
-    tabela.cell(1, 0).merge(tabela.cell(1, 2)).text = (
-        f"O.S.: {numero_os}     |     CHASSI: {dados.get('chassis', '')}"
-    )
-    for cell, rotulo in zip(tabela.rows[2].cells,
-                            ("DATA / HORA", "SETOR / OPERADOR", "ANOTAÇÕES / OCORRÊNCIAS")):
-        cell.text = rotulo
-    alturas_cabecalho = (Pt(25), Pt(25), Pt(27))
-    altura_linha = int((altura - Pt(36) - sum(alturas_cabecalho)) / quantidade_linhas)
-    for idx, row in enumerate(tabela.rows):
-        row.height_rule = WD_ROW_HEIGHT_RULE.AT_LEAST
-        row.height = alturas_cabecalho[idx] if idx < 3 else altura_linha
-        row._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
-        if idx >= 2:
-            for coluna, medida in zip(row.cells, larguras):
-                coluna.width = medida
-        for cell in _celulas_unicas_linha(row):
-            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
-            if idx in (0, 2):
-                shade = OxmlElement("w:shd")
-                shade.set(qn("w:fill"), "E7E6E6")
-                cell._tc.get_or_add_tcPr().append(shade)
-            for paragraph in cell.paragraphs:
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if idx < 3 else WD_ALIGN_PARAGRAPH.LEFT
-                paragraph.paragraph_format.space_before = Pt(2)
-                paragraph.paragraph_format.space_after = Pt(2)
-                for run in paragraph.runs:
-                    run.font.name = "Calibri"
-                    run.font.size = Pt(11)
-                    run.bold = idx in (0, 2)
-    # Parágrafo obrigatório após tabela sem criar uma página extra em branco.
-    fim = doc.add_paragraph()
-    fim.paragraph_format.space_before = Pt(0)
-    fim.paragraph_format.space_after = Pt(0)
-    fim.paragraph_format.line_spacing = Pt(1)
-    fim.add_run().font.size = Pt(1)
+    modelo = Document(TEMPLATE_DIARIO_BORDO)
+    origem = modelo.sections[0]
+    secao = doc.add_section(WD_SECTION_START.NEW_PAGE)
+    for campo in ("page_width", "page_height", "orientation", "top_margin", "bottom_margin",
+                  "left_margin", "right_margin", "header_distance", "footer_distance", "gutter"):
+        setattr(secao, campo, getattr(origem, campo))
+    # A página fornecida não tem cabeçalho/rodapé. Não herdar os da O.S.
+    secao.header.is_linked_to_previous = False
+    secao.footer.is_linked_to_previous = False
+    secao.first_page_header.is_linked_to_previous = False
+    secao.first_page_footer.is_linked_to_previous = False
+    secao.even_page_header.is_linked_to_previous = False
+    secao.even_page_footer.is_linked_to_previous = False
+    body = doc._body._element
+    proximo_desenho = max((int(e.get("id", "0")) for e in body.xpath(".//wp:docPr")), default=0) + 1
+    for elemento in modelo._body._element:
+        if elemento.tag == qn("w:sectPr"):
+            continue
+        copia = deepcopy(elemento)
+        # Evita IDs de desenho duplicados com logo/layout, sem mudar as formas.
+        for desenho in copia.xpath(".//wp:docPr"):
+            desenho.set("id", str(proximo_desenho))
+            proximo_desenho += 1
+        body.insert(body.index(body.sectPr), copia)
 
 
 def _limpar_layout(tabela):

@@ -49,6 +49,7 @@ SETTINGS_FILE = os.path.join(DATA_DIR, "settings.json")
 
 TEMPLATE_WORD = os.path.join(TEMPLATE_DIR, "modelo_oc.docx")
 TEMPLATE_OS = os.path.join(TEMPLATE_DIR, "modelo_os.docx")
+TEMPLATE_DIARIO_BORDO = os.path.join(TEMPLATE_DIR, "modelo_diario_bordo.docx")
 TEMPLATE_REQUISICAO_EXPEDICAO = os.path.join(TEMPLATE_DIR, "modelo_requisicao_expedicao.docx")
 
 EMPRESA_PADRAO = "JI MONTADORA"
