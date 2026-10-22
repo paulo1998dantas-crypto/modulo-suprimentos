@@ -18,6 +18,25 @@ from processos_os import PROCESSOS_ORDEM  # noqa: E402
 
 
 class WorkOrderImportCopyTests(unittest.TestCase):
+    def test_checklist_por_atividade_nao_importa_numero_como_responsavel(self):
+        path = gerar_os_docx(
+            "OS-CHECKLIST", {"chassis": "CHASSI-CHECKLIST"}, [], {},
+            {"CORTE": [{"atividade": "Cortar perfil"},
+                       {"atividade": "Conferir corte", "responsavel": "PAULO"}]},
+            composicao_resolvida=[],
+        )
+        try:
+            parsed = app_module.parse_os_docx_atualizado(
+                SimpleNamespace(stream=io.BytesIO(Path(path).read_bytes()))
+            )
+        finally:
+            os.remove(path)
+            os.rmdir(os.path.dirname(path))
+        self.assertEqual([
+            {"atividade": "Cortar perfil", "responsavel": ""},
+            {"atividade": "Conferir corte", "responsavel": "PAULO"},
+        ], parsed["processos"]["CORTE"])
+
     def test_empty_manual_composition_is_not_recreated_in_docx(self):
         path = gerar_os_docx(
             "OS-SEM-COMPONENTES",
@@ -129,6 +148,29 @@ RESPONSÁVEL: CARLOS
         self.assertEqual(2, parsed["composicao"][1]["level"])
         self.assertEqual("COMP-1", parsed["composicao"][1]["item"])
         self.assertEqual("COMPONENTE FILHO", parsed["composicao"][1]["descricao"])
+
+    def test_pdf_checklist_e_diario_nao_viram_atividades_na_reimportacao(self):
+        texto = """PROCESSOS DE PRODUCAO ELETRICA 1:
+RESPONSAVEL DATA HORA INICIO HORA FIM
+# ATIVIDADE OK NOK
+OK
+NOK
+1 Instalar chicote ☐ ☐
+RESPONSÁVEL: CARLOS
+2 Conferir ligação ☑ ☐
+F-35 – Versão 01 Página - 3 - de 7
+Página - 3 - de 7
+DIÁRIO DE BORDO DA O.S.
+O.S.: 3211 | CHASSI: VJ687280
+DATA / HORA SETOR / OPERADOR ANOTAÇÕES / OCORRÊNCIAS
+OBSERVAÇÃO LIVRE DO OPERADOR
+"""
+        with patch.object(app_module, "_extract_pdf_text", return_value=texto):
+            parsed = app_module.parse_os_pdf(SimpleNamespace(stream=io.BytesIO(b"pdf")))
+        self.assertEqual([
+            {"atividade": "Instalar chicote", "responsavel": "CARLOS"},
+            {"atividade": "Conferir ligação", "responsavel": ""},
+        ], parsed["processos"]["ELÉTRICA 1"])
 
 
 if __name__ == "__main__":

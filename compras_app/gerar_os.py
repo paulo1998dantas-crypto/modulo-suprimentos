@@ -9,6 +9,7 @@ import pypdfium2 as pdfium
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_ROW_HEIGHT_RULE
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches, Pt
 
@@ -419,6 +420,170 @@ def _preencher_tabela_processo(tabela, linhas):
             _set_cell_text(cells_reais[1], atividade)
             _formatar_cell_atividade(cells_reais[1])
 
+    _incluir_ok_nok_por_atividade(tabela)
+
+
+def _definir_celula_grade(tc, largura_twips, span=1):
+    """Compatibiliza as mesclagens do cabeçalho e do checklist na mesma tabela."""
+    props = tc.get_or_add_tcPr()
+    props.get_or_add_tcW().set(qn("w:w"), str(largura_twips))
+    props.tcW.set(qn("w:type"), "dxa")
+    anterior = props.find(qn("w:gridSpan"))
+    if anterior is not None:
+        props.remove(anterior)
+    if span > 1:
+        elemento = OxmlElement("w:gridSpan")
+        elemento.set(qn("w:val"), str(span))
+        props.append(elemento)
+
+
+def _incluir_ok_nok_por_atividade(tabela):
+    """Mantém metadados do processo, mas transfere OK/NOK para cada atividade."""
+    header_idx = encontrar_linha_cabecalho(tabela, "ATIVIDADE")
+    if header_idx is None:
+        return
+    header = tabela.rows[header_idx]
+    textos = [cell.text.strip().upper() for cell in _celulas_unicas_linha(header)]
+    if "OK" in textos and "NOK" in textos:
+        for row in tabela.rows[header_idx + 1:]:
+            for cell in _celulas_unicas_linha(row)[-2:]:
+                if not cell.text.strip():
+                    cell.text = "☐"
+                    _set_cell_align(cell, WD_ALIGN_PARAGRAPH.CENTER)
+                    for run in cell.paragraphs[0].runs:
+                        run.font.name = "Segoe UI Symbol"
+                        run.font.size = Pt(12)
+        return
+
+    largura = sum(col.w.twips for col in tabela._tbl.tblGrid.gridCol_lst)
+    # União das divisões do cabeçalho (quatro campos) com # / atividade / OK / NOK.
+    numero, marcacao = 420, 720
+    quarto = largura // 4
+    limites = [0, numero, quarto, 2 * quarto, 3 * quarto,
+               largura - 2 * marcacao, largura - marcacao, largura]
+    if limites != sorted(set(limites)):
+        raise ValueError("Largura insuficiente para o checklist de atividades da O.S.")
+    grade = tabela._tbl.tblGrid
+    for coluna in list(grade):
+        grade.remove(coluna)
+    for inicio, fim in zip(limites, limites[1:]):
+        coluna = OxmlElement("w:gridCol")
+        coluna.set(qn("w:w"), str(fim - inicio))
+        grade.append(coluna)
+
+    # Remove somente o resultado global antigo; preserva responsável, data e horas.
+    resultado_global = header_idx >= 3 and any(
+        "OK/NOK" in cell.text.upper() for cell in tabela.rows[1].cells
+    )
+    for idx in range(header_idx):
+        tr = tabela.rows[idx]._tr
+        if resultado_global and idx in (1, 2):
+            tr.remove(tr.tc_lst[0])
+        celulas = tr.tc_lst
+        if len(celulas) == 1:
+            _definir_celula_grade(celulas[0], largura, len(limites) - 1)
+        elif len(celulas) == 4:
+            for tc, inicio, fim in zip(celulas, (0, 2, 3, 4), (2, 3, 4, 7)):
+                _definir_celula_grade(tc, limites[fim] - limites[inicio], fim - inicio)
+
+    for idx in range(header_idx, len(tabela.rows)):
+        row = tabela.rows[idx]
+        tr = row._tr
+        celulas = tr.tc_lst
+        if len(celulas) < 2:
+            continue
+        _definir_celula_grade(celulas[0], numero)
+        _definir_celula_grade(celulas[1], largura - numero - 2 * marcacao, 4)
+        for rotulo in ("OK", "NOK"):
+            tc = deepcopy(celulas[0])
+            _definir_celula_grade(tc, marcacao)
+            tr.append(tc)
+            cell = _celulas_unicas_linha(row)[-1]
+            cell.text = rotulo if idx == header_idx else "☐"
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            for paragraph in cell.paragraphs:
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.paragraph_format.space_before = Pt(0)
+                paragraph.paragraph_format.space_after = Pt(0)
+                for run in paragraph.runs:
+                    run.bold = idx == header_idx
+                    run.font.size = Pt(11 if idx == header_idx else 12)
+                    if idx != header_idx:
+                        run.font.name = "Segoe UI Symbol"
+        props = tr.get_or_add_trPr()
+        if props.find(qn("w:cantSplit")) is None:
+            props.append(OxmlElement("w:cantSplit"))
+
+
+def _inserir_diario_bordo(doc, numero_os, dados):
+    """Uma página de formulário após o layout, somente na O.S. completa."""
+    titulo = "DIÁRIO DE BORDO DA O.S."
+    if any(tabela.rows and titulo in tabela.rows[0].cells[0].text for tabela in doc.tables):
+        return
+    secao = doc.sections[-1]
+    largura = secao.page_width - secao.left_margin - secao.right_margin
+    altura = secao.page_height - secao.top_margin - secao.bottom_margin
+    quebra = doc.add_paragraph()
+    quebra.paragraph_format.page_break_before = True
+    quebra.paragraph_format.space_before = Pt(0)
+    quebra.paragraph_format.space_after = Pt(0)
+    quebra.paragraph_format.line_spacing = Pt(1)
+    quebra.add_run().font.size = Pt(1)
+
+    quantidade_linhas = 16
+    tabela = doc.add_table(rows=3 + quantidade_linhas, cols=3)
+    tabela.autofit = False
+    larguras = [int(largura * 0.12), int(largura * 0.22)]
+    larguras.append(largura - sum(larguras))
+    for coluna, medida in zip(tabela.columns, larguras):
+        coluna.width = medida
+    props = tabela._tbl.tblPr
+    props.find(qn("w:tblW")).set(qn("w:w"), str(round(largura / 635)))
+    props.find(qn("w:tblW")).set(qn("w:type"), "dxa")
+    bordas = OxmlElement("w:tblBorders")
+    for lado in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        borda = OxmlElement("w:" + lado)
+        for atributo, valor in (("val", "single"), ("sz", "6"), ("color", "000000")):
+            borda.set(qn("w:" + atributo), valor)
+        bordas.append(borda)
+    props.append(bordas)
+    tabela.cell(0, 0).merge(tabela.cell(0, 2)).text = titulo
+    tabela.cell(1, 0).merge(tabela.cell(1, 2)).text = (
+        f"O.S.: {numero_os}     |     CHASSI: {dados.get('chassis', '')}"
+    )
+    for cell, rotulo in zip(tabela.rows[2].cells,
+                            ("DATA / HORA", "SETOR / OPERADOR", "ANOTAÇÕES / OCORRÊNCIAS")):
+        cell.text = rotulo
+    alturas_cabecalho = (Pt(25), Pt(25), Pt(27))
+    altura_linha = int((altura - Pt(36) - sum(alturas_cabecalho)) / quantidade_linhas)
+    for idx, row in enumerate(tabela.rows):
+        row.height_rule = WD_ROW_HEIGHT_RULE.AT_LEAST
+        row.height = alturas_cabecalho[idx] if idx < 3 else altura_linha
+        row._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
+        if idx >= 2:
+            for coluna, medida in zip(row.cells, larguras):
+                coluna.width = medida
+        for cell in _celulas_unicas_linha(row):
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            if idx in (0, 2):
+                shade = OxmlElement("w:shd")
+                shade.set(qn("w:fill"), "E7E6E6")
+                cell._tc.get_or_add_tcPr().append(shade)
+            for paragraph in cell.paragraphs:
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if idx < 3 else WD_ALIGN_PARAGRAPH.LEFT
+                paragraph.paragraph_format.space_before = Pt(2)
+                paragraph.paragraph_format.space_after = Pt(2)
+                for run in paragraph.runs:
+                    run.font.name = "Calibri"
+                    run.font.size = Pt(11)
+                    run.bold = idx in (0, 2)
+    # Parágrafo obrigatório após tabela sem criar uma página extra em branco.
+    fim = doc.add_paragraph()
+    fim.paragraph_format.space_before = Pt(0)
+    fim.paragraph_format.space_after = Pt(0)
+    fim.paragraph_format.line_spacing = Pt(1)
+    fim.add_run().font.size = Pt(1)
+
 
 def _limpar_layout(tabela):
     if len(tabela.rows) <= 1 or len(tabela.rows[1].cells) == 0:
@@ -606,7 +771,8 @@ def _alinhar_tabelas_processo(refs, doc):
         if idx >= len(doc.tables):
             continue
         tabela = doc.tables[idx]
-        for row in tabela.rows[2:]:
+        inicio = encontrar_linha_cabecalho(tabela, "ATIVIDADE")
+        for row in tabela.rows[inicio if inicio is not None else 2:]:
             for cell_idx, cell in enumerate(_celulas_unicas_linha(row)):
                 if cell_idx == 1:
                     _formatar_cell_atividade(cell)
@@ -855,6 +1021,8 @@ def gerar_os_docx(
     _alinhar_tabelas_processo(refs, doc)
     if modo == "faturamento_direto":
         _inserir_dados_cliente_faturamento(doc, dados, refs)
+    if modo == "completa":
+        _inserir_diario_bordo(doc, numero_os, dados)
     return _salvar_documento_os(
         doc,
         numero_os,

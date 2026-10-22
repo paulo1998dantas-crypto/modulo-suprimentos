@@ -2669,6 +2669,15 @@ def parse_os_docx_atualizado(file_storage):
                 break
         if responsible_col is None and len(tabela_proc.columns) > 2:
             responsible_col = 2
+        rotulos_atividade = {
+            normalizar_texto(cell.text) for cell in tabela_proc.rows[header_idx].cells
+        }
+        if {"OK", "NOK"}.issubset(rotulos_atividade) and not any(
+            "RESPONS" in rotulo for rotulo in rotulos_atividade
+        ):
+            # No checklist por atividade, o responsável global não é uma coluna
+            # das atividades. Não importar o número da linha como operador.
+            responsible_col = None
 
         inicio = header_idx + 1
         linhas = []
@@ -2874,6 +2883,12 @@ def parse_os_pdf(file_storage):
     current = None
     for linha in linhas:
         texto_norm = normalizar_texto(linha)
+        if texto_norm.startswith((
+            "DIARIO DE BORDO", "LAYOUT DO VEICULO", "VISTOS DE QUALIDADE",
+            "DESCRICAO DO SERVICO", "PROCESSO VINCULADO", "OBS FINAL", "FORECAST DE ORIGEM",
+        )):
+            current = None
+            continue
         if "PROCESSOS DE PRODUCAO" in texto_norm:
             nome_processo = identificar_nome_processo(linha)
             current = normalizar_nome_processo(nome_processo) if nome_processo else None
@@ -2882,9 +2897,12 @@ def parse_os_pdf(file_storage):
             marcador_responsavel = re.search(r"RESPONS[AÁ]VEL\s*:\s*(.*)", linha, flags=re.IGNORECASE)
             if marcador_responsavel and not linha[:marcador_responsavel.start()].strip():
                 if processos[current]:
-                    processos[current][-1]["responsavel"] = marcador_responsavel.group(1).strip()
+                    processos[current][-1]["responsavel"] = re.sub(
+                        r"[\s|☐☑☒□✓✔✗✘]+$", "", marcador_responsavel.group(1)
+                    ).strip()
                 continue
             atividade_original = linha[:marcador_responsavel.start()].strip() if marcador_responsavel else linha.strip()
+            atividade_original = re.sub(r"[\s|☐☑☒□✓✔✗✘]+$", "", atividade_original)
             atividade_original = re.sub(r"^\s*(?:#|\d+[.)-]?)\s*", "", atividade_original).strip()
             atividade_norm = normalizar_texto(atividade_original)
             if (
@@ -2893,10 +2911,15 @@ def parse_os_pdf(file_storage):
                 or any(token in atividade_norm for token in ("OK/NOK", "HORA INICIO", "HORA FIM"))
                 or ("ATIVIDADE" in atividade_norm and ("|" in atividade_original or atividade_norm.startswith("ATIVIDADE")))
                 or atividade_norm in {"ATIVIDADE", "RESPONSAVEL", "DATA"}
+                or re.fullmatch(r"(?:OK|NOK)(?:[\s|]+(?:OK|NOK))*", atividade_norm)
+                or re.match(r"^PAGINA\s*-?\s*\d+\s*-?\s*DE\s*\d+", atividade_norm)
+                or re.match(r"^F-\d+\s*[–-]\s*VERSAO\b", atividade_norm)
                 or re.fullmatch(r"[_\-.\s]+", atividade_original)
             ):
                 continue
-            responsavel = marcador_responsavel.group(1).strip() if marcador_responsavel else ""
+            responsavel = re.sub(
+                r"[\s|☐☑☒□✓✔✗✘]+$", "", marcador_responsavel.group(1)
+            ).strip() if marcador_responsavel else ""
             processos[current].append({"atividade": atividade_original, "responsavel": responsavel})
     data["processos"] = processos
     return data
