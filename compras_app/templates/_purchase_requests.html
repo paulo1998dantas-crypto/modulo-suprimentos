@@ -68,10 +68,12 @@
     <div class="pr-actions"><button type="button" id="pr-confirm-anticipation-save">Confirmar e encerrar solicitação</button></div>
   </dialog>
   <dialog id="pr-allocate-dialog" class="pr-confirm-dialog">
-    <div class="pr-heading"><div><h2>Alocar pedido de compra existente</h2><p>A solicitação será concluída e vinculada ao pedido selecionado.</p></div><button type="button" id="pr-allocate-cancel">Fechar</button></div>
-    <label>Pedido vigente<select id="pr-allocate-order" required><option value="">Carregando pedidos disponíveis…</option></select></label>
+    <div class="pr-heading"><div><h2>Alocar pedidos de compra</h2><p>Distribua a quantidade entre uma ou mais O.C.s. A solicitação só será concluída quando toda a quantidade estiver alocada.</p></div><button type="button" id="pr-allocate-cancel">Fechar</button></div>
+    <p id="pr-allocate-request" class="pr-note"></p>
+    <div id="pr-allocate-lines"></div>
+    <p id="pr-allocate-details" class="pr-note" aria-live="polite"></p>
     <label>Motivo / confirmação<textarea id="pr-allocate-reason" maxlength="4000" rows="4" required placeholder="Registre por que este pedido atende a solicitação"></textarea></label>
-    <div class="pr-actions"><button type="button" id="pr-allocate-save">Alocar e concluir</button></div>
+    <div class="pr-actions"><button type="button" id="pr-allocate-save">Salvar alocações</button></div>
   </dialog>
   <dialog id="pr-edit-request" class="pr-confirm-dialog">
     <div class="pr-heading"><div><h2>Editar solicitação</h2><p>A alteração ficará registrada no histórico.</p></div><button type="button" id="pr-edit-cancel">Fechar</button></div>
@@ -108,5 +110,5 @@
   {% endif %}
 </section>
 <script id="pr-config" type="application/json">{{ request_config|tojson }}</script>
-<script src="/static/purchase_requests.js?v=20261021-admin-historico" defer></script>
+<script src="/static/purchase_requests.js?v=20261021-admin-historico-20261022-multiplos-pedidos" defer></script>
 

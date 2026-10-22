@@ -25,6 +25,7 @@ function context() {
     showDetails(){}, showHistory(){}, openEdit(){}, excludeRequest(){}, act(){},
     encodeURIComponent, message:(...args)=>calls.push(['message',...args]), load:async()=>calls.push(['reload']),
     api:async(...args)=>{calls.push(['api',...args]); return {items:[]};}, calls});
+  ctx.readAllocationInputs=()=>ctx.testAllocations||null;
   vm.runInContext(section('function openCompletion(row)', 'async function openOrderAllocation(row)'), ctx);
   return ctx;
 }
@@ -77,16 +78,16 @@ test('alocar e concluir exige pedido e motivo, enviando versão para auditoria e
   vm.runInContext(section('async function allocateExistingOrder(){','async function act(row,action){'),ctx);
   ctx.$('pr-allocate-order').value=''; ctx.$('pr-allocate-reason').value='';
   await ctx.allocateExistingOrder(); assert.equal(ctx.calls.some(c=>c[0]==='api'),false);
-  ctx.$('pr-allocate-order').value='oc-123'; ctx.$('pr-allocate-reason').value='Pedido atende';
+  ctx.testAllocations=[{purchase_order_id:'oc-123',quantity:'2.000'}]; ctx.$('pr-allocate-reason').value='Pedido atende';
   await ctx.allocateExistingOrder(); const call=ctx.calls.find(c=>c[0]==='api');
   assert.equal(call[1],'/'+row().id+'/action');
-  assert.deepEqual(JSON.parse(JSON.stringify(call[2])),{action:'ALOCAR_PEDIDO',version:7,purchase_order_id:'oc-123',reason:'Pedido atende'});
+  assert.deepEqual(JSON.parse(JSON.stringify(call[2])),{action:'ALOCAR_PEDIDO',version:7,allocations:[{purchase_order_id:'oc-123',quantity:'2.000'}],replace_allocations:true,reason:'Pedido atende'});
   assert.equal(ctx.calls.some(c=>c[0]==='reload'),true);
 });
 test('erro de validação do pedido não fecha a confirmação nem informa sucesso', async () => {
   const ctx=context(); ctx.allocatingOrderRow=row(); ctx.api=async()=>{throw Error('Pedido sem saldo');};
   vm.runInContext(section('async function allocateExistingOrder(){','async function act(row,action){'),ctx);
-  ctx.$('pr-allocate-order').value='oc-123'; ctx.$('pr-allocate-reason').value='Pedido atende';
+  ctx.testAllocations=[{purchase_order_id:'oc-123',quantity:'2.000'}]; ctx.$('pr-allocate-reason').value='Pedido atende';
   ctx.$('pr-allocate-dialog').showModal(); await ctx.allocateExistingOrder();
   assert.equal(ctx.$('pr-allocate-dialog').open,true);
   assert.equal(ctx.allocatingOrderRow.id,row().id);

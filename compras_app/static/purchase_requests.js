@@ -21,6 +21,41 @@ async function api(path="",payload){
 }
 const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:"America/Sao_Paulo"});
 function button(text,fn){const b=node("button",text);b.type="button";b.addEventListener("click",fn);return b;}
+let allocationInputs=[];
+function renderAllocationInputs(row,orders){
+ const container=$("pr-allocate-lines");container.replaceChildren();allocationInputs=[];
+ const remaining=Number(row.remaining_quantity??row.quantity);
+ $("pr-allocate-request").textContent="SOL-"+row.id.slice(0,8).toUpperCase()+" · "+row.sku_codigo+" · solicitado: "+qty(row.quantity)+" "+row.unidade+" · já alocado: "+qty(row.allocated_quantity||0)+" · restante: "+qty(remaining);
+ for(const linkedOrder of row.purchase_orders||[])container.append(node("p","Já vinculado: O.C. "+linkedOrder.numero_oc+" · "+qty(linkedOrder.quantity)+" "+row.unidade));
+ for(const order of orders){
+  const label=node("label","O.C. "+order.numero_oc+" · "+(order.fornecedor_nome||"—")+" · saldo "+qty(order.available_quantity)+" · entrega "+date(order.delivery_date));
+  const input=node("input");input.type="number";input.min="0";input.max=String(order.available_quantity);input.step="0.001";input.value=String((row.purchase_orders||[]).find(o=>o.purchase_order_id===order.id)?.quantity||0);
+  input.setAttribute("aria-label","Quantidade para O.C. "+order.numero_oc);
+  label.append(input);container.append(label);allocationInputs.push({order,input});
+  input.oninput=updateAllocationTotal;
+ }
+ updateAllocationTotal();
+}
+function updateAllocationTotal(){
+ const total=allocationInputs.reduce((sum,{input})=>sum+Number(input.value||0),0);
+ $("pr-allocate-details").textContent="Total distribuído entre pedidos: "+qty(total)+". Use zero nos pedidos não selecionados. Salvar substitui a distribuição anterior e mantém a alteração no histórico.";
+}
+function readAllocationInputs(row){
+ if(!row)return null;
+ const allocations=[];
+ for(const {order,input}of allocationInputs){
+  const value=Number(input.value||0);
+  if(!Number.isFinite(value)||value<0||value>Number(order.available_quantity)||Math.abs(value*1000-Math.round(value*1000))>0.000001){
+   message("Informe quantidades válidas, com até três decimais, respeitando o saldo de cada O.C.",true);return null;
+  }
+  if(value>0)allocations.push({purchase_order_id:order.id,quantity:value.toFixed(3)});
+ }
+ const total=allocations.reduce((sum,item)=>sum+Number(item.quantity),0);
+ if(!allocations.length||total-Number(row.quantity)>0.000001){
+  message("Informe uma quantidade em pelo menos uma O.C., sem exceder a quantidade solicitada.",true);return null;
+ }
+ return allocations;
+}
 function showDetails(row){
  const content=$("pr-details-content");content.replaceChildren();
  content.append(node("h3","SOL-"+row.id.slice(0,8).toUpperCase()+" · "+row.sku_codigo));
@@ -33,7 +68,8 @@ function showDetails(row){
   ["Referências / O.S.",row.reference_display||row.reference,true],["Referência original",row.reference,true],
   ["Solicitante",row.requested_by],["Solicitada em",date(row.created_at)],["Comprador",row.buyer],
   ["Assumida em",date(row.assumed_at)],["Assumida por",row.assumed_by],
-  ["Atualizada em",date(row.updated_at)],["Pedido existente / criado",row.numero_oc||row.anticipation_numero_oc],
+  ["Atualizada em",date(row.updated_at)],["Pedidos alocados",(row.purchase_orders||[]).map(o=>"O.C. "+o.numero_oc+" · "+qty(o.quantity)+" "+row.unidade+" · "+o.fornecedor_nome+" · "+o.purchase_status+" · "+date(o.linked_at)+" · "+o.linked_by).join("\n")||row.numero_oc||row.anticipation_numero_oc,true],
+  ["Quantidade alocada",qty(row.allocated_quantity||0)],["Quantidade restante",qty(row.remaining_quantity??row.quantity)],
   ["Fornecedor",row.fornecedor_nome||row.anticipation_fornecedor_nome],["Status do pedido",row.purchase_status||row.anticipation_purchase_status],
   ["Saldo pendente no pedido",row.anticipation_pending_quantity==null?"—":qty(row.anticipation_pending_quantity)],
   ["Previsão do pedido",date(row.anticipation_delivery_date)],["Nova data negociada",date(row.anticipation_confirmed_delivery_date)],
@@ -95,7 +131,15 @@ function render(){
   if(row.completed_at)line(milestones,"Concluída: "+date(row.completed_at));
   situation.append(milestones);
   const order=cell("Pedido / fornecedor","pr-order-cell");order.append(node("strong",orderNumber?"O.C. "+orderNumber:"Sem pedido"));
-  if(supplier)line(order,supplier);if(orderStatus)line(order,orderStatus,true);
+  if((row.purchase_orders||[]).length){
+   order.replaceChildren();
+   for(const linkedOrder of row.purchase_orders){
+    order.append(node("strong","O.C. "+linkedOrder.numero_oc+" · "+qty(linkedOrder.quantity)+" "+row.unidade));
+    line(order,linkedOrder.fornecedor_nome);line(order,linkedOrder.purchase_status,true);
+   }
+   if(pending)line(order,"Falta alocar: "+qty(row.remaining_quantity)+" "+row.unidade);
+  }
+  if(!(row.purchase_orders||[]).length){if(supplier)line(order,supplier);if(orderStatus)line(order,orderStatus,true);}
   if(anticipation){line(order,"Saldo: "+qty(row.anticipation_pending_quantity||0)+" "+row.unidade);line(order,"Previsão: "+date(row.anticipation_delivery_date));}
   if(row.anticipation_confirmed_delivery_date)line(order,"Negociada: "+date(row.anticipation_confirmed_delivery_date));
   const actionCell=cell("Ações","pr-actions-cell");actionCell.append(button("Detalhes",()=>showDetails(row)));
@@ -111,7 +155,7 @@ function render(){
    actions.append(button("Excluir definitivamente",()=>openAdminRequest(row,true)));
   }
   if(cfg.can_manage){
-   if(pending)actions.append(button("Alocar pedido existente",()=>openOrderAllocation(row)));
+   if(pending||row.status==="CONCLUIDA")actions.append(button("Gerenciar pedidos",()=>openOrderAllocation(row)));
    if(row.status==="SOLICITADA")actions.append(button(anticipation?"Registrar solicitação ao fornecedor":"Assumir",()=>act(row,anticipation?"SOLICITAR_ANTECIPACAO":"ASSUMIR")));
    if(anticipation&&row.status==="EM_COMPRAS")actions.append(button("Confirmar data negociada",()=>openAnticipationConfirmation(row)));
    if(anticipation&&pending)actions.append(button("Converter em nova O.C.",()=>act(row,"CONVERTER_NOVA_COMPRA")));
@@ -270,6 +314,7 @@ async function showHistory(id){
    if(after.buyer&&before.buyer!==after.buyer)box.append(node("p","Comprador: "+after.buyer));
    if(after.purchase_order)box.append(node("p","Pedido: "+after.purchase_order.numero_oc+" · Fornecedor: "+after.purchase_order.fornecedor_nome+" · "+after.purchase_order.status));
    if(after.purchase_order_id)box.append(node("p","Pedido vinculado (ID): "+after.purchase_order_id));
+   if(after.purchase_orders)for(const linkedOrder of after.purchase_orders)box.append(node("p","O.C. "+linkedOrder.numero_oc+" · "+qty(linkedOrder.quantity)+" · "+linkedOrder.fornecedor_nome+" · "+date(linkedOrder.linked_at)+" · "+linkedOrder.linked_by));
    if(after.anticipation_confirmed_delivery_date&&before.anticipation_confirmed_delivery_date!==after.anticipation_confirmed_delivery_date)box.append(node("p","Nova data de entrega negociada: "+date(after.anticipation_confirmed_delivery_date)));
    if(before.purchase_order_id&&!after.purchase_order_id)box.append(node("p","Pedido anterior: "+before.purchase_order_id+" · solicitação reaberta"));
    if(event.reason)box.append(node("p",event.reason));
@@ -319,24 +364,22 @@ function chooseCompletion(method){
 async function openOrderAllocation(row){
  try{
   const data=await api("/"+encodeURIComponent(row.id)+"/orders");
-  const select=$("pr-allocate-order");select.replaceChildren(node("option","Selecione uma O.C. vigente que cubra a quantidade"));select.firstChild.value="";
-  for(const order of data.items||[]){
-   const option=node("option","O.C. "+order.numero_oc+" · "+(order.fornecedor_nome||"Fornecedor não informado")+" · saldo disponível "+qty(order.available_quantity)+" · previsão "+date(order.delivery_date));
-   option.value=order.id;select.append(option);
-  }
-  if(!(data.items||[]).length)return message("Não há pedido vigente com saldo suficiente para cobrir esta solicitação.",true);
-  allocatingOrderRow=row;$("pr-allocate-reason").value="";$("pr-allocate-dialog").showModal();
+  if(!(data.items||[]).length)return message("Não há pedido vigente com saldo disponível deste material.",true);
+  allocatingOrderRow=data.request||row;
+  renderAllocationInputs(allocatingOrderRow,data.items);
+  $("pr-allocate-reason").value="";$("pr-allocate-dialog").showModal();
  }catch(e){message(e.message,true);}
 }
 async function allocateExistingOrder(){
- const row=allocatingOrderRow,orderId=$("pr-allocate-order").value,reason=$("pr-allocate-reason").value.trim();
+ const row=allocatingOrderRow,reason=$("pr-allocate-reason").value.trim();
  if(!row)return;
- if(!orderId||!reason)return message("Selecione o pedido vigente e informe o motivo da alocação.",true);
+ const allocations=readAllocationInputs(row);if(!allocations)return;
+ if(!reason)return message("Informe o motivo da alocação.",true);
  $("pr-allocate-save").disabled=true;
  try{
-  await api("/"+encodeURIComponent(row.id)+"/action",{action:"ALOCAR_PEDIDO",version:row.version,purchase_order_id:orderId,reason});
+  const result=await api("/"+encodeURIComponent(row.id)+"/action",{action:"ALOCAR_PEDIDO",version:row.version,allocations,replace_allocations:true,reason});
   $("pr-allocate-dialog").close();allocatingOrderRow=null;
-  message("Pedido existente alocado e solicitação concluída com rastreabilidade.");await load();
+  message(result.request?.status==="CONCLUIDA"?"Pedidos vinculados; solicitação concluída.":"Alocação parcial registrada. A solicitação continua em compras.");await load();
  }catch(e){message(e.message,true);}
  finally{$("pr-allocate-save").disabled=false;}
 }
