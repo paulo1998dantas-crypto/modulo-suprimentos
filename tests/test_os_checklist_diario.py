@@ -62,15 +62,24 @@ class ChecklistDiarioTest(unittest.TestCase):
         diario = doc.tables[-1]
         modelo = Document(TEMPLATE_DIARIO_BORDO)
         self.assertIn("Diário de bordo", " ".join(c.text for c in diario.rows[0].cells))
-        self.assertEqual(42, len(diario.rows))
-        self.assertEqual(10, len(diario.columns))
+        self.assertEqual(18, len(diario.rows))
+        self.assertEqual(6, len(diario.columns))
+        self.assertEqual(
+            ["Data", "Operador", "Etapa do processo", "Hora setup", "Ocorrência", "Tempo parada"],
+            [c.text for c in diario.rows[1].cells],
+        )
+        self.assertTrue(all(not c.text.strip() for r in diario.rows[2:] for c in r.cells))
+        self.assertTrue(all(len(_celulas_unicas_linha(r)) == 6 for r in diario.rows[1:]))
+        texto = " ".join(c.text for r in diario.rows for c in r.cells).casefold()
+        for removido in ("veículo", "modelo", "chassi", "completo", "trabalho", "sim", "não"):
+            self.assertNotIn(removido, texto)
         self.assertEqual(2, len(doc.sections))
         for campo in ("page_width", "page_height", "top_margin", "bottom_margin", "left_margin", "right_margin"):
             self.assertEqual(getattr(modelo.sections[0], campo), getattr(doc.sections[-1], campo))
         self.assertFalse(doc.sections[-1].footer.is_linked_to_previous)
         self.assertFalse(doc.sections[-1].header.is_linked_to_previous)
         self.assertFalse(any(p.text.strip() for p in doc.sections[-1].footer.paragraphs))
-        # A tabela é a do arquivo aprovado, incluindo formas Sim/Não e duas fichas.
+        # A página mantém exatamente a tabela vigente, com seis campos por linha.
         def xml_sem_ids(tabela):
             xml = deepcopy(tabela._tbl)
             for item in xml.xpath(".//wp:docPr"):

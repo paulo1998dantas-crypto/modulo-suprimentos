@@ -5,9 +5,10 @@ Alteração restrita à apresentação dos documentos gerados pelo Suprimentos.
 - Tabelas de processo: cada atividade possui duas marcações independentes,
   OK e NOK. Responsável, data, hora de início e fim continuam no cabeçalho.
 - O.S. completa: após o layout, anexa o arquivo aprovado `modelo_diario_bordo.docx`,
-  preservando as duas fichas, campos manuais de operador/veículo/etapa/setup/trabalho,
-  ocorrências, tempo da parada, caixas Sim/Não, dimensões e margens originais.
-  Página exclusiva com cabeçalho e rodapé vazios como no modelo fornecido.
+  com uma única tabela de seis colunas: Data, Operador, Etapa do processo,
+  Hora setup, Ocorrência e Tempo parada. São 16 linhas em branco para registros
+  manuais, sem fichas separadas, dados do veículo, Sim/Não ou horas de trabalho.
+  Página exclusiva com cabeçalho e rodapé vazios.
 - Produção e preparação reutilizam o checklist por atividade. Diário não é
   acrescentado às requisições, faturamentos diretos, máscaras ou versões resumidas.
 - Os templates anteriores permanecem preservados; o gerador aplica a
