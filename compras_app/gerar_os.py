@@ -17,6 +17,7 @@ from docx.shared import Inches, Pt
 from composicao import normalizar_componentes, resolver_composicao_final
 from config import TEMPLATE_OS, TEMPLATE_REQUISICAO_EXPEDICAO, TEMPLATE_DIARIO_BORDO
 from os_template import encontrar_linha_cabecalho, mapear_tabelas_os
+from os_setores import filtrar_linhas_documento_os
 
 logger = logging.getLogger(__name__)
 
@@ -817,13 +818,14 @@ def gerar_os_docx(
         _configurar_cabecalho_requisicao(doc, refs, dados_requisicao)
 
     if refs.get("itens") is not None:
-        _preencher_tabela_produtos(doc.tables[refs["itens"]], itens)
+        _preencher_tabela_produtos(doc.tables[refs["itens"]], filtrar_linhas_documento_os(itens))
 
     composicao_final = (
         composicao_resolvida
         if composicao_resolvida is not None
         else resolver_composicao_final(itens, componentes)
     )
+    composicao_final = filtrar_linhas_documento_os(composicao_final)
     ocultar_composicao = modo in {"resumida", "producao", "expedicao", "preparacao", "faturamento_direto"}
     ocultar_observacoes = modo in {"mascara", "producao", "expedicao", "preparacao", "faturamento_direto"}
 

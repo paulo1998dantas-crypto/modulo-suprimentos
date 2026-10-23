@@ -153,7 +153,7 @@ class PreparacaoFilterTests(unittest.TestCase):
         self.assertIn("10440013", codigos)
         self.assertIn("10280050", codigos)
 
-    def test_preparacao_mostra_cj_bancos_sem_explodir_composicao(self):
+    def test_preparacao_mantem_todo_pacote_do_pai_inclusive_cj_bancos(self):
         catalogo = {
             "30200036": {
                 "descricao": "CJ BANCOS REC LE 3,3 EXECUTIVO",
@@ -208,8 +208,7 @@ class PreparacaoFilterTests(unittest.TestCase):
         )
 
         codigos = [linha["codigo"] for linha in preparacao]
-        self.assertEqual(codigos, ["30200036"])
-        self.assertTrue(preparacao[0].get("ocultar_composicao_preparacao"))
+        self.assertEqual(codigos, ["10440013", "10280050", "30200036"])
 
     def test_preparacao_referencia_cj_piso_e_nao_forca_3024(self):
         catalogo = {
@@ -242,7 +241,7 @@ class PreparacaoFilterTests(unittest.TestCase):
             catalogo,
         )
 
-        self.assertEqual([linha["codigo"] for linha in linhas], ["30140027"])
+        self.assertEqual([linha["codigo"] for linha in linhas], ["30140027", "30240062"])
         self.assertEqual(linhas[0]["regra_preparacao"], "PISO")
 
     def test_isolamento_e_acabamento_pp_cj_sao_preparacao(self):

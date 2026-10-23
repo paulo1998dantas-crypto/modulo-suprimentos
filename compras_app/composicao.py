@@ -49,6 +49,17 @@ def consolidar_componentes_por_codigo(linhas, estrategia="max"):
             continue
 
         atual = resultado[indice_por_codigo[chave]]
+        # A quantidade continua consolidada por SKU. Preservar todos os pais
+        # permite rotear o material para preparação mesmo quando o primeiro
+        # consumo encontrado veio de outra árvore da mesma O.S.
+        pais = []
+        for origem in (atual, linha):
+            for valor in [origem.get("item", ""), *(origem.get("pais_origem") or [])]:
+                pai = normalizar_codigo(valor)
+                if pai and pai != codigo and pai not in pais:
+                    pais.append(pai)
+        if len(pais) > 1:
+            atual["pais_origem"] = pais
         qtd_atual = parse_quantidade(atual.get("qtd", atual.get("quantidade", 0)))
         qtd_nova = parse_quantidade(linha.get("qtd", linha.get("quantidade", 0)))
         qtd_final = qtd_atual + qtd_nova if estrategia == "somar" else max(qtd_atual, qtd_nova)
@@ -116,6 +127,7 @@ def normalizar_linha_composicao(comp, item="", level=0):
         "setor",
         "tipo_requisicao",
         "setor_manual",
+        "pais_origem",
         "line_id",
         "equivalence_group_id",
         "equivalence_group_code",

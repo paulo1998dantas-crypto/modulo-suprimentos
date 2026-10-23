@@ -96,6 +96,7 @@ from os_setores import (
     SETOR_EXPEDICAO,
     SETOR_FATURAMENTO_DIRETO,
     SETOR_PREPARACAO,
+    SETOR_NULO,
     TIPO_REQUISICAO_FATURAMENTO_DIRETO,
     agrupar_linhas_setor,
     agrupar_linhas_por_fornecedor,
@@ -6699,11 +6700,13 @@ def _parse_os_composition_form(form):
         comp_setores_manuais = form.getlist("os_comp_setor_manual[]")
         comp_fornecedores = form.getlist("os_comp_fornecedor[]")
         comp_line_ids = form.getlist("os_comp_line_id[]")
+        comp_pais = form.getlist("os_comp_pais_json[]")
         source_rows = []
         for idx in range(len(comp_codigos)):
             source_rows.append(
                 {
                     "line_id": comp_line_ids[idx] if idx < len(comp_line_ids) else "",
+                    "pais_origem": json.loads(comp_pais[idx]) if idx < len(comp_pais) and comp_pais[idx] else [],
                     "item": comp_itens[idx] if idx < len(comp_itens) else "",
                     "codigo": comp_codigos[idx],
                     "descricao": comp_descricoes[idx] if idx < len(comp_descricoes) else "",
@@ -6743,9 +6746,14 @@ def _parse_os_composition_form(form):
         setor = str(raw_row.get("setor", "") or "").strip().upper()
         setor_manual_raw = raw_row.get("setor_manual", False)
         setor_manual = setor_manual_raw is True or str(setor_manual_raw).strip().lower() in {"1", "true", "sim"}
-        if setor in {SETOR_EXPEDICAO, SETOR_PREPARACAO, SETOR_FATURAMENTO_DIRETO}:
+        if setor in {SETOR_EXPEDICAO, SETOR_PREPARACAO, SETOR_FATURAMENTO_DIRETO, SETOR_NULO}:
             linha["setor"] = setor
             linha["setor_manual"] = setor_manual
+        pais = raw_row.get("pais_origem")
+        if isinstance(pais, list):
+            linha["pais_origem"] = list(dict.fromkeys(
+                normalizar_codigo(str(pai)) for pai in pais if str(pai or "").strip()
+            ))
         fornecedor = str(raw_row.get("fornecedor", "") or "").strip()
         if fornecedor:
             linha["fornecedor"] = fornecedor
@@ -7309,7 +7317,7 @@ def gerar_os():
         )
         for linha in pendencias_preparacao
     }
-    for linha in linhas_layout_preparacao(itens, os_produtos):
+    for linha in linhas_layout_preparacao(itens, os_produtos, composicao_enriquecida):
         chave = (
             normalizar_codigo(linha.get("codigo", "")),
             normalizar_codigo(linha.get("item", "")),
@@ -7318,15 +7326,26 @@ def gerar_os():
         if chave not in chaves_preparacao:
             pendencias_preparacao.append(linha)
             chaves_preparacao.add(chave)
-    requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto]
+    # NULO continua na planilha de materiais e na composição persistida,
+    # mas não entra em nenhuma via operacional de impressão.
+    pendencias_nulo = filtrar_linhas_setor(composicao_enriquecida, SETOR_NULO)
+    requisicao_materiais = [*pendencias_expedicao, *pendencias_preparacao, *pendencias_faturamento_direto, *pendencias_nulo]
 
     itens_expedicao = construir_itens_os_expedicao(linhas_para_exibicao_os(pendencias_expedicao, codigos_inativos))
     itens_preparacao = construir_itens_os_preparacao(linhas_para_exibicao_os(pendencias_preparacao, codigos_inativos))
     for item in itens_expedicao + itens_preparacao:
         item["qtd"] = _formatar_qtd_saida(item.get("qtd", ""))
 
+    destinos_por_codigo = {normalizar_codigo(linha.get("codigo", "")): linha.get("setor", "")
+                           for linha in composicao_enriquecida}
+    # Acrescentar só o destino à composição impressa original. Não alterar
+    # as descrições, unidades ou quantidades do snapshot da O.S. completa.
+    composicao_documento = [{**linha, "setor": destinos_por_codigo.get(
+        normalizar_codigo(linha.get("codigo", "")), linha.get("setor", ""))} for linha in composicao_final]
+    itens_documento = [{**item, "setor": destinos_por_codigo.get(
+        normalizar_codigo(item.get("codigo", "")), item.get("setor", ""))} for item in itens]
     itens_por_modo = {
-        "originais": itens,
+        "originais": itens_documento,
         "expedicao": itens_expedicao,
         "preparacao": itens_preparacao,
     }
@@ -7425,7 +7444,7 @@ def gerar_os():
                 componentes,
                 processos_final,
                 layout_clone,
-                composicao_final,
+                composicao_documento,
                 modo=config_modo["doc_mode"],
                 titulo_arquivo=config_modo["titulo"],
                 incluir_cliente_nome=config_modo.get("incluir_cliente_nome", True),
