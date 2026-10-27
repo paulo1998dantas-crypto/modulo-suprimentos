@@ -5,7 +5,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const validos = new Set(['EXPEDICAO', 'PREPARACAO', 'F.D', 'NULO']);
-  const nulos = new Set(['10240301', '10240299', '10320035']);
+  const nulos = new Set(['10240301', '10240299', '10320035', '10240131', '30240102', '30240032']);
   const texto = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toUpperCase().replace(/_/g, ' ').trim().replace(/\s+/g, ' ');
   const codigo = value => String(value || '').split(' - ', 1)[0].trim();

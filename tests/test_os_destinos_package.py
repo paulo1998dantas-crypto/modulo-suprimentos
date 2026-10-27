@@ -105,3 +105,33 @@ def test_docx_nao_imprime_nulo_manual_nem_recalcula_composicao():
         assert 'SKU-OCULTO' not in text
         assert 'NÃO IMPRIMIR' not in text
         assert rows == original
+
+
+def test_os_completa_mantem_composicao_dos_skus_nulo():
+    from gerar_os import gerar_os_docx
+
+    item_pai = {
+        'codigo': '30240032', 'descricao': 'ACESSORIO CJ EXTINTOR COM SUPORTE ABC 4KG',
+        'qtd': 1, 'unidade': 'cj', 'setor': 'NULO',
+    }
+    componentes = {
+        '30240032': [
+            {'codigo': '10240044', 'descricao': 'ACESSORIO EXTINTOR ABC 4KG'},
+            {'codigo': '10240045', 'descricao': 'ACESSORIO SUPORTE EXTINTOR ABC 4KG'},
+        ],
+    }
+    composicao = [
+        {'item': '30240032', 'codigo': '10240044', 'descricao': 'ACESSORIO EXTINTOR ABC 4KG',
+         'qtd': 1, 'unidade': 'pc', 'level': 0, 'setor': 'EXPEDICAO'},
+        {'item': '30240032', 'codigo': '10240045', 'descricao': 'ACESSORIO SUPORTE EXTINTOR ABC 4KG',
+         'qtd': 1, 'unidade': 'pc', 'level': 0, 'setor': 'EXPEDICAO'},
+    ]
+
+    with patch('gerar_os._salvar_documento_os', side_effect=lambda doc, *a, **k: doc):
+        doc = gerar_os_docx('TESTE', {}, [item_pai], componentes, {},
+                            composicao_resolvida=composicao, modo='completa')
+
+    text = '\n'.join(cell.text for table in doc.tables for row in table.rows for cell in row.cells)
+    assert '30240032' not in text
+    assert '10240044' in text and 'ACESSORIO EXTINTOR ABC 4KG' in text
+    assert '10240045' in text and 'ACESSORIO SUPORTE EXTINTOR ABC 4KG' in text
