@@ -6338,6 +6338,9 @@ salvarRascunhoOS();
 {% if can('suprimentos.production_order.view') %}
 <a class="tab-btn" href="/erp/ordens-producao">OP - MODIFICAÇÃO</a>
 {% endif %}
+{% if can('suprimentos.work_order.view') and current_user and (('PCP' in (current_user.roles or [])) or ('ADMIN' in (current_user.roles or [])) or current_user.role in ['PCP', 'ADMIN', 'ADM']) %}
+<a class="tab-btn" href="/erp/baixa-externa">BAIXA EXTERNA</a>
+{% endif %}
 {% if can('suprimentos.work_order.view') %}
 <a class="tab-btn" href="/erp/forecast">PROGRAMAÇÃO COMERCIAL</a>
 {% endif %}

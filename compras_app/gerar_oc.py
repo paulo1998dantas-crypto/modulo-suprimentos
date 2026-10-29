@@ -10,6 +10,7 @@ from docx.oxml.ns import qn
 from docx.shared import Inches, Pt
 from datetime import datetime
 from composicao import expandir_composicao_itens, normalizar_componentes
+from external_materials import internal_purchase_bom
 from config import TEMPLATE_WORD, TEMPLATE_OS, OS_COMPONENTES_FILE
 import logging
 
@@ -366,6 +367,7 @@ def gerar_word(numero_oc, fornecedor, dados_pedido, itens, incluir_composicao=Tr
     # Composicao de materiais (B.O.M) usando a tabela do template, se existir
     componentes = normalizar_componentes(componentes) if componentes is not None else _carregar_componentes_local()
 
+    componentes = internal_purchase_bom(componentes)
     composicao_rows = []
     if incluir_composicao:
         composicao_rows = expandir_composicao_itens(itens, componentes, incluir_itens_sem_bom=False)

@@ -1508,7 +1508,7 @@ def salvar_os_fornecedores(fornecedores):
 def carregar_os_componentes(force=False):
     if supabase_data.enabled():
         try:
-            return supabase_data.carregar_bom_componentes(force=force)
+            return normalizar_componentes(supabase_data.carregar_bom_componentes(force=force))
         except Exception:
             app.logger.exception("Falha ao carregar B.O.M. do Supabase")
             return {}
@@ -8584,6 +8584,10 @@ def _erp_stock_request(path, method="GET", payload=None):
 purchase_requests.register(app, lambda *args, **kwargs: _erp_stock_request(*args, **kwargs),
                            current_user, can, login_required, erp_feature_required,
                            stock_binary_request=lambda path: _erp_stock_binary_request(path))
+
+from external_stock_routes import register as register_external_stock
+register_external_stock(app, lambda *args, **kwargs: _erp_stock_request(*args, **kwargs),
+                        current_user, can, login_required, erp_feature_required)
 
 
 def _erp_stock_binary_request(path):

@@ -98,6 +98,7 @@ def _codigo_alcancavel_por_bom(codigo_raiz, codigo_alvo, componentes, visitados=
 
 
 def normalizar_componentes(componentes):
+    from external_materials import is_external_material
     normalizados = {}
     for item_codigo, comps in (componentes or {}).items():
         item_norm = normalizar_codigo(item_codigo)
@@ -107,6 +108,8 @@ def normalizar_componentes(componentes):
         for comp in comps or []:
             linha = dict(comp or {})
             linha["codigo"] = normalizar_codigo(linha.get("codigo", ""))
+            if is_external_material(linha['codigo']):
+                continue
             destino.append(linha)
     return normalizados
 
@@ -196,6 +199,7 @@ def expandir_composicao_item(codigo_item, quantidade, componentes, start_level=0
 
 
 def expandir_composicao_itens(itens, componentes, incluir_itens_sem_bom=True):
+    componentes = normalizar_componentes(componentes)
     itens_consolidados = []
     indice_por_codigo = {}
     for original in itens or []:
