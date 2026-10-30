@@ -1,10 +1,12 @@
-"""External foam stock is technical BOM information, not supplier purchasing.
+"""External foam/fabric stock is technical BOM information, not supplier purchasing.
 
 Keep this classification identical in Suprimentos and Estoque.
 """
-EXTERNAL_MATERIAL_SKUS = frozenset({
+EXTERNAL_FOAM_SKUS = frozenset({
     '10220272', '10220273', '10220274', '10220275', '10220276',
 })
+EXTERNAL_FABRIC_SKUS = frozenset({'10220269', '10220270', '10280062'})
+EXTERNAL_MATERIAL_SKUS = EXTERNAL_FOAM_SKUS | EXTERNAL_FABRIC_SKUS
 
 
 def is_external_material(code):

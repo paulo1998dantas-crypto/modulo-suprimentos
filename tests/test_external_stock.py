@@ -14,14 +14,17 @@ from external_stock_routes import register
 class ExternalStockTests(unittest.TestCase):
     def test_technical_bom_is_not_mutated_and_bank_is_preserved_in_os_and_purchase(self):
         graph={'30200001':[{'codigo':'10200001','quantidade':3}],
-               '10200001':[{'codigo':'10220272','quantidade':2}]}
+               '10200001':[{'codigo':'10220272','quantidade':2},
+                           {'codigo':'10220269','quantidade':1.2},
+                           {'codigo':'10220270','quantidade':0.6},
+                           {'codigo':'10280062','quantidade':1.8}]}
         self.assertEqual([],internal_purchase_bom(graph)['10200001'])
         self.assertEqual([],normalizar_componentes(graph)['10200001'])
         lines=expandir_composicao_itens([{'codigo':'30200001','qtd':2}],graph)
         self.assertEqual([('10200001',6)],[(r['codigo'],r['qtd']) for r in lines])
         direct=resolver_composicao_final([{'codigo':'10200001','qtd':4}],graph)
         self.assertEqual([('10200001',4)],[(r['codigo'],r['qtd']) for r in direct])
-        self.assertEqual(1,len(graph['10200001']))
+        self.assertEqual(4,len(graph['10200001']))
 
     def setUp(self):
         self.app=Flask(__name__,template_folder=str(Path(__file__).resolve().parents[1]/'compras_app/templates'))
@@ -53,8 +56,9 @@ class ExternalStockTests(unittest.TestCase):
             self.assertEqual(403,self.client.get('/api/erp/external-stock').status_code)
             self.assertEqual(403,self.client.get('/erp/baixa-externa').status_code)
 
-    def test_classification_has_only_five_user_supplied_foam_skus(self):
-        self.assertEqual({'10220272','10220273','10220274','10220275','10220276'},EXTERNAL_MATERIAL_SKUS)
+    def test_classification_has_five_foams_and_three_user_supplied_fabrics(self):
+        self.assertEqual({'10220272','10220273','10220274','10220275','10220276',
+                          '10220269','10220270','10280062'},EXTERNAL_MATERIAL_SKUS)
 
 
 if __name__=='__main__':unittest.main()
