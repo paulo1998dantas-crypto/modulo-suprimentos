@@ -2,6 +2,24 @@
 
 ## Preparação
 
+### Bancos
+
+Na categoria **20 - BANCOS**, o grupo oficial do cadastro define o destino:
+
+- **30 - CONJUNTO / KIT**: PREPARAÇÃO, como referência do CJ Banco.
+- **10 - INSUMO**: EXPEDIÇÃO, inclusive descrições com trilho ou reforço.
+
+O CJ Banco não propaga seu destino automático aos seus componentes. Assim,
+bancos unitários, capas e demais insumos não vão para preparação apenas por
+pertencerem ao conjunto. Uma regra própria de outra categoria (por exemplo,
+reforço ou PP) continua válida. O banco insumo permanece em expedição mesmo
+quando outra origem do seu consumo está em preparação. A escolha manual da
+própria linha continua prevalecendo, inclusive NULO e faturamento direto.
+
+Categoria/grupo prevalecem sobre o prefixo do SKU. O prefixo é usado apenas
+como compatibilidade quando faltam metadados no legado. Os demais grupos
+da categoria e as demais categorias conservam suas regras anteriores.
+
 O destino sugerido é PREPARAÇÃO para todo cadastro do grupo PP (grupo estrutural
 20, Produto Processo/Produto em Processo ou PP) e para descrições com a palavra
 PP. A regra vale para cadastros atuais e futuros, sem uma lista fixa de SKUs.
@@ -12,7 +30,8 @@ isolamento, acabamento, teto e bancos continuam válidas.
 O pacote de um pai de preparação acompanha seu destino em todos os níveis da
 composição salva, mesmo que os componentes não tenham essas palavras-chave.
 A filtragem da via de preparação usa o destino resolvido, sem eliminar novamente
-matérias-primas, itens indiretos ou componentes dos conjuntos de bancos.
+matérias-primas ou itens indiretos. A exceção de herança do CJ Banco é resolvida
+antes do filtro, com a mesma regra no navegador e no servidor.
 Não reexpande nem substitui a composição editada pela engenharia vigente.
 
 Uma escolha manual da linha prevalece sobre a sugestão. Uma alteração manual

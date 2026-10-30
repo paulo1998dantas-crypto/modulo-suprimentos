@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'compras_app'))
 os.environ['SUPRIMENTOS_FILE_LOG'] = '0'
 from os_setores import (enriquecer_composicao, propagar_setor_preparacao,
                        filtrar_linhas_preparacao, filtrar_linhas_documento_os,
-                       linhas_layout_preparacao)
+                       linhas_layout_preparacao, classificar_item)
 from composicao import expandir_composicao_itens, expandir_composicao_manual
 from app import _parse_os_composition_form
 
@@ -71,3 +71,30 @@ def test_nulo_no_form_legado_e_layout_respeita_mudanca_manual_do_pai():
         'os_comp_qtd[]':'2', 'os_comp_setor[]':'NULO', 'os_comp_setor_manual[]':'1'}))
     assert parsed[0]['setor'] == 'NULO'
     assert linhas_layout_preparacao([{'codigo':'20140001','qtd':2}], {}, parsed) == []
+
+
+def test_layout_bancos_inclui_so_conjunto_e_preserva_escolha_manual():
+    catalogo = {
+        'CJ': {'categoria':'20 - BANCOS','grupo':'30 - CONJUNTO / KIT'},
+        'BCO': {'categoria':'20 - BANCOS','grupo':'10 - INSUMO','descricao':'BCO C/ TRILHO'},
+    }
+    itens = [{'codigo':'CJ','qtd':1}, {'codigo':'BCO','qtd':3}]
+    assert classificar_item({'codigo':'BCO',**catalogo['BCO']}) == 'EXPEDICAO'
+    layout = linhas_layout_preparacao(itens, catalogo)
+    assert [r['codigo'] for r in layout] == ['CJ']
+    assert layout[0]['regra_preparacao'] == 'CJ_BANCOS'
+    assert linhas_layout_preparacao(itens, catalogo, [
+        {'codigo':'CJ','setor':'EXPEDICAO','setor_manual':True}
+    ]) == []
+
+
+def test_banco_reclassificado_limpa_regra_herdada_sem_alterar_quantidade():
+    rows = [{'codigo':'BCO','item':'PP','categoria':'20 - BANCOS','grupo':'10 - INSUMO',
+             'setor':'PREPARACAO','setor_manual':False,'regra_preparacao':'HERDADO',
+             'qtd':2.5,'line_id':'linha-original','level':2}]
+    original = copy.deepcopy(rows)
+    result = propagar_setor_preparacao(rows, {'PP':{'grupo':'PP'}})
+    assert result[0]['setor'] == 'EXPEDICAO'
+    assert 'regra_preparacao' not in result[0]
+    assert result[0]['qtd'] == 2.5 and result[0]['line_id'] == 'linha-original'
+    assert rows == original

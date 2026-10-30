@@ -94,6 +94,75 @@ def test_pacote_nulo_so_no_relatorio_e_pp_todo_na_preparacao(tmp_path):
         workbook.close()
 
 
+def test_pacote_cj_banco_preparacao_insumos_e_capas_expedicao(tmp_path):
+    catalog = {
+        'TRANSF': {'descricao': 'TRANSFORMACAO TESTE', 'unidade': 'un'},
+        '30200036': {'descricao': 'CJ BANCO TESTE', 'categoria': '20 - BANCOS',
+                     'grupo': '30 - CONJUNTO / KIT', 'unidade': 'cj'},
+        '10200083': {'descricao': 'BCO TESTE C/TRILHO', 'categoria': '20 - BANCOS',
+                     'grupo': '10 - INSUMO', 'unidade': 'pc'},
+        '10220001': {'descricao': 'CAPA TESTE', 'categoria': '22 - PECAS BCO',
+                     'grupo': '10 - INSUMO', 'unidade': 'pc'},
+    }
+    bom = {
+        'TRANSF': [{'codigo': '30200036', 'quantidade': 1}],
+        '30200036': [{'codigo': '10200083', 'quantidade': 3}],
+        '10200083': [{'codigo': '10220001', 'quantidade': 2}],
+    }
+    original = copy.deepcopy(bom)
+    material_dir = tmp_path / 'materials'
+    material_dir.mkdir()
+    values = [
+        (application, 'login_enabled', False), (application, 'can', True),
+        (application, 'shared_rbac_enabled', False),
+        (application.supabase_data, 'enabled', False), (supabase_catalog, 'enabled', False),
+        (application, 'atualizar_skus_automatico', {}),
+        (application, 'carregar_os_fornecedores', {}),
+        (application, 'carregar_os_produtos', catalog), (application, 'carregar_produtos', catalog),
+        (application, 'carregar_os_componentes', bom),
+        (application, 'carregar_regras_popup_item', []), (application, 'carregar_os_processos', {}),
+        (application, 'carregar_relacoes_processo_item', {}), (application, 'get_bom_dir', ''),
+        (application, 'limpar_importacao', None), (application, '_preparar_transformacao_documento_os', None),
+        (application, 'pasta_os', str(material_dir)),
+    ]
+    with ExitStack() as stack:
+        for target, name, value in values:
+            stack.enter_context(patch.object(target, name, return_value=value))
+        register = stack.enter_context(patch.object(application, 'registrar_historico', return_value={'id': 'TESTE'}))
+        application.app.config.update(TESTING=True)
+        response = application.app.test_client().post('/gerar_os', data={
+            'acao': 'imprimir', 'os_numero': 'TESTE', 'os_codigo[]': 'TRANSF', 'os_qtd[]': '1'})
+    assert response.status_code == 200
+    assert bom == original
+    expected = {'30200036': (1, 'PREPARACAO'), '10200083': (3, 'EXPEDICAO'),
+                '10220001': (6, 'EXPEDICAO')}
+    composition = {line['codigo']: line for line in register.call_args.kwargs['composicao']}
+    assert set(composition) == set(expected)
+    for sku, (qtd, setor) in expected.items():
+        assert composition[sku]['qtd'] == qtd
+        assert composition[sku]['setor'] == setor
+    with zipfile.ZipFile(io.BytesIO(response.data)) as package:
+        docs = {}
+        for name in package.namelist():
+            if name.endswith('.docx'):
+                doc = Document(io.BytesIO(package.read(name)))
+                docs[name] = '\n'.join(cell.text for table in doc.tables for row in table.rows for cell in row.cells)
+        preparation = next(text for name, text in docs.items() if 'PREPARA' in name.upper())
+        shipping = next(text for name, text in docs.items() if 'EXPEDI' in name.upper())
+        assert 'CJ BANCO TESTE' in preparation and 'CJ BANCO TESTE' not in shipping
+        for sku in ('10200083', '10220001'):
+            assert sku in shipping and sku not in preparation
+        workbook_name = next(name for name in package.namelist() if name.endswith('.xlsx'))
+        workbook = load_workbook(io.BytesIO(package.read(workbook_name)), read_only=True)
+        rows = list(workbook['Requisicao'].values)
+        data = [dict(zip(rows[1], row)) for row in rows[2:]]
+        data = {row['CODIGO']: row for row in data}
+        for sku, (qtd, setor) in expected.items():
+            assert data[sku]['SETOR'] == setor
+            assert float(str(data[sku]['QTD']).replace(',', '.')) == qtd
+        workbook.close()
+
+
 def test_docx_nao_imprime_nulo_manual_nem_recalcula_composicao():
     from gerar_os import gerar_os_docx
     rows = [{'codigo':'SKU-OCULTO', 'descricao':'NÃO IMPRIMIR', 'qtd':7, 'setor':'NULO', 'setor_manual':True}]

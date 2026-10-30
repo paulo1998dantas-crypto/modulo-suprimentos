@@ -153,7 +153,7 @@ class PreparacaoFilterTests(unittest.TestCase):
         self.assertIn("10440013", codigos)
         self.assertIn("10280050", codigos)
 
-    def test_preparacao_mantem_todo_pacote_do_pai_inclusive_cj_bancos(self):
+    def test_componentes_de_cj_bancos_com_regra_propria_de_preparacao_permanecem(self):
         catalogo = {
             "30200036": {
                 "descricao": "CJ BANCOS REC LE 3,3 EXECUTIVO",

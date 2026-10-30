@@ -53,6 +53,32 @@ def _eh_cj_teto(codigo, grupo, descricao):
     )
 
 
+def _destino_bancos(item_info):
+    """Usa categoria/grupo oficiais; o SKU é fallback apenas do legado."""
+    info = item_info or {}
+    categoria = normalizar_texto(info.get("categoria", ""))
+    grupo = normalizar_texto(info.get("grupo", ""))
+    codigo = normalizar_codigo(info.get("codigo", ""))
+    descricao = normalizar_texto(info.get("descricao", ""))
+    banco = bool(re.match(r"^20\b", categoria) or categoria in {"BANCO", "BANCOS"})
+    if not categoria:
+        banco = (len(codigo) == 8 and codigo.isdigit() and codigo[2:4] == "20"
+                 and bool(re.search(r"\b(?:BCO|BANCOS?)\b", descricao)))
+    if not banco:
+        return None
+    if grupo:
+        if re.match(r"^30\b", grupo) or grupo in {"CJ", "CONJUNTO", "KIT", "CONJUNTO / KIT"}:
+            return SETOR_PREPARACAO
+        if re.match(r"^10\b", grupo) or grupo == "INSUMO":
+            return SETOR_EXPEDICAO
+        return None
+    if codigo.startswith("30"):
+        return SETOR_PREPARACAO
+    if codigo.startswith("10"):
+        return SETOR_EXPEDICAO
+    return None
+
+
 def classificar_item(item_info):
     categoria = normalizar_texto((item_info or {}).get("categoria", ""))
     grupo = normalizar_texto((item_info or {}).get("grupo", ""))
@@ -61,6 +87,11 @@ def classificar_item(item_info):
     referencia = f"{categoria} {grupo} {descricao}"
     if codigo in CODIGOS_DESTINO_NULO:
         return SETOR_NULO
+    destino_bancos = _destino_bancos(item_info)
+    if destino_bancos is not None:
+        if classificar_tipo_requisicao(item_info) == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
+            return SETOR_FATURAMENTO_DIRETO
+        return destino_bancos
     if _regra_preparacao_obrigatoria(item_info):
         return SETOR_PREPARACAO
     if classificar_tipo_requisicao(item_info) == TIPO_REQUISICAO_FATURAMENTO_DIRETO:
@@ -240,6 +271,9 @@ def _regra_preparacao(linha, catalogo=None):
     descricao = normalizar_texto(info.get("descricao", ""))
     referencia = f"{categoria} {grupo} {descricao}"
 
+    destino_bancos = _destino_bancos(info)
+    if destino_bancos is not None:
+        return "CJ_BANCOS" if destino_bancos == SETOR_PREPARACAO else ""
     obrigatoria = _regra_preparacao_obrigatoria(info)
     if obrigatoria:
         return obrigatoria
@@ -322,7 +356,9 @@ def propagar_setor_preparacao(linhas, catalogo=None, componentes=None):
     """Resolve pelo snapshot editado da O.S., nunca reinclui itens da B.O.M.
 
     Destino manual vence o padrão; filhos acompanham preparação e alterações
-    manuais de um pai. NULO esconde só sua linha. F.D. conserva o fluxo próprio.
+    manuais de um pai. CJ Banco não transmite preparação automática aos seus
+    componentes; banco insumo mantém expedição, salvo edição da própria linha.
+    NULO esconde só sua linha. F.D. conserva o fluxo próprio.
     """
     linhas = [dict(linha or {}) for linha in (linhas or [])]
     por_codigo = {normalizar_codigo(linha.get("codigo", "")): linha for linha in linhas}
@@ -343,12 +379,19 @@ def propagar_setor_preparacao(linhas, catalogo=None, componentes=None):
             return automatico, False
         if automatico in {SETOR_NULO, SETOR_FATURAMENTO_DIRETO}:
             return automatico, False
+        if _destino_bancos(info) == SETOR_EXPEDICAO:
+            return SETOR_EXPEDICAO, False
         pais = [linha.get("item", ""), *(linha.get("pais_origem") or [])]
         destinos_pais = []
         for valor in pais:
             pai = normalizar_codigo(valor)
             if pai and pai != codigo:
-                destinos_pais.append(resolver(pai, visitados | {codigo}))
+                destino_pai = resolver(pai, visitados | {codigo})
+                info_pai = _info_linha(por_codigo.get(pai, {"codigo": pai}), catalogo)
+                if (_destino_bancos(info_pai) == SETOR_PREPARACAO
+                        and not destino_pai[1]):
+                    continue
+                destinos_pais.append(destino_pai)
         manuais = [destino for destino, manual in destinos_pais
                    if manual and destino in {SETOR_PREPARACAO, SETOR_EXPEDICAO}]
         if manuais:
@@ -369,6 +412,8 @@ def propagar_setor_preparacao(linhas, catalogo=None, componentes=None):
         regra = _regra_preparacao(linha, catalogo)
         if setor == SETOR_PREPARACAO:
             linha["regra_preparacao"] = regra or "HERDADO"
+        else:
+            linha.pop("regra_preparacao", None)
     return linhas
 
 

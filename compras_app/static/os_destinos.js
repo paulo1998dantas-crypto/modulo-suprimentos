@@ -16,19 +16,37 @@
     result.codigo = codigo(line.codigo);
     return result;
   }
+  function destinoBancos(item) {
+    const categoria = texto(item.categoria), grupo = texto(item.grupo), cod = codigo(item.codigo);
+    const descricao = texto(item.descricao || item.nome);
+    const banco = categoria ? /^20\b/.test(categoria) || ['BANCO', 'BANCOS'].includes(categoria)
+      : /^\d{8}$/.test(cod) && cod.slice(2, 4) === '20' && /\b(?:BCO|BANCOS?)\b/.test(descricao);
+    if (!banco) return null;
+    if (grupo) {
+      if (/^30\b/.test(grupo) || ['CJ', 'CONJUNTO', 'KIT', 'CONJUNTO / KIT'].includes(grupo)) return 'PREPARACAO';
+      if (/^10\b/.test(grupo) || grupo === 'INSUMO') return 'EXPEDICAO';
+      return null;
+    }
+    if (cod.startsWith('30')) return 'PREPARACAO';
+    if (cod.startsWith('10')) return 'EXPEDICAO';
+    return null;
+  }
   function classificar(line, catalogo) {
     const item = info(line || {}, catalogo);
     const cod = item.codigo, grupo = texto(item.grupo), categoria = texto(item.categoria);
     const descricao = texto(item.descricao || item.nome), referencia = `${categoria} ${grupo} ${descricao}`;
     if (nulos.has(cod)) return 'NULO';
-    if (cod.startsWith('20') || /^20\b/.test(grupo) || /\bPP\b|\bPRODUTO(?: EM)? PROCESSO\b/.test(grupo)
-        || /\bPP\b/.test(descricao) || /\bCJ MOVE(?:L|IS)\b/.test(descricao)
-        || /^MP (?:PASSADEIRA\b|CHAPA (?:DE )?COMPENSADO\b)/.test(descricao)) return 'PREPARACAO';
-    if ([descricao, categoria, grupo, item.tipo_requisicao, item.setor].some(value => {
+    const banco = destinoBancos(item);
+    const fd = [descricao, categoria, grupo, item.tipo_requisicao, item.setor].some(value => {
       const tokens = texto(value).match(/[A-Z0-9]+/g) || [];
       return tokens.some((token, i) => token === 'FD' || token === 'F' && tokens[i + 1] === 'D'
         || token === 'FATURAMENTO' && tokens[i + 1] === 'DIRETO');
-    })) return 'F.D';
+    });
+    if (banco !== null) return fd ? 'F.D' : banco;
+    if (cod.startsWith('20') || /^20\b/.test(grupo) || /\bPP\b|\bPRODUTO(?: EM)? PROCESSO\b/.test(grupo)
+        || /\bPP\b/.test(descricao) || /\bCJ MOVE(?:L|IS)\b/.test(descricao)
+        || /^MP (?:PASSADEIRA\b|CHAPA (?:DE )?COMPENSADO\b)/.test(descricao)) return 'PREPARACAO';
+    if (fd) return 'F.D';
     const ppOuCj = ['20', '30'].includes(cod.slice(0, 2)) || /CONJUNTO|KIT|PRODUTO EM PROCESSO/.test(grupo);
     if (descricao.startsWith('CJ TETO') && ppOuCj) return 'PREPARACAO';
     if (/TRILHO|REFORCO|ISOLAMENTO/.test(referencia)) return 'PREPARACAO';
@@ -49,9 +67,14 @@
       const automatico = classificar(line, catalogo);
       if (manual(line) && validos.has(line.setor)) return [line.setor, true];
       if (visitados.has(cod) || ['NULO', 'F.D'].includes(automatico)) return [automatico, false];
+      if (destinoBancos(info(line, catalogo)) === 'EXPEDICAO') return ['EXPEDICAO', false];
       const proximos = new Set([...visitados, cod]);
       const pais = [line.item, ...(Array.isArray(line.pais_origem) ? line.pais_origem : [])]
-        .map(codigo).filter(pai => pai && pai !== cod).map(pai => resolver(pai, proximos));
+        .map(codigo).filter(pai => pai && pai !== cod).map(pai => {
+          const destino = resolver(pai, proximos);
+          const paiInfo = info(porCodigo.get(pai) || {codigo: pai}, catalogo);
+          return destinoBancos(paiInfo) === 'PREPARACAO' && !destino[1] ? null : destino;
+        }).filter(Boolean);
       const manuais = pais.filter(([destino, editado]) => editado && ['PREPARACAO', 'EXPEDICAO'].includes(destino));
       const resolved = manuais.length
         ? [manuais.some(([destino]) => destino === 'PREPARACAO') ? 'PREPARACAO' : 'EXPEDICAO', true]
@@ -63,6 +86,7 @@
       line.setor = resolver(codigo(line.codigo), new Set(), line)[0];
       line.setor_origem = line.setor;
       line.tipo_requisicao = line.setor === 'F.D' ? 'FATURAMENTO DIRETO' : 'MATERIAL';
+      if (line.setor !== 'PREPARACAO') delete line.regra_preparacao;
     });
     return result;
   }
