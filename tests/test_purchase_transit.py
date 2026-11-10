@@ -64,19 +64,30 @@ class PurchaseTransitTests(unittest.TestCase):
         book.close()
         response.close()
 
-    def test_export_failure_returns_error_instead_of_partial_workbook(self):
+    def test_cyclic_composition_returns_error_instead_of_partial_workbook(self):
         row = dict(sku_codigo='30009999', quantidade_pedida=1, quantidade_recebida=0, quantidade_pendente=1)
         catalog = {'30009999': dict(descricao='CJ sem composição', unidade='cj', grupo='30')}
         with patch.object(app_module, 'login_enabled', return_value=False), \
              patch.object(app_module, 'erp_feature_enabled', return_value=True), \
              patch.object(app_module, 'can', return_value=True), \
              patch.object(app_module.supabase_data, 'carregar_compras_transito', return_value=[row]), \
-             patch('purchase_transit_export.load_current_graph', return_value=(catalog, [])):
+             patch('purchase_transit_export.load_current_graph', return_value=(catalog, [
+                 dict(parent_sku='30009999', component_sku='30009999', quantidade=1)])):
             response = self.client.get('/erp/relatorios/compras-transito.xlsx')
         self.assertEqual(400, response.status_code)
         self.assertIn('30009999', response.get_json()['error'])
         self.assertFalse(response.get_json()['ok'])
         self.assertNotIn('attachment', response.headers.get('Content-Disposition', ''))
+
+    def test_no_composition_exports_original_item_with_original_quantities(self):
+        from purchase_transit_export import project_transit_rows
+        row = dict(sku_codigo='30009999', descricao_original='CJ sem composição', unidade='cj',
+                   quantidade_pedida=10, quantidade_recebida=4, quantidade_pendente=6)
+        catalog = {'30009999': dict(descricao='CJ sem composição', unidade='cj', grupo='30')}
+        result = project_transit_rows([row], catalog, [])
+        self.assertEqual('30009999', result[0]['sku_codigo'])
+        self.assertEqual((10, 4, 6), tuple(result[0][k] for k in
+                         ('quantidade_pedida', 'quantidade_recebida', 'quantidade_pendente')))
 
     def test_purchase_discount_is_per_piece_before_tax_and_keeps_legacy_mode(self):
         self.assertAlmostEqual(
