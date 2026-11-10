@@ -9213,7 +9213,9 @@ def erp_purchase_orders_transit():
 @permission_required("suprimentos.purchase.export")
 def erp_purchase_orders_transit_report():
     try:
+        from purchase_transit_export import export_transit_rows
         rows = supabase_data.carregar_compras_transito(force=True)
+        rows = export_transit_rows(rows)
         wb = _purchase_transit_workbook(rows)
         output = io.BytesIO()
         wb.save(output)
@@ -9222,12 +9224,15 @@ def erp_purchase_orders_transit_report():
     except Exception as exc:
         app.logger.exception("Falha ao exportar compras em transito")
         return jsonify({"ok": False, "error": str(exc)}), 400
-    return send_file(
+    response = send_file(
         output,
         as_attachment=True,
         download_name=f"Compras_Transito_Pendente_{date.today().isoformat()}.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        max_age=0,
     )
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
 
 @app.route("/api/erp/purchase-orders", methods=["POST"])

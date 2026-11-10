@@ -26,6 +26,55 @@ class PurchaseTransitTests(unittest.TestCase):
         app_module.app.config.update(TESTING=True)
         self.client = app_module.app.test_client()
 
+    def test_export_download_contains_pieces_and_atomic_banks_with_proportional_receipts(self):
+        row = dict(numero_oc='2810', numero_linha=11, fornecedor_nome='Fornecedor',
+                   sku_codigo='30120029', descricao_original='CJ teste', unidade='cj',
+                   quantidade_pedida=10, quantidade_recebida=4, quantidade_pendente=6,
+                   data_necessidade='2026-11-23', destino='O.S. 3246', status='PARCIALMENTE_RECEBIDA')
+        catalog = {
+            '30120029': dict(descricao='CJ teste', unidade='cj', grupo='30'),
+            'GLASS': dict(descricao='VIDRO teste', unidade='pc', grupo='10'),
+            'BANK': dict(descricao='BCO RECLINAVEL', unidade='pc', grupo='30'),
+        }
+        edges = [dict(parent_sku='30120029', component_sku='GLASS', quantidade=2),
+                 dict(parent_sku='30120029', component_sku='BANK', quantidade=1),
+                 dict(parent_sku='BANK', component_sku='FOAM', quantidade=3)]
+        with patch.object(app_module, 'login_enabled', return_value=False), \
+             patch.object(app_module, 'erp_feature_enabled', return_value=True), \
+             patch.object(app_module, 'can', return_value=True), \
+             patch.object(app_module.supabase_data, 'carregar_compras_transito', return_value=[row]) as source, \
+             patch('purchase_transit_export.load_current_graph', return_value=(catalog, edges)):
+            response = self.client.get('/erp/relatorios/compras-transito.xlsx')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('no-store', response.headers['Cache-Control'])
+        source.assert_called_once_with(force=True)
+        book = load_workbook(io.BytesIO(response.data), read_only=True)
+        self.assertEqual(['Transito pendente'], book.sheetnames)
+        values = list(book.active.values)
+        self.assertEqual(14, len(values[0]))
+        self.assertEqual(['GLASS', 'BANK'], [r[3] for r in values[1:]])
+        self.assertEqual((20, 8, 12), values[1][6:9])
+        self.assertEqual((10, 4, 6), values[2][6:9])
+        self.assertEqual(('2810', 11, 'Fornecedor'), values[1][:3])
+        self.assertEqual('O.S. 3246', values[1][12])
+        self.assertEqual('30120029', row['sku_codigo'])
+        book.close()
+        response.close()
+
+    def test_export_failure_returns_error_instead_of_partial_workbook(self):
+        row = dict(sku_codigo='30240037', quantidade_pedida=1, quantidade_recebida=0, quantidade_pendente=1)
+        catalog = {'30240037': dict(descricao='ACESSORIO CJ PME', unidade='cj', grupo='30')}
+        with patch.object(app_module, 'login_enabled', return_value=False), \
+             patch.object(app_module, 'erp_feature_enabled', return_value=True), \
+             patch.object(app_module, 'can', return_value=True), \
+             patch.object(app_module.supabase_data, 'carregar_compras_transito', return_value=[row]), \
+             patch('purchase_transit_export.load_current_graph', return_value=(catalog, [])):
+            response = self.client.get('/erp/relatorios/compras-transito.xlsx')
+        self.assertEqual(400, response.status_code)
+        self.assertIn('30240037', response.get_json()['error'])
+        self.assertFalse(response.get_json()['ok'])
+        self.assertNotIn('attachment', response.headers.get('Content-Disposition', ''))
+
     def test_purchase_discount_is_per_piece_before_tax_and_keeps_legacy_mode(self):
         self.assertAlmostEqual(
             990.00,
@@ -414,6 +463,9 @@ class PurchaseTransitTests(unittest.TestCase):
             patch.object(app_module, "erp_feature_enabled", return_value=True),
             patch.object(app_module, "can", return_value=True),
             patch.object(app_module.supabase_data, "carregar_compras_transito", return_value=rows),
+            patch('purchase_transit_export.load_current_graph', return_value=({
+                'SKU-1': {'descricao': 'Item', 'unidade': 'pc', 'grupo': '10'},
+            }, [])),
         ):
             api_response = self.client.get("/api/erp/purchase-orders/transit")
             export_response = self.client.get("/erp/relatorios/compras-transito.xlsx")
