@@ -71,6 +71,15 @@ _PROCESSO_CAMPOS_EXPLICITOS = (
     "arquivo_processo",
 )
 
+PROCESSO_BANCO_PADRAO = "12 - PROCESSO BANCO - LB MC 3,2,3 - ESJ"
+PROCESSO_ELETRICA1_PADRAO = "PADRÃO - ELÉTRICA 1 - PASSAGEM CHICOTE SALÃO"
+
+
+def _eh_conjunto_banco(codigo):
+    # Grupo 30, categoria 20: inclui os conjuntos atuais e os próximos SKUs.
+    return bool(re.fullmatch(r"3020\d{4}", _normalizar_item_codigo(codigo)))
+
+
 _STOPWORDS_RELACAO = {
     "BOM",
     "B",
@@ -209,6 +218,17 @@ def construir_processo_por_item(produtos=None, processos_disponiveis=None, relac
         conjunto = _resolver_conjunto_por_texto(descricao, processos_disponiveis)
         if conjunto:
             mapa[codigo_norm] = conjunto
+
+    for codigo, info in (produtos or {}).items():
+        codigo_norm = _normalizar_item_codigo(codigo)
+        if not codigo_norm:
+            continue
+        if _eh_conjunto_banco(codigo_norm) and PROCESSO_BANCO_PADRAO in processos_disponiveis:
+            atuais = mapa.get(codigo_norm) or []
+            atuais = atuais if isinstance(atuais, list) else [atuais]
+            mapa[codigo_norm] = list(dict.fromkeys([*atuais, PROCESSO_BANCO_PADRAO]))
+        elif codigo_norm not in mapa and PROCESSO_ELETRICA1_PADRAO in processos_disponiveis:
+            mapa[codigo_norm] = [PROCESSO_ELETRICA1_PADRAO]
 
     return mapa
 
