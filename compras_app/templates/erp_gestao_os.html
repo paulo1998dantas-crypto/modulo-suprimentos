@@ -186,7 +186,7 @@ const date=v=>{if(!v)return '—';const d=new Date(`${onlyDate(v)}T12:00:00`);re
 function message(text,error=false){const box=document.getElementById('message');box.hidden=!text;box.className='message'+(error?' error':'');box.textContent=text||''}
 async function api(url,options={}){const response=await fetch(url,{headers:{'Content-Type':'application/json'},...options});let body={};try{body=await response.json()}catch{}if(!response.ok||body.ok===false)throw new Error(body.error||`Falha na operação (${response.status}).`);return body}
 function optionsWithNotApplicable(values){return [...new Set([...(values||[]),'N/A'])]}
-function selectOptions(name,values,placeholder='Selecione...'){const el=form.elements[name];el.innerHTML=`<option value="">${placeholder}</option>`+optionsWithNotApplicable(values).map(v=>`<option value="${esc(v)}">${v==='N/A'?'N/A — não aplicável':esc(name==='linha'&&v==='LL'?'LL — LUXO':v)}</option>`).join('')}
+function selectOptions(name,values,placeholder='Selecione...'){const el=form.elements[name];el.innerHTML=`<option value="">${placeholder}</option>`+optionsWithNotApplicable(values).map(v=>`<option value="${esc(v)}">${v==='N/A'?'N/A — não aplicável':esc(v)}</option>`).join('')}
 function datalistOptions(id,values){document.getElementById(id).innerHTML=optionsWithNotApplicable(values).map(v=>`<option value="${esc(v)}"></option>`).join('')}
 function loadCatalogFields(){
   selectOptions('vendedor',state.catalogs.vendedores);selectOptions('mercado',state.catalogs.mercados);
